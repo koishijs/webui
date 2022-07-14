@@ -1,17 +1,4 @@
 <template>
-  <h1 class="config-header">
-    <span class="left">
-      <template v-if="current.path">
-        分组<k-alias :current="current"></k-alias>
-      </template>
-      <template v-else>{{ current.label }}</template>
-    </span>
-    <span class="right">
-      <k-button solid @click="addItem(current.path, 'unload', '')">添加插件</k-button>
-      <k-button solid @click="addItem(current.path, 'group', 'group')">添加分组</k-button>
-      <k-button v-if="current.path" solid type="error" @click="removeItem(current.path)">移除分组</k-button>
-    </span>
-  </h1>
   <div class="k-form" v-if="current.config.$isolate?.length">
     <h2>隔离服务</h2>
     <ul>

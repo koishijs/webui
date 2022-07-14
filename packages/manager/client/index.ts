@@ -7,9 +7,19 @@ import Market from './market/index.vue'
 import { overrideCount } from './utils'
 import AddGroup from './icons/add-group.vue'
 import AddPlugin from './icons/add-plugin.vue'
+import TrashCan from './icons/trash-can.vue'
+import Check from './icons/check.vue'
+import Play from './icons/play.vue'
+import Stop from './icons/stop.vue'
+import Save from './icons/save.vue'
 
 icons.register('add-plugin', AddPlugin)
 icons.register('add-group', AddGroup)
+icons.register('trash-can', TrashCan)
+icons.register('check', Check)
+icons.register('play', Play)
+icons.register('stop', Stop)
+icons.register('save', Save)
 
 export default (ctx: Context) => {
   ctx.addView({

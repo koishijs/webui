@@ -152,6 +152,7 @@ export const separator = /(?<!@[\w-]+)\//g
 
 export function addItem(path: string, action: 'group' | 'unload', name: string) {
   const id = Math.random().toString(36).slice(2, 8)
+  if (path === '@global') path = ''
   if (path) path += '/'
   path += name + ':' + id
   send(`manager/${action}`, path)
