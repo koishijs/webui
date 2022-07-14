@@ -8,6 +8,7 @@
     </router-view>
     <div class="loading" v-else v-loading="true" element-loading-text="正在加载数据……"></div>
   </main>
+  <status></status>
   <k-view name="global"></k-view>
 </template>
 
@@ -17,6 +18,7 @@ import { store } from '@koishijs/client'
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 import Navbar from './navbar.vue'
+import Status from './status.vue'
 
 const route = useRoute()
 
@@ -59,7 +61,7 @@ a {
 }
 
 main.layout-main {
-  margin-left: var(--navbar-size);
+  margin-left: var(--navbar-width);
   overflow-y: hidden;
 
   &.sidebar-hidden {

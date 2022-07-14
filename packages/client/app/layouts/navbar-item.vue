@@ -37,7 +37,7 @@ const loaded = computed(() => {
 <style lang="scss">
 
 .navbar-item {
-  height: var(--navbar-size);
+  height: var(--navbar-width);
   display: flex;
   justify-content: center;
   align-items: center;

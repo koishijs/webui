@@ -21,8 +21,10 @@ $white: #ffffff;
   --menu-fg: var(--fg1);
   --hover-bg: var(--bg2);
 
-  --navbar-size: 3.5rem;
+  --navbar-width: 3.5rem;
   --navbar-icon-size: 1.25rem;
+  --title-height: var(--navbar-width);
+  --status-height: 1.5rem;
 
   // breakpoints
   --bp-large: 1440px;

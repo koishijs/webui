@@ -1,5 +1,5 @@
 <template>
-  <nav class="navbar">
+  <nav class="layout-navbar">
     <div class="top">
       <navbar-item v-for="route in getRoutes('top')" :key="route.name" :route="route"></navbar-item>
     </div>
@@ -33,19 +33,19 @@ function toggle() {
 
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 
-nav.navbar {
+nav.layout-navbar {
   position: fixed;
   z-index: 100;
-  top: var(--navbar-size);
-  bottom: 0;
-  width: var(--navbar-size);
+  top: var(--title-height);
+  bottom: var(--status-height);
+  width: var(--navbar-width);
   background-color: var(--card-bg);
-  box-shadow: var(--card-shadow);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  border-right: var(--border) 1px solid;
   transition: var(--color-transition);
 }
 
