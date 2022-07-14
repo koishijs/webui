@@ -1,9 +1,9 @@
 <template>
-  <sidebar v-if="!sidebarHidden"/>
+  <navbar v-if="!sidebarHidden"></navbar>
   <main :class="mainClasses">
     <router-view v-if="loaded" #="{ Component }">
       <keep-alive>
-        <component :is="Component"/>
+        <component :is="Component"></component>
       </keep-alive>
     </router-view>
     <div class="loading" v-else v-loading="true" element-loading-text="正在加载数据……"></div>
@@ -16,7 +16,7 @@
 import { store } from '@koishijs/client'
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
-import Sidebar from './sidebar.vue'
+import Navbar from './navbar.vue'
 
 const route = useRoute()
 
@@ -59,7 +59,7 @@ a {
 }
 
 main.layout-main {
-  margin-left: var(--aside-width);
+  margin-left: var(--navbar-size);
   overflow-y: hidden;
 
   &.sidebar-hidden {
