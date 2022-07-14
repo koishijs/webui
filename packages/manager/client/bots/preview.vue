@@ -7,7 +7,7 @@
     </div>
     <div class="info">
       <div><k-icon name="robot"/>{{ data.username }}</div>
-      <div><k-icon name="layer-group"/>{{ data.platform }}</div>
+      <div><k-icon name="platform"/>{{ data.platform }}</div>
       <div class="cur-frequency">
         <span style="margin-right: 8px">
           <k-icon name="arrow-up"/>
@@ -47,6 +47,8 @@ div.bot {
   padding: 1rem 2rem;
   width: 16rem;
   display: flex;
+  transition: 0.3s ease;
+  border-bottom: 1px solid var(--border);
 
   &.active {
     > div.avatar {

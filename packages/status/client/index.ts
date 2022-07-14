@@ -3,6 +3,7 @@ import {} from '@koishijs/plugin-status/src'
 import LoadChart from './components/load-chart.vue'
 import Home from './index.vue'
 import Charts from './charts'
+import './icons'
 
 export default (ctx: Context) => {
   ctx.install(Charts)
@@ -10,7 +11,7 @@ export default (ctx: Context) => {
   ctx.addPage({
     path: '/',
     name: '仪表盘',
-    icon: 'tachometer',
+    icon: 'activity:gauge',
     order: 1000,
     component: Home,
   })

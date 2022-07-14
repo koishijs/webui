@@ -41,7 +41,7 @@
     "cac": "^6.7.12",
     "cosmokit": "^1.2.1",
     "element-plus": "^2.2.2",
-    "marked": "^4.0.16",
+    "marked": "^4.0.18",
     "sass": "^1.52.1",
     "schemastery": "^3.4.3",
     "vite": "^2.9.9",

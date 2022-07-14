@@ -5,7 +5,7 @@
     </div>
     <div class="bottom">
       <div class="navbar-item" @click="toggle">
-        <k-icon class="menu-icon" :name="isDark ? 'moon' : 'sun'"></k-icon>
+        <k-icon class="menu-icon" :name="'activity:' + (isDark ? 'moon' : 'sun')"></k-icon>
       </div>
       <navbar-item v-for="route in getRoutes('bottom')" :key="route.name" :route="route"></navbar-item>
     </div>

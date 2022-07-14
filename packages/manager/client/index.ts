@@ -1,25 +1,11 @@
-import { Card, Context, icons } from '@koishijs/client'
+import { Card, Context } from '@koishijs/client'
 import type {} from '@koishijs/plugin-manager'
 import Bots from './bots/index.vue'
 import Settings from './settings/index.vue'
 import Dependencies from './deps/index.vue'
 import Market from './market/index.vue'
 import { overrideCount } from './utils'
-import AddGroup from './icons/add-group.vue'
-import AddPlugin from './icons/add-plugin.vue'
-import TrashCan from './icons/trash-can.vue'
-import Check from './icons/check.vue'
-import Play from './icons/play.vue'
-import Stop from './icons/stop.vue'
-import Save from './icons/save.vue'
-
-icons.register('add-plugin', AddPlugin)
-icons.register('add-group', AddGroup)
-icons.register('trash-can', TrashCan)
-icons.register('check', Check)
-icons.register('play', Play)
-icons.register('stop', Stop)
-icons.register('save', Save)
+import './icons'
 
 export default (ctx: Context) => {
   ctx.addView({
@@ -36,7 +22,7 @@ export default (ctx: Context) => {
   ctx.addPage({
     path: '/bots',
     name: '机器人',
-    icon: 'robot',
+    icon: 'activity:robot',
     order: 640,
     authority: 4,
     fields: ['bots'],
@@ -46,7 +32,7 @@ export default (ctx: Context) => {
   ctx.addPage({
     path: '/plugins/:name*',
     name: '插件配置',
-    icon: 'cog',
+    icon: 'activity:plugin',
     order: 630,
     authority: 4,
     fields: ['config', 'packages', 'dependencies'],
@@ -56,7 +42,7 @@ export default (ctx: Context) => {
   ctx.addPage({
     path: '/market',
     name: '插件市场',
-    icon: 'puzzle-piece',
+    icon: 'activity:market',
     order: 620,
     authority: 4,
     fields: ['config', 'market', 'packages'],
@@ -66,7 +52,7 @@ export default (ctx: Context) => {
   ctx.addPage({
     path: '/dependencies',
     name: '依赖管理',
-    icon: 'box-open',
+    icon: 'activity:deps',
     order: 610,
     authority: 4,
     fields: ['market', 'dependencies'],
