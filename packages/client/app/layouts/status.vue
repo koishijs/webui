@@ -9,9 +9,10 @@
 
 .layout-status {
   position: fixed;
+  box-sizing: border-box;
   z-index: 100;
   bottom: 0;
-  height: var(--status-height);
+  height: var(--footer-height);
   left: 0;
   right: 0;
   background-color: var(--card-bg);

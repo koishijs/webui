@@ -1,13 +1,11 @@
 <template>
-  <navbar v-if="!sidebarHidden"></navbar>
-  <main :class="mainClasses">
-    <router-view v-if="loaded" #="{ Component }">
-      <keep-alive>
-        <component :is="Component"></component>
-      </keep-alive>
-    </router-view>
-    <div class="loading" v-else v-loading="true" element-loading-text="正在加载数据……"></div>
-  </main>
+  <navbar></navbar>
+  <router-view v-if="loaded" #="{ Component }">
+    <keep-alive>
+      <component :is="Component"></component>
+    </keep-alive>
+  </router-view>
+  <div class="loading" v-else v-loading="true" element-loading-text="正在加载数据……"></div>
   <status></status>
   <k-view name="global"></k-view>
 </template>
@@ -27,12 +25,12 @@ const loaded = computed(() => {
   return route.meta.fields.every((key) => store[key])
 })
 
-const mainClasses = computed(() => {
-  const result = ['layout-main']
-  result.push('route-' + route.path.slice(1).split('/', 1)[0])
-  if (sidebarHidden.value) result.push('sidebar-hidden')
-  return result
-})
+// const mainClasses = computed(() => {
+//   const result = ['layout-main']
+//   result.push('route-' + route.path.slice(1).split('/', 1)[0])
+//   if (sidebarHidden.value) result.push('sidebar-hidden')
+//   return result
+// })
 
 const sidebarHidden = computed(() => {
   return route.meta.position === 'hidden'
@@ -58,19 +56,6 @@ a {
   color: inherit;
   text-decoration: none;
   transition: color 0.3s ease;
-}
-
-main.layout-main {
-  margin-left: var(--navbar-width);
-  overflow-y: hidden;
-
-  &.sidebar-hidden {
-    margin-left: 0;
-  }
-
-  .loading {
-    height: 100vh;
-  }
 }
 
 p, ul {

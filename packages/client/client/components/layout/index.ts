@@ -1,4 +1,5 @@
 import { App } from 'vue'
+import Layout from './layout.vue'
 import CardAside from './card-aside.vue'
 import CardNumeric from './card-numeric.vue'
 import Card from './card.vue'
@@ -8,6 +9,7 @@ import TabGroup from './tab-group.vue'
 import TabItem from './tab-item.vue'
 
 export default function (app: App) {
+  app.component('k-layout', Layout)
   app.component('k-card-aside', CardAside)
   app.component('k-numeric', CardNumeric)
   app.component('k-card', Card)

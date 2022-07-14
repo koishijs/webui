@@ -5,10 +5,10 @@ $white: #ffffff;
 
 :root {
   --active: #506ae6;
-  --border: #e2e2e4;
+  --border: #e0e4e8;
   --border-dark: #c8c9cc;
   --card-bg: #ffffff;
-  --page-bg: #f2f3f5;
+  --page-bg: #ffffff;
   --card-border: var(--card-bg);
   --card-shadow: 0 6px 10px -4px rgb(0 0 0 / 15%);
   --loading-mask-bg: #f2f3f5bf;
@@ -32,7 +32,7 @@ html.dark {
   --active: #ffffff;
   --border: #4f515cbf;
   --card-bg: #2f3034;
-  --page-bg: #202225;
+  --page-bg: #f6f8fa;
   --card-border: var(--border);
   --loading-mask-bg: #202225bf;
 

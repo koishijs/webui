@@ -37,9 +37,10 @@ function toggle() {
 
 nav.layout-navbar {
   position: fixed;
+  box-sizing: border-box;
   z-index: 100;
-  top: var(--title-height);
-  bottom: var(--status-height);
+  top: var(--header-height);
+  bottom: var(--footer-height);
   width: var(--navbar-width);
   background-color: var(--card-bg);
   display: flex;
