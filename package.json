@@ -5,6 +5,7 @@
   "workspaces": [
     "packages/*"
   ],
+  "packageManager": "yarn@1.22.19",
   "license": "MIT",
   "scripts": {
     "build": "yakumo tsc",

@@ -1,5 +1,5 @@
 import { App } from 'vue'
-import Layout from './layout.vue'
+import Layout from './k-layout.vue'
 import CardAside from './card-aside.vue'
 import CardNumeric from './card-numeric.vue'
 import Card from './card.vue'
