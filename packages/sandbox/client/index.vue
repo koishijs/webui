@@ -1,6 +1,6 @@
 <template>
-  <k-card-aside class="page-sandbox">
-    <template #aside>
+  <k-layout container="page-sandbox">
+    <template #left>
       <div class="card-header k-menu-item" @click="createUser">添加用户</div>
       <div class="user-container">
         <el-scrollbar>
@@ -14,6 +14,7 @@
         </el-scrollbar>
       </div>
     </template>
+
     <div class="card-header">
       <template v-for="(name, key) in panelTypes" :key="key">
         <span class="k-choose-item"
@@ -37,7 +38,7 @@
         </div>
       </template>
     </keep-alive>
-  </k-card-aside>
+  </k-layout>
 </template>
 
 <script lang="ts" setup>
