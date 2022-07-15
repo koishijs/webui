@@ -1,5 +1,5 @@
 <template>
-  <k-layout container-class="darker">
+  <k-layout main="darker">
     <div ref="root" :class="{ insight: true, highlight: tooltip.active }">
       <svg
         ref="svg"

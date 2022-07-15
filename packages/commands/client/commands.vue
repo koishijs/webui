@@ -1,10 +1,10 @@
 <template>
-  <k-card class="page-commands">
+  <k-layout>
     <el-tree :data="store.commands" :props="{ label: 'name' }"></el-tree>
     <template #footer>
       <p>开发中，未来会支持拖动和修改……</p>
     </template>
-  </k-card>
+  </k-layout>
 </template>
 
 <script lang="ts" setup>

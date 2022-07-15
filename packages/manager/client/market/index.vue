@@ -1,5 +1,5 @@
 <template>
-  <k-layout container-class="darker">
+  <k-layout main="darker">
     <el-scrollbar v-if="plugins.length">
       <div class="search-box">
         <k-badge type="success" v-for="(word, index) in words.slice(0, -1)" :key="index" @click="words.splice(index, 1)">{{ word }}</k-badge>
