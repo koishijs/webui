@@ -16,7 +16,7 @@
     <aside class="layout-left" v-if="$slots.left">
       <slot name="left"></slot>
     </aside>
-    <main class="layout-main">
+    <main class="layout-main" :class="main">
       <slot></slot>
     </main>
     <aside class="layout-right" v-if="$slots.right">
@@ -35,8 +35,9 @@ export interface MenuItem {
 }
 
 defineProps<{
-  containerClass: string
-  menu: MenuItem[]
+  main?: string
+  containerClass?: string
+  menu?: MenuItem[]
 }>()
 
 </script>
@@ -112,6 +113,7 @@ defineProps<{
 
   .layout-main {
     flex: 1;
+    overflow: hidden;
   }
 
   &.darker {

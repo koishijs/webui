@@ -1,17 +1,19 @@
 <template>
-  <k-card class="page-logs frameless" scrollbar>
-    <div ref="root" class="logs">
-      <div class="line" :class="{ start: line.includes(hint) }" v-for="line in store.logs">
-        <code v-html="renderLine(line)"></code>
+  <k-layout>
+    <el-scrollbar class="container">
+      <div ref="root" class="logs">
+        <div class="line" :class="{ start: line.includes(hint) }" v-for="line in store.logs">
+          <code v-html="renderLine(line)"></code>
+        </div>
       </div>
-    </div>
-  </k-card>
+    </el-scrollbar>
+  </k-layout>
 </template>
 
 <script lang="ts" setup>
 
 import { watch, ref, nextTick, onMounted } from 'vue'
-import { store, receive } from '@koishijs/client'
+import { store } from '@koishijs/client'
 import Converter from 'ansi_up'
 
 const root = ref<HTMLElement>()
@@ -40,10 +42,9 @@ watch(() => store.logs.length, async () => {
 
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 
-.page-logs {
-  height: calc(100vh - 4rem);
+.container {
   color: var(--terminal-fg);
   background-color: var(--terminal-bg);
 
