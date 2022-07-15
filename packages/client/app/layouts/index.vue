@@ -1,39 +1,28 @@
 <template>
-  <navbar></navbar>
+  <activity-bar></activity-bar>
   <router-view v-if="loaded" #="{ Component }">
     <keep-alive>
       <component :is="Component"></component>
     </keep-alive>
   </router-view>
   <div class="loading" v-else v-loading="true" element-loading-text="正在加载数据……"></div>
-  <status></status>
+  <status-bar></status-bar>
   <k-view name="global"></k-view>
 </template>
 
 <script lang="ts" setup>
 
-import { store } from '@koishijs/client'
+import { store } from './utils'
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
-import Navbar from './navbar.vue'
-import Status from './status.vue'
+import ActivityBar from './activity-bar.vue'
+import StatusBar from './status-bar.vue'
 
 const route = useRoute()
 
 const loaded = computed(() => {
   if (!route.meta.fields) return true
   return route.meta.fields.every((key) => store[key])
-})
-
-// const mainClasses = computed(() => {
-//   const result = ['layout-main']
-//   result.push('route-' + route.path.slice(1).split('/', 1)[0])
-//   if (sidebarHidden.value) result.push('sidebar-hidden')
-//   return result
-// })
-
-const sidebarHidden = computed(() => {
-  return route.meta.position === 'hidden'
 })
 
 </script>

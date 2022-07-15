@@ -9,10 +9,9 @@
 
 <script lang="ts" setup>
 
-import { store } from '@koishijs/client'
 import { computed, PropType } from 'vue'
 import { RouteRecordNormalized } from 'vue-router'
-import { routeCache } from './utils'
+import { routeCache, store } from './utils'
 
 const props = defineProps({
   route: {} as PropType<RouteRecordNormalized>,

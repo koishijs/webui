@@ -3,8 +3,9 @@ import { Dict } from 'koishi'
 import { App, Component, defineComponent, h, markRaw, reactive, ref, Ref, resolveComponent, watch } from 'vue'
 import { createRouter, createWebHistory, RouteRecordNormalized, START_LOCATION } from 'vue-router'
 import { config, Store, store } from './data'
-import install from './components'
+import install, { remove } from './components'
 import Overlay from './components/chat/overlay.vue'
+import * as cordis from 'cordis'
 
 export * from './components'
 export * from './data'
@@ -13,6 +14,7 @@ export default install
 
 // layout api
 
+export type Field = keyof Console.Services
 export type Computed<T> = T | (() => T)
 
 export interface ViewOptions {
@@ -24,7 +26,7 @@ export interface ViewOptions {
 
 export interface PageExtension {
   name: string
-  fields?: (keyof Console.Services)[]
+  fields?: Field[]
   badge?: () => number
 }
 
@@ -43,7 +45,7 @@ export interface PageOptions extends RouteMetaExtension, PageExtension {
 
 declare module 'vue-router' {
   interface RouteMeta extends RouteMetaExtension {
-    fields?: (keyof Console.Services)[]
+    fields?: Field[]
     badge?: (() => number)[]
   }
 }
@@ -56,7 +58,7 @@ export const router = createRouter({
   routes: [],
 })
 
-export const extensions = reactive<Record<string, Context>>({})
+export const extensions = reactive<Dict<cordis.Fork<Context>>>({})
 
 export const routes: Ref<RouteRecordNormalized[]> = ref([])
 
@@ -71,27 +73,23 @@ export function getValue<T>(computed: Computed<T>): T {
   return typeof computed === 'function' ? (computed as any)() : computed
 }
 
-export class Context {
+export interface Context {}
+
+export class Context extends cordis.Context {
   static app: App
   static pending: Dict<DisposableExtension[]> = {}
 
-  public disposables: Disposable[] = []
-
   addView(options: ViewOptions) {
     options.order ??= 0
-    options.id ??= Math.random().toString(36).slice(2)
+    markRaw(options.component)
     const list = views[options.type] ||= []
     const index = list.findIndex(a => a.order < options.order)
-    markRaw(options.component)
     if (index >= 0) {
       list.splice(index, 0, options)
     } else {
       list.push(options)
     }
-    this.disposables.push(() => {
-      const index = list.findIndex(item => item.id === options.id)
-      if (index >= 0) list.splice(index, 1)
-    })
+    return this.state.collect('view', () => remove(list, options))
   }
 
   addPage(options: PageOptions) {
@@ -110,24 +108,21 @@ export class Context {
       },
     })
     routes.value = router.getRoutes()
-    this.disposables.push(() => {
-      dispose()
-      routes.value = router.getRoutes()
-    })
     const route = routes.value.find(r => r.name === name)
     for (const options of Context.pending[name] || []) {
       this.mergeMeta(route, options)
     }
+    return this.state.collect('page', () => {
+      dispose()
+      routes.value = router.getRoutes()
+      return true
+    })
   }
 
   private mergeMeta(route: RouteRecordNormalized, options: DisposableExtension) {
-    const { ctx, fields, badge } = options
+    const { fields, badge } = options
     if (fields) route.meta.fields.push(...fields)
     if (badge) route.meta.badge.push(badge)
-    ctx.disposables.push(() => {
-      const index = route.meta.badge.indexOf(badge)
-      if (index >= 0) route.meta.badge.splice(index, 1)
-    })
   }
 
   extendsPage(options: PageExtension): void
@@ -140,14 +135,6 @@ export class Context {
     } else {
       (Context.pending[name] ||= []).push(options)
     }
-  }
-
-  install(extension: Extension) {
-    extension(this)
-  }
-
-  dispose() {
-    this.disposables.forEach(dispose => dispose())
   }
 }
 
@@ -164,21 +151,22 @@ export function defineExtension(callback: Extension) {
 
 async function loadExtension(path: string) {
   if (extensions[path]) return
-  extensions[path] = new Context()
 
   if (path.endsWith('.css')) {
-    const link = document.createElement('link')
-    link.rel = 'stylesheet'
-    link.href = path
-    document.head.appendChild(link)
-    extensions[path].disposables.push(() => {
-      document.head.removeChild(link)
+    extensions[path] = root.plugin((ctx) => {
+      const link = document.createElement('link')
+      link.rel = 'stylesheet'
+      link.href = path
+      document.head.appendChild(link)
+      ctx.on('dispose', () => {
+        document.head.removeChild(link)
+      })
     })
     return
   }
 
   const exports = await import(/* @vite-ignore */ path)
-  exports.default?.(extensions[path])
+  extensions[path] = root.plugin(exports.default)
 
   const { redirect } = router.currentRoute.value.query
   if (typeof redirect === 'string') {
@@ -228,7 +216,7 @@ router.beforeEach(async (to, from) => {
 // component helper
 
 export namespace Card {
-  export function create(render: Function, fields: readonly (keyof Console.Services)[] = []) {
+  export function create(render: Function, fields: readonly Field[] = []) {
     return defineComponent({
       render: () => fields.every(key => store[key]) ? render() : null,
     })
@@ -238,7 +226,7 @@ export namespace Card {
     icon: string
     title: string
     type?: string
-    fields?: (keyof Console.Services)[]
+    fields?: Field[]
     content: (store: Store) => any
   }
 

@@ -117,10 +117,10 @@ defineProps<{
   .layout-main {
     flex: 1;
     overflow: hidden;
-  }
 
-  &.darker {
-    background-color: #f6f8fa;
+    &.darker {
+      background-color: #f6f8fa;
+    }
   }
 }
 

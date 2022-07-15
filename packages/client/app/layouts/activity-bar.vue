@@ -1,27 +1,30 @@
 <template>
-  <nav class="layout-navbar">
+  <nav class="layout-activity">
     <div class="top">
-      <navbar-item v-for="route in getRoutes('top')" :key="route.name" :route="route"></navbar-item>
+      <activity-item v-for="route in getRoutes('top')" :key="route.name" :route="route"></activity-item>
     </div>
     <div class="bottom">
       <div class="navbar-item" @click="toggle">
         <k-icon class="menu-icon" :name="'activity:' + (isDark ? 'moon' : 'sun')"></k-icon>
       </div>
-      <navbar-item v-for="route in getRoutes('bottom')" :key="route.name" :route="route"></navbar-item>
+      <activity-item v-for="route in getRoutes('bottom')" :key="route.name" :route="route"></activity-item>
     </div>
   </nav>
 </template>
 
 <script lang="ts" setup>
 
-import { routes, getValue } from '@koishijs/client'
+import { routes, getValue, store } from '@koishijs/client'
 import { useDark } from '@vueuse/core'
-import NavbarItem from './navbar-item.vue'
+import ActivityItem from './activity-item.vue'
 
 function getRoutes(position: 'top' | 'bottom') {
   const scale = position === 'top' ? 1 : -1
   return routes.value
-    .filter(r => getValue(r.meta.position) === position)
+    .filter((route) => {
+      const { fields = [] } = route.meta
+      return fields.every(key => store[key]) && getValue(route.meta.position) === position
+    })
     .sort((a, b) => scale * (b.meta.order - a.meta.order))
 }
 
@@ -35,7 +38,7 @@ function toggle() {
 
 <style lang="scss">
 
-nav.layout-navbar {
+nav.layout-activity {
   position: fixed;
   box-sizing: border-box;
   z-index: 100;
