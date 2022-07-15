@@ -1,6 +1,6 @@
 import { Context, Dict, pick, Quester, Schema } from 'koishi'
 import { DataService } from '@koishijs/plugin-console'
-import scan, { AnalyzedPackage, PackageJson, Registry } from '@koishijs/registry'
+import Scanner, { AnalyzedPackage, PackageJson, Registry } from '@koishijs/registry'
 import which from 'which-pm-runs'
 import spawn from 'cross-spawn'
 import { loadManifest } from './utils'
@@ -32,23 +32,20 @@ class MarketProvider extends DataService<Dict<MarketProvider.Data>> {
 
   async prepare() {
     const cwd = this.ctx.app.baseDir
-    let { registry } = this.config
-    if (!registry) {
-      registry = await new Promise<string>((resolve, reject) => {
-        let stdout = ''
-        const agent = which()
-        const key = (agent?.name === 'yarn' && !agent?.version.startsWith('1.')) ? 'npmRegistryServer' : 'registry'
-        const child = spawn(agent?.name || 'npm', ['config', 'get', key], { cwd })
-        child.on('exit', (code) => {
-          if (!code) return resolve(stdout)
-          reject(new Error(`child process failed with code ${code}`))
-        })
-        child.on('error', reject)
-        child.stdout.on('data', (data) => {
-          stdout += data.toString()
-        })
+    const registry = await new Promise<string>((resolve, reject) => {
+      let stdout = ''
+      const agent = which()
+      const key = (agent?.name === 'yarn' && !agent?.version.startsWith('1.')) ? 'npmRegistryServer' : 'registry'
+      const child = spawn(agent?.name || 'npm', ['config', 'get', key], { cwd })
+      child.on('exit', (code) => {
+        if (!code) return resolve(stdout)
+        reject(new Error(`child process failed with code ${code}`))
       })
-    }
+      child.on('error', reject)
+      child.stdout.on('data', (data) => {
+        stdout += data.toString()
+      })
+    })
 
     this.http = this.ctx.http.extend({
       endpoint: registry.trim(),
@@ -64,17 +61,25 @@ class MarketProvider extends DataService<Dict<MarketProvider.Data>> {
       this.flushData()
     })
 
-    tasks.push(scan({
-      version: '4',
-      request: this.http.get,
-      onSuccess: (item) => {
-        const { name, versions } = item
-        this.tempCache[name] = this.fullCache[name] = {
-          ...item,
-          versions: versions.map(item => pick(item, ['version', 'keywords', 'peerDependencies'])),
-        }
-        this.flushData()
-      },
+    const scanner = new Scanner(this.http.get)
+    tasks.push(Promise.resolve().then(async () => {
+      if (this.config.searchRegistry) {
+        scanner.objects = await this.ctx.http.get(this.config.searchRegistry)
+      } else {
+        await scanner.collect()
+      }
+
+      await scanner.analyze({
+        version: '4',
+        onSuccess: (item) => {
+          const { name, versions } = item
+          this.tempCache[name] = this.fullCache[name] = {
+            ...item,
+            versions: versions.map(item => pick(item, ['version', 'keywords', 'peerDependencies'])),
+          }
+          this.flushData()
+        },
+      })
     }))
 
     await Promise.allSettled(tasks)
@@ -87,11 +92,11 @@ class MarketProvider extends DataService<Dict<MarketProvider.Data>> {
 
 namespace MarketProvider {
   export interface Config {
-    registry?: string
+    searchRegistry?: string
   }
 
   export const Config: Schema<Config> = Schema.object({
-    registry: Schema.string().description('用于插件市场搜索和下载的 registry。').default(''),
+    searchRegistry: Schema.string().description('用于搜索插件市场的网址。默认跟随你当前的 npm registry。'),
   }).description('插件市场设置')
 
   export interface Data extends Omit<AnalyzedPackage, 'versions'> {
