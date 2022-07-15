@@ -12,14 +12,14 @@
     </div>
   </header>
 
-  <div class="layout-container" :class="containerClass">
-    <aside class="layout-left" v-if="$slots.left">
+  <div class="layout-container" :class="container">
+    <aside class="layout-left" :class="left" v-if="$slots.left">
       <slot name="left"></slot>
     </aside>
     <main class="layout-main" :class="main">
       <slot></slot>
     </main>
-    <aside class="layout-right" v-if="$slots.right">
+    <aside class="layout-right" :class="right" v-if="$slots.right">
       <slot name="right"></slot>
     </aside>
   </div>
@@ -36,6 +36,9 @@ export interface MenuItem {
 
 defineProps<{
   main?: string
+  left?: string
+  right?: string
+  container?: string
   containerClass?: string
   menu?: MenuItem[]
 }>()

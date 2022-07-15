@@ -1,6 +1,6 @@
 <template>
-  <k-card-aside class="page-chat">
-    <template #aside>
+  <k-layout container="page-chat">
+    <template #left>
       <el-scrollbar>
         <template v-for="({ name, channels }, id) in guilds" :key="id">
           <div class="k-tab-group-title">{{ name }}</div>
@@ -12,7 +12,8 @@
         </template>
       </el-scrollbar>
     </template>
-    <keep-alive #default>
+
+    <keep-alive>
       <template v-if="current" :key="current">
         <div class="card-header">{{ header }}</div>
         <virtual-list :data="filtered" pinned v-model:active-key="index" key-name="messageId">
@@ -32,7 +33,7 @@
         </k-empty>
       </template>
     </keep-alive>
-  </k-card-aside>
+  </k-layout>
 </template>
 
 <script lang="ts" setup>
@@ -113,9 +114,6 @@ function handleSend(content: string) {
 <style lang="scss">
 
 .page-chat {
-  position: relative;
-  height: calc(100vh - 4rem);
-
   aside .el-scrollbar__view {
     padding: 1rem 0;
     line-height: 2.25rem;
