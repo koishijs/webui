@@ -1,54 +1,56 @@
 <template>
-  <div :class="{ highlight: tooltip.active }">
-    <svg
-      ref="svg"
-      id="couple"
-      :width="width - 256"
-      :height="height"
-      :viewBox="`-${width / 2 - 128} -${height / 2} ${width - 256} ${height}`"
-    >
-      <g class="links">
-        <g class="link" v-for="(link, index) in links" :key="index" :class="{ active: subgraph.links.has(link) }">
-          <line
-            :x1="link.source.x"
-            :y1="link.source.y"
-            :x2="link.target.x"
-            :y2="link.target.y"
-            class="shadow"
-            @mouseenter.stop.prevent="onMouseEnterLink(link, $event)"
-            @mouseleave.stop.prevent="onMouseLeaveLink(link, $event)"
-          />
-          <line
-            :x1="link.source.x"
-            :y1="link.source.y"
-            :x2="link.target.x"
-            :y2="link.target.y"
-            :class="link.type"
-          />
+  <k-layout container-class="darker">
+    <div ref="root" :class="{ insight: true, highlight: tooltip.active }">
+      <svg
+        ref="svg"
+        id="couple"
+        :width="width"
+        :height="height"
+        :viewBox="`-${width / 2} -${height / 2} ${width} ${height}`"
+      >
+        <g class="links">
+          <g class="link" v-for="(link, index) in links" :key="index" :class="{ active: subgraph.links.has(link) }">
+            <line
+              :x1="link.source.x"
+              :y1="link.source.y"
+              :x2="link.target.x"
+              :y2="link.target.y"
+              class="shadow"
+              @mouseenter.stop.prevent="onMouseEnterLink(link, $event)"
+              @mouseleave.stop.prevent="onMouseLeaveLink(link, $event)"
+            />
+            <line
+              :x1="link.source.x"
+              :y1="link.source.y"
+              :x2="link.target.x"
+              :y2="link.target.y"
+              :class="link.type"
+            />
+          </g>
         </g>
-      </g>
-      <g class="nodes">
-        <g class="node"
-          v-for="(node, index) in nodes" :key="index"
-          :class="{ active: subgraph.nodes.has(node) }"
-        >
-          <circle
-            :cx="node.x"
-            :cy="node.y"
-            @mouseenter.stop.prevent="onMouseEnterNode(node, $event)"
-            @mouseleave.stop.prevent="onMouseLeaveNode(node, $event)"
-            @mousedown.stop.prevent="onDragStart(node, $event)"
-            @touchstart.stop.prevent="onDragStart(node, $event)"
-          />
+        <g class="nodes">
+          <g class="node"
+            v-for="(node, index) in nodes" :key="index"
+            :class="{ active: subgraph.nodes.has(node) }"
+          >
+            <circle
+              :cx="node.x"
+              :cy="node.y"
+              @mouseenter.stop.prevent="onMouseEnterNode(node, $event)"
+              @mouseleave.stop.prevent="onMouseLeaveNode(node, $event)"
+              @mousedown.stop.prevent="onDragStart(node, $event)"
+              @touchstart.stop.prevent="onDragStart(node, $event)"
+            />
+          </g>
         </g>
-      </g>
-    </svg>
-    <transition name="fade">
-      <div class="tooltip" v-show="tooltip.active" :style="tooltip.style">
-        <div v-for="(line, index) of tooltip.content.split('\n')" :key="index">{{ line }}</div>
-      </div>
-    </transition>
-  </div>
+      </svg>
+      <transition name="fade">
+        <div class="tooltip" v-show="tooltip.active" :style="tooltip.style">
+          <div v-for="(line, index) of tooltip.content.split('\n')" :key="index">{{ line }}</div>
+        </div>
+      </transition>
+    </div>
+  </k-layout>
 </template>
 
 <script lang="ts" setup>
@@ -58,9 +60,10 @@ import { store } from '@koishijs/client'
 import Insight from '../src'
 import * as d3 from 'd3-force'
 import { useTooltip, getEventPoint } from './tooltip'
-import { useEventListener, useWindowSize } from '@vueuse/core'
+import { useElementSize, useEventListener } from '@vueuse/core'
 
-const { width, height } = useWindowSize()
+const root = ref<HTMLElement>()
+const { width, height } = useElementSize(root)
 
 const tooltip = useTooltip()
 const dragged = ref<Node>(null)
@@ -242,6 +245,11 @@ const subgraph = computed<Graph>(() => {
 </script>
 
 <style lang="scss" scoped>
+
+.insight {
+  width: 100%;
+  height: 100%;
+}
 
 g.node {
   circle {
