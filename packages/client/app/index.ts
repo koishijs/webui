@@ -1,7 +1,7 @@
 import { createApp } from 'vue'
-import client, { config, connect, router } from '@koishijs/client'
+import client, { config, connect, root, router } from '@koishijs/client'
 import App from './layouts/index.vue'
-import Blank from './layouts/blank.vue'
+import Home from './layouts/home.vue'
 
 import './index.scss'
 
@@ -11,13 +11,15 @@ app.use(client)
 
 app.provide('ecTheme', 'dark-blue')
 
-router.addRoute({
-  path: '/blank',
-  component: Blank,
-  meta: { fields: [], position: 'hidden' },
-})
-
 app.use(router)
+
+root.addPage({
+  path: '/',
+  name: '欢迎',
+  icon: 'activity:home',
+  order: 1000,
+  component: Home,
+})
 
 router.afterEach((route) => {
   if (typeof route.name === 'string') {

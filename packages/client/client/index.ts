@@ -18,9 +18,14 @@ export type Field = keyof Console.Services
 export type Computed<T> = T | (() => T)
 
 export interface ViewOptions {
-  id?: string
   type: string
   order?: number
+  component: Component
+}
+
+export interface WidgetOptions {
+  id: string
+  type: 'small' | 'medium' | 'large'
   component: Component
 }
 
@@ -51,6 +56,7 @@ declare module 'vue-router' {
 }
 
 export const views = reactive<Record<string, ViewOptions[]>>({})
+export const widgets = reactive<WidgetOptions[]>([])
 
 export const router = createRouter({
   history: createWebHistory(config.uiPath),
@@ -90,6 +96,12 @@ export class Context extends cordis.Context {
       list.push(options)
     }
     return this.state.collect('view', () => remove(list, options))
+  }
+
+  widget(options: WidgetOptions) {
+    markRaw(options.component)
+    widgets.push(options)
+    return this.state.collect('widget', () => remove(widgets, options))
   }
 
   addPage(options: PageOptions) {
@@ -138,7 +150,7 @@ export class Context extends cordis.Context {
   }
 }
 
-const root = new Context()
+export const root = new Context()
 
 root.addView({
   type: 'global',

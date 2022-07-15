@@ -5,8 +5,8 @@ import HistoryChart from './history'
 import HourChart from './hour'
 
 export default (ctx: Context) => {
-  ctx.install(HistoryChart)
-  ctx.install(HourChart)
-  ctx.install(GuildChart)
-  ctx.install(CommandChart)
+  ctx.plugin(HistoryChart)
+  ctx.plugin(HourChart)
+  ctx.plugin(GuildChart)
+  ctx.plugin(CommandChart)
 }

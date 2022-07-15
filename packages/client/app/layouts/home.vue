@@ -1,12 +1,20 @@
 <template>
-  <div class="card-grid profile-grid">
-    <k-view name="numeric"></k-view>
-  </div>
-  <k-view name="home"></k-view>
-  <div class="card-grid chart-grid">
-    <k-view name="chart"></k-view>
-  </div>
+  <k-layout main="darker">
+    <el-scrollbar>
+      <div class="card-grid profile-grid">
+        <k-view name="numeric"></k-view>
+      </div>
+      <k-view name="home"></k-view>
+      <div class="card-grid chart-grid">
+        <k-view name="chart"></k-view>
+      </div>
+    </el-scrollbar>
+  </k-layout>
 </template>
+
+<script lang="ts" setup>
+
+</script>
 
 <style lang="scss">
 

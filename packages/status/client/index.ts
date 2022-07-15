@@ -1,20 +1,10 @@
 import { Card, Context } from '@koishijs/client'
 import {} from '@koishijs/plugin-status/src'
 import LoadChart from './components/load-chart.vue'
-import Home from './index.vue'
 import Charts from './charts'
-import './icons'
 
 export default (ctx: Context) => {
-  ctx.install(Charts)
-
-  ctx.addPage({
-    path: '/',
-    name: '仪表盘',
-    icon: 'activity:gauge',
-    order: 1000,
-    component: Home,
-  })
+  ctx.plugin(Charts)
 
   ctx.addView({
     type: 'numeric',
@@ -29,7 +19,6 @@ export default (ctx: Context) => {
   })
 
   ctx.addView({
-    id: 'database',
     type: 'numeric',
     component: Card.numeric({
       title: '数据库体积',
@@ -41,7 +30,6 @@ export default (ctx: Context) => {
   })
 
   ctx.addView({
-    id: 'assets',
     type: 'numeric',
     component: Card.numeric({
       title: '资源服务器',
