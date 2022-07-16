@@ -1,8 +1,8 @@
 import { App } from 'vue'
-import Button from './button.vue'
-import Choose from './choose.vue'
+import Button from './k-button.vue'
+import Tab from './k-tab.vue'
 
 export default function (app: App) {
   app.component('k-button', Button)
-  app.component('k-choose', Choose)
+  app.component('k-tab', Tab)
 }

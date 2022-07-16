@@ -1,6 +1,6 @@
 <template>
-  <span class="k-choose">
-    <span class="k-choose-item"
+  <span class="k-tab">
+    <span class="k-tab-item"
       v-for="(label, key) in data" :key="key"
       :class="{ active: modelValue === key }"
       @click="$emit('update:modelValue', key)">{{ label }}</span>
@@ -20,7 +20,7 @@ defineEmits(['update:modelValue'])
 
 <style lang="scss">
 
-.k-choose-item {
+.k-tab-item {
   cursor: pointer;
   position: relative;
   color: var(--disabled);

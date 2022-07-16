@@ -11,7 +11,7 @@
     </template>
     <template v-else>
       <h1 v-if="secure">
-        <k-choose :data="['平台账户登录', '用户名密码登录']" v-model="config.authType"></k-choose>
+        <k-tab :data="['平台账户登录', '用户名密码登录']" v-model="config.authType"></k-tab>
       </h1>
       <h1 v-else><span>平台账户登录</span></h1>
       <template v-if="config.authType === 0">
