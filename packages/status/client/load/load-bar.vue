@@ -47,25 +47,26 @@ const caption = computed(() => {
   font-size: 0.9em;
 
   .title {
-    min-width: 3rem;
+    min-width: 3em;
   }
 
   .body {
-    width: 100%;
-    height: 1.2rem;
+    width: 10rem;
+    height: 1rem;
     position: relative;
     display: inline;
     background-color: var(--bg1);
     border-radius: 4px;
     overflow: hidden;
-    transition: color 0.3s ease, background-color 0.3s ease;
+    transition: var(--color-transition);
+    color: var(--fg1);
   }
 
   .bar {
     height: 100%;
     position: relative;
     float: left;
-    transition: 0.3s ease;
+    transition: width 0.3s ease;
   }
 
   .used {
@@ -87,6 +88,7 @@ const caption = computed(() => {
 
   .caption {
     left: 1rem;
+    font-size: 0.9em;
     position: relative;
   }
 

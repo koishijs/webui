@@ -1,10 +1,11 @@
 import { Card, Context } from '@koishijs/client'
 import {} from '@koishijs/plugin-status/src'
-import LoadChart from './components/load-chart.vue'
 import Charts from './charts'
+import Load from './load'
 
 export default (ctx: Context) => {
   ctx.plugin(Charts)
+  ctx.plugin(Load)
 
   ctx.addView({
     type: 'numeric',
@@ -58,10 +59,5 @@ export default (ctx: Context) => {
       fields: ['meta'],
       content: ({ meta }) => meta.activeGuilds,
     }),
-  })
-
-  ctx.addView({
-    type: 'home',
-    component: LoadChart,
   })
 }
