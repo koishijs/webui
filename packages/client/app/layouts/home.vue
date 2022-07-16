@@ -2,8 +2,8 @@
   <k-layout main="darker">
     <el-scrollbar>
       <welcome></welcome>
-      <k-view name="numeric" class="card-grid profile-grid"></k-view>
-      <k-view name="chart" class="card-grid chart-grid"></k-view>
+      <k-slot name="numeric" class="card-grid profile-grid"></k-slot>
+      <k-slot name="chart" class="card-grid chart-grid"></k-slot>
     </el-scrollbar>
   </k-layout>
 </template>

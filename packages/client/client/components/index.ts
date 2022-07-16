@@ -31,7 +31,7 @@ import ChatImage from './chat/image.vue'
 import * as icons from './icons'
 import layout from './layout'
 import notice from './notice'
-import View from './view'
+import Slot from './slot'
 
 import 'element-plus/es/components/button/style/css'
 import 'element-plus/es/components/checkbox/style/css'
@@ -100,5 +100,5 @@ export default function (app: App) {
   app.use(layout)
   app.use(notice)
 
-  app.component('k-view', View)
+  app.component('k-slot', Slot)
 }

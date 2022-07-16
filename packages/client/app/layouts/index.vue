@@ -7,7 +7,7 @@
   </router-view>
   <div class="loading" v-else v-loading="true" element-loading-text="正在加载数据……"></div>
   <status-bar></status-bar>
-  <k-view name="global"></k-view>
+  <k-slot name="global"></k-slot>
 </template>
 
 <script lang="ts" setup>

@@ -10,7 +10,7 @@
       <k-button solid type="error" @click="send('manager/bot-remove', current)">移除实例</k-button>
     </template>
   </h1>
-  <k-view name="manager:bot-prolog" :data="data"></k-view>
+  <k-slot name="manager:bot-prolog" :data="data"></k-slot>
   <k-form :schema="store.protocols[key]" :initial="initial" v-model="data.config" :show-header="true" #prolog>
     <k-schema :instant="!bot" :initial="bot?.adapter" :schema="adapterSchema" v-model="data.adapter" :disabled="!!current">
       <h3>adapter</h3>
@@ -20,9 +20,9 @@
       <h3>protocol</h3>
       <p>选择要使用的协议。</p>
     </k-schema>
-    <k-view name="manager:bot-config" :data="data"></k-view>
+    <k-slot name="manager:bot-config" :data="data"></k-slot>
   </k-form>
-  <k-view name="manager:bot-epilog" :data="data"></k-view> -->
+  <k-slot name="manager:bot-epilog" :data="data"></k-slot> -->
 </template>
 
 <script lang="ts" setup>

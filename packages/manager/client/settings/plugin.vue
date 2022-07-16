@@ -40,7 +40,7 @@
       </template>
     </k-comment>
 
-    <k-view name="manager:settings"></k-view>
+    <k-slot name="manager:settings"></k-slot>
 
     <!-- schema -->
     <k-comment v-if="!local.schema" type="warning">
