@@ -21,6 +21,8 @@
   justify-content: space-between;
   border-top: var(--border) 1px solid;
   transition: var(--color-transition);
+  font-size: 0.875rem;
+  line-height: var(--footer-height);
 }
 
 </style>
