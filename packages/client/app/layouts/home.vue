@@ -1,18 +1,16 @@
 <template>
   <k-layout main="darker">
     <el-scrollbar>
-      <div class="card-grid profile-grid">
-        <k-view name="numeric"></k-view>
-      </div>
-      <k-view name="home"></k-view>
-      <div class="card-grid chart-grid">
-        <k-view name="chart"></k-view>
-      </div>
+      <welcome></welcome>
+      <k-view name="numeric" class="card-grid profile-grid"></k-view>
+      <k-view name="chart" class="card-grid chart-grid"></k-view>
     </el-scrollbar>
   </k-layout>
 </template>
 
 <script lang="ts" setup>
+
+import Welcome from './welcome.vue'
 
 </script>
 

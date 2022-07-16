@@ -7,6 +7,6 @@ export default defineComponent({
     data: {},
   },
   setup: () => ({ name, data }) => {
-    return (views[name] || []).map(view => h(view.component as any, { data }))
+    return h('div', (views[name] || []).map(view => h(view.component as any, { data })))
   },
 })
