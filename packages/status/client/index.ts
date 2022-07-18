@@ -1,10 +1,12 @@
 import { Card, Context } from '@koishijs/client'
 import {} from '@koishijs/plugin-status/src'
 import Charts from './charts'
+import Bots from './bots'
 import Load from './load'
 
 export default (ctx: Context) => {
   ctx.plugin(Charts)
+  ctx.plugin(Bots)
   ctx.plugin(Load)
 
   ctx.addView({

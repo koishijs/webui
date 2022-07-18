@@ -1,19 +1,16 @@
 import { Context, Schema } from 'koishi'
 import { resolve } from 'path'
 import Installer from './installer'
-import BotProvider from './bots'
 import MarketProvider from './market'
 import PackageProvider from './packages'
 import ConfigWriter from './writer'
 
-export * from './bots'
 export * from './market'
 export * from './packages'
 export * from './writer'
 
 export {
   Installer,
-  BotProvider,
   MarketProvider,
   PackageProvider,
   ConfigWriter,
@@ -23,7 +20,6 @@ declare module '@koishijs/plugin-console' {
   namespace Console {
     interface Services {
       dependencies: Installer
-      bots: BotProvider
       market: MarketProvider
       packages: PackageProvider
       config: ConfigWriter
@@ -46,7 +42,6 @@ export function apply(ctx: Context, config: Config) {
   }
 
   ctx.plugin(Installer)
-  ctx.plugin(BotProvider)
   ctx.plugin(MarketProvider, config)
   ctx.plugin(PackageProvider)
   ctx.plugin(ConfigWriter)

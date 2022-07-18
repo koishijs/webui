@@ -29,6 +29,7 @@ class SandboxBot extends Bot {
   static using = ['console'] as const
 
   username = 'koishi'
+  hidden = true
 
   constructor(public ctx: Context, config: SandboxBot.Config) {
     super(ctx, {

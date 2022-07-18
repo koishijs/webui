@@ -1,5 +1,5 @@
 <template>
-  <div class="bot k-menu-item">
+  <div class="bot">
     <div class="avatar" :style="{ backgroundImage: `url(${data.avatar})` }" @click="$emit('avatar-click')">
       <el-tooltip :content="statusNames[data.status]">
         <div :class="['status', data.status, { error: data.error }]"></div>
@@ -25,7 +25,7 @@
 <script lang="ts" setup>
 
 import type { Bot } from 'koishi'
-import type { BotProvider } from '@koishijs/plugin-manager'
+import type { ProfileProvider } from '@koishijs/plugin-status/src'
 
 const statusNames: Record<Bot.Status, string> = {
   online: '运行中',
@@ -36,7 +36,7 @@ const statusNames: Record<Bot.Status, string> = {
 }
 
 defineProps<{
-  data: BotProvider.Data
+  data: ProfileProvider.BotData
 }>()
 
 </script>
@@ -48,7 +48,10 @@ div.bot {
   width: 16rem;
   display: flex;
   transition: 0.3s ease;
-  border-bottom: 1px solid var(--border);
+
+  & + & {
+    border-top: 1px solid var(--border);
+  }
 
   &.active {
     > div.avatar {

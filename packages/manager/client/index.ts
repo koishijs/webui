@@ -1,6 +1,5 @@
 import { Card, Context } from '@koishijs/client'
 import type {} from '@koishijs/plugin-manager'
-import Bots from './bots/index.vue'
 import Settings from './settings/index.vue'
 import Dependencies from './deps/index.vue'
 import Market from './market/index.vue'
@@ -17,16 +16,6 @@ export default (ctx: Context) => {
       fields: ['bots'],
       content: ({ bots }) => Object.values(bots).reduce((sum, bot) => sum + bot.messageSent, 0) + ' / min',
     }),
-  })
-
-  ctx.addPage({
-    path: '/bots',
-    name: '机器人',
-    icon: 'activity:robot',
-    order: 640,
-    authority: 4,
-    fields: ['bots'],
-    component: Bots,
   })
 
   ctx.addPage({
