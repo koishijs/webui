@@ -128,7 +128,7 @@
 import { watch, ref, computed } from 'vue'
 import type { PropType } from 'vue'
 import { deepEqual, getChoices, getFallback, Schema, validate } from './utils'
-import { clone, isNullable } from 'cosmokit'
+import { clone, isNullable, valueMap } from 'cosmokit'
 import BitCheckbox from './bit.vue'
 import SchemaItem from './item.vue'
 import SchemaGroup from './group.vue'
@@ -197,11 +197,23 @@ const isComposite = computed(() => {
 const config = ref()
 const signal = ref(false)
 
+function optional(schema: Schema) {
+  if (schema.type === 'object') {
+    return Schema.object(valueMap(schema.dict, (item) => {
+      return item.type === 'const' ? item : item.required(false)
+    }))
+  } else if (schema.type === 'intersect') {
+    return Schema.intersect(schema.list.map(optional))
+  } else {
+    return schema
+  }
+}
+
 watch(() => props.modelValue, (value) => {
   active.value = props.schema
   for (const item of choices.value) {
     try {
-      item(value)
+      optional(item)(value)
       active.value = item
       break
     } catch {}
