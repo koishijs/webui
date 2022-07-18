@@ -3,10 +3,6 @@ import Home from './activity/home.vue'
 import Moon from './activity/moon.vue'
 import Sun from './activity/sun.vue'
 import Application from './svg/application.vue'
-import ArrowDown from './svg/arrow-down.vue'
-import ArrowLeft from './svg/arrow-left.vue'
-import ArrowRight from './svg/arrow-right.vue'
-import ArrowUp from './svg/arrow-up.vue'
 import Balance from './svg/balance.vue'
 import Book from './svg/book.vue'
 import BoxOpen from './svg/box-open.vue'
@@ -58,10 +54,6 @@ register('activity:moon', Moon)
 register('activity:sun', Sun)
 
 register('application', Application)
-register('arrow-down', ArrowDown)
-register('arrow-left', ArrowLeft)
-register('arrow-right', ArrowRight)
-register('arrow-up', ArrowUp)
 register('balance', Balance)
 register('book', Book)
 register('box-open', BoxOpen)

@@ -3,6 +3,7 @@ import {} from '@koishijs/plugin-status/src'
 import Charts from './charts'
 import Bots from './bots'
 import Load from './load'
+import './icons'
 
 export default (ctx: Context) => {
   ctx.plugin(Charts)
