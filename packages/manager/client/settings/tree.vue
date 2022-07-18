@@ -25,14 +25,7 @@
       #="{ node }">
       <div class="item">
         <div class="label">{{ node.label === 'group' ? '分组：' + node.data.alias : node.label || '待添加' }}</div>
-        <div class="right" v-if="node.label === 'group' || !node.data.path">
-          <span class="button" @click.stop="addItem(node.data.path, 'unload', '')">
-            <k-icon name="add-plugin"></k-icon>
-          </span>
-          <span class="button" @click.stop="addItem(node.data.path, 'group', 'group')">
-            <k-icon name="add-group"></k-icon>
-          </span>
-        </div>
+        <div class="right"></div>
       </div>
     </el-tree>
   </el-scrollbar>

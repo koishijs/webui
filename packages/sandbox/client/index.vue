@@ -17,7 +17,7 @@
 
     <div class="card-header">
       <template v-for="(name, key) in panelTypes" :key="key">
-        <span class="k-tab-item"
+        <span class="k-horizontal-tab-item"
           :class="{ active: config.panelType === key }"
           @click="config.panelType = key">{{ name }}</span>
       </template>

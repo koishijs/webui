@@ -63,8 +63,9 @@ class MarketProvider extends DataService<Dict<MarketProvider.Data>> {
 
     const scanner = new Scanner(this.http.get)
     tasks.push(Promise.resolve().then(async () => {
-      if (this.config.searchRegistry) {
-        scanner.objects = await this.ctx.http.get(this.config.searchRegistry)
+      if (this.config.searchUrl) {
+        const result = await this.ctx.http.get(this.config.searchUrl)
+        scanner.objects = result.objects
       } else {
         await scanner.collect()
       }
@@ -92,11 +93,11 @@ class MarketProvider extends DataService<Dict<MarketProvider.Data>> {
 
 namespace MarketProvider {
   export interface Config {
-    searchRegistry?: string
+    searchUrl?: string
   }
 
   export const Config: Schema<Config> = Schema.object({
-    searchRegistry: Schema.string().description('用于搜索插件市场的网址。默认跟随你当前的 npm registry。'),
+    searchUrl: Schema.string().description('用于搜索插件市场的网址。默认跟随你当前的 npm registry。'),
   }).description('插件市场设置')
 
   export interface Data extends Omit<AnalyzedPackage, 'versions'> {
