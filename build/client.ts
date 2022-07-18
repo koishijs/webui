@@ -1,12 +1,9 @@
 import { buildExtension } from '@koishijs/client/src'
-import { cwd, getPackages } from './utils'
 import { RollupOutput } from 'rollup'
 import { appendFile, copyFile } from 'fs-extra'
+import { cwd, register } from 'yakumo'
 import * as vite from 'vite'
 import vue from '@vitejs/plugin-vue'
-import cac from 'cac'
-
-const { args } = cac().help().parse()
 
 function findModulePath(id: string) {
   const path = require.resolve(id).replace(/\\/g, '/')
@@ -111,17 +108,14 @@ async function buildConsole() {
   }
 }
 
-;(async () => {
-  const folders = await getPackages(args)
-
-  for (const folder of folders) {
-    console.log('building ' + folder)
-    if (folder === 'packages/client') {
+register('client', async (project) => {
+  for (const path in project.workspaces) {
+    if (path === '/packages/client') {
       await buildConsole()
       continue
     }
 
-    await buildExtension(cwd + '/' + folder, {
+    await buildExtension(cwd + path, {
       plugins: [{
         name: 'fuck-echarts',
         renderChunk(code, chunk) {
@@ -132,4 +126,4 @@ async function buildConsole() {
       }],
     })
   }
-})()
+})
