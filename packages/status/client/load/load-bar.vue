@@ -2,13 +2,13 @@
   <div class="load-bar">
     <span class="title">{{ title }}</span>
     <span class="body">
-      <span class="used bar" :style="{ width: percentage(rate[1] - rate[0]) }">
-        <span v-if="mainly === 'used'" class="caption">{{ caption }}</span>
+      <span
+        v-for="(type, index) in types"
+        :key="type"
+        :class="[type, 'bar']"
+        :style="{ width: percentage(distribution[index]) }">
+        <template v-if="index === maxIndex">{{ caption }}</template>
       </span>
-      <span class="app bar" :style="{ width: percentage(rate[0]) }">
-        <span v-if="mainly === 'app'" class="caption">{{ caption }}</span>
-      </span>
-      <span v-if="mainly === 'free'" class="caption">{{ caption }}</span>
     </span>
   </div>
 </template>
@@ -24,12 +24,16 @@ function percentage(value: number, digits = 3) {
   return (value * 100).toFixed(digits) + '%'
 }
 
-const segments = ['used', 'app', 'free'] as const
+const types = ['used', 'app', 'free'] as const
 
-const mainly = computed<typeof segments[number]>(() => {
-  const length = [props.rate[1] - props.rate[0], props.rate[0], 1 - props.rate[1]]
-  const index = length.indexOf(Math.max(...length))
-  return segments[index]
+const distribution = computed(() => [
+  props.rate[1] - props.rate[0],
+  props.rate[0],
+  1 - props.rate[1],
+])
+
+const maxIndex = computed(() => {
+  return distribution.value.indexOf(Math.max(...distribution.value))
 })
 
 const caption = computed(() => {
@@ -45,6 +49,8 @@ const caption = computed(() => {
   align-items: center;
   user-select: none;
   font-size: 0.9em;
+  margin: 0.5rem 0;
+  padding: 0rem 1rem;
 
   .title {
     min-width: 3em;
@@ -52,11 +58,12 @@ const caption = computed(() => {
 
   .body {
     width: 10rem;
-    height: 1rem;
+    height: 0.8rem;
+    font-size: 0.8em;
     position: relative;
     display: inline;
     background-color: var(--bg1);
-    border-radius: 4px;
+    border-radius: 1rem;
     overflow: hidden;
     transition: var(--color-transition);
     color: var(--fg1);
@@ -66,7 +73,9 @@ const caption = computed(() => {
     height: 100%;
     position: relative;
     float: left;
-    transition: width 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   .used {
@@ -84,16 +93,6 @@ const caption = computed(() => {
     &:hover {
       background-color: var(--warning-tint);
     }
-  }
-
-  .caption {
-    left: 1rem;
-    font-size: 0.9em;
-    position: relative;
-  }
-
-  & + & {
-    margin-top: 0.6rem;
   }
 }
 

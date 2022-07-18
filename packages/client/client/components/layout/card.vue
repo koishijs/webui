@@ -34,7 +34,7 @@ $paddingY: 1.5rem;
   background-color: var(--card-bg);
   border: 1px solid var(--card-border);
   box-shadow: var(--card-shadow);
-  transition: border-color 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease;
+  transition: var(--color-transition);
 
   header {
     position: relative;

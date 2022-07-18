@@ -4,7 +4,7 @@
       <slot name="header">{{ $route.name }}</slot>
     </div>
     <div class="right">
-      <el-tooltip v-for="{ icon, label, disabled, action } in menu || []" :disabled="disabled" :content="label" placement="bottom">
+      <el-tooltip v-for="{ icon, label, disabled, action } in menu || []" :disabled="!!disabled" :content="label" placement="bottom">
         <span class="menu-item" :class="{ disabled }" @click="action()">
           <k-icon class="menu-icon" :name="icon"></k-icon>
         </span>

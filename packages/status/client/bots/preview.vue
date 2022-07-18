@@ -1,8 +1,8 @@
 <template>
   <div class="bot">
     <div class="avatar" :style="{ backgroundImage: `url(${data.avatar})` }" @click="$emit('avatar-click')">
-      <el-tooltip :content="statusNames[data.status]">
-        <div :class="['status', data.status, { error: data.error }]"></div>
+      <el-tooltip :content="statusNames[data.status]" placement="right">
+        <status-light :class="data.status"></status-light>
       </el-tooltip>
     </div>
     <div class="info">
@@ -26,6 +26,7 @@
 
 import type { Bot } from 'koishi'
 import type { ProfileProvider } from '@koishijs/plugin-status/src'
+import StatusLight from './light.vue'
 
 const statusNames: Record<Bot.Status, string> = {
   online: '运行中',
@@ -44,8 +45,9 @@ defineProps<{
 <style scoped lang="scss">
 
 div.bot {
-  padding: 1rem 2rem;
-  width: 16rem;
+  width: 15rem;
+  padding: 0.5rem 1rem;
+  font-size: 14px;
   display: flex;
   transition: 0.3s ease;
 
@@ -61,40 +63,25 @@ div.bot {
 
   > div.avatar {
     position: relative;
-    width: 80px;
-    height: 80px;
-    box-sizing: border-box;
-    border: 2px solid var(--border);
+    width: 4rem;
+    height: 4rem;
+    box-sizing: content-box;
+    border: 1px solid var(--border);
     transition: border 0.3s ease;
     border-radius: 100%;
     background-size: 100%;
     background-repeat: no-repeat;
     transition: 0.1s ease;
 
-    $borderWidth: 2px;
+    $borderWidth: 1px;
 
-    > div.status {
+    .status-light {
       position: absolute;
       bottom: -$borderWidth;
       right: -$borderWidth;
-      width: 1rem;
-      height: 1rem;
-      border-radius: 100%;
+      width: 0.875rem;
+      height: 0.875rem;
       border: $borderWidth solid var(--bg0);
-      transition: background-color 0.3s ease, border-color 0.3s ease;
-
-      &.online {
-        background-color: var(--success);
-      }
-      &.connect, &.reconnect {
-        background-color: var(--warning);
-      }
-      &.error {
-        background-color: var(--error) !important;
-      }
-      &.offline {
-        background-color: var(--disabled);
-      }
     }
   }
 
