@@ -14,14 +14,14 @@ function findModulePath(id: string) {
   return path.slice(0, path.indexOf(keyword)) + keyword.slice(0, -1)
 }
 
-const dist = cwd + '/plugins/frontend/console/dist'
+const dist = cwd + '/packages/console/dist'
 
 export async function build(root: string, config: vite.UserConfig = {}) {
   const { rollupOptions = {} } = config.build || {}
   return vite.build({
     root,
     build: {
-      outDir: cwd + '/plugins/frontend/console/dist',
+      outDir: cwd + '/packages/console/dist',
       emptyOutDir: true,
       cssCodeSplit: false,
       ...config.build,
@@ -56,7 +56,7 @@ export async function build(root: string, config: vite.UserConfig = {}) {
 
 async function buildConsole() {
   // build for console main
-  const { output } = await build(cwd + '/plugins/frontend/client/app') as RollupOutput
+  const { output } = await build(cwd + '/packages/client/app') as RollupOutput
 
   await Promise.all([
     copyFile(findModulePath('vue') + '/dist/vue.runtime.esm-browser.prod.js', dist + '/vue.js'),
@@ -86,13 +86,13 @@ async function buildConsole() {
     }),
   ])
 
-  await build(cwd + '/plugins/frontend/client/client', {
+  await build(cwd + '/packages/client/client', {
     build: {
       outDir: dist,
       emptyOutDir: false,
       rollupOptions: {
         input: {
-          'client': cwd + '/plugins/frontend/client/client/index.ts',
+          'client': cwd + '/packages/client/client/index.ts',
         },
         output: {
           manualChunks: {
@@ -115,7 +115,8 @@ async function buildConsole() {
   const folders = await getPackages(args)
 
   for (const folder of folders) {
-    if (folder === 'plugins/frontend/client') {
+    console.log('building ' + folder)
+    if (folder === 'packages/client') {
       await buildConsole()
       continue
     }

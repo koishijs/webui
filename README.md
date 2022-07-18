@@ -13,6 +13,7 @@
 - @koishijs/plugin-chat
 - @koishijs/plugin-commands
 - @koishijs/plugin-dataview
+- @koishijs/plugin-explorer
 - @koishijs/plugin-footer
 - @koishijs/plugin-insight
 - @koishijs/plugin-logger
