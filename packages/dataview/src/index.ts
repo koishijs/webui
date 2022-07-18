@@ -3,6 +3,8 @@ import { DataService } from '@koishijs/plugin-console'
 import { resolve } from 'path'
 import { deserialize, serialize } from './utils'
 
+export * from './utils'
+
 export type DbEvents = {
   [M in Keys<Database, Function> as `database/${M}`]: (...args: string[]) => Promise<string>
 }
@@ -10,7 +12,7 @@ export type DbEvents = {
 declare module '@koishijs/plugin-console' {
   namespace Console {
     interface Services {
-      dbInfo: DatabaseProvider
+      database: DatabaseProvider
     }
   }
 
@@ -39,7 +41,7 @@ class DatabaseProvider extends DataService<DatabaseInfo> {
   }
 
   constructor(ctx: Context) {
-    super(ctx, 'dbInfo')
+    super(ctx, 'database')
 
     ctx.console.addEntry({
       dev: resolve(__dirname, '../client/index.ts'),
@@ -85,4 +87,3 @@ namespace DatabaseProvider {
 }
 
 export default DatabaseProvider
-export * from './utils'

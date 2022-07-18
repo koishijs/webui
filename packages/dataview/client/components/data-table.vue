@@ -113,8 +113,7 @@
 
 import { Dict } from 'koishi'
 import { computed, ComputedRef, nextTick, reactive, ref, watch, watchEffect } from 'vue'
-import { store } from '@koishijs/client'
-import { message } from '@koishijs/client'
+import { store, message } from '@koishijs/client'
 import { formatSize, handleError, sendQuery, timeStr } from '../utils'
 
 export interface TableStatus {
@@ -151,7 +150,7 @@ const props = defineProps<{
   name: string
 }>()
 
-const table = computed(() => store.dbInfo.tables[props.name])
+const table = computed(() => store.database.tables[props.name])
 
 watchEffect(() => {
   state.pageSize = state.pageSize || pageSizes[0]

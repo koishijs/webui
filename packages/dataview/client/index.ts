@@ -1,5 +1,5 @@
 import { Card, Context } from '@koishijs/client'
-import {} from '@koishijs/plugin-dataview'
+import {} from '@koishijs/plugin-dataview/src'
 import Database from './index.vue'
 import './icons'
 
@@ -10,7 +10,7 @@ export default (ctx: Context) => {
     icon: 'database',
     order: 410,
     authority: 4,
-    fields: ['dbInfo'],
+    fields: ['database'],
     component: Database,
   })
 
@@ -20,8 +20,8 @@ export default (ctx: Context) => {
       title: '数据库体积',
       icon: 'database',
       type: 'size',
-      fields: ['dbInfo'],
-      content: ({ dbInfo }) => dbInfo.size,
+      fields: ['database'],
+      content: ({ database }) => database.size,
     }),
   })
 }

@@ -2,12 +2,12 @@
   <k-layout container="page-database">
     <template #header>
       数据库
-      <span v-if="store.dbInfo?.size">({{ formatSize(store.dbInfo.size) }})</span>
+      <span v-if="store.database?.size">({{ formatSize(store.database.size) }})</span>
     </template>
 
     <template #left>
       <el-scrollbar>
-        <k-tab-group :data="store.dbInfo.tables" v-model="current"></k-tab-group>
+        <k-tab-group :data="store.database.tables" v-model="current"></k-tab-group>
       </el-scrollbar>
     </template>
 
@@ -37,10 +37,10 @@ const route = useRoute()
 const current = computed<string>({
   get() {
     const name = join(route.params.name)
-    return store.dbInfo.tables[name] ? name : ''
+    return store.database.tables[name] ? name : ''
   },
   set(name) {
-    if (!store.dbInfo.tables[name]) name = ''
+    if (!store.database.tables[name]) name = ''
     router.replace('/database/' + name)
   },
 })

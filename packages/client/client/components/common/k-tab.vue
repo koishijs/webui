@@ -18,7 +18,7 @@ defineEmits(['update:modelValue'])
 
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 
 .k-tab-item {
   cursor: pointer;
