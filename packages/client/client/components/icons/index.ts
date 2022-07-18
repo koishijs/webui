@@ -23,10 +23,6 @@ import FileArchive from './svg/file-archive.vue'
 import Filter from './svg/filter.vue'
 import GitHub from './svg/github.vue'
 import GitLab from './svg/gitlab.vue'
-import Hdd from './svg/hdd.vue'
-import HeartEmpty from './svg/heart-empty.vue'
-import HeartFull from './svg/heart-full.vue'
-import History from './svg/history.vue'
 import InfoFull from './svg/info-full.vue'
 import Koishi from './svg/koishi.vue'
 import Link from './svg/link.vue'
@@ -42,7 +38,6 @@ import Tag from './svg/tag.vue'
 import TimesFull from './svg/times-full.vue'
 import Tools from './svg/tools.vue'
 import Undo from './svg/undo.vue'
-import Users from './svg/users.vue'
 import User from './svg/user.vue'
 
 import './style.scss'
@@ -74,10 +69,6 @@ register('file-archive', FileArchive)
 register('filter', Filter)
 register('github', GitHub)
 register('gitlab', GitLab)
-register('hdd', Hdd)
-register('heart-empty', HeartEmpty)
-register('heart-full', HeartFull)
-register('history', History)
 register('info-full', InfoFull)
 register('koishi', Koishi)
 register('link', Link)
@@ -93,7 +84,6 @@ register('tag', Tag)
 register('times-full', TimesFull)
 register('tools', Tools)
 register('undo', Undo)
-register('users', Users)
 register('user', User)
 
 export function register(name: string, component: Component) {

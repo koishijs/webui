@@ -1,8 +1,10 @@
 <template>
   <k-status>
     <template #tooltip>
-      <load-bar title="CPU" :rate="store.profile.cpu"/>
-      <load-bar title="内存" :rate="store.profile.memory"/>
+      <div class="load">
+        <load-bar title="CPU" :rate="store.profile.cpu"/>
+        <load-bar title="内存" :rate="store.profile.memory"/>
+      </div>
     </template>
     CPU: {{ percentage(store.profile.cpu[1], 0) }}
     内存: {{ percentage(store.profile.memory[1], 0) }}
@@ -16,3 +18,11 @@ import { store } from '@koishijs/client'
 import { percentage } from './utils'
 
 </script>
+
+<style lang="scss" scoped>
+
+.load {
+  padding: 0.25rem 1rem;
+}
+
+</style>

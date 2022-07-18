@@ -32,14 +32,17 @@ const received = computed(() => {
 
 .k-status {
   .k-icon {
-    margin: 0 4px;
+    margin: 0 4px 0 6px;
     transform: translateY(2px);
   }
 
   .status-light {
     width: 0.625rem;
     height: 0.625rem;
-    margin-right: 4px;
+  }
+
+  .status-light + .status-light {
+    margin-left: 4px;
   }
 }
 

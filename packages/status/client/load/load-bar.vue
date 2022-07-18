@@ -50,7 +50,6 @@ const caption = computed(() => {
   user-select: none;
   font-size: 0.9em;
   margin: 0.5rem 0;
-  padding: 0rem 1rem;
 
   .title {
     min-width: 3em;

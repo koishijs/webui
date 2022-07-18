@@ -46,7 +46,7 @@ defineProps<{
 
 div.bot {
   width: 15rem;
-  padding: 0.5rem 1rem;
+  padding: 0.75rem 1rem;
   font-size: 14px;
   display: flex;
   transition: 0.3s ease;

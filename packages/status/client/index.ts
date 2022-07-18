@@ -26,7 +26,7 @@ export default (ctx: Context) => {
     type: 'numeric',
     component: Card.numeric({
       title: '资源服务器',
-      icon: 'hdd',
+      icon: 'storage',
       type: 'size',
       fields: ['meta'],
       content: ({ meta }) => meta.assetSize,
@@ -37,7 +37,7 @@ export default (ctx: Context) => {
     type: 'numeric',
     component: Card.numeric({
       title: '活跃用户数量',
-      icon: 'heart-full',
+      icon: 'heart',
       fields: ['meta'],
       content: ({ meta }) => meta.activeUsers,
     }),
@@ -46,7 +46,7 @@ export default (ctx: Context) => {
   ctx.addView({
     type: 'numeric',
     component: Card.numeric({
-      title: '活跃群数量',
+      title: '活跃群组数量',
       icon: 'users',
       fields: ['meta'],
       content: ({ meta }) => meta.activeGuilds,
