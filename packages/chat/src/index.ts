@@ -106,9 +106,7 @@ export function apply(ctx: Context, options: Config = {}) {
           return segment('image', data)
         },
       })
-      Object.values(ctx.console.ws.handles).forEach((handle) => {
-        handle.socket.send(JSON.stringify({ type: 'chat', body: message }))
-      })
+      ctx.console.ws.broadcast('chat', message, { authority: 3 })
     })
 
     const { get } = ctx.http

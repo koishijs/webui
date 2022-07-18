@@ -14,7 +14,7 @@
 
 <script lang="ts" setup>
 
-import { routes, getValue, store } from '@koishijs/client'
+import { routes, getValue, root } from '@koishijs/client'
 import { useDark } from '@vueuse/core'
 import ActivityItem from './activity-item.vue'
 
@@ -22,8 +22,8 @@ function getRoutes(position: 'top' | 'bottom') {
   const scale = position === 'top' ? 1 : -1
   return routes.value
     .filter((route) => {
-      const { fields = [] } = route.meta
-      return fields.every(key => store[key]) && getValue(route.meta.position) === position
+      if (root.bail('activity', route.meta)) return false
+      return getValue(route.meta.position) === position
     })
     .sort((a, b) => scale * (b.meta.order - a.meta.order))
 }

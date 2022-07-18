@@ -1,7 +1,7 @@
 import { Console } from '@koishijs/plugin-console'
 import { Dict } from 'koishi'
 import { App, Component, defineComponent, h, markRaw, reactive, ref, Ref, resolveComponent, watch } from 'vue'
-import { createRouter, createWebHistory, RouteRecordNormalized, START_LOCATION } from 'vue-router'
+import { createRouter, createWebHistory, RouteMeta, RouteRecordNormalized, START_LOCATION } from 'vue-router'
 import { config, Store, store } from './data'
 import install, { isNullable, remove } from './components'
 import Overlay from './components/chat/overlay.vue'
@@ -79,7 +79,13 @@ export function getValue<T>(computed: Computed<T>): T {
   return typeof computed === 'function' ? (computed as any)() : computed
 }
 
-export interface Context {}
+export interface Events<C extends Context> extends cordis.Events<C> {
+  'activity'(meta: RouteMeta): boolean
+}
+
+export interface Context {
+  [Context.events]: Events<this>
+}
 
 export class Context extends cordis.Context {
   static app: App
@@ -151,6 +157,10 @@ export class Context extends cordis.Context {
 }
 
 export const root = new Context()
+
+root.on('activity', (options) => {
+  return !options.fields.every(key => store[key])
+})
 
 root.addView({
   type: 'global',
