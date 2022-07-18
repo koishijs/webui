@@ -41,7 +41,7 @@ class DatabaseProvider extends DataService<DatabaseInfo> {
   }
 
   constructor(ctx: Context) {
-    super(ctx, 'database')
+    super(ctx, 'database', { authority: 4 })
 
     ctx.console.addEntry({
       dev: resolve(__dirname, '../client/index.ts'),
