@@ -16,10 +16,6 @@ class MetaProvider extends DataService<MetaProvider.Payload> {
     super(ctx, 'meta')
 
     this.extend(async () => ctx.assets?.stats())
-    this.extend(async () => {
-      const stats = await ctx.database?.stats()
-      return { databaseSize: stats.size }
-    })
 
     this.extend(async () => {
       const activeUsers = await ctx.database?.eval('user', row => $.count(row.id), {

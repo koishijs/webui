@@ -3,35 +3,17 @@
     <k-icon :name="icon"/>
     <div class="content">
       <p class="title">{{ title }}</p>
-      <p class="value"><slot>{{ text }}</slot></p>
+      <p class="value"><slot></slot></p>
     </div>
   </k-card>
 </template>
 
 <script lang="ts" setup>
 
-import { computed } from 'vue'
-
-const props = defineProps<{
+defineProps<{
   title: string
   icon: string
-  type?: 'size'
-  value?: number
-  fallback?: string
 }>()
-
-const text = computed(() => {
-  if (!props.value) return props.fallback
-  if (props.type === 'size') {
-    if (props.value >= (1 << 20) * 1000) {
-      return (props.value / (1 << 30)).toFixed(1) + ' GB'
-    } else if (props.value >= (1 << 10) * 1000) {
-      return (props.value / (1 << 20)).toFixed(1) + ' MB'
-    } else {
-      return (props.value / (1 << 10)).toFixed(1) + ' KB'
-    }
-  }
-})
 
 </script>
 

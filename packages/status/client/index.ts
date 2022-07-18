@@ -22,17 +22,6 @@ export default (ctx: Context) => {
   ctx.addView({
     type: 'numeric',
     component: Card.numeric({
-      title: '数据库体积',
-      icon: 'database',
-      type: 'size',
-      fields: ['meta'],
-      content: ({ meta }) => meta.databaseSize,
-    }),
-  })
-
-  ctx.addView({
-    type: 'numeric',
-    component: Card.numeric({
       title: '资源服务器',
       icon: 'hdd',
       type: 'size',

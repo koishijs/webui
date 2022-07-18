@@ -3,7 +3,7 @@ import { Dict } from 'koishi'
 import { App, Component, defineComponent, h, markRaw, reactive, ref, Ref, resolveComponent, watch } from 'vue'
 import { createRouter, createWebHistory, RouteRecordNormalized, START_LOCATION } from 'vue-router'
 import { config, Store, store } from './data'
-import install, { remove } from './components'
+import install, { isNullable, remove } from './components'
 import Overlay from './components/chat/overlay.vue'
 import * as cordis from 'cordis'
 
@@ -243,11 +243,27 @@ export namespace Card {
   }
 
   export function numeric({ type, icon, fields, title, content }: NumericOptions) {
-    const render = type ? () => h(resolveComponent('k-numeric'), {
-      icon, title, type, value: content(store), fallback: '未安装',
-    }) : () => h(resolveComponent('k-numeric'), {
-      icon, title,
-    }, () => content(store))
-    return create(render, fields)
+    if (!type) {
+      return defineComponent(() => () => {
+        if (!fields.every(key => store[key])) return
+        return h(resolveComponent('k-numeric'), { icon, title }, () => content(store))
+      })
+    }
+
+    return defineComponent(() => () => {
+      if (!fields.every(key => store[key])) return
+      let value = content(store)
+      if (isNullable(value)) return
+      if (type === 'size') {
+        if (value >= (1 << 20) * 1000) {
+          value = (value / (1 << 30)).toFixed(1) + ' GB'
+        } else if (value >= (1 << 10) * 1000) {
+          value = (value / (1 << 20)).toFixed(1) + ' MB'
+        } else {
+          value = (value / (1 << 10)).toFixed(1) + ' KB'
+        }
+      }
+      return h(resolveComponent('k-numeric'), { icon, title }, () => [value])
+    })
   }
 }
