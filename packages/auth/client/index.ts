@@ -19,7 +19,7 @@ export default (ctx: Context) => {
     send('login/token', config.id, config.token).catch(e => message.error(e.message))
   }
 
-  ctx.disposables.push(router.beforeEach((route) => {
+  ctx.state.disposables.push(router.beforeEach((route) => {
     if ((route.meta.authority || route.meta.fields.includes('user')) && !store.user) {
       // handle router.back()
       return history.state.forward === '/login' ? '/' : '/login'

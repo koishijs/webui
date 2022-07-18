@@ -1,12 +1,12 @@
 <template>
-  <k-card class="profile-basic">
+  <k-layout main="page-profile">
     <h1>
       基本资料
       <k-button class="float-right" solid type="error" @click="logout">退出登录</k-button>
       <k-button class="float-right" solid :disabled="!Object.keys(diff).length" @click="update">应用更改</k-button>
     </h1>
     <k-form :schema="schema" v-model="diff" :show-header="false"></k-form>
-  </k-card>
+  </k-layout>
 </template>
 
 <script lang="ts" setup>
@@ -56,7 +56,7 @@ async function update() {
 
 <style lang="scss">
 
-.profile-basic {
+.page-profile {
   max-width: 50rem;
   margin: 2rem auto;
 
