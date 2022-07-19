@@ -1,7 +1,7 @@
 {
   "name": "@koishijs/plugin-insight",
   "description": "Show plugin dependency graph for Koishi",
-  "version": "2.1.0",
+  "version": "3.0.0",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
   "files": [
@@ -41,12 +41,12 @@
     }
   },
   "peerDependencies": {
-    "@koishijs/plugin-console": "^3.4.4",
-    "koishi": "^4.8.0"
+    "@koishijs/plugin-console": "^4.0.0",
+    "koishi": "^4.8.1"
   },
   "devDependencies": {
-    "@koishijs/cli": "^4.8.0",
-    "@koishijs/client": "^3.4.4",
+    "@koishijs/cli": "^4.8.1",
+    "@koishijs/client": "^4.0.0",
     "@types/d3-force": "^3.0.3",
     "@types/throttle-debounce": "^2.1.0"
   },

@@ -1,7 +1,7 @@
 {
   "name": "@koishijs/plugin-commands",
   "description": "Override Command Config for Koishi",
-  "version": "1.4.1",
+  "version": "2.0.0",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
   "files": [
@@ -36,11 +36,11 @@
     }
   },
   "peerDependencies": {
-    "koishi": "^4.8.0"
+    "koishi": "^4.8.1"
   },
   "devDependencies": {
-    "@koishijs/client": "^3.4.4",
-    "@koishijs/plugin-console": "^3.4.4",
+    "@koishijs/client": "^4.0.0",
+    "@koishijs/plugin-console": "^4.0.0",
     "@koishijs/plugin-mock": "^2.0.0",
     "@types/throttle-debounce": "^2.1.0"
   },
