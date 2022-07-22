@@ -1,4 +1,4 @@
-import { Context, Dict, pick, Quester, Schema } from 'koishi'
+import { Context, Dict, pick, Quester, Schema, Time } from 'koishi'
 import { DataService } from '@koishijs/plugin-console'
 import Scanner, { AnalyzedPackage, PackageJson } from '@koishijs/registry'
 import which from 'which-pm-runs'
@@ -60,12 +60,13 @@ class MarketProvider extends DataService<Dict<MarketProvider.Data>> {
   async prepare() {
     await this.initialize()
 
+    const { searchUrl, searchTimeout } = this.config
     const scanner = new Scanner(this.http.get)
-    if (this.config.searchUrl) {
-      const result = await this.ctx.http.get(this.config.searchUrl)
+    if (searchUrl) {
+      const result = await this.ctx.http.get(searchUrl, { timeout: searchTimeout })
       scanner.objects = result.objects
     } else {
-      await scanner.collect()
+      await scanner.collect({ timeout: searchTimeout })
     }
 
     await scanner.analyze({
@@ -89,11 +90,13 @@ class MarketProvider extends DataService<Dict<MarketProvider.Data>> {
 namespace MarketProvider {
   export interface Config {
     searchUrl?: string
+    searchTimeout?: number
   }
 
   export const Config: Schema<Config> = Schema.object({
     searchUrl: Schema.string().description('用于搜索插件市场的网址。默认跟随你当前的 npm registry。'),
-  }).description('插件市场设置')
+    searchTimeout: Schema.number().role('time').default(Time.second * 30).description('搜索插件市场的超时时间。'),
+  }).description('搜索设置')
 
   export interface Data extends Omit<AnalyzedPackage, 'versions'> {
     versions: Partial<PackageJson>[]

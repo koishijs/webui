@@ -33,7 +33,9 @@ export interface Dependency {
    * whether it is a workspace package
    */
   workspace?: boolean
-  active?: boolean
+  /**
+   * available versions
+   */
   versions?: Partial<PackageJson>[]
 }
 
@@ -64,7 +66,6 @@ class Installer extends DataService<Dict<Dependency>> {
         // some dependencies may be left with no local installation
         const meta = loadManifest(name)
         result[name].resolved = meta.version
-        result[name].active = meta.$active
         result[name].workspace = meta.$workspace
         if (meta.$workspace) return
       } catch {}
@@ -74,7 +75,9 @@ class Installer extends DataService<Dict<Dependency>> {
         result[name].versions = Object.values(registry.versions)
           .map(item => pick(item, ['version', 'peerDependencies']))
           .reverse()
-      } catch {}
+      } catch (e) {
+        logger.warn(e.message)
+      }
     }, { concurrency: 10 })
     return result
   }
@@ -135,9 +138,10 @@ class Installer extends DataService<Dict<Dependency>> {
     await this.refresh()
     const newPayload = this.get()
     for (const name in oldPayload) {
-      const { active, resolved, workspace } = oldPayload[name]
-      if (workspace || !active) continue
+      const { resolved, workspace } = oldPayload[name]
+      if (workspace) continue
       if (newPayload[name].resolved === resolved) continue
+      if (!(require.resolve(name) in require.cache)) continue
       this.ctx.loader.fullReload()
     }
     this.ctx.console.packages.refresh()
