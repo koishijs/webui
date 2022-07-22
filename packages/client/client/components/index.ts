@@ -13,6 +13,7 @@ import {
   ElMessageBox,
   ElPagination,
   ElPopconfirm,
+  ElProgress,
   ElRadio,
   ElScrollbar,
   ElSelect,
@@ -54,6 +55,7 @@ import 'element-plus/es/components/table/style/css'
 import 'element-plus/es/components/table-column/style/css'
 import 'element-plus/es/components/pagination/style/css'
 import 'element-plus/es/components/popconfirm/style/css'
+import 'element-plus/es/components/progress/style/css'
 import 'element-plus/es/components/date-picker/style/css'
 import 'element-plus/es/components/time-picker/style/css'
 import './style.scss'
@@ -83,6 +85,7 @@ export default function (app: App) {
   app.use(ElLoading)
   app.use(ElPagination)
   app.use(ElPopconfirm)
+  app.use(ElProgress)
   app.use(ElRadio)
   app.use(ElScrollbar)
   app.use(ElSelect)

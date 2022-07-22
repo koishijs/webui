@@ -26,13 +26,14 @@ class MarketProvider extends DataService<MarketProvider.Payload> {
     await this.prepare().catch((e) => {
       logger.warn(e)
       this.scanner.total = -1
+      this.scanner.progress = -1
     })
     this.refresh()
   }
 
   flushData() {
     const now = Date.now()
-    if (now - this.timestamp < Time.second / 2) return
+    if (now - this.timestamp < 100) return
     this.timestamp = now
     this.ctx.console.ws.broadcast('market/patch', {
       data: this.tempCache,
@@ -103,7 +104,7 @@ class MarketProvider extends DataService<MarketProvider.Payload> {
       data: this.fullCache,
       failed: this.failed.length,
       total: this.scanner?.total || 0,
-      progress: this.scanner?.progress || 0,
+      progress: this.scanner?.progress || -1,
     }
   }
 }
@@ -126,7 +127,6 @@ namespace MarketProvider {
   export interface Payload {
     data: Dict<Data>
     total: number
-    failed: number
     progress: number
   }
 }

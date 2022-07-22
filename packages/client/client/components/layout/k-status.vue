@@ -15,7 +15,7 @@
   cursor: default;
   padding: 0 0.5rem;
   display: inline-flex;
-  align-items: baseline;
+  align-items: center;
   transition: var(--color-transition);
 
   &:hover {

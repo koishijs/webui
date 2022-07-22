@@ -4,6 +4,7 @@ import type {} from '@koishijs/plugin-manager'
 import Settings from './settings/index.vue'
 import Dependencies from './deps/index.vue'
 import Market from './market/index.vue'
+import Progress from './market/progress.vue'
 import { overrideCount } from './utils'
 import './icons'
 
@@ -27,6 +28,12 @@ export default (ctx: Context) => {
       h('h2', '浏览插件'),
       h('p', '浏览插件市场中的插件，并根据自己的需要安装和配置。'),
     ])),
+  })
+
+  ctx.addView({
+    type: 'status-right',
+    component: Progress,
+    order: 10,
   })
 
   ctx.addPage({

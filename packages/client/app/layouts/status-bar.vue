@@ -23,6 +23,10 @@
   transition: var(--color-transition);
   font-size: 0.875rem;
   line-height: var(--footer-height);
+
+  > * {
+    display: inline-flex;
+  }
 }
 
 </style>
