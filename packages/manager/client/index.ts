@@ -1,4 +1,5 @@
-import { Card, Context } from '@koishijs/client'
+import { defineComponent, h } from 'vue'
+import { Context, router } from '@koishijs/client'
 import type {} from '@koishijs/plugin-manager'
 import Settings from './settings/index.vue'
 import Dependencies from './deps/index.vue'
@@ -8,14 +9,14 @@ import './icons'
 
 export default (ctx: Context) => {
   ctx.addView({
-    type: 'numeric',
-    order: 100,
-    component: Card.numeric({
-      title: '当前消息频率',
-      icon: 'paper-plane',
-      fields: ['bots'],
-      content: ({ bots }) => Object.values(bots).reduce((sum, bot) => sum + bot.messageSent, 0) + ' / min',
-    }),
+    type: 'welcome:choice',
+    component: defineComponent(() => () => h('div', {
+      class: 'choice',
+      onClick: () => router.push('/market'),
+    }, [
+      h('h2', '浏览插件'),
+      h('p', '浏览插件市场中的插件，并根据自己的需要安装和配置。'),
+    ])),
   })
 
   ctx.addPage({
