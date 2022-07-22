@@ -76,6 +76,11 @@ export namespace Console {
       .description('启用调试模式（仅供开发者使用）。')
       .default(process.env.NODE_ENV === 'development')
       .hidden(),
+    cacheDir: Schema
+      .string()
+      .description('调试服务器缓存目录。')
+      .default('.vite')
+      .hidden(),
   })
 
   export interface Services {

@@ -111,13 +111,14 @@ class HttpService extends DataService<string[]> {
   }
 
   private async createVite() {
-    const { root } = this.config
+    const { root, cacheDir } = this.config
     const { createServer } = require('vite') as typeof import('vite')
     const { default: vue } = require('@vitejs/plugin-vue') as typeof import('@vitejs/plugin-vue')
 
     this.vite = await createServer({
       root,
       base: '/vite/',
+      cacheDir: resolve(this.ctx.baseDir, cacheDir),
       server: {
         middlewareMode: true,
         fs: {
@@ -160,6 +161,7 @@ namespace HttpService {
     root?: string
     uiPath?: string
     devMode?: boolean
+    cacheDir?: string
     open?: boolean
   }
 }
