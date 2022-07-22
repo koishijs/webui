@@ -119,7 +119,7 @@ defineProps<{
     overflow: hidden;
 
     &.darker {
-      background-color: #f6f8fa;
+      background-color: var(--bg1);
     }
   }
 }
