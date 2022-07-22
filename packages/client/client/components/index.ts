@@ -26,7 +26,7 @@ import {
 } from 'element-plus'
 
 import common from './common'
-import form from './form'
+import form from 'schemastery-vue'
 import ChatImage from './chat/image.vue'
 import * as icons from './icons'
 import layout from './layout'
@@ -63,10 +63,10 @@ export const message = ElMessage
 export const messageBox = ElMessageBox
 
 export * from './common'
-export * from './form'
 export * from './layout'
 export * from './notice'
 
+export * from 'schemastery-vue'
 export * from '@satorijs/components'
 
 export { icons, ChatImage }

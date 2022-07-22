@@ -1,4 +1,5 @@
 import { App, Component, defineComponent, h } from 'vue'
+import { IconCog, IconExternal, IconEye, IconEyeSlash } from 'schemastery-vue'
 import Home from './activity/home.vue'
 import Moon from './activity/moon.vue'
 import Sun from './activity/sun.vue'
@@ -12,13 +13,9 @@ import ChevronLeft from './svg/chevron-left.vue'
 import ChevronRight from './svg/chevron-right.vue'
 import ChevronUp from './svg/chevron-up.vue'
 import ClipboardList from './svg/clipboard-list.vue'
-import Cog from './svg/cog.vue'
 import Edit from './svg/edit.vue'
 import ExclamationFull from './svg/exclamation-full.vue'
 import Expand from './svg/expand.vue'
-import External from './svg/external.vue'
-import EyeSlash from './svg/eye-slash.vue'
-import Eye from './svg/eye.vue'
 import FileArchive from './svg/file-archive.vue'
 import Filter from './svg/filter.vue'
 import GitHub from './svg/github.vue'
@@ -58,13 +55,13 @@ register('chevron-left', ChevronLeft)
 register('chevron-right', ChevronRight)
 register('chevron-up', ChevronUp)
 register('clipboard-list', ClipboardList)
-register('cog', Cog)
+register('cog', IconCog)
 register('edit', Edit)
 register('exclamation-full', ExclamationFull)
 register('expand', Expand)
-register('external', External)
-register('eye-slash', EyeSlash)
-register('eye', Eye)
+register('external', IconExternal)
+register('eye-slash', IconEyeSlash)
+register('eye', IconEye)
 register('file-archive', FileArchive)
 register('filter', Filter)
 register('github', GitHub)

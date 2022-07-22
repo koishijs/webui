@@ -44,6 +44,7 @@
     "marked": "^4.0.18",
     "sass": "^1.52.1",
     "schemastery": "^3.4.3",
+    "schemastery-vue": "^1.0.0",
     "vite": "^2.9.14",
     "vue": "^3.2.36",
     "vue-router": "^4.0.15"
