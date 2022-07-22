@@ -3,7 +3,7 @@ import { MarketProvider } from '@koishijs/plugin-manager'
 import { getMixedMeta } from '../utils'
 
 export function getKeywords(name: string) {
-  return store.packages[name]?.keywords || store.market[name].keywords || []
+  return store.packages[name]?.keywords || store.market.data[name].keywords || []
 }
 
 export function validate(data: MarketProvider.Data, word: string) {

@@ -91,7 +91,7 @@ const name = computed(() => {
 })
 
 const local = computed(() => store.packages[name.value])
-const remote = computed(() => store.market[name.value])
+const remote = computed(() => store.market.data[name.value])
 const env = computed(() => envMap.value[name.value])
 const hint = computed(() => local.value.workspace ? '，请检查源代码' : '，请联系插件作者')
 

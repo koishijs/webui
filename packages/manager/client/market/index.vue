@@ -1,6 +1,6 @@
 <template>
   <k-layout main="darker">
-    <el-scrollbar v-if="plugins.length">
+    <el-scrollbar v-if="store.market.total > 0">
       <div class="search-box">
         <k-badge type="success" v-for="(word, index) in words.slice(0, -1)" :key="index" @click="words.splice(index, 1)">{{ word }}</k-badge>
         <input
@@ -14,13 +14,23 @@
         <k-icon name="search"></k-icon>
       </div>
       <div class="market-filter">
-        共搜索到 {{ realWords.length ? packages.length + ' / ' : '' }}{{ Object.keys(store.market).length }} 个插件。
+        共搜索到 {{ realWords.length ? packages.length + ' / ' : '' }}{{ Object.keys(store.market.data).length }} 个插件。
         <el-checkbox v-model="config.showInstalled">显示已下载的插件</el-checkbox>
       </div>
       <div class="market-container">
         <package-view v-for="data in packages" :key="data.name" :data="data" @query="onQuery"></package-view>
       </div>
     </el-scrollbar>
+
+    <div v-else-if="!store.market.total">
+      <div class="el-loading-spinner">
+        <svg class="circular" viewBox="25 25 50 50">
+          <circle class="path" cx="50" cy="50" r="20" fill="none"></circle>
+        </svg>
+        <p class="el-loading-text">正在加载插件市场……</p>
+      </div>
+    </div>
+
     <k-comment v-else type="error" class="market-error">
       <p>无法连接到插件市场。这可能是以下原因导致的：</p>
       <ul>
@@ -84,12 +94,8 @@ function onQuery(word: string) {
   words.push('')
 }
 
-const plugins = computed(() => {
-  return Object.values(store.market).filter(data => data.shortname)
-})
-
 const packages = computed(() => {
-  return plugins.value
+  return Object.values(store.market.data)
     .filter(data => words.every(word => validate(data, word)))
     .filter(item => config.showInstalled || !store.packages[item.name])
     .sort((a, b) => b.popularity - a.popularity)

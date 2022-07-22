@@ -1,14 +1,18 @@
-import { Context, Dict, pick, Quester, Schema, Time } from 'koishi'
+import { Context, Dict, Logger, pick, Quester, Schema, Time } from 'koishi'
 import { DataService } from '@koishijs/plugin-console'
 import Scanner, { AnalyzedPackage, PackageJson } from '@koishijs/registry'
 import which from 'which-pm-runs'
 import spawn from 'cross-spawn'
 
-class MarketProvider extends DataService<Dict<MarketProvider.Data>> {
+const logger = new Logger('market')
+
+class MarketProvider extends DataService<MarketProvider.Payload> {
   /** https://github.com/npm/registry/blob/master/docs/REGISTRY-API.md */
   public http: Quester
 
   private timestamp = 0
+  private failed: string[] = []
+  private scanner: Scanner
   private fullCache: Dict<MarketProvider.Data> = {}
   private tempCache: Dict<MarketProvider.Data> = {}
   private initTask: Promise<string>
@@ -18,16 +22,24 @@ class MarketProvider extends DataService<Dict<MarketProvider.Data>> {
   }
 
   async start() {
-    const logger = this.ctx.logger('market')
-    await this.prepare().catch(logger.warn)
+    await this.initialize()
+    await this.prepare().catch((e) => {
+      logger.warn(e)
+      this.scanner.total = -1
+    })
     this.refresh()
   }
 
   flushData() {
     const now = Date.now()
-    if (now - this.timestamp < 100) return
+    if (now - this.timestamp < Time.second / 2) return
     this.timestamp = now
-    this.patch(this.tempCache)
+    this.ctx.console.ws.broadcast('market/patch', {
+      data: this.tempCache,
+      failed: this.failed.length,
+      total: this.scanner.total,
+      progress: this.scanner.progress,
+    })
     this.tempCache = {}
   }
 
@@ -58,32 +70,41 @@ class MarketProvider extends DataService<Dict<MarketProvider.Data>> {
   }
 
   async prepare() {
-    await this.initialize()
-
     const { searchUrl, searchTimeout } = this.config
     const scanner = new Scanner(this.http.get)
     if (searchUrl) {
       const result = await this.ctx.http.get(searchUrl, { timeout: searchTimeout })
+      scanner.total = result.total
       scanner.objects = result.objects
     } else {
       await scanner.collect({ timeout: searchTimeout })
     }
 
+    this.failed = []
+    this.scanner = scanner
     await scanner.analyze({
       version: '4',
+      onFailure: (name) => {
+        this.failed.push(name)
+      },
       onSuccess: (item) => {
         const { name, versions } = item
         this.tempCache[name] = this.fullCache[name] = {
           ...item,
           versions: versions.map(item => pick(item, ['version', 'keywords', 'peerDependencies'])),
         }
-        this.flushData()
       },
+      after: () => this.flushData(),
     })
   }
 
   async get() {
-    return this.fullCache
+    return {
+      data: this.fullCache,
+      failed: this.failed.length,
+      total: this.scanner?.total || 0,
+      progress: this.scanner?.progress || 0,
+    }
   }
 }
 
@@ -100,6 +121,13 @@ namespace MarketProvider {
 
   export interface Data extends Omit<AnalyzedPackage, 'versions'> {
     versions: Partial<PackageJson>[]
+  }
+
+  export interface Payload {
+    data: Dict<Data>
+    total: number
+    failed: number
+    progress: number
   }
 }
 

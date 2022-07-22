@@ -31,7 +31,7 @@ watch(() => store.dependencies, (value) => {
 
 export function addFavorite(name: string) {
   if (config.override[name] || store.packages[name]) return
-  config.override[name] = store.market[name].version
+  config.override[name] = store.market.data[name].version
 }
 
 export function removeFavorite(name: string) {
@@ -41,7 +41,7 @@ export function removeFavorite(name: string) {
 export const getMixedMeta = (name: string) => ({
   keywords: [],
   peerDependencies: {},
-  ...store.market[name],
+  ...store.market.data[name],
   ...store.packages[name],
 })
 

@@ -84,7 +84,7 @@ const local = computed(() => {
 })
 
 const versions = computed(() => {
-  return local.value ? local.value.versions : store.market[props.name].versions
+  return local.value ? local.value.versions : store.market.data[props.name]?.versions
 })
 
 </script>

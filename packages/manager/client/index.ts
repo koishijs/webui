@@ -1,11 +1,21 @@
 import { defineComponent, h } from 'vue'
-import { Context, router } from '@koishijs/client'
+import { Context, receive, router, store } from '@koishijs/client'
 import type {} from '@koishijs/plugin-manager'
 import Settings from './settings/index.vue'
 import Dependencies from './deps/index.vue'
 import Market from './market/index.vue'
 import { overrideCount } from './utils'
 import './icons'
+
+receive('market/patch', (data) => {
+  store.market = {
+    ...data,
+    data: {
+      ...store.market?.data,
+      ...data.data,
+    },
+  }
+})
 
 export default (ctx: Context) => {
   ctx.addView({

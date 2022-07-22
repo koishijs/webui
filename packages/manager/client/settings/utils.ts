@@ -30,7 +30,7 @@ function getEnvInfo(name: string) {
       return
     }
 
-    const available = Object.values(store.market || {})
+    const available = Object.values(store.market.data)
       .filter(data => isAvailable(name, data))
       .map(data => data.name)
     result.using[name] = { required, available }

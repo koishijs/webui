@@ -51,7 +51,7 @@ const names = computed(() => {
     data = data.filter(name => !store.dependencies[name].workspace)
   }
   for (const key in config.override) {
-    if (!data.includes(key) && store.market[key]) data.push(key)
+    if (!data.includes(key) && store.market.data[key]) data.push(key)
   }
   return data.sort((a, b) => a > b ? 1 : -1)
 })
