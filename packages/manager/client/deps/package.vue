@@ -1,24 +1,29 @@
 <template>
   <tr class="dep-package-view">
     <td class="name" :class="state">{{ name }}</td>
+
     <td class="current">
       <template v-if="local">
         {{ local.resolved }}
         <template v-if="local.workspace">(工作区)</template>
-        <template v-else-if="local.resolved === versions[0]?.version">(最新)</template>
+        <template v-else-if="local.resolved === versions?.[0].version">(最新)</template>
       </template>
       <span v-else>-</span>
     </td>
+
     <td class="target">
-      <template v-if="local?.workspace">
-        <k-button class="action" @click="send('market/patch', name, null)">移除依赖</k-button>
-      </template>
-      <template v-else>
-        <k-button class="prefix right-adjacent" @click="prefix = matrix[prefix]">{{ prefix || '=' }}</k-button>
+      <k-button v-if="local?.workspace" class="action" @click="send('market/patch', name, null)">
+        移除依赖
+      </k-button>
+      <template v-else-if="versions">
+        <k-button class="prefix right-adjacent" @click="prefix = transition[prefix]">{{ prefix || '=' }}</k-button>
         <el-select class="left-adjacent" v-model="value">
           <el-option value="">移除依赖</el-option>
           <el-option v-for="({ version }) in versions" :key="version" :value="version"></el-option>
         </el-select>
+      </template>
+      <template v-else>
+        版本获取失败
       </template>
     </td>
   </tr>
@@ -63,7 +68,7 @@ const prefix = computed({
   },
 })
 
-const matrix = { '': '^', '^': '~', '~': '' }
+const transition = { '': '^', '^': '~', '~': '' }
 
 const state = computed(() => {
   if (!props.name.includes('koishi-plugin-') && !props.name.startsWith('@koishijs/plugin-')) {
@@ -79,7 +84,7 @@ const local = computed(() => {
 })
 
 const versions = computed(() => {
-  return store.market[props.name]?.versions || []
+  return local.value ? local.value.versions : store.market[props.name].versions
 })
 
 </script>
@@ -125,17 +130,20 @@ const versions = computed(() => {
     }
   }
 
+  $button-size: 12rem;
+  $prefix-size: 2rem;
+
   .k-button.action {
-    width: 10rem;
+    width: $button-size;
   }
 
   .el-select {
-    width: 8rem;
+    width: $button-size - $prefix-size;
   }
 
   .k-button.prefix {
-    width: 2rem;
-    height: 2rem;
+    width: $prefix-size;
+    height: $prefix-size;
     vertical-align: bottom;
     padding: 0;
   }

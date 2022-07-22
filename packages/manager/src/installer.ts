@@ -1,12 +1,13 @@
-import { Context, defineProperty, Dict, Logger } from 'koishi'
+import { Context, Dict, Logger, pick, valueMap } from 'koishi'
 import { DataService } from '@koishijs/plugin-console'
-import { PackageJson } from '@koishijs/registry'
+import { PackageJson, Registry } from '@koishijs/registry'
 import { resolve } from 'path'
 import { promises as fsp } from 'fs'
 import { loadManifest } from './utils'
 import {} from '@koishijs/cli'
 import which from 'which-pm-runs'
 import spawn from 'cross-spawn'
+import pMap from 'p-map'
 
 declare module '@koishijs/plugin-console' {
   interface Events {
@@ -27,17 +28,20 @@ export interface Dependency {
    * installed package version
    * @example `1.2.5`
    */
-  resolved: string
+  resolved?: string
   /**
    * whether it is a workspace package
    */
-  workspace: boolean
+  workspace?: boolean
   active?: boolean
+  versions?: Partial<PackageJson>[]
 }
 
 class Installer extends DataService<Dict<Dependency>> {
+  static using = ['console.market']
+
   private manifest: PackageJson
-  private _payload: Dict<Dependency>
+  private task: Promise<Dict<Dependency>>
 
   constructor(public ctx: Context) {
     super(ctx, 'dependencies', { authority: 4 })
@@ -51,22 +55,33 @@ class Installer extends DataService<Dict<Dependency>> {
     return this.ctx.app.baseDir
   }
 
-  async get(force = false) {
-    if (!force && this._payload) return this._payload
-    const results: Dict<Dependency> = {}
-    for (const name in this.manifest.dependencies) {
+  private async _get() {
+    const { market } = this.ctx.console
+    await market.initialize()
+    const result = valueMap<string, Dependency>(this.manifest.dependencies, request => ({ request }))
+    await pMap(Object.keys(result), async (name) => {
       try {
         // some dependencies may be left with no local installation
         const meta = loadManifest(name)
-        results[name] = {
-          request: this.manifest.dependencies[name],
-          resolved: meta.version,
-          workspace: meta.$workspace,
-        }
-        defineProperty(results[name], 'active', require.resolve(name) in require.cache)
+        result[name].resolved = meta.version
+        result[name].active = meta.$active
+        result[name].workspace = meta.$workspace
+        if (meta.$workspace) return
       } catch {}
-    }
-    return this._payload = results
+
+      try {
+        const registry = await market.http.get<Registry>(`/${name}`)
+        result[name].versions = Object.values(registry.versions)
+          .map(item => pick(item, ['version', 'peerDependencies']))
+          .reverse()
+      } catch {}
+    }, { concurrency: 10 })
+    return result
+  }
+
+  async get(force = false) {
+    if (!force && this.task) return this.task
+    return this.task = this._get()
   }
 
   async exec(command: string, args: string[]) {

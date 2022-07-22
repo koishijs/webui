@@ -1,16 +1,17 @@
 import { Context, Dict, pick, Quester, Schema } from 'koishi'
 import { DataService } from '@koishijs/plugin-console'
-import Scanner, { AnalyzedPackage, PackageJson, Registry } from '@koishijs/registry'
+import Scanner, { AnalyzedPackage, PackageJson } from '@koishijs/registry'
 import which from 'which-pm-runs'
 import spawn from 'cross-spawn'
-import { loadManifest } from './utils'
 
 class MarketProvider extends DataService<Dict<MarketProvider.Data>> {
   /** https://github.com/npm/registry/blob/master/docs/REGISTRY-API.md */
-  private http: Quester
+  public http: Quester
+
   private timestamp = 0
   private fullCache: Dict<MarketProvider.Data> = {}
   private tempCache: Dict<MarketProvider.Data> = {}
+  private initTask: Promise<string>
 
   constructor(ctx: Context, public config: MarketProvider.Config) {
     super(ctx, 'market', { authority: 4 })
@@ -30,7 +31,7 @@ class MarketProvider extends DataService<Dict<MarketProvider.Data>> {
     this.tempCache = {}
   }
 
-  async prepare() {
+  private async _initialize() {
     const cwd = this.ctx.app.baseDir
     const registry = await new Promise<string>((resolve, reject) => {
       let stdout = ''
@@ -47,43 +48,37 @@ class MarketProvider extends DataService<Dict<MarketProvider.Data>> {
       })
     })
 
-    this.http = this.ctx.http.extend({
-      endpoint: registry.trim(),
-    })
+    const endpoint = registry.trim()
+    this.http = this.ctx.http.extend({ endpoint })
+    return endpoint
+  }
 
-    const meta = loadManifest(cwd)
-    const tasks = Object.keys(meta.dependencies).map(async (name) => {
-      const registry = await this.http.get<Registry>(`/${name}`)
-      const versions = Object.values(registry.versions)
-        .map(item => pick(item, ['version', 'peerDependencies']))
-        .reverse()
-      this.tempCache[name] = this.fullCache[name] = { versions } as any
-      this.flushData()
-    })
+  initialize() {
+    return this.initTask ||= this._initialize()
+  }
+
+  async prepare() {
+    await this.initialize()
 
     const scanner = new Scanner(this.http.get)
-    tasks.push(Promise.resolve().then(async () => {
-      if (this.config.searchUrl) {
-        const result = await this.ctx.http.get(this.config.searchUrl)
-        scanner.objects = result.objects
-      } else {
-        await scanner.collect()
-      }
+    if (this.config.searchUrl) {
+      const result = await this.ctx.http.get(this.config.searchUrl)
+      scanner.objects = result.objects
+    } else {
+      await scanner.collect()
+    }
 
-      await scanner.analyze({
-        version: '4',
-        onSuccess: (item) => {
-          const { name, versions } = item
-          this.tempCache[name] = this.fullCache[name] = {
-            ...item,
-            versions: versions.map(item => pick(item, ['version', 'keywords', 'peerDependencies'])),
-          }
-          this.flushData()
-        },
-      })
-    }))
-
-    await Promise.allSettled(tasks)
+    await scanner.analyze({
+      version: '4',
+      onSuccess: (item) => {
+        const { name, versions } = item
+        this.tempCache[name] = this.fullCache[name] = {
+          ...item,
+          versions: versions.map(item => pick(item, ['version', 'keywords', 'peerDependencies'])),
+        }
+        this.flushData()
+      },
+    })
   }
 
   async get() {
