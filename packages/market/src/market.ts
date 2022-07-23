@@ -71,14 +71,14 @@ class MarketProvider extends DataService<MarketProvider.Payload> {
   }
 
   async prepare() {
-    const { searchUrl, searchTimeout } = this.config
+    const { endpoint, timeout } = this.config
     const scanner = new Scanner(this.http.get)
-    if (searchUrl) {
-      const result = await this.ctx.http.get(searchUrl, { timeout: searchTimeout })
+    if (endpoint) {
+      const result = await this.ctx.http.get(endpoint, { timeout })
       scanner.total = result.total
       scanner.objects = result.objects
     } else {
-      await scanner.collect({ timeout: searchTimeout })
+      await scanner.collect({ timeout })
     }
 
     this.failed = []
@@ -111,13 +111,13 @@ class MarketProvider extends DataService<MarketProvider.Payload> {
 
 namespace MarketProvider {
   export interface Config {
-    searchUrl?: string
-    searchTimeout?: number
+    endpoint?: string
+    timeout?: number
   }
 
   export const Config: Schema<Config> = Schema.object({
-    searchUrl: Schema.string().description('用于搜索插件市场的网址。默认跟随你当前的 npm registry。'),
-    searchTimeout: Schema.number().role('time').default(Time.second * 30).description('搜索插件市场的超时时间。'),
+    endpoint: Schema.string().role('url').description('用于搜索插件市场的网址。默认跟随你当前的 npm registry。'),
+    timeout: Schema.number().role('time').default(Time.second * 30).description('搜索插件市场的超时时间。'),
   }).description('搜索设置')
 
   export interface Data extends Omit<AnalyzedPackage, 'versions'> {

@@ -17,6 +17,6 @@
 - @koishijs/plugin-footer
 - @koishijs/plugin-insight
 - @koishijs/plugin-logger
-- @koishijs/plugin-manager
+- @koishijs/plugin-market
 - @koishijs/plugin-sandbox
 - @koishijs/plugin-status

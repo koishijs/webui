@@ -1,6 +1,6 @@
 import { defineComponent, h } from 'vue'
 import { Context, receive, router, store } from '@koishijs/client'
-import type {} from '@koishijs/plugin-manager'
+import type {} from '@koishijs/plugin-market'
 import Settings from './settings/index.vue'
 import Dependencies from './deps/index.vue'
 import Market from './market/index.vue'

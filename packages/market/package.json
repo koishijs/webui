@@ -1,7 +1,7 @@
 {
-  "name": "@koishijs/plugin-manager",
+  "name": "@koishijs/plugin-market",
   "description": "Manage your bots and plugins with console",
-  "version": "2.0.2",
+  "version": "1.0.0",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
   "files": [
@@ -13,18 +13,17 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/koishijs/koishi.git",
-    "directory": "plugins/frontend/manager"
+    "directory": "plugins/frontend/market"
   },
   "bugs": {
     "url": "https://github.com/koishijs/koishi/issues"
   },
-  "homepage": "https://koishi.js.org/plugins/console/manager.html",
+  "homepage": "https://koishi.js.org/plugins/console/market.html",
   "keywords": [
     "bot",
     "chatbot",
     "koishi",
     "plugin",
-    "manager",
     "market",
     "manager",
     "server"

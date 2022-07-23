@@ -1,6 +1,6 @@
 import { Dict } from 'koishi'
 import { computed } from 'vue'
-import { MarketProvider } from '@koishijs/plugin-manager'
+import { MarketProvider } from '@koishijs/plugin-market'
 import { router, send, store } from '@koishijs/client'
 import {} from '@koishijs/cli'
 

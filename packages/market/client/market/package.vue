@@ -48,7 +48,7 @@
 <script lang="ts" setup>
 
 import { computed, PropType } from 'vue'
-import { MarketProvider } from '@koishijs/plugin-manager'
+import { MarketProvider } from '@koishijs/plugin-market'
 import { store } from '@koishijs/client'
 import { config, addFavorite, removeFavorite, getMixedMeta, gotoSettings } from '../utils'
 

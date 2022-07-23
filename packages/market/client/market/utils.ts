@@ -1,5 +1,5 @@
 import { store } from '@koishijs/client'
-import { MarketProvider } from '@koishijs/plugin-manager'
+import { MarketProvider } from '@koishijs/plugin-market'
 import { getMixedMeta } from '../utils'
 
 export function getKeywords(name: string) {

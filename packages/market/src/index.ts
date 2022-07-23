@@ -30,10 +30,14 @@ declare module '@koishijs/plugin-console' {
 export const name = 'manager'
 export const using = ['console', 'loader'] as const
 
-export interface Config extends MarketProvider.Config {}
+export interface Config {
+  search?: MarketProvider.Config
+}
 
 export const Config: Schema<Config> = Schema.intersect([
-  MarketProvider.Config,
+  Schema.object({
+    search: MarketProvider.Config,
+  }),
 ])
 
 export function apply(ctx: Context, config: Config) {
@@ -42,7 +46,7 @@ export function apply(ctx: Context, config: Config) {
   }
 
   ctx.plugin(Installer)
-  ctx.plugin(MarketProvider, config)
+  ctx.plugin(MarketProvider, config.search)
   ctx.plugin(PackageProvider)
   ctx.plugin(ConfigWriter)
 
