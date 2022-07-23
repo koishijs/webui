@@ -1,5 +1,5 @@
 <template>
-  <k-layout>
+  <k-layout main="page-deps">
     <div class="controls">
       <el-checkbox v-model="config.hideWorkspace">忽略工作区依赖</el-checkbox>
       <span class="float-right" v-if="!overrideCount">当前没有变更的依赖</span>
@@ -22,7 +22,7 @@
         </tr>
       </thead>
     </table>
-    <el-scrollbar>
+    <el-scrollbar class="body-container">
       <table class="table-body">
         <colgroup>
           <col width="auto">
@@ -82,26 +82,36 @@ async function install() {
 
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 
-.controls {
-  height: 2rem;
-  padding: 0 2rem;
-  line-height: 2rem;
-  margin: 1rem 0;
-}
+.page-deps {
+  display: flex;
+  flex-flow: column;
 
-tbody {
-  tr {
-    transition: 0.3s ease;
+  .controls {
+    height: 2rem;
+    padding: 0 2rem;
+    line-height: 2rem;
+    margin: 1rem 0;
   }
 
-  tr:hover {
-    background-color: var(--hover-bg);
+  .body-container {
+    transform: translateY(1px);
+    margin-top: -1px;
   }
 
-  tr:first-child {
-    border-top: none;
+  tbody {
+    tr {
+      transition: 0.3s ease;
+    }
+
+    tr:hover {
+      background-color: var(--hover-bg);
+    }
+
+    tr:first-child {
+      border-top: none;
+    }
   }
 }
 
