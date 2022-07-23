@@ -74,6 +74,16 @@ html.dark {
   --activity-icon-size: #{$navbar-icon-size};
   --header-height: #{$header-height};
   --footer-height: #{$footer-height};
+
+  --card-margin: 2rem;
+  --card-padding-vertical: 1.5rem;
+  --card-padding-horizontal: 1.25rem;
+
+  @media screen and (max-width: $bp-small) {
+    --card-margin: 1.5rem;
+    --card-padding-vertical: 1rem;
+    --card-padding-horizontal: 1rem;
+  }
 }
 
 html.dark .el-switch {

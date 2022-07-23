@@ -1,5 +1,5 @@
 <template>
-  <k-layout main="darker">
+  <k-layout main="darker" container="page-market">
     <el-scrollbar v-if="store.market.total > 0">
       <div class="search-box">
         <k-badge type="success" v-for="(word, index) in words.slice(0, -1)" :key="index" @click="words.splice(index, 1)">{{ word }}</k-badge>
@@ -105,13 +105,18 @@ const packages = computed(() => {
 
 <style lang="scss">
 
+.page-market .layout-main .el-scrollbar__view {
+  padding: 0 var(--card-margin);
+}
+
 .search-box {
   margin: 2rem auto 0;
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 600px;
+  width: 100%;
   max-width: 600px;
+  box-sizing: border-box;
   height: 3rem;
   border-radius: 1.5rem;
   background-color: var(--card-bg);
@@ -166,9 +171,9 @@ const packages = computed(() => {
 
 .market-container {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
-  gap: 2rem;
-  margin: 2rem;
+  grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+  gap: var(--card-margin);
+  margin: var(--card-margin) 0;
   justify-items: center;
 }
 

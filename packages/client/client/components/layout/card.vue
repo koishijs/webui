@@ -28,7 +28,6 @@ $paddingX: 1.25rem;
 $paddingY: 1.5rem;
 
 .k-card {
-  margin: 2rem;
   border-radius: 8px;
   overflow: hidden;
   background-color: var(--card-bg);

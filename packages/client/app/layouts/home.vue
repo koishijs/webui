@@ -1,5 +1,5 @@
 <template>
-  <k-layout main="darker">
+  <k-layout main="darker" container="page-welcome">
     <el-scrollbar>
       <welcome></welcome>
       <k-slot name="numeric" class="card-grid profile-grid"></k-slot>
@@ -16,30 +16,40 @@ import Welcome from './welcome.vue'
 
 <style lang="scss">
 
-.card-grid {
-  display: grid;
-  margin: 2rem;
+@import '@koishijs/client/palette.scss';
+
+.page-welcome {
+  .k-card.welcome {
+    margin: var(--card-margin);
+  }
+
+  .k-card-body {
+    margin: var(--card-padding-vertical) 0;
+    padding: 0 var(--card-padding-horizontal);
+  }
 }
 
-.card-grid .k-card {
-  margin: 0;
+.card-grid {
+  display: grid;
+  margin: var(--card-margin);
+  grid-gap: var(--card-margin);
 }
 
 .profile-grid {
   grid-template-columns: repeat(3, 1fr);
-  grid-gap: 2rem;
+
+  @media screen and (max-width: $bp-medium) {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
 .chart-grid {
-  grid-template-columns: repeat(2, 1fr);
-  grid-gap: 2rem;
-
   .echarts {
     max-width: 100%;
     margin: 0 auto;
   }
 
-  @media (min-width: 1400px) {
+  @media (min-width: $bp-medium) {
     grid-template-columns: repeat(2, 1fr);
 
     @media (min-width: 1600px) {
@@ -59,19 +69,19 @@ import Welcome from './welcome.vue'
     }
   }
 
-  @media (max-width: 1440px) {
+  @media (max-width: $bp-medium) {
     grid-template-columns: 1fr;
 
-    @media (min-width: 1200px) {
+    @media (min-width: $bp-small) {
       .echarts {
         width: 800px;
         height: 400px;
       }
     }
 
-    @media (max-width: 1200px) {
+    @media (max-width: $bp-small) {
       .echarts {
-        width: 720px;
+        width: 600px;
         height: 400px;
       }
     }

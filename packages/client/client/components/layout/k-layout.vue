@@ -1,10 +1,11 @@
 <template>
-  <div class="layout-container" :class="{ container, 'has-left-aside': $slots.left, 'has-right-aside': $slots.right }">
+  <div class="layout-container" :class="[container, { 'has-left-aside': $slots.left, 'has-right-aside': $slots.right }]">
     <aside class="layout-left" :class="left" v-if="$slots.left">
       <slot name="left"></slot>
     </aside>
 
     <div class="main-container">
+      <div class="mask" @click="isLeftAsideOpen = !isLeftAsideOpen"></div>
       <layout-header>
         <template #left>
           <slot name="header">{{ $route.name }}</slot>
@@ -30,6 +31,7 @@
 
 <script lang="ts" setup>
 
+import { isLeftAsideOpen } from './utils'
 import LayoutHeader from './layout-header.vue'
 
 export interface MenuItem {
@@ -80,7 +82,7 @@ defineProps<{
   .main-container {
     position: relative;
     flex: 1;
-    transition: all 0.3s ease;
+    transition: left 0.3s ease;
     background-color: var(--bg3);
     min-height: 100%;
     display: flex;
@@ -94,6 +96,24 @@ defineProps<{
       flex: 1 1 auto;
       overflow: hidden;
     }
+
+    .mask {
+      pointer-events: none;
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #000;
+      opacity: 0;
+      z-index: 300;
+      transition: opacity 0.3s ease;
+
+      .is-left-aside-open & {
+        opacity: 0.25;
+        pointer-events: auto;
+      }
+    }
   }
 }
 
@@ -101,15 +121,18 @@ defineProps<{
   .layout-container {
     .layout-left {
       position: fixed;
+      top: 0;
       left: var(--activity-width);
       right: var(--activity-width);
-      bottom: var(--footer-height);
+      bottom: 0;
     }
 
     .main-container {
       position: fixed;
       left: 0;
+      top: 0;
       width: 100vw;
+      bottom: 0;
     }
   }
 

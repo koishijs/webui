@@ -2,7 +2,11 @@
   "name": "@koishijs/client",
   "description": "Koishi Console Client",
   "version": "4.0.1",
-  "main": "client/index.ts",
+  "exports": {
+    ".": "./client/index.ts",
+    "./palette.scss": "./client/components/palette.scss",
+    "./package.json": "./package.json"
+  },
   "files": [
     "app",
     "client",

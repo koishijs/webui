@@ -68,6 +68,7 @@ const email = computed(() => props.data.author?.email)
 
 .market-view {
   width: 100%;
+  max-width: 540px;
   height: 192px;
   margin: 0;
   display: flex;
