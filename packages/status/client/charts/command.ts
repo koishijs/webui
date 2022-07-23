@@ -2,7 +2,7 @@ import { Context } from '@koishijs/client'
 import { createChart, Tooltip } from './utils'
 
 export default (ctx: Context) => {
-  ctx.addView({
+  ctx.slot({
     type: 'chart',
     component: createChart({
       title: '指令调用频率',

@@ -4,7 +4,7 @@ import Database from './index.vue'
 import './icons'
 
 export default (ctx: Context) => {
-  ctx.addPage({
+  ctx.page({
     path: '/database/:name*',
     name: '数据库',
     icon: 'database',
@@ -14,7 +14,7 @@ export default (ctx: Context) => {
     component: Database,
   })
 
-  ctx.addView({
+  ctx.slot({
     type: 'numeric',
     component: Card.numeric({
       title: '数据库体积',

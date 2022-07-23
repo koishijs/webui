@@ -13,7 +13,7 @@ app.provide('ecTheme', 'dark-blue')
 
 app.use(router)
 
-root.addPage({
+root.page({
   path: '/',
   name: '欢迎',
   icon: 'activity:home',

@@ -17,15 +17,9 @@ export default install
 export type Field = keyof Console.Services
 export type Computed<T> = T | (() => T)
 
-export interface ViewOptions {
+export interface SlotOptions {
   type: string
   order?: number
-  component: Component
-}
-
-export interface WidgetOptions {
-  id: string
-  type: 'small' | 'medium' | 'large'
   component: Component
 }
 
@@ -55,8 +49,7 @@ declare module 'vue-router' {
   }
 }
 
-export const views = reactive<Record<string, ViewOptions[]>>({})
-export const widgets = reactive<WidgetOptions[]>([])
+export const views = reactive<Record<string, SlotOptions[]>>({})
 
 export const router = createRouter({
   history: createWebHistory(config.uiPath),
@@ -70,10 +63,6 @@ export const routes: Ref<RouteRecordNormalized[]> = ref([])
 
 export type Disposable = () => void
 export type Extension = (ctx: Context) => void
-
-interface DisposableExtension extends PageExtension {
-  ctx: Context
-}
 
 export function getValue<T>(computed: Computed<T>): T {
   return typeof computed === 'function' ? (computed as any)() : computed
@@ -89,9 +78,8 @@ export interface Context {
 
 export class Context extends cordis.Context {
   static app: App
-  static pending: Dict<DisposableExtension[]> = {}
 
-  addView(options: ViewOptions) {
+  slot(options: SlotOptions) {
     options.order ??= 0
     markRaw(options.component)
     const list = views[options.type] ||= []
@@ -104,14 +92,8 @@ export class Context extends cordis.Context {
     return this.state.collect('view', () => remove(list, options))
   }
 
-  widget(options: WidgetOptions) {
-    markRaw(options.component)
-    widgets.push(options)
-    return this.state.collect('widget', () => remove(widgets, options))
-  }
-
-  addPage(options: PageOptions) {
-    const { path, name, component, badge, ...rest } = options
+  page(options: PageOptions) {
+    const { path, name, component, badge, fields = [], ...rest } = options
     const dispose = router.addRoute({
       path,
       name,
@@ -120,39 +102,17 @@ export class Context extends cordis.Context {
         order: 0,
         authority: 0,
         position: 'top',
-        fields: [],
+        fields,
         badge: badge ? [badge] : [],
         ...rest,
       },
     })
     routes.value = router.getRoutes()
-    const route = routes.value.find(r => r.name === name)
-    for (const options of Context.pending[name] || []) {
-      this.mergeMeta(route, options)
-    }
     return this.state.collect('page', () => {
       dispose()
       routes.value = router.getRoutes()
       return true
     })
-  }
-
-  private mergeMeta(route: RouteRecordNormalized, options: DisposableExtension) {
-    const { fields, badge } = options
-    if (fields) route.meta.fields.push(...fields)
-    if (badge) route.meta.badge.push(badge)
-  }
-
-  extendsPage(options: PageExtension): void
-  extendsPage(options: DisposableExtension) {
-    const { name } = options
-    options.ctx = this
-    const route = router.getRoutes().find(r => r.name === name)
-    if (route) {
-      this.mergeMeta(route, options)
-    } else {
-      (Context.pending[name] ||= []).push(options)
-    }
   }
 }
 
@@ -162,7 +122,7 @@ root.on('activity', (options) => {
   return !options.fields.every(key => store[key])
 })
 
-root.addView({
+root.slot({
   type: 'global',
   component: Overlay,
 })

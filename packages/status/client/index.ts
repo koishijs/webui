@@ -1,16 +1,16 @@
-import { Card, Context } from '@koishijs/client'
+import { Card, defineExtension } from '@koishijs/client'
 import {} from '@koishijs/plugin-status/src'
 import Charts from './charts'
 import Bots from './bots'
 import Load from './load'
 import './icons'
 
-export default (ctx: Context) => {
+export default defineExtension((ctx) => {
   ctx.plugin(Charts)
   ctx.plugin(Bots)
   ctx.plugin(Load)
 
-  ctx.addView({
+  ctx.slot({
     type: 'numeric',
     component: Card.numeric({
       title: '近期消息频率',
@@ -22,7 +22,7 @@ export default (ctx: Context) => {
     }),
   })
 
-  ctx.addView({
+  ctx.slot({
     type: 'numeric',
     component: Card.numeric({
       title: '资源服务器',
@@ -33,7 +33,7 @@ export default (ctx: Context) => {
     }),
   })
 
-  ctx.addView({
+  ctx.slot({
     type: 'numeric',
     component: Card.numeric({
       title: '活跃用户数量',
@@ -43,7 +43,7 @@ export default (ctx: Context) => {
     }),
   })
 
-  ctx.addView({
+  ctx.slot({
     type: 'numeric',
     component: Card.numeric({
       title: '活跃群组数量',
@@ -52,4 +52,4 @@ export default (ctx: Context) => {
       content: ({ meta }) => meta.activeGuilds,
     }),
   })
-}
+})

@@ -35,7 +35,7 @@ export default (ctx: Context) => {
     }
   }))
 
-  ctx.addPage({
+  ctx.page({
     path: '/login',
     name: '登录',
     icon: 'sign-in',
@@ -43,7 +43,7 @@ export default (ctx: Context) => {
     component: Login,
   })
 
-  ctx.addPage({
+  ctx.page({
     path: '/profile',
     name: '用户资料',
     icon: 'user-full',

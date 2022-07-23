@@ -3,7 +3,7 @@ import Chat from './chat.vue'
 import './icons'
 
 export default (ctx: Context) => {
-  ctx.addPage({
+  ctx.page({
     path: '/chat',
     name: '聊天',
     icon: 'activity:comments',

@@ -5,7 +5,7 @@ import './index.scss'
 import './icons'
 
 export default (ctx: Context) => {
-  ctx.addPage({
+  ctx.page({
     path: '/logs',
     name: '日志',
     icon: 'activity:logs',

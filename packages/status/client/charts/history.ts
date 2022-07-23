@@ -4,7 +4,7 @@ import { createChart, Tooltip } from './utils'
 const week = '日一二三四五六'
 
 export default (ctx: Context) => {
-  ctx.addView({
+  ctx.slot({
     type: 'chart',
     component: createChart({
       title: '历史发言数量',

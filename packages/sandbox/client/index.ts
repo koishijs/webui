@@ -3,7 +3,7 @@ import Sandbox from './index.vue'
 import './icons'
 
 export default (ctx: Context) => {
-  ctx.addPage({
+  ctx.page({
     name: '沙盒',
     path: '/sandbox',
     icon: 'activity:flask',

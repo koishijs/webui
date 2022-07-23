@@ -3,7 +3,7 @@ import {} from '@koishijs/plugin-commands'
 import Commands from './commands.vue'
 
 export default (ctx: Context) => {
-  ctx.addPage({
+  ctx.page({
     path: '/commands',
     name: '指令管理',
     icon: 'tools',

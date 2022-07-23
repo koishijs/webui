@@ -19,7 +19,7 @@ receive('market/patch', (data) => {
 })
 
 export default (ctx: Context) => {
-  ctx.addView({
+  ctx.slot({
     type: 'welcome-choice',
     component: defineComponent(() => () => h('div', {
       class: 'choice',
@@ -30,13 +30,13 @@ export default (ctx: Context) => {
     ])),
   })
 
-  ctx.addView({
+  ctx.slot({
     type: 'status-right',
     component: Progress,
     order: 10,
   })
 
-  ctx.addPage({
+  ctx.page({
     path: '/plugins/:name*',
     name: '插件配置',
     icon: 'activity:plugin',
@@ -46,7 +46,7 @@ export default (ctx: Context) => {
     component: Settings,
   })
 
-  ctx.addPage({
+  ctx.page({
     path: '/market',
     name: '插件市场',
     icon: 'activity:market',
@@ -56,7 +56,7 @@ export default (ctx: Context) => {
     component: Market,
   })
 
-  ctx.addPage({
+  ctx.page({
     path: '/dependencies',
     name: '依赖管理',
     icon: 'activity:deps',
