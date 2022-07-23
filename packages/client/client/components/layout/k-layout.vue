@@ -1,24 +1,27 @@
 <template>
-  <header class="layout-header">
-    <div class="left">
-      <slot name="header">{{ $route.name }}</slot>
-    </div>
-    <div class="right">
-      <el-tooltip v-for="{ icon, label, disabled, action } in menu || []" :disabled="!!disabled" :content="label" placement="bottom">
-        <span class="menu-item" :class="{ disabled }" @click="action()">
-          <k-icon class="menu-icon" :name="icon"></k-icon>
-        </span>
-      </el-tooltip>
-    </div>
-  </header>
-
-  <div class="layout-container" :class="container">
+  <div class="layout-container" :class="{ container, 'has-left-aside': $slots.left, 'has-right-aside': $slots.right }">
     <aside class="layout-left" :class="left" v-if="$slots.left">
       <slot name="left"></slot>
     </aside>
-    <main class="layout-main" :class="main">
-      <slot></slot>
-    </main>
+
+    <div class="main-container">
+      <layout-header>
+        <template #left>
+          <slot name="header">{{ $route.name }}</slot>
+        </template>
+        <template #right>
+          <el-tooltip v-for="{ icon, label, disabled, action } in menu || []" :disabled="!!disabled" :content="label" placement="bottom">
+            <span class="menu-item" :class="{ disabled }" @click="action()">
+              <k-icon class="menu-icon" :name="icon"></k-icon>
+            </span>
+          </el-tooltip>
+        </template>
+      </layout-header>
+      <main class="layout-main" :class="main">
+        <slot></slot>
+      </main>
+    </div>
+
     <aside class="layout-right" :class="right" v-if="$slots.right">
       <slot name="right"></slot>
     </aside>
@@ -26,6 +29,8 @@
 </template>
 
 <script lang="ts" setup>
+
+import LayoutHeader from './layout-header.vue'
 
 export interface MenuItem {
   icon: string
@@ -47,60 +52,14 @@ defineProps<{
 
 <style lang="scss">
 
-.layout-header {
-  position: absolute;
-  box-sizing: border-box;
-  z-index: 100;
-  top: 0;
-  height: var(--header-height);
-  left: 0;
-  right: 0;
-  background-color: var(--card-bg);
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-between;
-  border-bottom: var(--border) 1px solid;
-  transition: var(--color-transition);
-  font-weight: bolder;
-
-  .left {
-    margin-left: var(--navbar-width);
-    padding-left: 1rem;
-  }
-
-  .right {
-    margin-right: 0.5rem;
-  }
-
-  .menu-item {
-    position: relative;
-    width: 4rem;
-    height: var(--header-height);
-    display: inline-flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: var(--color-transition);
-
-    &.disabled {
-      opacity: 0.3;
-      pointer-events: none;
-    }
-
-    .menu-icon {
-      height: 1.125rem;
-    }
-  }
-}
+@import '../palette.scss';
 
 .layout-container {
   position: fixed;
   box-sizing: border-box;
   z-index: 100;
-  top: var(--header-height);
-  left: var(--navbar-width);
+  top: 0;
+  left: var(--activity-width);
   bottom: var(--footer-height);
   right: 0;
   background-color: var(--card-bg);
@@ -109,17 +68,60 @@ defineProps<{
   flex-direction: row;
 
   .layout-left {
-    width: 20rem;
+    top: 0;
+    bottom: 0;
+    position: relative;
+    width: $aside-width;
     border-right: var(--border) 1px solid;
     transition: var(--color-transition);
+    background-color: var(--bg2);
   }
 
-  .layout-main {
+  .main-container {
+    position: relative;
     flex: 1;
-    overflow: hidden;
+    transition: all 0.3s ease;
+    background-color: var(--bg3);
+    min-height: 100%;
+    display: flex;
+    flex-flow: column;
 
     &.darker {
-      background-color: var(--bg1);
+      background-color: var(--bg2);
+    }
+
+    .layout-main {
+      flex: 1 1 auto;
+      overflow: hidden;
+    }
+  }
+}
+
+@media screen and (max-width: $bp-small) {
+  .layout-container {
+    .layout-left {
+      position: fixed;
+      left: var(--activity-width);
+      right: var(--activity-width);
+      bottom: var(--footer-height);
+    }
+
+    .main-container {
+      position: fixed;
+      left: 0;
+      width: 100vw;
+    }
+  }
+
+  .is-left-aside-open .layout-container.has-left-aside {
+    .main-container {
+      left: calc($aside-width + $navbar-width);
+    }
+  }
+
+  .is-left-aside-open .layout-container:not(.has-left-aside) {
+    .main-container {
+      left: $navbar-width;
     }
   }
 }

@@ -38,14 +38,14 @@ function toggle() {
 
 <style lang="scss">
 
-nav.layout-activity {
+.layout-activity {
   position: fixed;
   box-sizing: border-box;
   z-index: 100;
-  top: var(--header-height);
+  top: 0;
   bottom: var(--footer-height);
-  width: var(--navbar-width);
-  background-color: var(--card-bg);
+  width: var(--activity-width);
+  background-color: var(--bg1);
   display: flex;
   flex-direction: column;
   justify-content: space-between;

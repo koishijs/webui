@@ -1,4 +1,5 @@
 @use 'sass:color';
+@import './palette.scss';
 
 $black: #000000;
 $white: #ffffff;
@@ -48,6 +49,77 @@ html.dark {
   @include apply-color(warning, #f9af1b);
   @include apply-color(error, #ff595a);
   @include apply-color(info, #4f545c);
+}
+
+:root {
+  --bg0: #{$white-0};
+  --bg1: #{$white-3};
+  --bg2: #{$white-2};
+  --bg3: #{$white-1};
+
+  --fg0: #000000;
+  --fg1: #231f37;
+  --fg2: #545260;
+  --fg3: #7a7887;
+  --fg3t: #7a78877f;
+
+  --disabled: #909399;
+
+  --hover-inset: 0 0 2px inset #0002;
+
+  --menu-fg: var(--fg1);
+  --hover-bg: var(--bg2);
+
+  --activity-width: #{$navbar-width};
+  --activity-icon-size: #{$navbar-icon-size};
+  --header-height: #{$header-height};
+  --footer-height: #{$footer-height};
+}
+
+html.dark .el-switch {
+  --el-switch-off-color: #72767d;
+}
+
+html.dark {
+  --bg0: #{$black-0};
+  --bg1: #{$black-1};
+  --bg2: #{$black-2};
+  --bg3: #{$black-3};
+
+  --fg0: #ffffff;
+  --fg1: #e3e5e8;
+  --fg2: #dcddde;
+  --fg3: #b9bbbe;
+
+  --menu-fg: var(--fg3);
+  --hover-bg: var(--bg3);
+}
+
+.k-menu-item {
+  display: block;
+  position: relative;
+  cursor: pointer;
+  user-select: none;
+  color: var(--menu-fg);
+  transition: color 0.3s ease, border-color 0.3s ease, background-color 0.3s ease;
+
+  &:hover {
+    color: var(--fg0);
+    background-color: var(--hover-bg);
+  }
+
+  &.active {
+    font-weight: bolder;
+    color: var(--active);
+  }
+}
+
+.k-group {
+  display: inline-block;
+}
+
+.float-right {
+  float: right;
 }
 
 :root {

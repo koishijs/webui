@@ -36,7 +36,7 @@ const loaded = computed(() => {
 <style lang="scss">
 
 .navbar-item {
-  height: var(--navbar-width);
+  height: var(--activity-width);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -44,7 +44,7 @@ const loaded = computed(() => {
   transition: var(--color-transition);
 
   .menu-icon {
-    height: var(--navbar-icon-size);
+    height: var(--activity-icon-size);
   }
 
   $marker-width: 4px;

@@ -8,6 +8,8 @@ import Empty from './empty.vue'
 import TabGroup from './tab-group.vue'
 import TabItem from './tab-item.vue'
 
+export * from './utils'
+
 export default function (app: App) {
   app.component('k-layout', Layout)
   app.component('k-status', Status)
