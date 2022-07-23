@@ -1,5 +1,5 @@
 <template>
-  <k-layout container="page-database">
+  <k-layout class="page-database">
     <template #header>
       数据库
       <span v-if="store.database?.size">({{ formatSize(store.database.size) }})</span>

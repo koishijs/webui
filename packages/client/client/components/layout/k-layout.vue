@@ -46,7 +46,6 @@ defineProps<{
   left?: string
   right?: string
   container?: string
-  containerClass?: string
   menu?: MenuItem[]
 }>()
 
@@ -54,7 +53,7 @@ defineProps<{
 
 <style lang="scss">
 
-@import '../palette.scss';
+@import '@koishijs/client/palette.scss';
 
 .layout-container {
   position: fixed;

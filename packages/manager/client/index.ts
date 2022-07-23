@@ -20,7 +20,7 @@ receive('market/patch', (data) => {
 
 export default (ctx: Context) => {
   ctx.addView({
-    type: 'welcome:choice',
+    type: 'welcome-choice',
     component: defineComponent(() => () => h('div', {
       class: 'choice',
       onClick: () => router.push('/market'),

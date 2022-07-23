@@ -1,5 +1,5 @@
 <template>
-  <k-layout main="darker" container="page-welcome">
+  <k-layout main="darker" class="page-home">
     <el-scrollbar>
       <welcome></welcome>
       <k-slot name="numeric" class="card-grid profile-grid"></k-slot>
@@ -18,7 +18,7 @@ import Welcome from './welcome.vue'
 
 @import '@koishijs/client/palette.scss';
 
-.page-welcome {
+.page-home {
   .k-card.welcome {
     margin: var(--card-margin);
   }

@@ -17,16 +17,24 @@ defineProps<{
 
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 
-.k-card-numeric {
+@import '@koishijs/client/palette.scss';
+
+.k-card-numeric .k-card-body {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
   .k-icon {
-    height: 2.4rem;
-    padding: 0.3rem 0;
+    height: 2.5rem;
     width: 3rem;
-    text-align: center;
     color: var(--fg2);
     transition: color 0.3s ease;
+
+    @media screen and (max-width: $bp-small) {
+      height: 2.25rem;
+    }
   }
 
   .content {
@@ -43,7 +51,7 @@ defineProps<{
   }
 
   .value {
-    font-size: 1.2rem;
+    font-size: 1.125rem;
   }
 }
 

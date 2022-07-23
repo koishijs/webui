@@ -1,5 +1,5 @@
 @use 'sass:color';
-@import './palette.scss';
+@import '@koishijs/client/palette.scss';
 
 $black: #000000;
 $white: #ffffff;
@@ -77,7 +77,7 @@ html.dark {
 
   --card-margin: 2rem;
   --card-padding-vertical: 1.5rem;
-  --card-padding-horizontal: 1.25rem;
+  --card-padding-horizontal: 1.5rem;
 
   @media screen and (max-width: $bp-small) {
     --card-margin: 1.5rem;

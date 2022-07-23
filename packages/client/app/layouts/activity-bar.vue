@@ -38,6 +38,8 @@ function toggle() {
 
 <style lang="scss">
 
+@import '@koishijs/client/palette.scss';
+
 .layout-activity {
   position: fixed;
   box-sizing: border-box;
@@ -51,6 +53,10 @@ function toggle() {
   justify-content: space-between;
   border-right: var(--border) 1px solid;
   transition: var(--color-transition);
+
+  @media screen and (max-width: $bp-small) {
+    bottom: 0;
+  }
 }
 
 </style>

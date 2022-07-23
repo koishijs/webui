@@ -1,5 +1,5 @@
 <template>
-  <k-layout container="page-chat">
+  <k-layout class="page-chat">
     <template #left>
       <el-scrollbar>
         <template v-for="({ name, channels }, id) in guilds" :key="id">
