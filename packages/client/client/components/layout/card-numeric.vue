@@ -19,8 +19,6 @@ defineProps<{
 
 <style lang="scss">
 
-@import '@koishijs/client/palette.scss';
-
 .k-card-numeric .k-card-body {
   display: flex;
   justify-content: space-between;
@@ -32,7 +30,7 @@ defineProps<{
     color: var(--fg2);
     transition: color 0.3s ease;
 
-    @media screen and (max-width: $bp-small) {
+    @media screen and (max-width: 768px) {
       height: 2.25rem;
     }
   }

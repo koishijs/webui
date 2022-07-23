@@ -1,5 +1,5 @@
 @use 'sass:color';
-@import '@koishijs/client/palette.scss';
+@import './palette.scss';
 
 $black: #000000;
 $white: #ffffff;
@@ -14,6 +14,7 @@ $white: #ffffff;
   --card-shadow: 0 6px 10px -4px rgb(0 0 0 / 15%);
   --loading-mask-bg: #f2f3f5bf;
   --color-transition: color 0.3s ease, border-color 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease;
+  --bp-small: 768px;
 
   @mixin apply-color($name, $base) {
     --#{$name}: #{$base};
@@ -70,16 +71,17 @@ html.dark {
   --menu-fg: var(--fg1);
   --hover-bg: var(--bg2);
 
-  --activity-width: #{$navbar-width};
-  --activity-icon-size: #{$navbar-icon-size};
-  --header-height: #{$header-height};
-  --footer-height: #{$footer-height};
+  --aside-width: 17.5rem;
+  --activity-width: 4rem;
+  --activity-icon-size: 1.5rem;
+  --header-height: 3rem;
+  --footer-height: 1rem;
 
   --card-margin: 2rem;
   --card-padding-vertical: 1.5rem;
   --card-padding-horizontal: 1.5rem;
 
-  @media screen and (max-width: $bp-small) {
+  @media screen and (max-width: 768px) {
     --card-margin: 1.5rem;
     --card-padding-vertical: 1rem;
     --card-padding-horizontal: 1rem;

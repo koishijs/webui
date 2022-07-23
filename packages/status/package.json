@@ -1,7 +1,7 @@
 {
   "name": "@koishijs/plugin-status",
   "description": "Status view for Koishi",
-  "version": "6.0.1",
+  "version": "6.0.2",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
   "files": [
@@ -42,11 +42,11 @@
     }
   },
   "peerDependencies": {
-    "@koishijs/plugin-console": "^4.0.1",
+    "@koishijs/plugin-console": "^4.1.0",
     "koishi": "^4.8.1"
   },
   "devDependencies": {
-    "@koishijs/client": "^4.0.1",
+    "@koishijs/client": "^4.1.0",
     "@koishijs/cli": "^4.8.1",
     "echarts": "^5.3.2",
     "vue-echarts": "^6.0.3"

@@ -79,6 +79,16 @@ export interface Context {
 export class Context extends cordis.Context {
   static app: App
 
+  /** @deprecated */
+  addView(options: SlotOptions) {
+    return this.slot(options)
+  }
+
+  /** @deprecated */
+  addPage(options: PageOptions) {
+    return this.page(options)
+  }
+
   slot(options: SlotOptions) {
     options.order ??= 0
     markRaw(options.component)

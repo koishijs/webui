@@ -53,8 +53,6 @@ defineProps<{
 
 <style lang="scss">
 
-@import '@koishijs/client/palette.scss';
-
 .layout-container {
   position: fixed;
   box-sizing: border-box;
@@ -72,7 +70,7 @@ defineProps<{
     top: 0;
     bottom: 0;
     position: relative;
-    width: $aside-width;
+    width: var(--aside-width);
     border-right: var(--border) 1px solid;
     transition: var(--color-transition);
     background-color: var(--bg2);
@@ -116,7 +114,7 @@ defineProps<{
   }
 }
 
-@media screen and (max-width: $bp-small) {
+@media screen and (max-width: 768px) {
   .layout-container {
     .layout-left {
       position: fixed;
@@ -137,13 +135,13 @@ defineProps<{
 
   .is-left-aside-open .layout-container.has-left-aside {
     .main-container {
-      left: calc($aside-width + $navbar-width);
+      left: calc(var(--aside-width) + var(--activity-width));
     }
   }
 
   .is-left-aside-open .layout-container:not(.has-left-aside) {
     .main-container {
-      left: $navbar-width;
+      left: var(--activity-width);
     }
   }
 }

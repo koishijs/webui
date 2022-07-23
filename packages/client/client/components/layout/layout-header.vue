@@ -58,7 +58,7 @@ import { isLeftAsideOpen } from './utils'
   }
 }
 
-@media screen and (max-width: $bp-small) {
+@media screen and (max-width: 768px) {
   .toggle-sidebar-button {
     display: block;
   }
@@ -67,7 +67,7 @@ import { isLeftAsideOpen } from './utils'
 .layout-header {
   position: relative;
   box-sizing: border-box;
-  height: $header-height;
+  height: var(--header-height);
   flex: 0 0 auto;
   background-color: inherit;
   display: flex;

@@ -16,8 +16,6 @@ import Welcome from './welcome.vue'
 
 <style lang="scss">
 
-@import '@koishijs/client/palette.scss';
-
 .page-home {
   .k-card.welcome {
     margin: var(--card-margin);
@@ -38,7 +36,7 @@ import Welcome from './welcome.vue'
 .profile-grid {
   grid-template-columns: repeat(3, 1fr);
 
-  @media screen and (max-width: $bp-medium) {
+  @media screen and (max-width: 1024px) {
     grid-template-columns: repeat(2, 1fr);
   }
 }
@@ -49,7 +47,7 @@ import Welcome from './welcome.vue'
     margin: 0 auto;
   }
 
-  @media (min-width: $bp-medium) {
+  @media (min-width: 1024px) {
     grid-template-columns: repeat(2, 1fr);
 
     @media (min-width: 1600px) {
@@ -69,17 +67,17 @@ import Welcome from './welcome.vue'
     }
   }
 
-  @media (max-width: $bp-medium) {
+  @media (max-width: 1024px) {
     grid-template-columns: 1fr;
 
-    @media (min-width: $bp-small) {
+    @media (min-width: 768px) {
       .echarts {
         width: 800px;
         height: 400px;
       }
     }
 
-    @media (max-width: $bp-small) {
+    @media (max-width: 768px) {
       .echarts {
         width: 600px;
         height: 400px;

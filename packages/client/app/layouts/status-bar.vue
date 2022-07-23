@@ -7,8 +7,6 @@
 
 <style lang="scss">
 
-@import '@koishijs/client/palette.scss';
-
 .layout-status {
   position: fixed;
   box-sizing: border-box;
@@ -31,7 +29,7 @@
   }
 }
 
-@media screen and (max-width: $bp-small) {
+@media screen and (max-width: 768px) {
   .layout-status {
     display: none;
   }

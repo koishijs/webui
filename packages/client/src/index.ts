@@ -37,6 +37,11 @@ export async function buildExtension(root: string, config: UserConfig = {}) {
         '@koishijs/client': root + '/client.js',
       },
     },
+    css: {
+      preprocessorOptions: {
+        sass: {},
+      },
+    },
   }, config))
 
   await fsp.rename(root + '/dist/index.es.js', root + '/dist/index.js')

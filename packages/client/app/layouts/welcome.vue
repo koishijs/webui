@@ -21,8 +21,6 @@ function openDocs() {
 
 <style lang="scss">
 
-@import '@koishijs/client/palette.scss';
-
 .page-home .welcome {
   --welcome-title: 2.5rem;
   --welcome-padding: 3rem 3rem;
@@ -71,7 +69,7 @@ function openDocs() {
     }
   }
 
-  @media screen and (max-width: $bp-small) {
+  @media screen and (max-width: 768px) {
     --welcome-title: 2rem;
     --welcome-padding: 2rem 2rem;
     --welcome-gap: 1.5rem;
