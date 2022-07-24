@@ -2,26 +2,26 @@
   <template v-if="name">
     <!-- reusability -->
     <k-comment v-if="local.id && !local.forkable && current.disabled" type="warning">
-      此插件已在运行且不可重用，启用可能会导致非预期的问题。
+      <p>此插件已在运行且不可重用，启用可能会导致非预期的问题。</p>
     </k-comment>
 
     <!-- latest -->
     <k-comment v-if="hasUpdate">
-      当前的插件版本不是最新，<router-link to="/dependencies">点击前往依赖管理</router-link>。
+      <p>当前的插件版本不是最新，<router-link to="/dependencies">点击前往依赖管理</router-link>。</p>
     </k-comment>
 
     <!-- external -->
     <k-comment type="warning" v-if="!local.workspace && !store.dependencies[name]">
-      尚未将当前插件列入依赖，<a @click="send('market/patch', name, local.version)">点击添加</a>。
+      <p>尚未将当前插件列入依赖，<a @click="send('market/patch', name, local.version)">点击添加</a>。</p>
     </k-comment>
 
     <!-- impl -->
     <template v-for="name in env.impl" :key="name">
       <k-comment v-if="deps[name] && current.disabled" type="warning">
-        此插件将会提供 {{ name }} 服务，但此服务已被其他插件实现。
+        <p>此插件将会提供 {{ name }} 服务，但此服务已被其他插件实现。</p>
       </k-comment>
       <k-comment v-else :type="current.disabled ? 'primary' : 'success'">
-        此插件{{ current.disabled ? '将会提供' : '提供了' }} {{ name }} 服务。
+        <p>此插件{{ current.disabled ? '将会提供' : '提供了' }} {{ name }} 服务。</p>
       </k-comment>
     </template>
 
@@ -29,22 +29,22 @@
     <k-comment
       v-for="({ required, available }, name) in env.using" :key="name"
       :type="deps[name] ? 'success' : required ? 'warning' : 'primary'">
-      {{ required ? '必需' : '可选' }}服务：{{ name }}
-      {{ deps[name] ? '(已加载)' : '(未加载，启用下列任一插件可实现此服务)' }}
-      <template v-if="!deps[name]" #body>
-        <ul>
-          <li v-for="name in available">
-            <k-dep-link :name="name"></k-dep-link> (点击{{ name in store.packages ? '配置' : '添加' }})
-          </li>
-        </ul>
-      </template>
+      <p>
+        {{ required ? '必需' : '可选' }}服务：{{ name }}
+        {{ deps[name] ? '(已加载)' : '(未加载，启用下列任一插件可实现此服务)' }}
+      </p>
+      <ul v-if="!deps[name]">
+        <li v-for="name in available">
+          <k-dep-link :name="name"></k-dep-link> (点击{{ name in store.packages ? '配置' : '添加' }})
+        </li>
+      </ul>
     </k-comment>
 
-    <k-slot name="manager:settings"></k-slot>
+    <k-slot name="market-settings"></k-slot>
 
     <!-- schema -->
     <k-comment v-if="!local.schema" type="warning">
-      此插件未声明配置项，这可能并非预期行为{{ hint }}。
+      <p>此插件未声明配置项，这可能并非预期行为{{ hint }}。</p>
     </k-comment>
     <k-form :schema="local.schema" :initial="current.config" v-model="config">
       <template #hint>{{ hint }}</template>
@@ -52,7 +52,7 @@
   </template>
 
   <k-comment v-else-if="current.label" type="error">
-    此插件尚未安装，<span class="link" @click.stop="gotoMarket">点击前往插件市场</span>。
+    <p>此插件尚未安装，<span class="link" @click.stop="gotoMarket">点击前往插件市场</span>。</p>
   </k-comment>
 </template>
 
@@ -60,7 +60,7 @@
 
 import { send, store, router } from '@koishijs/client'
 import { computed, provide } from 'vue'
-import { envMap, Tree, separator } from './utils'
+import { envMap, Tree } from './utils'
 import KDepLink from './dep-link.vue'
 
 const props = defineProps<{
@@ -104,8 +104,9 @@ function gotoMarket() {
   router.push('/market?keyword=' + props.current.label)
 }
 
-provide('manager.local', local)
-provide('manager.config', config)
+provide('manager.settings.local', local)
+provide('manager.settings.config', config)
+provide('manager.settings.current', computed(() => props.current))
 
 </script>
 

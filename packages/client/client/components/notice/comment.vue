@@ -1,10 +1,9 @@
 <template>
   <div class="k-comment" :class="type">
     <k-icon :name="icon"></k-icon>
-    <h4 class="k-comment-header">
-      <slot>{{ title }}</slot>
-    </h4>
-    <slot name="body"></slot>
+    <slot>
+      <p>{{ title }}</p>
+    </slot>
   </div>
 </template>
 
@@ -48,10 +47,7 @@ const icon = computed(() => {
   position: relative;
   line-height: 1.7;
   transition: 0.3s ease;
-
-  h4 {
-    margin: 1rem 0;
-  }
+  font-weight: 500;
 
   > .k-icon {
     position: absolute;

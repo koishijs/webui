@@ -115,10 +115,6 @@ function onClick(event: MouseEvent) {
       color: var(--disabled);
     }
   }
-
-  & + & {
-    margin-left: 1rem;
-  }
 }
 
 </style>
