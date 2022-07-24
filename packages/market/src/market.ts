@@ -7,7 +7,6 @@ import spawn from 'cross-spawn'
 const logger = new Logger('market')
 
 class MarketProvider extends DataService<MarketProvider.Payload> {
-  /** https://github.com/npm/registry/blob/master/docs/REGISTRY-API.md */
   public http: Quester
 
   private timestamp = 0
@@ -116,7 +115,7 @@ namespace MarketProvider {
   }
 
   export const Config: Schema<Config> = Schema.object({
-    endpoint: Schema.string().role('url').description('用于搜索插件市场的网址。默认跟随你当前的 npm registry。'),
+    endpoint: Schema.string().role('url').description('用于搜索插件市场的网址。默认跟随当前的 npm registry。'),
     timeout: Schema.number().role('time').default(Time.second * 30).description('搜索插件市场的超时时间。'),
   }).description('搜索设置')
 

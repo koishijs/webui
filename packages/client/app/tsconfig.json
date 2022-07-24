@@ -3,6 +3,7 @@
     "rootDir": ".",
     "target": "es2020",
     "module": "esnext",
+    "jsx": "preserve",
     "composite": true,
     "skipLibCheck": true,
     "esModuleInterop": true,
