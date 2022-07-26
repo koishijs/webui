@@ -136,7 +136,7 @@ class Installer extends DataService<Dict<Dependency>> {
     const code = await this.exec(agent, args)
     if (code) return code
     await this.refresh()
-    const newPayload = this.get()
+    const newPayload = await this.get()
     for (const name in oldPayload) {
       const { resolved, workspace } = oldPayload[name]
       if (workspace) continue
