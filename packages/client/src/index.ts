@@ -33,7 +33,7 @@ export async function buildExtension(root: string, config: UserConfig = {}) {
       alias: {
         'vue': root + '/vue.js',
         'vue-router': root + '/vue-router.js',
-        '@useuse/core': root + '/useuse.js',
+        '@vueuse/core': root + '/vueuse.js',
         '@koishijs/client': root + '/client.js',
       },
     },

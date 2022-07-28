@@ -1,30 +1,5 @@
 import { App } from 'vue'
-import {
-  ElButton,
-  ElCheckbox,
-  ElDatePicker,
-  ElDropdown,
-  ElDropdownItem,
-  ElDropdownMenu,
-  ElInput,
-  ElInputNumber,
-  ElLoading,
-  ElMessage,
-  ElMessageBox,
-  ElPagination,
-  ElPopconfirm,
-  ElProgress,
-  ElRadio,
-  ElScrollbar,
-  ElSelect,
-  ElSlider,
-  ElSwitch,
-  ElTable,
-  ElTableColumn,
-  ElTimePicker,
-  ElTooltip,
-  ElTree,
-} from 'element-plus'
+import Element, { ElLoading, ElMessage, ElMessageBox } from 'element-plus'
 
 import common from './common'
 import form from 'schemastery-vue'
@@ -34,30 +9,7 @@ import layout from './layout'
 import notice from './notice'
 import Slot from './slot'
 
-import 'element-plus/es/components/button/style/css'
-import 'element-plus/es/components/checkbox/style/css'
-import 'element-plus/es/components/dropdown/style/css'
-import 'element-plus/es/components/dropdown-item/style/css'
-import 'element-plus/es/components/dropdown-menu/style/css'
-import 'element-plus/es/components/input/style/css'
-import 'element-plus/es/components/input-number/style/css'
-import 'element-plus/es/components/loading/style/css'
-import 'element-plus/es/components/message/style/css'
-import 'element-plus/es/components/message-box/style/css'
-import 'element-plus/es/components/radio/style/css'
-import 'element-plus/es/components/scrollbar/style/css'
-import 'element-plus/es/components/select/style/css'
-import 'element-plus/es/components/slider/style/css'
-import 'element-plus/es/components/switch/style/css'
-import 'element-plus/es/components/tooltip/style/css'
-import 'element-plus/es/components/tree/style/css'
-import 'element-plus/es/components/table/style/css'
-import 'element-plus/es/components/table-column/style/css'
-import 'element-plus/es/components/pagination/style/css'
-import 'element-plus/es/components/popconfirm/style/css'
-import 'element-plus/es/components/progress/style/css'
-import 'element-plus/es/components/date-picker/style/css'
-import 'element-plus/es/components/time-picker/style/css'
+import 'element-plus/dist/index.css'
 import './style.scss'
 
 export const loading = ElLoading.service
@@ -74,28 +26,7 @@ export * from '@satorijs/components'
 export { icons, ChatImage }
 
 export default function (app: App) {
-  app.use(ElButton)
-  app.use(ElCheckbox)
-  app.use(ElDatePicker)
-  app.use(ElDropdown)
-  app.use(ElDropdownItem)
-  app.use(ElDropdownMenu)
-  app.use(ElInput)
-  app.use(ElInputNumber)
-  app.use(ElLoading)
-  app.use(ElPagination)
-  app.use(ElPopconfirm)
-  app.use(ElProgress)
-  app.use(ElRadio)
-  app.use(ElScrollbar)
-  app.use(ElSelect)
-  app.use(ElSlider)
-  app.use(ElSwitch)
-  app.use(ElTooltip)
-  app.use(ElTree)
-  app.use(ElTable)
-  app.use(ElTableColumn)
-  app.use(ElTimePicker)
+  app.use(Element)
 
   app.use(common)
   app.use(form)
