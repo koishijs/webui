@@ -27,6 +27,7 @@ $white: #ffffff;
   @include apply-color(success, #67c23a);
   @include apply-color(warning, #e49400);
   @include apply-color(error, #f56c6c);
+  @include apply-color(danger, #f56c6c);
   @include apply-color(info, #909399);
 }
 
@@ -49,6 +50,7 @@ html.dark {
   @include apply-color(success, #3ba55e);
   @include apply-color(warning, #f9af1b);
   @include apply-color(error, #ff595a);
+  @include apply-color(danger, #ff595a);
   @include apply-color(info, #4f545c);
 }
 
@@ -147,13 +149,26 @@ html.dark {
   --el-color-primary-light-9: var(--bg1);
   --el-color-success: var(--success);
   --el-color-warning: var(--warning);
-  --el-color-error: var(--error);
+  --el-color-danger: var(--error);
   --el-color-white: var(--bg1);
   --el-color-black: var(--fg1);
   --el-bg-color: var(--bg0);
   --el-bg-color-overlay: var(--bg0);
   --el-fill-color-blank: transparent;
-  --el-fill-color-light: var(--page-bg);
+  --el-fill-color-light: var(--bg1);
+}
+
+.theme-color {
+  @mixin apply-color($name) {
+    &.#{$name} {
+      color: var(--#{$name});
+    }
+  }
+
+  @include apply-color(primary);
+  @include apply-color(success);
+  @include apply-color(warning);
+  @include apply-color(danger);
 }
 
 .k-icon {
@@ -216,26 +231,41 @@ html.dark .el-switch {
 }
 
 .right-adjacent {
-  &.k-button, &.el-select .el-input__wrapper {
+  &.el-button, &.el-select .el-input__wrapper {
     border-top-right-radius: 0;
     border-bottom-right-radius: 0;
   }
 
-  &:hover {
-    z-index: 100;
-  }
-  &:hover + .left-adjacent {
-    border-left-color: transparent;
+  &:hover, &:focus {
+    + .left-adjacent::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      border-left: 1px solid #c6e2ff;
+      z-index: 1;
+    }
   }
 }
 
 .left-adjacent {
-  z-index: 0;
   margin-left: -1px;
 
-  &.k-button, &.el-select .el-input__wrapper {
+  &.el-button, &.el-select .el-input__wrapper {
     border-top-left-radius: 0;
     border-bottom-left-radius: 0;
+  }
+}
+
+.el-overlay-dialog {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  .el-dialog {
+    margin: 0;
   }
 }
 

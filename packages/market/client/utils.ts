@@ -1,18 +1,22 @@
 import { Dict } from 'koishi'
-import { computed, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { createStorage, router, send, store } from '@koishijs/client'
 
 interface ManagerConfig {
+  prefix: string
   override: Dict<string>
   showInstalled?: boolean
   hideWorkspace?: boolean
 }
 
 export const config = createStorage<ManagerConfig>('manager', 2, () => ({
+  prefix: '^',
   override: {},
   showInstalled: false,
   hideWorkspace: true,
 }))
+
+export const active = ref('')
 
 export const overrideCount = computed(() => {
   return Object.values(config.override).filter(value => value !== undefined).length

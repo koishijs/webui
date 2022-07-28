@@ -41,7 +41,7 @@
     "@vueuse/core": "^7.7.1",
     "cac": "^6.7.12",
     "cosmokit": "^1.2.1",
-    "element-plus": "^2.2.2",
+    "element-plus": "2.2.11",
     "marked": "^4.0.18",
     "sass": "^1.52.1",
     "schemastery": "^3.5.0",

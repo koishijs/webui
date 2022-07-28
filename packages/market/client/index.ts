@@ -1,8 +1,9 @@
 import { defineComponent, h } from 'vue'
 import { Context, receive, router, store } from '@koishijs/client'
 import type {} from '@koishijs/plugin-market'
-import Settings from './settings/index.vue'
+import Install from './deps/install.vue'
 import Dependencies from './deps/index.vue'
+import Settings from './settings/index.vue'
 import Market from './market/index.vue'
 import Progress from './market/progress.vue'
 import { overrideCount } from './utils'
@@ -28,6 +29,11 @@ export default (ctx: Context) => {
       h('h2', '浏览插件'),
       h('p', '浏览插件市场中的插件，并根据自己的需要安装和配置。'),
     ])),
+  })
+
+  ctx.slot({
+    type: 'global',
+    component: Install,
   })
 
   ctx.slot({

@@ -39,8 +39,6 @@
       </ul>
     </k-comment>
   </k-layout>
-
-  <install-panel v-model="active"></install-panel>
 </template>
 
 <script setup lang="ts">
@@ -48,12 +46,9 @@
 import { router, store } from '@koishijs/client'
 import { computed, reactive, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
-import { config } from '../utils'
+import { config, active } from '../utils'
 import { validate } from './utils'
 import PackageView from './package.vue'
-import InstallPanel from './install.vue'
-
-const active = ref<string>()
 
 const route = useRoute()
 

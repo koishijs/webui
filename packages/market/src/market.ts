@@ -91,7 +91,7 @@ class MarketProvider extends DataService<MarketProvider.Payload> {
         const { name, versions } = item
         this.tempCache[name] = this.fullCache[name] = {
           ...item,
-          versions: Object.fromEntries(versions.map(item => [item.version, pick(item, ['keywords', 'peerDependencies'])])),
+          versions: Object.fromEntries(versions.map(item => [item.version, pick(item, ['peerDependencies'])] as const)),
         }
       },
       after: () => this.flushData(),
