@@ -1,24 +1,19 @@
 <template>
   <tr class="dep-package-view">
-    <td class="name" :class="state">{{ name }}</td>
+    <td class="name">{{ name }}</td>
 
-    <td class="current">
-      {{ local.resolved }}
-      <template v-if="local.workspace">(工作区)</template>
-      <template v-else-if="local.resolved === local.latest">(最新)</template>
+    <td class="current">{{ local.resolved }}</td>
+
+    <td>{{ local.request }}</td>
+
+    <td>
+      <template v-if="local.workspace">工作区</template>
+      <template v-else-if="local.resolved === local.latest">最新</template>
+      <template v-else>可更新</template>
     </td>
 
-    <td class="target">
-      <k-button v-if="local.workspace" class="action" @click="send('market/patch', name, null)">
-        移除依赖
-      </k-button>
-      <template v-else-if="local.versions">
-        <k-button class="prefix right-adjacent" @click="prefix = transition[prefix]">{{ prefix || '=' }}</k-button>
-        <el-select class="left-adjacent" v-model="value">
-          <el-option value="">移除依赖</el-option>
-          <el-option v-for="({ version }) in local.versions" :key="version" :value="version"></el-option>
-        </el-select>
-      </template>
+    <td>
+      <el-button v-if="local.workspace || local.versions" @click="active = name">修改</el-button>
       <template v-else>
         版本获取失败
       </template>
@@ -29,8 +24,8 @@
 <script lang="ts" setup>
 
 import { computed } from 'vue'
-import { send, store } from '@koishijs/client'
-import { config } from '../utils'
+import { store } from '@koishijs/client'
+import { config, active } from '../utils'
 
 const props = defineProps({
   name: String,
@@ -65,17 +60,6 @@ const prefix = computed({
   },
 })
 
-const transition = { '': '^', '^': '~', '~': '' }
-
-const state = computed(() => {
-  if (!props.name.includes('koishi-plugin-') && !props.name.startsWith('@koishijs/plugin-')) {
-    return 'disabled'
-  }
-  if (store.packages?.[props.name]?.id) return 'success'
-  if (local.value) return 'warning'
-  return 'error'
-})
-
 const local = computed(() => {
   return store.dependencies[props.name]
 })
@@ -90,55 +74,11 @@ const local = computed(() => {
 
   td.name {
     text-align: left;
-    padding-left: 3.6rem;
-
-    &::before {
-      content: '';
-      position: absolute;
-      border-radius: 100%;
-      width: 0.5rem;
-      height: 0.5rem;
-      top: 50%;
-      left: 1.8rem;
-      transform: translate(-50%, -50%);
-      transition: background-color 0.3s ease;
-      box-shadow: 1px 1px 2px #3333;
-    }
-
-    // 已加载的插件
-    &.success::before {
-      background-color: var(--success);
-    }
-    // 未加载的插件
-    &.warning::before {
-      background-color: var(--warning);
-    }
-    // 未安装的插件
-    &.error::before {
-      background-color: var(--error);
-    }
-    // 非插件
-    &.disabled::before {
-      background-color: var(--disabled);
-    }
+    padding-left: 2rem;
   }
 
-  $button-size: 12rem;
-  $prefix-size: 2rem;
-
-  .k-button.action {
-    width: $button-size;
-  }
-
-  .el-select {
-    width: $button-size - $prefix-size;
-  }
-
-  .k-button.prefix {
-    width: $prefix-size;
-    height: $prefix-size;
-    vertical-align: bottom;
-    padding: 0;
+  .el-button {
+    width: 4rem;
   }
 }
 

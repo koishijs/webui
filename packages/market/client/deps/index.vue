@@ -11,14 +11,18 @@
     <table>
       <colgroup>
         <col width="auto">
-        <col width="30%">
-        <col width="30%">
+        <col width="15%">
+        <col width="15%">
+        <col width="15%">
+        <col width="15%">
       </colgroup>
       <thead>
         <tr>
           <th>依赖名称</th>
-          <th>当前版本</th>
+          <th>本地版本</th>
           <th>目标版本</th>
+          <th>状态</th>
+          <th>操作</th>
         </tr>
       </thead>
     </table>
@@ -26,8 +30,10 @@
       <table class="table-body">
         <colgroup>
           <col width="auto">
-          <col width="30%">
-          <col width="30%">
+          <col width="15%">
+          <col width="15%">
+          <col width="15%">
+          <col width="15%">
         </colgroup>
         <tbody>
           <package-view v-for="name in names" :key="name" :name="name"></package-view>

@@ -12,7 +12,7 @@
 
     <!-- external -->
     <k-comment type="warning" v-if="!local.workspace && !store.dependencies[name]">
-      <p>尚未将当前插件列入依赖，<a @click="send('market/patch', name, local.version)">点击添加</a>。</p>
+      <p>尚未将当前插件列入依赖，<a @click="send('market/install', { [name]: local.version })">点击添加</a>。</p>
     </k-comment>
 
     <!-- impl -->

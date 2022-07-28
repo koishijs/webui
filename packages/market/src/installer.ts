@@ -4,6 +4,7 @@ import { PackageJson, Registry } from '@koishijs/registry'
 import { resolve } from 'path'
 import { promises as fsp } from 'fs'
 import { loadManifest } from './utils'
+import { satisfies } from 'semver'
 import {} from '@koishijs/cli'
 import which from 'which-pm-runs'
 import spawn from 'cross-spawn'
@@ -12,7 +13,6 @@ import pMap from 'p-map'
 declare module '@koishijs/plugin-console' {
   interface Events {
     'market/install'(deps: Dict<string>): Promise<number>
-    'market/patch'(name: string, version: string): void
   }
 }
 
@@ -40,6 +40,7 @@ export interface Dependency {
 class Installer extends DataService<Dict<Dependency>> {
   static using = ['console.market']
 
+  private agent = which()?.name || 'npm'
   private manifest: PackageJson
   private task: Promise<Dict<Dependency>>
 
@@ -48,7 +49,6 @@ class Installer extends DataService<Dict<Dependency>> {
     this.manifest = loadManifest(this.cwd)
 
     ctx.console.addListener('market/install', this.installDep, { authority: 4 })
-    ctx.console.addListener('market/patch', this.patchDep, { authority: 4 })
   }
 
   get cwd() {
@@ -122,19 +122,25 @@ class Installer extends DataService<Dict<Dependency>> {
     await fsp.writeFile(filename, JSON.stringify(this.manifest, null, 2))
   }
 
-  patchDep = async (name: string, version: string) => {
-    await this.override({ [name]: version })
-    this.refresh()
-  }
-
   installDep = async (deps: Dict<string>) => {
-    const agent = which()?.name || 'npm'
     const oldPayload = await this.get()
     await this.override(deps)
-    const args: string[] = []
-    if (agent !== 'yarn') args.push('install')
-    const code = await this.exec(agent, args)
-    if (code) return code
+
+    let shouldInstall = false
+    for (const name in deps) {
+      const { resolved } = oldPayload[name] || {}
+      if (resolved && satisfies(resolved, deps[name])) continue
+      shouldInstall = true
+      break
+    }
+
+    if (shouldInstall) {
+      const args: string[] = []
+      if (this.agent !== 'yarn') args.push('install')
+      const code = await this.exec(this.agent, args)
+      if (code) return code
+    }
+
     await this.refresh()
     const newPayload = await this.get()
     for (const name in oldPayload) {
