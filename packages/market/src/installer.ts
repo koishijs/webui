@@ -29,14 +29,12 @@ export interface Dependency {
    * @example `1.2.5`
    */
   resolved?: string
-  /**
-   * whether it is a workspace package
-   */
+  /** whether it is a workspace package */
   workspace?: boolean
-  /**
-   * available versions
-   */
-  versions?: Partial<PackageJson>[]
+  /** all available versions */
+  versions?: Dict<Partial<PackageJson>>
+  /** latest version */
+  latest?: string
 }
 
 class Installer extends DataService<Dict<Dependency>> {
@@ -72,9 +70,11 @@ class Installer extends DataService<Dict<Dependency>> {
 
       try {
         const registry = await market.http.get<Registry>(`/${name}`)
-        result[name].versions = Object.values(registry.versions)
-          .map(item => pick(item, ['version', 'peerDependencies']))
+        const entries = Object.values(registry.versions)
+          .map(item => [item.version, pick(item, ['peerDependencies'])] as const)
           .reverse()
+        result[name].latest = entries[0][0]
+        result[name].versions = Object.fromEntries(entries)
       } catch (e) {
         logger.warn(e.message)
       }

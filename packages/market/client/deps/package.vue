@@ -3,23 +3,20 @@
     <td class="name" :class="state">{{ name }}</td>
 
     <td class="current">
-      <template v-if="local">
-        {{ local.resolved }}
-        <template v-if="local.workspace">(工作区)</template>
-        <template v-else-if="local.resolved === versions?.[0].version">(最新)</template>
-      </template>
-      <span v-else>-</span>
+      {{ local.resolved }}
+      <template v-if="local.workspace">(工作区)</template>
+      <template v-else-if="local.resolved === local.latest">(最新)</template>
     </td>
 
     <td class="target">
-      <k-button v-if="local?.workspace" class="action" @click="send('market/patch', name, null)">
+      <k-button v-if="local.workspace" class="action" @click="send('market/patch', name, null)">
         移除依赖
       </k-button>
-      <template v-else-if="versions">
+      <template v-else-if="local.versions">
         <k-button class="prefix right-adjacent" @click="prefix = transition[prefix]">{{ prefix || '=' }}</k-button>
         <el-select class="left-adjacent" v-model="value">
           <el-option value="">移除依赖</el-option>
-          <el-option v-for="({ version }) in versions" :key="version" :value="version"></el-option>
+          <el-option v-for="({ version }) in local.versions" :key="version" :value="version"></el-option>
         </el-select>
       </template>
       <template v-else>
@@ -81,10 +78,6 @@ const state = computed(() => {
 
 const local = computed(() => {
   return store.dependencies[props.name]
-})
-
-const versions = computed(() => {
-  return local.value ? local.value.versions : store.market.data[props.name]?.versions
 })
 
 </script>

@@ -18,7 +18,7 @@
         <el-checkbox v-model="config.showInstalled">显示已下载的插件</el-checkbox>
       </div>
       <div class="market-container">
-        <package-view v-for="data in packages" :key="data.name" :data="data" @query="onQuery"></package-view>
+        <package-view v-for="data in packages" :key="data.name" :data="data" @click="active = data.name" @query="onQuery"></package-view>
       </div>
     </el-scrollbar>
 
@@ -39,16 +39,21 @@
       </ul>
     </k-comment>
   </k-layout>
+
+  <install-panel v-model="active"></install-panel>
 </template>
 
 <script setup lang="ts">
 
 import { router, store } from '@koishijs/client'
-import { computed, reactive, watch } from 'vue'
+import { computed, reactive, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { config } from '../utils'
 import { validate } from './utils'
 import PackageView from './package.vue'
+import InstallPanel from './install.vue'
+
+const active = ref<string>()
 
 const route = useRoute()
 

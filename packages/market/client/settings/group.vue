@@ -32,6 +32,7 @@ import KAlias from './alias.vue'
 
 const props = defineProps<{
   current: Tree
+  modelValue: any
 }>()
 
 const config = ref()

@@ -91,7 +91,7 @@ class MarketProvider extends DataService<MarketProvider.Payload> {
         const { name, versions } = item
         this.tempCache[name] = this.fullCache[name] = {
           ...item,
-          versions: versions.map(item => pick(item, ['version', 'keywords', 'peerDependencies'])),
+          versions: Object.fromEntries(versions.map(item => [item.version, pick(item, ['keywords', 'peerDependencies'])])),
         }
       },
       after: () => this.flushData(),
@@ -120,7 +120,7 @@ namespace MarketProvider {
   }).description('搜索设置')
 
   export interface Data extends Omit<AnalyzedPackage, 'versions'> {
-    versions: Partial<PackageJson>[]
+    versions: Dict<Partial<PackageJson>>
   }
 
   export interface Payload {

@@ -18,7 +18,7 @@ export interface EnvInfo {
 
 function isAvailable(name: string, remote: MarketProvider.Data) {
   return {
-    ...remote.versions[0],
+    ...remote.versions[remote.version],
     ...store.packages[remote.name],
   }.manifest?.service.implements.includes(name)
 }

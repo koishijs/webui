@@ -5,9 +5,8 @@
       <a v-if="data.links.homepage" :href="data.links.homepage" target="_blank" rel="noopener noreferrer">
         <k-icon name="link"></k-icon>
       </a>
-      <k-button v-if="store.packages[data.name]" solid type="success" class="right" @click="gotoSettings(data.shortname)">配置</k-button>
-      <k-button v-else-if="!config.override[data.name]" solid class="right" @click="addFavorite(data.name)">添加</k-button>
-      <k-button v-else solid type="warning" class="right" @click="removeFavorite(data.name)">取消</k-button>
+      <k-button v-if="!store.packages[data.name]" solid class="right" @click="$emit('click')">添加</k-button>
+      <k-button v-else type="success" solid class="right" @click="$emit('click')">修改</k-button>
     </template>
     <k-markdown inline class="desc" :source="meta.manifest.description.zh || meta.manifest.description.en"></k-markdown>
     <div class="badges">
@@ -50,9 +49,9 @@
 import { computed, PropType } from 'vue'
 import { MarketProvider } from '@koishijs/plugin-market'
 import { store } from '@koishijs/client'
-import { config, addFavorite, removeFavorite, getMixedMeta, gotoSettings } from '../utils'
+import { getMixedMeta } from '../utils'
 
-defineEmits(['query'])
+defineEmits(['query', 'click'])
 
 const props = defineProps({
   data: {} as PropType<MarketProvider.Data>,
