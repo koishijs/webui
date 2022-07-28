@@ -66,7 +66,7 @@ export namespace Console {
     selfUrl: Schema
       .string()
       .description('Koishi 服务暴露在公网的地址。')
-      .role('url')
+      .role('link')
       .default(''),
     open: Schema
       .boolean()
