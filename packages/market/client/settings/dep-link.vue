@@ -1,25 +1,16 @@
 <template>
-  <span class="link" @click.stop="configurate(name)">
+  <span class="link" @click.stop="active = name">
     {{ name }}
   </span>
 </template>
 
 <script lang="ts" setup>
 
-import { store } from '@koishijs/client'
-import { addFavorite, gotoSettings } from '../utils'
+import { active } from '../utils'
 
 defineProps<{
   name: string
 }>()
-
-function configurate(name: string) {
-  if (store.packages[name]) {
-    gotoSettings(name.replace('koishi-plugin-', '').replace('@koishijs/plugin-', ''))
-  } else {
-    addFavorite(name)
-  }
-}
 
 </script>
 

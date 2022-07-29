@@ -1,7 +1,12 @@
 <template>
   <el-dialog v-model="showDialog" custom-class="install-panel" @closed="active = ''">
     <template v-if="active" #header="{ titleId, titleClass }">
-      <span :id="titleId" :class="[titleClass, '']">{{ active }} @</span>
+      <span :id="titleId" :class="[titleClass, '']">
+        {{ active }} @
+        <template v-if="store.dependencies[active]">
+          {{ store.dependencies[active].request }}&nbsp;&nbsp;→ 
+        </template>
+      </span>
       <el-button
         class="prefix right-adjacent"
         @click="prefix = transition[prefix]"
@@ -40,9 +45,7 @@
 
     <template v-if="active" #footer>
       <div class="left">
-        <template v-if="store.dependencies[active]">
-          当前版本：{{ store.dependencies[active].request }}
-        </template>
+        <el-button v-if="local" type="primary" @click="configure">点击配置</el-button>
       </div>
       <div class="right">
         <el-button @click="showDialog = false">取消</el-button>
@@ -66,7 +69,7 @@
 <script lang="ts" setup>
 
 import { computed, ref, watch } from 'vue'
-import { send, store, valueMap } from '@koishijs/client'
+import { loading, message, router, send, socket, store, valueMap } from '@koishijs/client'
 import { satisfies } from 'semver'
 import { config, active } from '../utils'
 
@@ -74,28 +77,49 @@ const transition = { '': '^', '^': '~', '~': '' }
 
 const showDialog = ref(false)
 
-function install(remove = false) {
-  send('market/install', {
-    [active.value]: remove ? null : prefix.value + version.value,
+async function install(remove = false) {
+  const instance = loading({
+    text: '正在更新依赖……',
   })
-  showDialog.value = false
+  const dispose = watch(socket, () => {
+    message.success('安装成功！')
+    dispose()
+    instance.close()
+  })
+  try {
+    showDialog.value = false
+    const code = await send('market/install', {
+      [active.value]: remove ? null : prefix.value + version.value,
+    })
+    if (code) {
+      message.error('安装失败！')
+    } else {
+      message.success('安装成功！')
+    }
+  } catch (err) {
+    message.error('安装超时！')
+  } finally {
+    dispose()
+    instance.close()
+  }
 }
 
 const prefix = ref<string>()
+
 const version = ref<string>()
 
 const request = computed(() => prefix.value + version.value)
 
 const unchanged = computed(() => request.value === store.dependencies[active.value]?.request)
 
-const current = computed(() => {
-  return store.dependencies[active.value]?.resolved
-})
+const current = computed(() => store.dependencies[active.value]?.resolved)
+
+const local = computed(() => store.packages?.[active.value])
 
 const workspace = computed(() => {
   // workspace plugins:     dependencies ? packages √
   // workspace non-plugins: dependencies √ packages ×
-  return store.dependencies[active.value]?.workspace || store.packages?.[active.value]?.workspace
+  return store.dependencies[active.value]?.workspace || local.value?.workspace
 })
 
 const data = computed(() => {
@@ -138,6 +162,30 @@ watch(() => active.value, (value) => {
 watch(() => prefix.value, (value) => {
   config.prefix = value
 })
+
+function* find(target: string, plugins: {}, prefix: string): IterableIterator<string> {
+  for (let key in plugins) {
+    const config = plugins[key]
+    if (key.startsWith('~')) key = key.slice(1)
+    const request = key.split(':')[0]
+    if (request === target) yield prefix + key
+    if (request === 'group') {
+      yield* find(target, config, prefix + key + '/')
+    }
+  }
+}
+
+function configure() {
+  showDialog.value = false
+  const name = local.value.shortname
+  const paths = [...find(name, store.config.plugins, '')]
+  if (paths.length) {
+    router.push('/plugins/' + paths[0])
+  } else {
+    send('manager/unload', name, {})
+    router.push('/plugins/' + name)
+  }
+}
 
 </script>
 

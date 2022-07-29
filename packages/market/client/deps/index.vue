@@ -2,11 +2,6 @@
   <k-layout main="page-deps">
     <div class="controls">
       <el-checkbox v-model="config.hideWorkspace">忽略工作区依赖</el-checkbox>
-      <span class="float-right" v-if="!overrideCount">当前没有变更的依赖</span>
-      <template v-else>
-        <k-button class="float-right" solid @click="install">更新依赖</k-button>
-        <k-button class="float-right" solid type="error" @click="config.override = {}">放弃变更</k-button>
-      </template>
     </div>
     <table>
       <colgroup>
@@ -45,10 +40,9 @@
 
 <script lang="ts" setup>
 
-import { computed, watch } from 'vue'
-import { store, send, socket } from '@koishijs/client'
-import { config, overrideCount } from '../utils'
-import { message, loading } from '@koishijs/client'
+import { computed } from 'vue'
+import { store } from '@koishijs/client'
+import { config } from '../utils'
 import PackageView from './package.vue'
 
 const names = computed(() => {
@@ -58,30 +52,6 @@ const names = computed(() => {
   }
   return data.sort((a, b) => a > b ? 1 : -1)
 })
-
-async function install() {
-  const instance = loading({
-    text: '正在更新依赖……',
-  })
-  const dispose = watch(socket, () => {
-    message.success('安装成功！')
-    dispose()
-    instance.close()
-  })
-  try {
-    const code = await send('market/install', config.override)
-    if (code) {
-      message.error('安装失败！')
-    } else {
-      message.success('安装成功！')
-    }
-  } catch (err) {
-    message.error('安装超时！')
-  } finally {
-    dispose()
-    instance.close()
-  }
-}
 
 </script>
 

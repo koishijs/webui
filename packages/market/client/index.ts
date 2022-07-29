@@ -6,7 +6,6 @@ import Dependencies from './deps/index.vue'
 import Settings from './settings/index.vue'
 import Market from './market/index.vue'
 import Progress from './market/progress.vue'
-import { overrideCount } from './utils'
 import './icons'
 
 receive('market/patch', (data) => {
@@ -68,8 +67,7 @@ export default (ctx: Context) => {
     icon: 'activity:deps',
     order: 610,
     authority: 4,
-    fields: ['market', 'dependencies'],
+    fields: ['dependencies'],
     component: Dependencies,
-    badge: () => overrideCount.value,
   })
 }
