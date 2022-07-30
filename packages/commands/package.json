@@ -1,7 +1,7 @@
 {
   "name": "@koishijs/plugin-commands",
   "description": "Override Command Config for Koishi",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
   "files": [
@@ -9,7 +9,7 @@
     "dist"
   ],
   "author": "Shigma <shigma10826@gmail.com>",
-  "license": "MIT",
+  "license": "AGPL-3.0",
   "scripts": {
     "lint": "eslint src --ext .ts"
   },
@@ -36,7 +36,7 @@
     }
   },
   "peerDependencies": {
-    "koishi": "^4.8.2"
+    "koishi": "^4.8.3"
   },
   "devDependencies": {
     "@koishijs/client": "^4.2.0",

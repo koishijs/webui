@@ -35,7 +35,7 @@ html.dark {
   --active: #ffffff;
   --border: #4f515cbf;
   --card-bg: #2f3034;
-  --page-bg: #f6f8fa;
+  --page-bg: #2f3034;
   --card-border: var(--border);
   --loading-mask-bg: #202225bf;
 
@@ -77,7 +77,7 @@ html.dark {
   --activity-width: 4rem;
   --activity-icon-size: 1.5rem;
   --header-height: 3rem;
-  --footer-height: 1.5rem;
+  --footer-height: 1.75rem;
 
   --card-margin: 2rem;
   --card-padding-vertical: 1.5rem;
@@ -155,7 +155,7 @@ html.dark {
   --el-bg-color: var(--bg0);
   --el-bg-color-overlay: var(--bg0);
   --el-fill-color-blank: transparent;
-  --el-fill-color-light: var(--bg1);
+  --el-fill-color-light: transparent;
 }
 
 .theme-color {
@@ -266,6 +266,14 @@ html.dark .el-switch {
 
   .el-dialog {
     margin: 0;
+  }
+
+  @media screen and (max-width: 768px) {
+    justify-content: flex-end;
+
+    .el-dialog {
+      width: 100%;
+    }
   }
 }
 

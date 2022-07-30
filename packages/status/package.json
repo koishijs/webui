@@ -1,7 +1,7 @@
 {
   "name": "@koishijs/plugin-status",
   "description": "Status view for Koishi",
-  "version": "6.0.2",
+  "version": "6.1.0",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
   "files": [
@@ -9,7 +9,7 @@
     "dist"
   ],
   "author": "Shigma <shigma10826@gmail.com>",
-  "license": "MIT",
+  "license": "AGPL-3.0",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/koishijs/koishi.git",
@@ -43,11 +43,11 @@
   },
   "peerDependencies": {
     "@koishijs/plugin-console": "^4.2.0",
-    "koishi": "^4.8.2"
+    "koishi": "^4.8.3"
   },
   "devDependencies": {
     "@koishijs/client": "^4.2.0",
-    "@koishijs/cli": "^4.8.2",
+    "@koishijs/cli": "^4.8.3",
     "echarts": "^5.3.2",
     "vue-echarts": "^6.0.3"
   }
