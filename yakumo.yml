@@ -1,0 +1,4 @@
+require:
+  - esbuild-register
+  - ./build/esbuild
+  - ./build/client
