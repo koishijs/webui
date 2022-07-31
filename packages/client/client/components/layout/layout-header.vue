@@ -79,8 +79,8 @@ import { isLeftAsideOpen } from './utils'
   font-weight: bolder;
 
   .left {
-    margin-left: var(--activity-width);
-    padding-left: 1rem;
+    margin-left: var(--header-height);
+    padding-left: 0.5rem;
   }
 
   .right {
@@ -105,6 +105,10 @@ import { isLeftAsideOpen } from './utils'
 
     .menu-icon {
       height: 1.125rem;
+    }
+
+    @media screen and (max-width: 768px) {
+      width: 3rem;
     }
   }
 }

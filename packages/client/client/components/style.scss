@@ -88,6 +88,12 @@ html.dark {
     --card-padding-vertical: 1rem;
     --card-padding-horizontal: 1rem;
   }
+
+  @media screen and (max-width: 420px) {
+    --card-margin: 1rem;
+    --card-padding-vertical: 0.75rem;
+    --card-padding-horizontal: 0.875rem;
+  }
 }
 
 html.dark .el-switch {

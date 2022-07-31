@@ -3,7 +3,7 @@
     <k-icon :name="icon"/>
     <div class="content">
       <p class="title">{{ title }}</p>
-      <p class="value"><slot></slot></p>
+      <p class="value"><slot>-</slot></p>
     </div>
   </k-card>
 </template>
@@ -46,10 +46,11 @@ defineProps<{
 
   p {
     margin: 0;
+    font-size: 0.9375rem;
   }
 
   .value {
-    font-size: 1.125rem;
+    font-size: 1rem;
   }
 }
 
