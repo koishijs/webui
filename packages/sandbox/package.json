@@ -47,7 +47,7 @@
     "koishi": "^4.8.3"
   },
   "devDependencies": {
-    "@koishijs/client": "^4.2.0",
-    "@koishijs/plugin-console": "^4.2.0"
+    "@koishijs/client": "^4.2.1",
+    "@koishijs/plugin-console": "^4.2.1"
   }
 }
