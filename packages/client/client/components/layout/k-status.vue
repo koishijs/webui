@@ -1,13 +1,21 @@
 <template>
   <el-tooltip placement="top" effect="light" popper-class="k-status-tooltip">
-    <template #content>
+    <template #content v-if="$slots.tooltip">
       <slot name="tooltip"></slot>
     </template>
-    <div class="k-status">
+    <div class="k-status" v-bind="$attrs">
       <slot></slot>
     </div>
   </el-tooltip>
 </template>
+
+<script lang="ts">
+
+export default {
+  inheritAttrs: false,
+}
+
+</script>
 
 <style lang="scss" scoped>
 
@@ -35,6 +43,10 @@
   border: 1px solid var(--border);
   box-shadow: var(--card-shadow);
   transition: var(--color-transition);
+
+  .el-popper__empty + .el-popper__arrow {
+    display: none;
+  }
 }
 
 </style>
