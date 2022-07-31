@@ -1,6 +1,7 @@
 <template>
   <k-status>
     <template #tooltip>
+      <span v-if="!store.profile.bots.length" class="el-popper__empty"></span>
       <bot-preview v-for="(bot, key) in store.profile.bots" :key="key" :data="bot"></bot-preview>
     </template>
     <status-light v-for="(bot, key) in store.profile.bots" :key="key" :class="bot.status"></status-light>
@@ -32,7 +33,11 @@ const received = computed(() => {
 
 .k-status {
   .k-icon {
-    margin: 0 4px 0 6px;
+    margin-right: 4px;
+  }
+
+  * + .k-icon {
+    margin-left: 6px;
   }
 
   .status-light {
