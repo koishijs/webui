@@ -1,7 +1,7 @@
 import { CAC } from 'cac'
 import { mkdir, readdir, readFile, writeFile } from 'fs-extra'
 import { buildExtension } from '@koishijs/client/lib'
-import { cwd, getPackages, PackageJson, spawnAsync, TsConfig } from './utils'
+import { cwd, getPackages, PackageJson, spawnAsync, TsConfig } from '.'
 import { extname } from 'path'
 import yaml from 'js-yaml'
 import ora from 'ora'

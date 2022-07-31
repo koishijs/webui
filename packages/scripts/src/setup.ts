@@ -1,7 +1,7 @@
 import { CAC } from 'cac'
 import { copyFile, mkdir, readFile, readJson, writeFile } from 'fs-extra'
 import { resolve } from 'path'
-import { config, cwd, meta, PackageJson } from './utils'
+import { config, cwd, meta, PackageJson } from '.'
 import { blue, red } from 'kleur'
 import which from 'which-pm-runs'
 import spawn from 'cross-spawn'
