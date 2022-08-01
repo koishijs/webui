@@ -109,7 +109,7 @@ async function buildConsole() {
 }
 
 register('client', async (project) => {
-  for (const path in project.workspaces) {
+  for (const path in project.targets) {
     if (path === '/packages/client') {
       await buildConsole()
       continue

@@ -1,4 +1,4 @@
-import { build, mergeConfig, UserConfig } from 'vite'
+import { build, InlineConfig, mergeConfig, UserConfig } from 'vite'
 import { existsSync, promises as fsp } from 'fs'
 import vue from '@vitejs/plugin-vue'
 
@@ -10,7 +10,11 @@ export async function buildExtension(root: string, config: UserConfig = {}) {
     build: {
       outDir: 'dist',
       assetsDir: '',
+      minify: true,
       emptyOutDir: true,
+      commonjsOptions: {
+        strictRequires: true,
+      },
       lib: {
         entry: root + '/client/index.ts',
         fileName: 'index',
@@ -37,12 +41,7 @@ export async function buildExtension(root: string, config: UserConfig = {}) {
         '@koishijs/client': root + '/client.js',
       },
     },
-    css: {
-      preprocessorOptions: {
-        sass: {},
-      },
-    },
-  }, config))
+  } as InlineConfig, config))
 
-  await fsp.rename(root + '/dist/index.es.js', root + '/dist/index.js')
+  await fsp.rename(root + '/dist/index.mjs', root + '/dist/index.js')
 }

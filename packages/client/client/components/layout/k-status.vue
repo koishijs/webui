@@ -1,7 +1,9 @@
 <template>
   <el-tooltip placement="top" effect="light" popper-class="k-status-tooltip">
-    <template #content v-if="$slots.tooltip">
-      <slot name="tooltip"></slot>
+    <template #content>
+      <slot name="tooltip">
+        <span class="el-popper__empty"></span>
+      </slot>
     </template>
     <div class="k-status" v-bind="$attrs">
       <slot></slot>

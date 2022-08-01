@@ -101,6 +101,10 @@ import { isLeftAsideOpen } from './utils'
     &.disabled {
       opacity: 0.3;
       pointer-events: none;
+
+      @media screen and (max-width: 768px) {
+        display: none;
+      }
     }
 
     .menu-icon {

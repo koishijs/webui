@@ -27,6 +27,10 @@ defineProps<{
   margin: 1rem 1.5rem;
   position: relative;
 
+  @media screen and (max-width: 768px) {
+    margin: 1rem 1rem;
+  }
+
   .nickname {
     position: relative;
     margin: 0 0 0.4rem 4.2rem;
