@@ -72,6 +72,9 @@ class HttpService extends DataService<string[]> {
     const { uiPath, root } = this.config
 
     this.ctx.router.get(uiPath + '(/.+)*', async (ctx, next) => {
+      await next()
+      if (ctx.body || ctx.response.body) return
+
       // add trailing slash and redirect
       if (ctx.path === uiPath && !uiPath.endsWith('/')) {
         return ctx.redirect(ctx.path + '/')
