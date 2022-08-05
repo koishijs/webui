@@ -1,7 +1,7 @@
 {
   "name": "@koishijs/plugin-status",
   "description": "Status view for Koishi",
-  "version": "6.1.1",
+  "version": "6.1.2",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
   "files": [
@@ -12,11 +12,11 @@
   "license": "AGPL-3.0",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/koishijs/koishi.git",
-    "directory": "plugins/frontend/status"
+    "url": "git+https://github.com/koishijs/console.git",
+    "directory": "packages/status"
   },
   "bugs": {
-    "url": "https://github.com/koishijs/koishi/issues"
+    "url": "https://github.com/koishijs/console/issues"
   },
   "homepage": "https://koishi.js.org/plugins/console/status.html",
   "keywords": [
@@ -42,11 +42,11 @@
     }
   },
   "peerDependencies": {
-    "@koishijs/plugin-console": "^4.3.1",
+    "@koishijs/plugin-console": "^4.3.2",
     "koishi": "^4.8.3"
   },
   "devDependencies": {
-    "@koishijs/client": "^4.3.1",
+    "@koishijs/client": "^4.3.2",
     "@koishijs/cli": "^4.8.3",
     "echarts": "^5.3.3",
     "vue-echarts": "^6.2.3"

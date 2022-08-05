@@ -1,8 +1,12 @@
-import { Context } from 'koishi'
+import { Context, Schema } from 'koishi'
 import { resolve } from 'path'
 import {} from '@koishijs/plugin-console'
 
 export const name = '{{name}}'
+
+export interface Config {}
+
+export const Config: Schema<Config> = Schema.object({})
 
 export function apply(ctx: Context) {
   ctx.using(['console'], (ctx) => {

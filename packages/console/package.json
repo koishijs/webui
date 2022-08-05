@@ -1,7 +1,7 @@
 {
   "name": "@koishijs/plugin-console",
   "description": "Web User Interface for Koishi",
-  "version": "4.3.1",
+  "version": "4.3.2",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
   "files": [
@@ -13,11 +13,11 @@
   "license": "AGPL-3.0",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/koishijs/koishi.git",
-    "directory": "plugins/frontend/console"
+    "url": "git+https://github.com/koishijs/console.git",
+    "directory": "packages/console"
   },
   "bugs": {
-    "url": "https://github.com/koishijs/koishi/issues"
+    "url": "https://github.com/koishijs/console/issues"
   },
   "homepage": "https://koishi.js.org/plugins/console/",
   "keywords": [
@@ -25,7 +25,9 @@
     "chatbot",
     "koishi",
     "plugin",
-    "webui"
+    "frontend",
+    "webui",
+    "console"
   ],
   "koishi": {
     "description": {
@@ -42,7 +44,7 @@
     "koishi": "^4.8.3"
   },
   "devDependencies": {
-    "@koishijs/client": "^4.3.1",
+    "@koishijs/client": "^4.3.2",
     "@types/uuid": "^8.3.4"
   },
   "dependencies": {
