@@ -3,6 +3,9 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
+      "@koishijs/client/lib/*": [
+        "packages/client/src/*",
+      ],
       "@koishijs/plugin-*": [
         "packages/*/src",
       ],

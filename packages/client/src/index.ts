@@ -41,6 +41,9 @@ export async function buildExtension(root: string, config: UserConfig = {}) {
         '@koishijs/client': root + '/client.js',
       },
     },
+    define: {
+      'process.env.NODE_ENV': '"production"',
+    },
   } as InlineConfig, config))
 
   await fsp.rename(root + '/dist/index.mjs', root + '/dist/index.js')
