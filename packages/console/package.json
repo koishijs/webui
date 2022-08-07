@@ -1,7 +1,7 @@
 {
   "name": "@koishijs/plugin-console",
   "description": "Web User Interface for Koishi",
-  "version": "4.3.4",
+  "version": "4.3.6",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
   "files": [
@@ -10,7 +10,7 @@
     "client/index.d.ts"
   ],
   "author": "Shigma <shigma10826@gmail.com>",
-  "license": "AGPL-3.0",
+  "license": "GPL-3.0",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/koishijs/console.git",
@@ -44,7 +44,7 @@
     "koishi": "^4.8.4"
   },
   "devDependencies": {
-    "@koishijs/client": "^4.3.4",
+    "@koishijs/client": "^4.3.6",
     "@types/uuid": "^8.3.4"
   },
   "dependencies": {

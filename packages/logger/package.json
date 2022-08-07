@@ -1,7 +1,7 @@
 {
   "name": "@koishijs/plugin-logger",
   "description": "Dump log files for Koishi",
-  "version": "2.1.1",
+  "version": "2.1.2",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
   "files": [
@@ -9,7 +9,7 @@
     "dist"
   ],
   "author": "Shigma <shigma10826@gmail.com>",
-  "license": "AGPL-3.0",
+  "license": "GPL-3.0",
   "scripts": {
     "lint": "eslint src --ext .ts"
   },
@@ -41,11 +41,11 @@
     }
   },
   "peerDependencies": {
-    "@koishijs/plugin-console": "^4.3.4",
+    "@koishijs/plugin-console": "^4.3.6",
     "koishi": "^4.8.4"
   },
   "devDependencies": {
-    "@koishijs/client": "^4.3.4",
+    "@koishijs/client": "^4.3.6",
     "@koishijs/cli": "^4.8.4",
     "ansi_up": "^5.1.0"
   }

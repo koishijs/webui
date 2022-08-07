@@ -1,7 +1,7 @@
 {
   "name": "@koishijs/plugin-chat",
   "description": "Display and respond to messages for Koishi",
-  "version": "3.1.1",
+  "version": "3.1.2",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
   "files": [
@@ -9,7 +9,7 @@
     "dist"
   ],
   "author": "Shigma <shigma10826@gmail.com>",
-  "license": "AGPL-3.0",
+  "license": "GPL-3.0",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/koishijs/console.git",
@@ -45,7 +45,7 @@
     "koishi": "^4.8.4"
   },
   "devDependencies": {
-    "@koishijs/client": "^4.3.4",
-    "@koishijs/plugin-console": "^4.3.4"
+    "@koishijs/client": "^4.3.6",
+    "@koishijs/plugin-console": "^4.3.6"
   }
 }

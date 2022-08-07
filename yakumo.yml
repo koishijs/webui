@@ -1,4 +1,5 @@
 require:
   - esbuild-register
   - yakumo-esbuild-yaml
+  - yakumo-publish-sync
   - ./build/client

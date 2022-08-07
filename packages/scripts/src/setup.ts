@@ -82,7 +82,7 @@ class Initiator {
       name: this.fullname,
       description: this.desc,
       ...source,
-    }, null, 2))
+    }, null, 2) + '\n')
   }
 
   async writeTsConfig() {
@@ -118,6 +118,7 @@ class Initiator {
     if (config.mode === 'monorepo') return
     await Promise.all([
       copyFile(this.source + '/.editorconfig', this.target + '/.editorconfig'),
+      copyFile(this.source + '/.gitattributes', this.target + '/.gitattributes'),
       copyFile(this.source + '/.gitignore', this.target + '/.gitignore'),
     ])
     spawn.sync('git', ['init'], { cwd: this.target, stdio: 'inherit' })
