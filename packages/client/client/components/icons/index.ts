@@ -1,11 +1,10 @@
 import { App, Component, defineComponent, h } from 'vue'
-import { IconCog, IconExternal, IconEye, IconEyeSlash } from 'schemastery-vue'
+import { IconExternal, IconEye, IconEyeSlash } from 'schemastery-vue'
 import Home from './activity/home.vue'
 import Moon from './activity/moon.vue'
 import Sun from './activity/sun.vue'
 import Application from './svg/application.vue'
 import Balance from './svg/balance.vue'
-import Book from './svg/book.vue'
 import BoxOpen from './svg/box-open.vue'
 import CheckFull from './svg/check-full.vue'
 import ChevronDown from './svg/chevron-down.vue'
@@ -47,7 +46,6 @@ register('activity:sun', Sun)
 
 register('application', Application)
 register('balance', Balance)
-register('book', Book)
 register('box-open', BoxOpen)
 register('check-full', CheckFull)
 register('chevron-down', ChevronDown)
@@ -55,7 +53,6 @@ register('chevron-left', ChevronLeft)
 register('chevron-right', ChevronRight)
 register('chevron-up', ChevronUp)
 register('clipboard-list', ClipboardList)
-register('cog', IconCog)
 register('edit', Edit)
 register('exclamation-full', ExclamationFull)
 register('expand', Expand)

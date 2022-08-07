@@ -1,4 +1,4 @@
 require:
   - esbuild-register
-  - ./build/yaml
+  - yakumo-esbuild-yaml
   - ./build/client
