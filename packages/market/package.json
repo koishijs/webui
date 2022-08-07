@@ -40,12 +40,12 @@
     }
   },
   "peerDependencies": {
-    "@koishijs/cli": "^4.8.3",
-    "@koishijs/plugin-console": "^4.3.2",
-    "koishi": "^4.8.3"
+    "@koishijs/cli": "^4.8.4",
+    "@koishijs/plugin-console": "^4.3.4",
+    "koishi": "^4.8.4"
   },
   "devDependencies": {
-    "@koishijs/client": "^4.3.2",
+    "@koishijs/client": "^4.3.4",
     "@types/cross-spawn": "^6.0.2",
     "@types/which-pm-runs": "^1.0.0"
   },
