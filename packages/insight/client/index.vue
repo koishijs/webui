@@ -34,6 +34,7 @@
             :class="{ active: subgraph.nodes.has(node) }"
           >
             <circle
+              :r="fNode === node ? 12 : 10"
               :cx="node.x"
               :cy="node.y"
               @mouseenter.stop.prevent="onMouseEnterNode(node, $event)"
@@ -253,7 +254,6 @@ const subgraph = computed<Graph>(() => {
 
 g.node {
   circle {
-    r: 10;
     stroke: var(--page-bg);
     stroke-opacity: 1;
     stroke-width: 2;
@@ -262,7 +262,6 @@ g.node {
     transition: r 0.3s ease, fill 0.3s ease, stroke 0.3s ease, box-shadow 0.3s ease;
 
     &:hover {
-      r: 12;
       fill: var(--active);
     }
   }
