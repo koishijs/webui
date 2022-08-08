@@ -14,13 +14,13 @@
 
 import { watch, ref, nextTick, onMounted } from 'vue'
 import { store } from '@koishijs/client'
-import Converter from 'ansi_up'
+import ansi from 'ansi_up'
 
 const root = ref<HTMLElement>()
 
 const hint = `app\u001b[0m \u001b[38;5;15;1mKoishi/`
 
-const converter = new Converter()
+const converter = new (ansi as any as typeof import('ansi_up')).default()
 
 function renderLine(line: string) {
   return converter.ansi_to_html(line)
@@ -50,7 +50,6 @@ watch(() => store.logs.length, async () => {
 
   .logs {
     padding: 1rem 1rem;
-    font-family: ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas, Liberation Mono, monospace;
   }
 
   .logs .line.start {
