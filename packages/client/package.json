@@ -49,5 +49,8 @@
     "vite": "^3.0.4",
     "vue": "^3.2.37",
     "vue-router": "^4.1.3"
+  },
+  "yakumo": {
+    "client": "./build/client"
   }
 }

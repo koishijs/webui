@@ -1,7 +1,6 @@
-import { buildExtension } from '@koishijs/client/src'
 import { RollupOutput } from 'rollup'
 import { appendFile, copyFile } from 'fs-extra'
-import { cwd, register } from 'yakumo'
+import { resolve } from 'path'
 import * as vite from 'vite'
 import vue from '@vitejs/plugin-vue'
 
@@ -11,11 +10,12 @@ function findModulePath(id: string) {
   return path.slice(0, path.indexOf(keyword)) + keyword.slice(0, -1)
 }
 
+const cwd = resolve(__dirname, '../../..')
 const dist = cwd + '/packages/console/dist'
 
 export async function build(root: string, config: vite.UserConfig = {}) {
   const { rollupOptions = {} } = config.build || {}
-  return vite.build({
+  return await vite.build({
     root,
     build: {
       outDir: cwd + '/packages/console/dist',
@@ -48,12 +48,12 @@ export async function build(root: string, config: vite.UserConfig = {}) {
         '@koishijs/client': root + '/client.js',
       },
     },
-  })
+  }) as RollupOutput
 }
 
-async function buildConsole() {
+export default async function () {
   // build for console main
-  const { output } = await build(cwd + '/packages/client/app') as RollupOutput
+  const { output } = await build(cwd + '/packages/client/app')
 
   await Promise.all([
     copyFile(findModulePath('vue') + '/dist/vue.runtime.esm-browser.prod.js', dist + '/vue.js'),
@@ -107,23 +107,3 @@ async function buildConsole() {
     }
   }
 }
-
-register('client', async (project) => {
-  for (const path in project.targets) {
-    if (path === '/packages/client') {
-      await buildConsole()
-      continue
-    }
-
-    await buildExtension(cwd + path, {
-      plugins: [{
-        name: 'fuck-echarts',
-        renderChunk(code, chunk) {
-          if (chunk.fileName.includes('echarts')) {
-            return code.replace(/\bSymbol(?!\.toStringTag)/g, 'FuckSymbol')
-          }
-        },
-      }],
-    })
-  }
-})

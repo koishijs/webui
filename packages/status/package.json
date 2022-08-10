@@ -28,7 +28,7 @@
     "server"
   ],
   "yakumo": {
-    "client": "./build/vite.config"
+    "client": "./build/client"
   },
   "koishi": {
     "description": {
