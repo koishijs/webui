@@ -1,13 +1,17 @@
 body {
   margin: 0;
   min-height: 100vh;
-  font-family: PingFang SC, Hiragino Sans GB, Microsoft YaHei, SimSun, sans-serif;
+  font-family: var(--font-family);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   color: var(--fg1);
   background-color: var(--page-bg);
   position: relative;
   transition: color 0.3s ease, background-color 0.3s ease;
+}
+
+code {
+  font-family: var(--font-family-code);
 }
 
 a {
