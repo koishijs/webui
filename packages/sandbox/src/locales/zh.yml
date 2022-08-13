@@ -1,0 +1,3 @@
+commands:
+  clear:
+    description: 清空聊天记录

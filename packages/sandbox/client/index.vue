@@ -45,7 +45,7 @@
 
 import { clone, message, send, Schema, store, ChatInput, VirtualList, deepEqual } from '@koishijs/client'
 import { computed, ref, watch } from 'vue'
-import { config, words, panelTypes } from './utils'
+import { channel, config, words, panelTypes } from './utils'
 import ChatMessage from './message.vue'
 
 const schema = Schema.object({
@@ -61,11 +61,6 @@ const users = computed(() => {
 
 const userMap = computed(() => {
   return Object.fromEntries(users.value.map((name) => [name, { name }]))
-})
-
-const channel = computed(() => {
-  if (config.panelType === 'guild') return '#'
-  return '@' + config.user
 })
 
 const length = 10

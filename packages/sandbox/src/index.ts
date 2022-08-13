@@ -1,10 +1,18 @@
 import { Bot, Context, Dict, observe, Random, Schema, segment, User } from 'koishi'
-import { DataService } from '@koishijs/plugin-console'
+import { DataService, SocketHandle } from '@koishijs/plugin-console'
 import { resolve } from 'path'
 
 declare module 'koishi' {
   interface User {
     sandbox: string
+  }
+}
+
+declare module '@satorijs/core' {
+  namespace Session {
+    interface Payload {
+      handle: SocketHandle
+    }
   }
 }
 
@@ -44,15 +52,17 @@ class SandboxBot extends Bot {
       prod: resolve(__dirname, '../dist'),
     })
 
-    ctx.console.addListener('sandbox/message', async (user, channel, content) => {
+    const self = this
+    ctx.console.addListener('sandbox/message', async function (user, channel, content) {
       ctx.console.ws.broadcast('sandbox', { content, user, channel })
-      this.dispatch(this.session({
+      self.dispatch(self.session({
         userId: user,
         content,
         channelId: channel,
         guildId: channel === '@' + user ? undefined : channel,
         type: 'message',
         subtype: channel === '@' + user ? 'private' : 'group',
+        handle: this,
         author: {
           userId: user,
           username: user,
@@ -100,6 +110,15 @@ export class UserProvider extends DataService<Dict<User>> {
 
   constructor(ctx: Context) {
     super(ctx, 'users', { authority: 4 })
+
+    ctx.i18n.define('zh', require('./locales/zh'))
+
+    ctx.platform('sandbox').command('clear')
+      .action(({ session }) => {
+        session.handle.send({
+          type: 'sandbox/clear',
+        })
+      })
 
     ctx.console.addListener('sandbox/user', async (name, data) => {
       const users = await this.get()
