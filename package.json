@@ -22,7 +22,7 @@
   },
   "devDependencies": {
     "@koishijs/plugin-database-memory": "^1.4.1",
-    "@koishijs/plugin-help": "^1.1.0",
+    "@koishijs/plugin-help": "^1.1.1",
     "@koishijs/plugin-mock": "^2.0.0",
     "@sinonjs/fake-timers": "^6.0.1",
     "@types/chai": "^4.3.1",
@@ -36,7 +36,7 @@
     "esbuild": "^0.14.51",
     "esbuild-register": "^3.3.3",
     "jest-mock": "^28.1.3",
-    "koishi": "^4.8.4",
+    "koishi": "^4.8.5",
     "mocha": "^9.2.2",
     "shx": "^0.3.4",
     "typescript": "^4.7.4",

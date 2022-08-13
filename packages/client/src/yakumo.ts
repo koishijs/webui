@@ -19,7 +19,7 @@ register('client', async (project) => {
       const exports = ns.unwrapExports(require(meta.yakumo.client))
       if (typeof exports === 'function') {
         await exports()
-        break
+        continue
       }
       config = exports
     }
