@@ -1,4 +1,4 @@
-import { Context, Logger, Schema, segment } from 'koishi'
+import { Context, Logger, Quester, Schema, segment } from 'koishi'
 import { resolve } from 'path'
 import receiver, { Message, RefreshConfig } from './receiver'
 import {} from '@koishijs/plugin-console'
@@ -114,7 +114,13 @@ export function apply(ctx: Context, options: Config = {}) {
       if (!whitelist.some(prefix => ctx.params.url.startsWith(prefix))) {
         return ctx.status = 403
       }
-      return ctx.body = await get<internal.Readable>(ctx.params.url, { responseType: 'stream' })
+      try {
+        ctx.body = await get<internal.Readable>(ctx.params.url, { responseType: 'stream' })
+      } catch (error) {
+        if (!Quester.isAxiosError(error) || !error.response) throw error
+        ctx.status = error.response.status
+        ctx.body = error.response.data
+      }
     })
   })
 }
