@@ -1,7 +1,7 @@
 {
   "name": "@koishijs/plugin-market",
   "description": "Manage your bots and plugins with console",
-  "version": "1.1.6",
+  "version": "1.2.0",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
   "files": [
@@ -29,6 +29,7 @@
     "server"
   ],
   "koishi": {
+    "category": "console",
     "description": {
       "en": "Manage your bots and plugins with console",
       "zh": "使用控制台管理你的插件、机器人和依赖"
