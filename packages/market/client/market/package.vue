@@ -33,12 +33,16 @@
     </div>
     <template #footer>
       <div class="info">
-        <span v-if="data.author" :class="{ pointer: email }" @click="email && $emit('query', 'email:' + email)">
-          <k-icon name="user"></k-icon>{{ data.author.name }}
-        </span>
-        <span><k-icon name="balance"></k-icon>{{ data.license }}</span>
         <span><k-icon name="tag"></k-icon>{{ data.version }}</span>
-        <span><k-icon name="file-archive"></k-icon>{{ Math.ceil(data.size / 1000) }} KB</span>
+        <span v-if="data.installSize"><k-icon name="file-archive"></k-icon>{{ formatSize(data.installSize) }}</span>
+        <span><k-icon name="balance"></k-icon>{{ data.license }}</span>
+      </div>
+      <div class="avatars">
+        <template v-for="({ email, username }, index) in data.maintainers" :key="index">
+          <a v-if="email" :title="username" @click="$emit('query', 'email:' + email)">
+            <img :src="`https://www.gravatar.com/avatar/${hash(email)}`">
+          </a>
+        </template>
       </div>
     </template>
   </k-card>
@@ -50,6 +54,7 @@ import { computed, PropType } from 'vue'
 import { MarketProvider } from '@koishijs/plugin-market'
 import { store } from '@koishijs/client'
 import { getMixedMeta } from '../utils'
+import { hash } from 'spark-md5'
 
 defineEmits(['query', 'click'])
 
@@ -59,7 +64,15 @@ const props = defineProps({
 
 const meta = computed(() => getMixedMeta(props.data.name))
 
-const email = computed(() => props.data.author?.email)
+function formatSize(value: number) {
+  if (value >= (1 << 20) * 1000) {
+    return +(value / (1 << 30)).toFixed(1) + ' GB'
+  } else if (value >= (1 << 10) * 1000) {
+    return +(value / (1 << 20)).toFixed(1) + ' MB'
+  } else {
+    return +(value / (1 << 10)).toFixed(1) + ' KB'
+  }
+}
 
 </script>
 
@@ -76,6 +89,7 @@ const email = computed(() => props.data.author?.email)
 
   header, footer {
     margin: 1rem 0;
+    flex-shrink: 0;
   }
 
   .k-card-body {
@@ -92,8 +106,27 @@ const email = computed(() => props.data.author?.email)
     font-size: 15px;
   }
 
-  header, footer {
-    flex-shrink: 0;
+  header {
+    font-size: 1.125rem;
+  }
+
+  footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 1.5rem;
+
+    .avatars a {
+      cursor: pointer;
+      margin-left: 4px;
+    }
+
+    .avatars img {
+      height: 1.5rem;
+      width: 1.5rem;
+      border-radius: 100%;
+      vertical-align: middle;
+    }
   }
 
   header .k-icon {
@@ -104,10 +137,11 @@ const email = computed(() => props.data.author?.email)
     transition: color 0.3s ease;
   }
 
-  .right {
+  button.right {
     position: absolute;
     right: 1rem;
-    top: -2px;
+    top: -3px;
+    padding: 0.35em 0.85em;
   }
 
   .info {
