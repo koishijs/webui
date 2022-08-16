@@ -38,11 +38,11 @@
         <span><k-icon name="balance"></k-icon>{{ data.license }}</span>
       </div>
       <div class="avatars">
-        <template v-for="({ email, username }, index) in data.maintainers" :key="index">
-          <a v-if="email" :title="username" @click="$emit('query', 'email:' + email)">
-            <img :src="`https://www.gravatar.com/avatar/${hash(email)}`">
+        <el-tooltip v-for="({ email, avatar, username }) in data.maintainers" :key="email" :content="username">
+          <a @click="$emit('query', 'email:' + email)">
+            <img :src="avatar">
           </a>
-        </template>
+        </el-tooltip>
       </div>
     </template>
   </k-card>
@@ -54,7 +54,6 @@ import { computed, PropType } from 'vue'
 import { MarketProvider } from '@koishijs/plugin-market'
 import { store } from '@koishijs/client'
 import { getMixedMeta } from '../utils'
-import { hash } from 'spark-md5'
 
 defineEmits(['query', 'click'])
 
@@ -64,13 +63,17 @@ const props = defineProps({
 
 const meta = computed(() => getMixedMeta(props.data.name))
 
+function formatValue(value: number) {
+  return value >= 100 ? +value.toFixed() : +value.toFixed(1)
+}
+
 function formatSize(value: number) {
   if (value >= (1 << 20) * 1000) {
-    return +(value / (1 << 30)).toFixed(1) + ' GB'
+    return formatValue(value / (1 << 30)) + ' GB'
   } else if (value >= (1 << 10) * 1000) {
-    return +(value / (1 << 20)).toFixed(1) + ' MB'
+    return formatValue(value / (1 << 20)) + ' MB'
   } else {
-    return +(value / (1 << 10)).toFixed(1) + ' KB'
+    return formatValue(value / (1 << 10)) + ' KB'
   }
 }
 

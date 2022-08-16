@@ -1,7 +1,7 @@
 {
   "name": "@koishijs/plugin-market",
   "description": "Manage your bots and plugins with console",
-  "version": "1.1.5",
+  "version": "1.1.6",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
   "files": [
@@ -47,7 +47,6 @@
   "devDependencies": {
     "@koishijs/client": "^4.3.7",
     "@types/cross-spawn": "^6.0.2",
-    "@types/spark-md5": "^3.0.2",
     "@types/which-pm-runs": "^1.0.0"
   },
   "dependencies": {
@@ -55,7 +54,6 @@
     "cross-spawn": "^7.0.3",
     "ns-require": "^1.1.4",
     "semver": "^7.3.7",
-    "spark-md5": "^3.0.2",
     "which-pm-runs": "^1.1.0"
   }
 }

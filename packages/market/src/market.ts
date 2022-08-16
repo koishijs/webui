@@ -3,6 +3,13 @@ import { DataService } from '@koishijs/plugin-console'
 import Scanner, { AnalyzedPackage, PackageJson } from '@koishijs/registry'
 import which from 'which-pm-runs'
 import spawn from 'cross-spawn'
+import { createHash } from 'crypto'
+
+declare module '@koishijs/registry' {
+  interface User {
+    avatar?: string
+  }
+}
 
 const logger = new Logger('market')
 
@@ -82,13 +89,17 @@ class MarketProvider extends DataService<MarketProvider.Payload> {
 
     this.failed = []
     this.scanner = scanner
+    const mirror = process.env.GRAVATAR_MIRROR || 'https://s.gravatar.com'
     await scanner.analyze({
       version: '4',
       onFailure: (name) => {
         this.failed.push(name)
       },
       onSuccess: (item) => {
-        const { name, versions } = item
+        const { name, versions, maintainers } = item
+        for (const user of maintainers) {
+          user.avatar = mirror + '/avatar/' + createHash('md5').update(user.email).digest('hex')
+        }
         this.tempCache[name] = this.fullCache[name] = {
           ...item,
           versions: Object.fromEntries(versions.map(item => [item.version, pick(item, ['peerDependencies'])] as const)),
