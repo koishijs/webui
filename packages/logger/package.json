@@ -1,7 +1,7 @@
 {
   "name": "@koishijs/plugin-logger",
   "description": "Dump log files for Koishi",
-  "version": "2.1.4",
+  "version": "2.1.5",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
   "files": [
@@ -30,6 +30,7 @@
     "logs"
   ],
   "koishi": {
+    "category": "console",
     "description": {
       "en": "Dump log files and show them in the console",
       "zh": "保存日志文件并在控制台中显示"
@@ -41,11 +42,11 @@
     }
   },
   "peerDependencies": {
-    "@koishijs/plugin-console": "^4.3.7",
+    "@koishijs/plugin-console": "^4.3.10",
     "koishi": "^4.8.5"
   },
   "devDependencies": {
-    "@koishijs/client": "^4.3.7",
+    "@koishijs/client": "^4.3.10",
     "@koishijs/cli": "^4.8.5",
     "ansi_up": "^5.1.0"
   }

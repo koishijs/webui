@@ -1,7 +1,7 @@
 {
   "name": "@koishijs/plugin-chat",
   "description": "Display and respond to messages for Koishi",
-  "version": "3.1.4",
+  "version": "3.1.5",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
   "files": [
@@ -28,6 +28,7 @@
     "server"
   ],
   "koishi": {
+    "category": "console",
     "description": {
       "en": "Receive and send messages using your bot account, just like a univeral chat app",
       "zh": "使用机器人账号接收和发送消息，就像一个通用的聊天软件一样"
@@ -45,7 +46,7 @@
     "koishi": "^4.8.5"
   },
   "devDependencies": {
-    "@koishijs/client": "^4.3.7",
-    "@koishijs/plugin-console": "^4.3.7"
+    "@koishijs/client": "^4.3.10",
+    "@koishijs/plugin-console": "^4.3.10"
   }
 }

@@ -1,7 +1,7 @@
 {
   "name": "@koishijs/plugin-console",
   "description": "Web User Interface for Koishi",
-  "version": "4.3.7",
+  "version": "4.3.10",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
   "files": [
@@ -30,6 +30,7 @@
     "console"
   ],
   "koishi": {
+    "category": "console",
     "description": {
       "en": "Web UI interface",
       "zh": "网页控制台"
@@ -44,7 +45,7 @@
     "koishi": "^4.8.5"
   },
   "devDependencies": {
-    "@koishijs/client": "^4.3.7",
+    "@koishijs/client": "^4.3.10",
     "@types/uuid": "^8.3.4"
   },
   "dependencies": {

@@ -1,5 +1,5 @@
 import { RollupOutput } from 'rollup'
-import { appendFile, copyFile } from 'fs-extra'
+import { appendFile, copyFile } from 'fs/promises'
 import { resolve } from 'path'
 import * as vite from 'vite'
 import vue from '@vitejs/plugin-vue'
