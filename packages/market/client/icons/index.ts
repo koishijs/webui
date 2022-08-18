@@ -9,6 +9,7 @@ import CategoryConsole from './category/console.vue'
 import CategoryGame from './category/game.vue'
 import CategoryOther from './category/other.vue'
 import CategoryStorage from './category/storage.vue'
+import CategoryTool from './category/tool.vue'
 
 import Balance from './market/balance.vue'
 import Download from './market/download.vue'
@@ -34,6 +35,7 @@ icons.register('category:console', CategoryConsole)
 icons.register('category:game', CategoryGame)
 icons.register('category:other', CategoryOther)
 icons.register('category:storage', CategoryStorage)
+icons.register('category:tool', CategoryTool)
 
 icons.register('balance', Balance)
 icons.register('download', Download)

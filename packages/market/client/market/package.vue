@@ -62,7 +62,7 @@ const props = defineProps({
 
 const meta = computed(() => getMixedMeta(props.data.name))
 
-const categories = ['console', 'game', 'business']
+const categories = ['console', 'game', 'business', 'storage', 'tool']
 
 function resolveCategory(name: string) {
   if (categories.includes(name)) return name
@@ -165,7 +165,7 @@ function formatSize(value: number) {
           content: '';
           z-index: 0;
           border-radius: 100%;
-          background-color: currentColor;
+          background-color: white;
         }
       }
     }
@@ -174,10 +174,11 @@ function formatSize(value: number) {
       height: 1rem;
       display: flex;
       align-items: center;
+      gap: 0 0.25rem;
+      width: fit-content;
 
       .k-icon {
         color: var(--warning);
-        margin-right: 0.25rem;
         height: 0.875rem;
         transition: color 0.3s ease;
       }
@@ -204,6 +205,7 @@ function formatSize(value: number) {
     height: 1.5rem;
     gap: 0 1.5rem;
     margin-bottom: -0.25rem;
+    cursor: default;
 
     .info {
       font-size: 14px;

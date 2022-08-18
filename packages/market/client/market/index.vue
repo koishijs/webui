@@ -44,7 +44,7 @@
 <script setup lang="ts">
 
 import { router, store } from '@koishijs/client'
-import { computed, reactive, ref, watch } from 'vue'
+import { computed, reactive, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { config, active } from '../utils'
 import { validate } from './utils'
