@@ -98,7 +98,7 @@ const packages = computed(() => {
   return Object.values(store.market.data)
     .filter(data => words.every(word => validate(data, word)))
     .filter(item => config.showInstalled || !store.packages[item.name])
-    .sort((a, b) => b.score - a.score)
+    .sort((a, b) => b.score.final - a.score.final)
 })
 
 </script>

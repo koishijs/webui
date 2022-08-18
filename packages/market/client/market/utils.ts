@@ -18,8 +18,8 @@ export function validate(data: MarketProvider.Data, word: string) {
   } else if (word.startsWith('email:')) {
     return data.maintainers.some(user => user.email === word.slice(6))
   } else if (word.startsWith('is:')) {
-    if (word === 'is:official') {
-      return data.official
+    if (word === 'is:verified') {
+      return data.verified
     } else {
       return true
     }

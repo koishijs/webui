@@ -98,7 +98,7 @@ class MarketProvider extends DataService<MarketProvider.Payload> {
       onSuccess: (item) => {
         const { name, versions, maintainers } = item
         for (const user of maintainers) {
-          user.avatar = mirror + '/avatar/' + createHash('md5').update(user.email).digest('hex')
+          user.avatar = mirror + '/avatar/' + createHash('md5').update(user.email).digest('hex') + '?d=mp'
         }
         this.tempCache[name] = this.fullCache[name] = {
           ...item,

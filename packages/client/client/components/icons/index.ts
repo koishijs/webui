@@ -4,7 +4,6 @@ import Home from './activity/home.vue'
 import Moon from './activity/moon.vue'
 import Sun from './activity/sun.vue'
 import Application from './svg/application.vue'
-import Balance from './svg/balance.vue'
 import BoxOpen from './svg/box-open.vue'
 import CheckFull from './svg/check-full.vue'
 import ChevronDown from './svg/chevron-down.vue'
@@ -45,7 +44,6 @@ register('activity:moon', Moon)
 register('activity:sun', Sun)
 
 register('application', Application)
-register('balance', Balance)
 register('box-open', BoxOpen)
 register('check-full', CheckFull)
 register('chevron-down', ChevronDown)

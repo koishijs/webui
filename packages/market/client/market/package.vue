@@ -6,33 +6,16 @@
       </div>
       <div class="right">
         <h2>
-          {{ data.shortname }}
-          <a v-if="data.links.homepage" :href="data.links.homepage" target="_blank" rel="noopener noreferrer">
-            <k-icon name="link"></k-icon>
-          </a>
+          <a :href="data.links.homepage" target="_blank" rel="noopener noreferrer">{{ data.shortname }}</a>
+          <span class="verified" v-if="data.verified">
+            <k-icon name="verified"></k-icon>
+          </span>
         </h2>
-        <div class="badges">
-          <k-badge type="success"
-            v-if="data.official"
-            @click="$emit('query', 'is:official')"
-          >官方</k-badge>
-          <k-badge type="primary"
-            v-if="meta.manifest.service.implements.includes('database')"
-            @click="$emit('query', 'impl:database')"
-          >数据库</k-badge>
-          <k-badge type="primary"
-            v-if="meta.manifest.service.implements.includes('adapter')"
-            @click="$emit('query', 'impl:adapter')"
-          >适配器</k-badge>
-          <k-badge type="primary"
-            v-if="meta.manifest.service.implements.includes('manifestassets')"
-            @click="$emit('query', 'impl:assets')"
-          >资源存储</k-badge>
-          <k-badge type="primary"
-            v-if="meta.manifest.service.required.includes('console') || meta.manifest.service.optional.includes('console')"
-            @click="$emit('query', 'using:console')"
-          >控制台</k-badge>
-        </div>
+        <el-tooltip :content="data.score.final.toFixed(3)" placement="right">
+          <div class="rating">
+            <k-icon v-for="(name, index) in formatRating(data.score.final)" :key="index" :name="name"></k-icon>
+          </div>
+        </el-tooltip>
         <k-button v-if="!store.packages[data.name]" solid class="right" @click="$emit('click')">添加</k-button>
         <k-button v-else type="success" solid class="right" @click="$emit('click')">修改</k-button>
       </div>
@@ -40,9 +23,18 @@
     <k-markdown inline class="desc" :source="meta.manifest.description.zh || meta.manifest.description.en"></k-markdown>
     <div class="footer">
       <div class="info">
-        <span><k-icon name="tag"></k-icon>{{ data.version }}</span>
-        <span v-if="data.installSize"><k-icon name="file-archive"></k-icon>{{ formatSize(data.installSize) }}</span>
-        <span><k-icon name="balance"></k-icon>{{ data.license }}</span>
+        <a :href="data.links.npm" target="_blank" rel="noopener noreferrer">
+          <k-icon name="tag"></k-icon>{{ data.version }}
+        </a>
+        <a v-if="data.installSize" :href="data.links.size" target="_blank" rel="noopener noreferrer">
+          <k-icon name="file-archive"></k-icon>{{ formatSize(data.installSize) }}
+        </a>
+        <span v-if="data.downloads">
+          <k-icon name="download"></k-icon>{{ data.downloads.lastMonth }}
+        </span>
+        <span v-if="!data.installSize && !data.downloads">
+          <k-icon name="balance"></k-icon>{{ data.license }}
+        </span>
       </div>
       <div class="avatars">
         <el-tooltip v-for="({ email, avatar, username }) in data.maintainers" :key="email" :content="username">
@@ -70,11 +62,18 @@ const props = defineProps({
 
 const meta = computed(() => getMixedMeta(props.data.name))
 
-const categories = ['game', 'business']
+const categories = ['console', 'game', 'business']
 
 function resolveCategory(name: string) {
   if (categories.includes(name)) return name
   return 'other'
+}
+
+function formatRating(value: number) {
+  value = (value - 0.3) * 10
+  return Array(5).fill(null).map((_, index) => {
+    return index < value ? 'star-full' : 'star-empty'
+  })
 }
 
 function formatValue(value: number) {
@@ -98,7 +97,7 @@ function formatSize(value: number) {
 .market-view {
   width: 100%;
   max-width: 540px;
-  height: 13rem;
+  height: 12.5rem;
   margin: 0;
   padding: 1.25rem;
   box-sizing: border-box;
@@ -116,8 +115,8 @@ function formatSize(value: number) {
     gap: 1rem;
 
     .left {
-      width: 4rem;
-      height: 4rem;
+      width: 3.5rem;
+      height: 3.5rem;
       border-radius: 8px;
       border: 1px solid var(--card-border);
       box-sizing: border-box;
@@ -134,23 +133,54 @@ function formatSize(value: number) {
       display: flex;
       flex-flow: column;
       justify-content: space-around;
-
-      .badges {
-        height: 1.5rem;
-      }
     }
 
     h2 {
       font-size: 1.125rem;
       margin: 0;
       line-height: 1;
+
+      .verified {
+        margin-left: 0.6rem;
+        height: 1.125rem;
+        width: 1.125rem;
+        vertical-align: -2px;
+        position: relative;
+        display: inline-block;
+
+        .k-icon {
+          color: var(--success);
+          height: 100%;
+          transition: color 0.3s ease;
+          z-index: 10;
+          position: relative;
+        }
+
+        &::before {
+          position: absolute;
+          top: 25%;
+          left: 25%;
+          right: 25%;
+          bottom: 25%;
+          content: '';
+          z-index: 0;
+          border-radius: 100%;
+          background-color: currentColor;
+        }
+      }
     }
 
-    .right .k-icon {
-      color: var(--fg1);
-      margin-left: 0.6rem;
-      height: 0.875rem;
-      transition: color 0.3s ease;
+    .rating {
+      height: 1rem;
+      display: flex;
+      align-items: center;
+
+      .k-icon {
+        color: var(--warning);
+        margin-right: 0.25rem;
+        height: 0.875rem;
+        transition: color 0.3s ease;
+      }
     }
 
     button.right {
@@ -172,39 +202,38 @@ function formatSize(value: number) {
     align-items: center;
     justify-content: space-between;
     height: 1.5rem;
+    gap: 0 1.5rem;
     margin-bottom: -0.25rem;
 
-    .avatars a {
-      cursor: pointer;
-      margin-left: 4px;
+    .info {
+      font-size: 14px;
+      color: var(--el-text-color-regular);
+      transition: color 0.3s ease;
+      display: flex;
+      gap: 1.5rem;
+
+      .k-icon {
+        height: 12px;
+        width: 16px;
+        margin-right: 6px;
+        vertical-align: -1px;
+      }
     }
 
-    .avatars img {
-      height: 1.5rem;
-      width: 1.5rem;
-      border-radius: 100%;
-      vertical-align: middle;
-    }
-  }
+    .avatars {
+      display: flex;
+      gap: 0.25rem;
 
-  .info {
-    cursor: default;
-    font-size: 14px;
-    color: var(--el-text-color-regular);
-    transition: color 0.3s ease;
+      a {
+        cursor: pointer;
+      }
 
-    .pointer {
-      cursor: pointer;
-    }
-
-    .k-icon {
-      height: 12px;
-      margin-right: 8px;
-      vertical-align: -1px;
-    }
-
-    span + span {
-      margin-left: 1.5rem;
+      img {
+        height: 1.5rem;
+        width: 1.5rem;
+        border-radius: 100%;
+        vertical-align: middle;
+      }
     }
   }
 }
