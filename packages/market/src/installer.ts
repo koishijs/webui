@@ -1,4 +1,4 @@
-import { Context, Dict, Logger, pick, valueMap } from 'koishi'
+import { Context, Dict, Logger, pick, Quester, Schema, Time, valueMap } from 'koishi'
 import { DataService } from '@koishijs/plugin-console'
 import { PackageJson, Registry } from '@koishijs/registry'
 import { resolve } from 'path'
@@ -38,13 +38,14 @@ export interface Dependency {
 }
 
 class Installer extends DataService<Dict<Dependency>> {
-  static using = ['console.market']
+  public http: Quester
+  public registry: string
 
   private agent = which()?.name || 'npm'
   private manifest: PackageJson
   private task: Promise<Dict<Dependency>>
 
-  constructor(public ctx: Context) {
+  constructor(public ctx: Context, public config: Installer.Config) {
     super(ctx, 'dependencies', { authority: 4 })
     this.manifest = loadManifest(this.cwd)
 
@@ -55,9 +56,38 @@ class Installer extends DataService<Dict<Dependency>> {
     return this.ctx.app.baseDir
   }
 
+  private async getRegistry() {
+    const stdout = await new Promise<string>((resolve, reject) => {
+      let stdout = ''
+      const agent = which()
+      const key = agent?.name === 'yarn' && !agent?.version.startsWith('1.') ? 'npmRegistryServer' : 'registry'
+      const child = spawn(this.agent, ['config', 'get', key], { cwd: this.cwd })
+      child.on('exit', (code) => {
+        if (!code) return resolve(stdout)
+        reject(new Error(`child process failed with code ${code}`))
+      })
+      child.on('error', reject)
+      child.stdout.on('data', (data) => {
+        stdout += data.toString()
+      })
+      child.stderr.on('data', (data) => {
+        data = data.toString().trim()
+        if (!data) return
+        for (const line of data.split('\n')) {
+          logger.warn(line)
+        }
+      })
+    })
+    return stdout.trim()
+  }
+
+  async start() {
+    const { endpoint, timeout } = this.config
+    this.registry = endpoint || await this.getRegistry()
+    this.http = this.ctx.http.extend({ endpoint: this.registry, timeout })
+  }
+
   private async _get() {
-    const { market } = this.ctx.console
-    await market.initialize()
     const result = valueMap<string, Dependency>(this.manifest.dependencies, request => ({ request }))
     await pMap(Object.keys(result), async (name) => {
       try {
@@ -69,7 +99,7 @@ class Installer extends DataService<Dict<Dependency>> {
       } catch {}
 
       try {
-        const registry = await market.http.get<Registry>(`/${name}`)
+        const registry = await this.http.get<Registry>(`/${name}`)
         const entries = Object.values(registry.versions)
           .map(item => [item.version, pick(item, ['peerDependencies'])] as const)
           .reverse()
@@ -137,6 +167,7 @@ class Installer extends DataService<Dict<Dependency>> {
     if (shouldInstall) {
       const args: string[] = []
       if (this.agent !== 'yarn') args.push('install')
+      args.push('--registry', this.registry)
       const code = await this.exec(this.agent, args)
       if (code) return code
     }
@@ -153,6 +184,18 @@ class Installer extends DataService<Dict<Dependency>> {
     this.ctx.console.packages.refresh()
     return 0
   }
+}
+
+namespace Installer {
+  export interface Config {
+    endpoint?: string
+    timeout?: number
+  }
+
+  export const Config: Schema<Config> = Schema.object({
+    endpoint: Schema.string().role('link').description('插件的下载源。默认跟随当前项目的 npm config。'),
+    timeout: Schema.number().role('time').default(Time.second * 5).description('获取插件数据的超时时间。'),
+  }).description('插件源设置')
 }
 
 export default Installer

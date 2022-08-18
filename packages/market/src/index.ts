@@ -31,11 +31,13 @@ export const name = 'manager'
 export const using = ['console', 'loader'] as const
 
 export interface Config {
+  registry?: Installer.Config
   search?: MarketProvider.Config
 }
 
 export const Config: Schema<Config> = Schema.intersect([
   Schema.object({
+    registry: Installer.Config,
     search: MarketProvider.Config,
   }),
 ])
@@ -45,7 +47,7 @@ export function apply(ctx: Context, config: Config) {
     return ctx.logger('manager').warn('manager is only available for json/yaml config file')
   }
 
-  ctx.plugin(Installer)
+  ctx.plugin(Installer, config.registry)
   ctx.plugin(MarketProvider, config.search)
   ctx.plugin(PackageProvider)
   ctx.plugin(ConfigWriter)

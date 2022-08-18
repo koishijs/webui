@@ -1,8 +1,6 @@
-import { Context, Dict, Logger, pick, Quester, Schema, Time } from 'koishi'
+import { Context, Dict, Logger, pick, Schema, Time } from 'koishi'
 import { DataService } from '@koishijs/plugin-console'
 import Scanner, { AnalyzedPackage, PackageJson } from '@koishijs/registry'
-import which from 'which-pm-runs'
-import spawn from 'cross-spawn'
 import { createHash } from 'crypto'
 
 declare module '@koishijs/registry' {
@@ -14,21 +12,19 @@ declare module '@koishijs/registry' {
 const logger = new Logger('market')
 
 class MarketProvider extends DataService<MarketProvider.Payload> {
-  public http: Quester
+  static using = ['console.dependencies']
 
   private timestamp = 0
   private failed: string[] = []
   private scanner: Scanner
   private fullCache: Dict<MarketProvider.Data> = {}
   private tempCache: Dict<MarketProvider.Data> = {}
-  private initTask: Promise<string>
 
   constructor(ctx: Context, public config: MarketProvider.Config) {
     super(ctx, 'market', { authority: 4 })
   }
 
   async start() {
-    await this.initialize()
     await this.prepare().catch((e) => {
       logger.warn(e)
       this.scanner.total = -1
@@ -50,35 +46,9 @@ class MarketProvider extends DataService<MarketProvider.Payload> {
     this.tempCache = {}
   }
 
-  private async _initialize() {
-    const cwd = this.ctx.app.baseDir
-    const registry = await new Promise<string>((resolve, reject) => {
-      let stdout = ''
-      const agent = which()
-      const key = (agent?.name === 'yarn' && !agent?.version.startsWith('1.')) ? 'npmRegistryServer' : 'registry'
-      const child = spawn(agent?.name || 'npm', ['config', 'get', key], { cwd })
-      child.on('exit', (code) => {
-        if (!code) return resolve(stdout)
-        reject(new Error(`child process failed with code ${code}`))
-      })
-      child.on('error', reject)
-      child.stdout.on('data', (data) => {
-        stdout += data.toString()
-      })
-    })
-
-    const endpoint = registry.trim()
-    this.http = this.ctx.http.extend({ endpoint })
-    return endpoint
-  }
-
-  initialize() {
-    return this.initTask ||= this._initialize()
-  }
-
   async prepare() {
     const { endpoint, timeout } = this.config
-    const scanner = new Scanner(this.http.get)
+    const scanner = new Scanner(this.ctx.console.dependencies.http.get)
     if (endpoint) {
       const result = await this.ctx.http.get(endpoint, { timeout })
       scanner.total = result.total
@@ -126,7 +96,7 @@ namespace MarketProvider {
   }
 
   export const Config: Schema<Config> = Schema.object({
-    endpoint: Schema.string().role('link').description('用于搜索插件市场的网址。默认跟随当前的 npm registry。'),
+    endpoint: Schema.string().role('link').description('用于搜索插件市场的网址。默认跟随 registry 设置。'),
     timeout: Schema.number().role('time').default(Time.second * 30).description('搜索插件市场的超时时间。'),
   }).description('搜索设置')
 
