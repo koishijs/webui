@@ -3,6 +3,7 @@ import Console from '.'
 
 export namespace DataService {
   export interface Options {
+    immediate?: boolean
     authority?: number
   }
 }
@@ -29,7 +30,7 @@ export abstract class DataService<T = never> extends Service {
   }
 
   constructor(protected ctx: Context, protected key: keyof Console.Services, public options: DataService.Options = {}) {
-    super(ctx, `console.${key}`, true)
+    super(ctx, `console.${key}`, options.immediate)
     DataService.define(key)
   }
 

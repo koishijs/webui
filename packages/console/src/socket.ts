@@ -57,7 +57,7 @@ class WsService extends DataService {
   readonly layer: WebSocketLayer
 
   constructor(public ctx: Context, private config: WsService.Config) {
-    super(ctx, 'ws')
+    super(ctx, 'ws', { immediate: true })
 
     this.layer = ctx.router.ws(config.apiPath, this.onConnection)
   }

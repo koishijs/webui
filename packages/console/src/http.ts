@@ -15,7 +15,7 @@ class HttpService extends DataService<string[]> {
   private data: Dict<string> = {}
 
   constructor(ctx: Context, private config: HttpService.Config) {
-    super(ctx, 'http')
+    super(ctx, 'http', { immediate: true })
 
     config.root ||= config.devMode
       ? resolve(dirname(require.resolve('@koishijs/client/package.json')), 'app')
@@ -95,7 +95,7 @@ class HttpService extends DataService<string[]> {
       const stats = await fsp.stat(filename).catch<Stats>(noop)
       if (stats?.isFile()) return sendFile(filename)
       const ext = extname(filename)
-      if (ext && ext !== '.html') return next()
+      if (ext && ext !== '.html') return ctx.status = 404
       const template = await fsp.readFile(resolve(root, 'index.html'), 'utf8')
       ctx.type = 'html'
       ctx.body = await this.transformHtml(template)
