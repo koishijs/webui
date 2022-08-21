@@ -4,7 +4,7 @@ import { resolve } from 'path'
 import { config, cwd, meta, PackageJson } from '.'
 import { blue, red } from 'kleur'
 import which from 'which-pm-runs'
-import spawn from 'cross-spawn'
+import spawn from 'execa'
 import prompts from 'prompts'
 
 class Initiator {

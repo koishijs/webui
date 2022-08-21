@@ -17,7 +17,7 @@ function initGraph(packages: Record<string, PackageJson>) {
   const nodes: Record<string, Node> = {}
   for (const path in packages) {
     const meta = packages[path]
-    if (!meta.main) return
+    if (!meta.main) continue
     nodes[meta.name] = { path, meta, prev: [], next: new Set() }
   }
 

@@ -47,12 +47,11 @@
   },
   "devDependencies": {
     "@koishijs/client": "^4.3.10",
-    "@types/cross-spawn": "^6.0.2",
     "@types/which-pm-runs": "^1.0.0"
   },
   "dependencies": {
     "@koishijs/registry": "^3.1.0",
-    "cross-spawn": "^7.0.3",
+    "execa": "^5.1.1",
     "ns-require": "^1.1.4",
     "semver": "^7.3.7",
     "which-pm-runs": "^1.1.0"

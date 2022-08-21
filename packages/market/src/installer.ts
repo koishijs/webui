@@ -7,7 +7,7 @@ import { loadManifest } from './utils'
 import { satisfies } from 'semver'
 import {} from '@koishijs/cli'
 import which from 'which-pm-runs'
-import spawn from 'cross-spawn'
+import spawn from 'execa'
 import pMap from 'p-map'
 
 declare module '@koishijs/plugin-console' {
