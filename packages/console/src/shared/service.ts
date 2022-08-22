@@ -39,7 +39,7 @@ export abstract class DataService<T = never> extends Service {
   }
 
   protected broadcast(type: string, value: any) {
-    this.ctx.console?.ws.broadcast(type, { key: this.key, value }, this.options)
+    this.ctx.console?.broadcast(type, { key: this.key, value }, this.options)
   }
 
   async refresh() {

@@ -106,7 +106,7 @@ export function apply(ctx: Context, options: Config = {}) {
           return segment('image', data)
         },
       })
-      ctx.console.ws.broadcast('chat', message, { authority: 3 })
+      ctx.console.broadcast('chat', message, { authority: 3 })
     })
 
     const { get } = ctx.http

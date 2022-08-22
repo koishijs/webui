@@ -1,35 +1,32 @@
-import { Context, Schema, Service } from 'koishi'
-import HttpService, { Entry } from './http'
-import WsService from './socket'
-import { DataService } from './service'
+import { Context, Schema } from 'koishi'
+import HttpService from './http'
+import WsService from './ws'
+import { Console, DataService, Entry } from '../shared'
 
-export * from './service'
+export * from '../shared'
 export * from './http'
-export * from './socket'
+export * from './ws'
 
-type NestedServices = {
-  [K in keyof Console.Services as `console.${K}`]: Console.Services[K]
-}
-
-declare module 'koishi' {
-  interface Context extends NestedServices {
-    console: Console
+declare module '../shared' {
+  namespace Console {
+    interface Services {
+      http?: HttpService
+      ws?: WsService
+    }
   }
 }
 
-export interface ClientConfig {
+interface ClientConfig {
   devMode: boolean
   uiPath: string
   endpoint: string
 }
 
-export interface Console extends Console.Services {}
-
-export class Console extends Service {
+class NodeConsole extends Console {
   public global = {} as ClientConfig
 
-  constructor(public ctx: Context, public config: Console.Config) {
-    super(ctx, 'console', true)
+  constructor(public ctx: Context, public config: NodeConsole.Config) {
+    super(ctx)
 
     const { devMode, uiPath, apiPath, selfUrl } = config
     this.global.devMode = devMode
@@ -40,18 +37,22 @@ export class Console extends Service {
     ctx.plugin(WsService, config)
   }
 
-  addEntry(filename: string | Entry) {
-    this.http.addEntry(filename)
+  addEntry(entry: string | Entry) {
+    this.http.addEntry(entry)
   }
 
   addListener<K extends keyof Events>(event: K, callback: Events[K], options?: DataService.Options) {
     this.ws.addListener(event, { callback, ...options })
   }
+
+  broadcast(type: string, body: any, options: DataService.Options) {
+    this.ws.broadcast(type, body, options)
+  }
 }
 
 export interface Events {}
 
-export namespace Console {
+namespace NodeConsole {
   export interface Config extends HttpService.Config, WsService.Config {}
 
   export const Config: Schema<Config> = Schema.object({
@@ -82,11 +83,6 @@ export namespace Console {
       .default('.vite')
       .hidden(),
   })
-
-  export interface Services {
-    http?: HttpService
-    ws?: WsService
-  }
 }
 
-export default Console
+export default NodeConsole

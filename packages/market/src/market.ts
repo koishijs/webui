@@ -1,6 +1,6 @@
 import { Context, Dict, Logger, pick, Schema, Time } from 'koishi'
 import { DataService } from '@koishijs/plugin-console'
-import Scanner, { AnalyzedPackage, PackageJson } from '@koishijs/registry'
+import Scanner, { AnalyzedPackage, PackageJson, SearchResult } from '@koishijs/registry'
 import { createHash } from 'crypto'
 
 declare module '@koishijs/registry' {
@@ -37,7 +37,7 @@ class MarketProvider extends DataService<MarketProvider.Payload> {
     const now = Date.now()
     if (now - this.timestamp < 100) return
     this.timestamp = now
-    this.ctx.console.ws.broadcast('market/patch', {
+    this.ctx.console.broadcast('market/patch', {
       data: this.tempCache,
       failed: this.failed.length,
       total: this.scanner.total,
@@ -50,9 +50,9 @@ class MarketProvider extends DataService<MarketProvider.Payload> {
     const { endpoint, timeout } = this.config
     const scanner = new Scanner(this.ctx.console.dependencies.http.get)
     if (endpoint) {
-      const result = await this.ctx.http.get(endpoint, { timeout })
-      scanner.total = result.total
-      scanner.objects = result.objects
+      const result = await this.ctx.http.get<SearchResult>(endpoint, { timeout })
+      scanner.objects = result.objects.filter(object => !object.ignored)
+      scanner.total = scanner.objects.length
     } else {
       await scanner.collect({ timeout })
     }

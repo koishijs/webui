@@ -1,7 +1,7 @@
 import { App, Awaitable, coerce, Context, Dict, Logger, WebSocketLayer } from 'koishi'
 import { v4 } from 'uuid'
 import WebSocket from 'ws'
-import { DataService } from './service'
+import { DataService } from '../shared'
 
 declare module 'koishi' {
   interface Events {

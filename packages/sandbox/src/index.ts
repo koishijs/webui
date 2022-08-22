@@ -54,7 +54,7 @@ class SandboxBot extends Bot {
 
     const self = this
     ctx.console.addListener('sandbox/message', async function (user, channel, content) {
-      ctx.console.ws.broadcast('sandbox', { content, user, channel })
+      ctx.console.broadcast('sandbox', { content, user, channel })
       self.dispatch(self.session({
         userId: user,
         content,
@@ -78,7 +78,7 @@ class SandboxBot extends Bot {
         return segment.image('data:image/png;base64,' + data.url.slice(9))
       },
     })
-    this.ctx.console.ws.broadcast('sandbox', { content, user: 'Koishi', channel })
+    this.ctx.console.broadcast('sandbox', { content, user: 'Koishi', channel })
     return [Random.id()]
   }
 }

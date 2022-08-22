@@ -1,18 +1,20 @@
 import { Context, Dict, noop, Random } from 'koishi'
 import { dirname, extname, resolve } from 'path'
 import { createReadStream, existsSync, promises as fsp, Stats } from 'fs'
-import { DataService } from './service'
+import { DataService, Entry } from '../shared'
 import { ViteDevServer } from 'vite'
 import open from 'open'
 
-export interface Entry {
-  dev: string
-  prod: string
+export interface ClientConfig {
+  devMode: boolean
+  uiPath: string
+  endpoint: string
 }
 
 class HttpService extends DataService<string[]> {
   private vite: ViteDevServer
   private data: Dict<string> = {}
+  public global = {} as ClientConfig
 
   constructor(ctx: Context, private config: HttpService.Config) {
     super(ctx, 'http', { immediate: true })

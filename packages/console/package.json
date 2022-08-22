@@ -2,8 +2,18 @@
   "name": "@koishijs/plugin-console",
   "description": "Web User Interface for Koishi",
   "version": "4.3.10",
-  "main": "lib/index.js",
+  "main": "lib/node/index.cjs",
   "typings": "lib/index.d.ts",
+  "exports": {
+    ".": {
+      "node": "./lib/node/index.cjs"
+    },
+    "./shared": {
+      "require": "./lib/shared/index.cjs",
+      "import": "./lib/shared/index.mjs"
+    },
+    "./package.json": "./package.json"
+  },
   "files": [
     "lib",
     "dist",
