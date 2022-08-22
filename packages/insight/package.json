@@ -43,10 +43,10 @@
   },
   "peerDependencies": {
     "@koishijs/plugin-console": "^4.3.10",
-    "koishi": "^4.8.5"
+    "koishi": "^4.8.6"
   },
   "devDependencies": {
-    "@koishijs/cli": "^4.8.5",
+    "@koishijs/cli": "^4.8.6",
     "@koishijs/client": "^4.3.10",
     "@types/d3-force": "^3.0.3",
     "@types/throttle-debounce": "^2.1.0"

@@ -30,6 +30,7 @@ $paddingY: 1.5rem;
 .k-card {
   border-radius: 8px;
   overflow: hidden;
+  position: relative;
   background-color: var(--card-bg);
   border: 1px solid var(--card-border);
   box-shadow: var(--card-shadow);

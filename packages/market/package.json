@@ -41,16 +41,16 @@
     }
   },
   "peerDependencies": {
-    "@koishijs/cli": "^4.8.5",
+    "@koishijs/cli": "^4.8.6",
     "@koishijs/plugin-console": "^4.3.10",
-    "koishi": "^4.8.5"
+    "koishi": "^4.8.6"
   },
   "devDependencies": {
     "@koishijs/client": "^4.3.10",
     "@types/which-pm-runs": "^1.0.0"
   },
   "dependencies": {
-    "@koishijs/registry": "^3.1.0",
+    "@koishijs/registry": "^3.1.2",
     "execa": "^5.1.1",
     "ns-require": "^1.1.4",
     "semver": "^7.3.7",
