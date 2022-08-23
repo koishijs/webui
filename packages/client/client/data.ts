@@ -1,6 +1,6 @@
-import { ClientConfig, Console, DataService, Events } from '@koishijs/plugin-console'
-import { Promisify } from 'koishi'
-import { reactive, ref } from 'vue'
+import BrowserConsole, { AbstractWebSocket, ClientConfig, Console, DataService, Events, SocketHandle } from '@koishijs/plugin-console'
+import { Context, Promisify } from 'koishi'
+import { markRaw, reactive, ref } from 'vue'
 import { useLocalStorage } from '@vueuse/core'
 
 interface StorageData<T> {
@@ -27,7 +27,7 @@ declare const KOISHI_CONFIG: ClientConfig
 export const config = KOISHI_CONFIG
 export const store = reactive<Store>({})
 
-export const socket = ref<WebSocket>(null)
+export const socket = ref<AbstractWebSocket>(null)
 const listeners: Record<string, (data: any) => void> = {}
 const responseHooks: Record<string, [Function, Function]> = {}
 
@@ -72,8 +72,49 @@ receive('response', ({ id, value, error }) => {
   }
 })
 
-export async function connect(endpoint: string) {
-  socket.value = new WebSocket(endpoint)
+class StubWebSocket implements AbstractWebSocket {
+  remote: StubWebSocket
+  onopen(event: any) {}
+  onmessage(event: any) {}
+  onclose(event: any) {}
+  onerror(event: any) {}
+  send(data: string) {
+    this.remote.onmessage(data)
+  }
+}
+
+class BackWebSocket extends StubWebSocket {
+  app: Context
+  handle: SocketHandle
+
+  constructor(public remote: StubWebSocket) {
+    super()
+    this.app = new Context()
+    this.app.plugin(BrowserConsole as any)
+    this.handle = new SocketHandle(this.app, this)
+  }
+
+  send(data: string) {
+    socket.value.onmessage(data)
+  }
+}
+
+class FrontWebSocket extends StubWebSocket {
+  remote = new BackWebSocket(this)
+
+  constructor() {
+    super()
+    this.onopen(null)
+  }
+}
+
+export function connect() {
+  if (config.endpoint) {
+    const endpoint = new URL(config.endpoint, location.origin).toString()
+    socket.value = markRaw(new WebSocket(endpoint.replace(/^http/, 'ws')))
+  } else {
+    socket.value = markRaw(new FrontWebSocket())
+  }
 
   socket.value.onmessage = (ev) => {
     const data = JSON.parse(ev.data)
@@ -89,10 +130,10 @@ export async function connect(endpoint: string) {
       store[key] = undefined
     }
     console.log('[koishi] websocket disconnected, will retry in 1s...')
-    setTimeout(() => connect(endpoint), 1000)
+    setTimeout(() => connect(), 1000)
   }
 
-  return new Promise((resolve) => {
+  return new Promise<Event>((resolve) => {
     socket.value.onopen = resolve
   })
 }

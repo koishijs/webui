@@ -1,5 +1,5 @@
 import { createApp } from 'vue'
-import client, { config, connect, root, router } from '@koishijs/client'
+import client, { connect, root, router } from '@koishijs/client'
 import App from './layouts/index.vue'
 import Home from './layouts/home.vue'
 
@@ -27,8 +27,6 @@ router.afterEach((route) => {
   }
 })
 
-const endpoint = new URL(config.endpoint, location.origin).toString()
-
-connect(endpoint.replace(/^http/, 'ws'))
-
 app.mount('#app')
+
+connect()

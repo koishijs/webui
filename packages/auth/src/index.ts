@@ -96,12 +96,12 @@ class AuthService extends DataService<UserAuth> {
       const listener = () => {
         delete states[id]
         dispose()
-        this.socket.off('close', listener)
+        this.socket.onclose = () => {}
       }
       const dispose = ctx.setTimeout(() => {
         if (states[id]?.[1] >= Date.now()) listener()
       }, config.loginTokenExpire)
-      this.socket.on('close', listener)
+      this.socket.onclose = listener
 
       return { id: user.id, name: user.name, token, expire }
     })
