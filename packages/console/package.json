@@ -6,7 +6,8 @@
   "typings": "lib/index.d.ts",
   "exports": {
     ".": {
-      "node": "./lib/node/index.cjs"
+      "node": "./lib/node/index.cjs",
+      "browser": "./lib/browser/index.mjs"
     },
     "./shared": {
       "require": "./lib/shared/index.cjs",

@@ -1,7 +1,7 @@
 import { Context, Schema } from 'koishi'
 import HttpService from './http'
 import WsService from './ws'
-import { Console, DataService, Entry } from '../shared'
+import { Console, Entry } from '../shared'
 
 export * from '../shared'
 export * from './http'
@@ -40,17 +40,7 @@ class NodeConsole extends Console {
   addEntry(entry: string | Entry) {
     this.http.addEntry(entry)
   }
-
-  addListener<K extends keyof Events>(event: K, callback: Events[K], options?: DataService.Options) {
-    this.ws.addListener(event, { callback, ...options })
-  }
-
-  broadcast(type: string, body: any, options: DataService.Options) {
-    this.ws.broadcast(type, body, options)
-  }
 }
-
-export interface Events {}
 
 namespace NodeConsole {
   export interface Config extends HttpService.Config, WsService.Config {}
