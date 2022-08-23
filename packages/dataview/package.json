@@ -31,6 +31,9 @@
   ],
   "koishi": {
     "category": "console",
+    "public": [
+      "dist"
+    ],
     "description": {
       "en": "View database in the console",
       "zh": "在网页控制台中访问数据库"
@@ -43,10 +46,10 @@
     }
   },
   "peerDependencies": {
-    "@koishijs/plugin-console": "^4.3.10",
+    "@koishijs/plugin-console": "^4.4.1",
     "koishi": "^4.8.6"
   },
   "devDependencies": {
-    "@koishijs/client": "^4.3.10"
+    "@koishijs/client": "^4.4.1"
   }
 }

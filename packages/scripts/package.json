@@ -31,7 +31,7 @@
     "koishi"
   ],
   "peerDependencies": {
-    "@koishijs/client": "^4.3.10"
+    "@koishijs/client": "^4.4.1"
   },
   "devDependencies": {
     "@types/fs-extra": "^9.0.13",

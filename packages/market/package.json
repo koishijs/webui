@@ -1,7 +1,7 @@
 {
   "name": "@koishijs/plugin-market",
   "description": "Manage your bots and plugins with console",
-  "version": "1.2.4",
+  "version": "1.2.5",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
   "files": [
@@ -30,6 +30,9 @@
   ],
   "koishi": {
     "category": "console",
+    "public": [
+      "dist"
+    ],
     "description": {
       "en": "Manage your bots and plugins with console",
       "zh": "使用控制台管理你的插件、机器人和依赖"
@@ -42,11 +45,11 @@
   },
   "peerDependencies": {
     "@koishijs/cli": "^4.8.6",
-    "@koishijs/plugin-console": "^4.3.10",
+    "@koishijs/plugin-console": "^4.4.1",
     "koishi": "^4.8.6"
   },
   "devDependencies": {
-    "@koishijs/client": "^4.3.10",
+    "@koishijs/client": "^4.4.1",
     "@types/which-pm-runs": "^1.0.0"
   },
   "dependencies": {

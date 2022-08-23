@@ -31,6 +31,9 @@
   ],
   "koishi": {
     "category": "console",
+    "public": [
+      "dist"
+    ],
     "description": {
       "en": "Show plugin dependency graph in the console",
       "zh": "在网页控制台中显示插件依赖关系图"
@@ -42,12 +45,12 @@
     }
   },
   "peerDependencies": {
-    "@koishijs/plugin-console": "^4.3.10",
+    "@koishijs/plugin-console": "^4.4.1",
     "koishi": "^4.8.6"
   },
   "devDependencies": {
     "@koishijs/cli": "^4.8.6",
-    "@koishijs/client": "^4.3.10",
+    "@koishijs/client": "^4.4.1",
     "@types/d3-force": "^3.0.3",
     "@types/throttle-debounce": "^2.1.0"
   },

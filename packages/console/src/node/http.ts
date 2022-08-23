@@ -21,7 +21,7 @@ class HttpService extends DataService<string[]> {
 
     config.root ||= config.devMode
       ? resolve(dirname(require.resolve('@koishijs/client/package.json')), 'app')
-      : resolve(__dirname, '../dist')
+      : resolve(__dirname, '../../dist')
   }
 
   async start() {
