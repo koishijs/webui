@@ -1,5 +1,5 @@
-import BrowserConsole, { AbstractWebSocket, ClientConfig, Console, DataService, Events, SocketHandle } from '@koishijs/plugin-console'
-import { Context, Promisify } from 'koishi'
+import { AbstractWebSocket, ClientConfig, Console, DataService, Events } from '@koishijs/plugin-console'
+import { Promisify } from 'koishi'
 import { markRaw, reactive, ref } from 'vue'
 import { useLocalStorage } from '@vueuse/core'
 
@@ -72,49 +72,8 @@ receive('response', ({ id, value, error }) => {
   }
 })
 
-class StubWebSocket implements AbstractWebSocket {
-  remote: StubWebSocket
-  onopen(event: any) {}
-  onmessage(event: any) {}
-  onclose(event: any) {}
-  onerror(event: any) {}
-  send(data: string) {
-    this.remote.onmessage(data)
-  }
-}
-
-class BackWebSocket extends StubWebSocket {
-  app: Context
-  handle: SocketHandle
-
-  constructor(public remote: StubWebSocket) {
-    super()
-    this.app = new Context()
-    this.app.plugin(BrowserConsole as any)
-    this.handle = new SocketHandle(this.app, this)
-  }
-
-  send(data: string) {
-    socket.value.onmessage(data)
-  }
-}
-
-class FrontWebSocket extends StubWebSocket {
-  remote = new BackWebSocket(this)
-
-  constructor() {
-    super()
-    this.onopen(null)
-  }
-}
-
-export function connect() {
-  if (config.endpoint) {
-    const endpoint = new URL(config.endpoint, location.origin).toString()
-    socket.value = markRaw(new WebSocket(endpoint.replace(/^http/, 'ws')))
-  } else {
-    socket.value = markRaw(new FrontWebSocket())
-  }
+export function connect(value: AbstractWebSocket) {
+  socket.value = markRaw(value)
 
   socket.value.onmessage = (ev) => {
     const data = JSON.parse(ev.data)
@@ -130,7 +89,7 @@ export function connect() {
       store[key] = undefined
     }
     console.log('[koishi] websocket disconnected, will retry in 1s...')
-    setTimeout(() => connect(), 1000)
+    setTimeout(() => connect(value), 1000)
   }
 
   return new Promise<Event>((resolve) => {

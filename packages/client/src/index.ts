@@ -35,7 +35,6 @@ export async function buildExtension(root: string, config: UserConfig = {}) {
     plugins: [vue()],
     resolve: {
       alias: {
-        'koishi': '@koishijs/core',
         'vue': root + '/vue.js',
         'vue-router': root + '/vue-router.js',
         '@vueuse/core': root + '/vueuse.js',

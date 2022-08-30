@@ -151,6 +151,9 @@ class HttpService extends DataService<string[]> {
           input: this.config.root + '/index.html',
         },
       },
+      define: {
+        KOISHI_MODULES: JSON.stringify(null),
+      },
     })
 
     this.ctx.router.all('/vite(/.+)*', (ctx) => new Promise((resolve) => {

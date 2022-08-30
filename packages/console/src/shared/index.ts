@@ -48,7 +48,7 @@ export class SocketHandle {
   }
 
   async receive(data: any) {
-    const { type, args, id } = JSON.parse(data.toString())
+    const { type, args, id } = JSON.parse(data.data.toString())
     const listener = this.ctx.console.listeners[type]
     if (!listener) {
       logger.info('unknown message:', type, ...args)

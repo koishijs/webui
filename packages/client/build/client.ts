@@ -39,10 +39,12 @@ export async function build(root: string, config: vite.UserConfig = {}) {
         },
       },
     },
+    define: {
+      KOISHI_MODULES: JSON.stringify(null),
+    },
     plugins: [vue()],
     resolve: {
       alias: {
-        'koishi': '@koishijs/core',
         'vue': root + '/vue.js',
         'vue-router': root + '/vue-router.js',
         '@vueuse/core': root + '/vueuse.js',

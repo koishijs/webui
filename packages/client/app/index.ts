@@ -1,7 +1,8 @@
 import { createApp } from 'vue'
-import client, { connect, root, router } from '@koishijs/client'
+import client, { config, connect, root, router } from '@koishijs/client'
 import App from './layouts/index.vue'
 import Home from './layouts/home.vue'
+import FrontWebSocket from './loader'
 
 import './index.scss'
 
@@ -29,4 +30,9 @@ router.afterEach((route) => {
 
 app.mount('#app')
 
-connect()
+if (KOISHI_MODULES) {
+  connect(new FrontWebSocket())
+} else {
+  const endpoint = new URL(config.endpoint, location.origin).toString()
+  connect(new WebSocket(endpoint.replace(/^http/, 'ws')))
+}
