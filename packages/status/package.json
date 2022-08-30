@@ -32,9 +32,6 @@
   },
   "koishi": {
     "category": "console",
-    "public": [
-      "dist"
-    ],
     "description": {
       "en": "Display running status in the console",
       "zh": "在控制台中显示运行状态"
@@ -49,12 +46,12 @@
     }
   },
   "peerDependencies": {
-    "@koishijs/plugin-console": "^4.4.1",
-    "koishi": "^4.8.6"
+    "@koishijs/plugin-console": "^4.4.4",
+    "koishi": "^4.8.7"
   },
   "devDependencies": {
-    "@koishijs/client": "^4.4.1",
-    "@koishijs/cli": "^4.8.6",
+    "@koishijs/client": "^4.4.4",
+    "@koishijs/cli": "^4.8.7",
     "echarts": "^5.3.3",
     "vue-echarts": "^6.2.3"
   }

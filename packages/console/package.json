@@ -1,16 +1,16 @@
 {
   "name": "@koishijs/plugin-console",
   "description": "Web User Interface for Koishi",
-  "version": "4.4.1",
-  "main": "lib/node/index.cjs",
+  "version": "4.4.4",
+  "main": "lib/node/index.js",
   "typings": "lib/index.d.ts",
   "exports": {
     ".": {
-      "node": "./lib/node/index.cjs",
+      "node": "./lib/node/index.js",
       "browser": "./lib/browser/index.mjs"
     },
     "./shared": {
-      "require": "./lib/shared/index.cjs",
+      "require": "./lib/shared/index.js",
       "import": "./lib/shared/index.mjs"
     },
     "./package.json": "./package.json"
@@ -53,10 +53,10 @@
     }
   },
   "peerDependencies": {
-    "koishi": "^4.8.6"
+    "koishi": "^4.8.7"
   },
   "devDependencies": {
-    "@koishijs/client": "^4.4.1",
+    "@koishijs/client": "^4.4.4",
     "@types/uuid": "^8.3.4"
   },
   "dependencies": {

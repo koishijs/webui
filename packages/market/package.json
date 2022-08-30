@@ -44,16 +44,16 @@
     }
   },
   "peerDependencies": {
-    "@koishijs/cli": "^4.8.6",
-    "@koishijs/plugin-console": "^4.4.1",
-    "koishi": "^4.8.6"
+    "@koishijs/cli": "^4.8.7",
+    "@koishijs/plugin-console": "^4.4.4",
+    "koishi": "^4.8.7"
   },
   "devDependencies": {
-    "@koishijs/client": "^4.4.1",
+    "@koishijs/client": "^4.4.4",
     "@types/which-pm-runs": "^1.0.0"
   },
   "dependencies": {
-    "@koishijs/registry": "^3.1.2",
+    "@koishijs/registry": "^3.1.3",
     "execa": "^5.1.1",
     "ns-require": "^1.1.4",
     "semver": "^7.3.7",
