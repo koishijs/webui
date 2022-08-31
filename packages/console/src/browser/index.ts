@@ -8,9 +8,9 @@ class BrowserConsole extends Console {
     super(ctx)
   }
 
-  addEntry(entry: string | Entry) {
-    if (typeof entry !== 'string') entry = entry.prod
-    this.http.addEntry(entry)
+  resolveEntry(entry: string | string[] | Entry) {
+    if (typeof entry === 'string' || Array.isArray(entry)) return entry
+    return entry.prod
   }
 }
 

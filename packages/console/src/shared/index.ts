@@ -1,4 +1,4 @@
-import { Awaitable, coerce, Context, Dict, Logger, Random, Service } from 'koishi'
+import { Awaitable, coerce, Context, Dict, Logger, makeArray, Random } from 'koishi'
 import { DataService } from './service'
 import NodeConsole from '../node'
 
@@ -90,18 +90,36 @@ export class SocketHandle {
 
 export interface Entry {
   dev: string
-  prod: string
+  prod: string | string[]
 }
 
-export abstract class Console extends Service {
+Context.service('console')
+
+export abstract class Console extends DataService<string[]> {
   readonly listeners: Dict<Listener> = {}
   readonly handles: Dict<SocketHandle> = {}
+  readonly entries: Dict<string[]> = {}
 
   constructor(public ctx: Context) {
-    super(ctx, 'console', true)
+    super(ctx, 'entry', { immediate: true })
+    ctx.console = this as any
   }
 
-  abstract addEntry(entry: string | Entry): void
+  abstract resolveEntry(entry: string | string[] | Entry): string | string[]
+
+  addEntry(entry: string | string[] | Entry) {
+    const key = 'extension-' + Random.id()
+    this.entries[key] = makeArray(this.resolveEntry(entry))
+    this.refresh()
+    this.caller?.on('dispose', () => {
+      delete this.entries[key]
+      this.refresh()
+    })
+  }
+
+  async get() {
+    return Object.values(this.entries).flat()
+  }
 
   addListener<K extends keyof Events>(event: K, callback: Events[K], options?: DataService.Options) {
     this.listeners[event] = { callback, ...options }
@@ -121,7 +139,9 @@ export abstract class Console extends Service {
 export interface Events {}
 
 export namespace Console {
-  export interface Services {}
+  export interface Services {
+    entry: Console
+  }
 }
 
 export default Console
