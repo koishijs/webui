@@ -170,7 +170,7 @@ async function loadExtension(path: string) {
 }
 
 const initTask = new Promise<void>((resolve) => {
-  watch(() => store.http, async (newValue, oldValue) => {
+  watch(() => store.entry, async (newValue, oldValue) => {
     newValue ||= []
     for (const path in extensions) {
       if (newValue.includes(path)) continue

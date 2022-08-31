@@ -1,9 +1,6 @@
-import type { AbstractWebSocket, SocketHandle } from '@koishijs/plugin-console'
+import type { AbstractWebSocket } from '@koishijs/plugin-console'
 import type { Context } from 'koishi'
-
-declare global {
-  const KOISHI_MODULES: string
-}
+import { config } from '@koishijs/client'
 
 class StubWebSocket implements AbstractWebSocket {
   remote: StubWebSocket
@@ -12,13 +9,12 @@ class StubWebSocket implements AbstractWebSocket {
   onclose(event: any) {}
   onerror(event: any) {}
   send(data: string) {
-    this.remote.onmessage(data)
+    this.remote.onmessage({ data })
   }
 }
 
 class BackWebSocket extends StubWebSocket {
   app: Context
-  handle: SocketHandle
 
   constructor(public remote: StubWebSocket) {
     super()
@@ -26,21 +22,31 @@ class BackWebSocket extends StubWebSocket {
   }
 
   private async start() {
-    const [koishi, console] = await Promise.all([
-      import(/* @vite-ignore */ KOISHI_MODULES + '/koishi/index.js'),
-      import(/* @vite-ignore */ KOISHI_MODULES + '/@koishijs/plugin-console/index.js'),
+    const [koishi, console, help, dataview, sandbox] = await Promise.all([
+      import(/* @vite-ignore */ config.endpoint + '/koishi/index.js'),
+      import(/* @vite-ignore */ config.endpoint + '/@koishijs/plugin-console/index.js'),
+      import(/* @vite-ignore */ config.endpoint + '/@koishijs/plugin-help/index.js'),
+      import(/* @vite-ignore */ config.endpoint + '/@koishijs/plugin-dataview/index.js'),
+      import(/* @vite-ignore */ config.endpoint + '/@koishijs/plugin-sandbox/index.js'),
     ]) as [
       typeof import('koishi'),
       typeof import('@koishijs/plugin-console'),
+      typeof import('@koishijs/plugin-help'),
+      typeof import('@koishijs/plugin-dataview'),
+      typeof import('@koishijs/plugin-sandbox'),
     ]
 
+    koishi.Context.service('console')
     this.app = new koishi.Context()
     this.app.plugin(console.default)
-    this.handle = new console.SocketHandle(this.app, this)
-  }
+    this.app.plugin(help)
+    this.app.plugin(dataview.default)
+    this.app.plugin(sandbox.default)
 
-  send(data: string) {
-    this.remote.onmessage(data)
+    this.app.start().then(() => {
+      // eslint-disable-next-line no-new
+      new console.SocketHandle(this.app, this)
+    })
   }
 }
 
@@ -49,6 +55,6 @@ export default class FrontWebSocket extends StubWebSocket {
 
   constructor() {
     super()
-    this.onopen(null)
+    this.onopen({})
   }
 }

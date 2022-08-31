@@ -39,9 +39,6 @@ export async function build(root: string, config: vite.UserConfig = {}) {
         },
       },
     },
-    define: {
-      KOISHI_MODULES: JSON.stringify(null),
-    },
     plugins: [vue()],
     resolve: {
       alias: {
