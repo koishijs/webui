@@ -33,6 +33,17 @@ declare module '@koishijs/plugin-console' {
   }
 }
 
+function clear(ctx: Context) {
+  ctx.i18n.define('zh', require('./locales/zh'))
+
+  ctx.platform('sandbox').command('clear')
+    .action(({ session }) => {
+      session.handle.send({
+        type: 'sandbox/clear',
+      })
+    })
+}
+
 class SandboxBot extends Bot {
   static using = ['console'] as const
 
@@ -45,9 +56,16 @@ class SandboxBot extends Bot {
       selfId: 'koishi',
     })
 
+    ctx.plugin(clear)
     ctx.plugin(UserProvider)
 
-    ctx.console.addEntry({
+    ctx.console.addEntry(process.env.KOISHI_BASE ? [
+      process.env.KOISHI_BASE + '/dist/index.js',
+      process.env.KOISHI_BASE + '/dist/style.css',
+    ] : process.env.KOISHI_ENV === 'browser' ? [
+      // @ts-ignore
+      import.meta.url.replace(/\/lib\/[^/]+$/, '/client/index.ts'),
+    ] : {
       dev: resolve(__dirname, '../client/index.ts'),
       prod: resolve(__dirname, '../dist'),
     })
@@ -110,15 +128,6 @@ export class UserProvider extends DataService<Dict<User>> {
 
   constructor(ctx: Context) {
     super(ctx, 'users', { authority: 4 })
-
-    ctx.i18n.define('zh', require('./locales/zh'))
-
-    ctx.platform('sandbox').command('clear')
-      .action(({ session }) => {
-        session.handle.send({
-          type: 'sandbox/clear',
-        })
-      })
 
     ctx.console.addListener('sandbox/user', async (name, data) => {
       const users = await this.get()
