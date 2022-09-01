@@ -1,4 +1,4 @@
-import { camelize, capitalize, Context, Dict, Fork, Plugin, Schema, State } from 'koishi'
+import { camelize, capitalize, Context, Fork, Plugin, Schema, State } from 'koishi'
 import { debounce } from 'throttle-debounce'
 import { DataService } from '@koishijs/plugin-console'
 import { resolve } from 'path'
@@ -32,12 +32,16 @@ function getSourceId(child: Fork) {
 }
 
 class Insight extends DataService<Insight.Payload> {
-  private nodes: Dict<Insight.Node>
-
   constructor(ctx: Context) {
     super(ctx, 'insight')
 
-    ctx.console.addEntry({
+    ctx.console.addEntry(process.env.KOISHI_BASE ? [
+      process.env.KOISHI_BASE + '/dist/index.js',
+      process.env.KOISHI_BASE + '/dist/style.css',
+    ] : process.env.KOISHI_ENV === 'browser' ? [
+      // @ts-ignore
+      import.meta.url.replace(/\/lib\/[^/]+$/, '/client/index.ts'),
+    ] : {
       dev: resolve(__dirname, '../client/index.ts'),
       prod: resolve(__dirname, '../dist'),
     })
@@ -49,26 +53,11 @@ class Insight extends DataService<Insight.Payload> {
 
   stop() {
     this.update.cancel()
-    clearInterval(this.timer)
   }
 
   private update = debounce(0, () => {
-    this.timer.refresh()
     this.refresh()
   })
-
-  private timer = setInterval(() => {
-    // if (!this.nodes) return
-    // for (const [, runtime] of this.ctx.app.registry) {
-    //   const data = this.nodes[runtime.uid]
-    //   if (!data) continue
-    //   if (runtime.disposables.length !== data.disposables) {
-    //     data.disposables = runtime.disposables.length
-    //     payload[runtime.uid] = data
-    //   }
-    // }
-    // if (Object.keys(payload).length) this.patch(payload)
-  }, 1000)
 
   async get() {
     const nodes: Insight.Node[] = []
