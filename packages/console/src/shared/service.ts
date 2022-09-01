@@ -38,15 +38,17 @@ export abstract class DataService<T = never> extends Service {
     this.refresh()
   }
 
-  protected broadcast(type: string, value: any) {
-    this.ctx.console?.broadcast(type, { key: this.key, value }, this.options)
-  }
-
   async refresh() {
-    this.broadcast('data', await this.get(true))
+    this.ctx.console?.broadcast('data', {
+      key: this.key,
+      value: await this.get(true),
+    }, this.options)
   }
 
   patch(value: T) {
-    this.broadcast('patch', value)
+    this.ctx.console?.broadcast('patch', {
+      key: this.key,
+      value,
+    }, this.options)
   }
 }

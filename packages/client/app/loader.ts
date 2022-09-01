@@ -13,6 +13,22 @@ class StubWebSocket implements AbstractWebSocket {
   }
 }
 
+const plugins = {
+  '@koishijs/plugin-console': {},
+  '@koishijs/plugin-echo': {},
+  '@koishijs/plugin-dataview': {},
+  '@koishijs/plugin-insight': {},
+  '@koishijs/plugin-help': {},
+  '@koishijs/plugin-sandbox': {},
+  '@koishijs/plugin-suggest': {},
+  '@koishijs/plugin-repeater': {},
+  'koishi-plugin-hangman': {},
+}
+
+function unwrap(module: any) {
+  return module?.default || module
+}
+
 class BackWebSocket extends StubWebSocket {
   app: Context
 
@@ -22,31 +38,17 @@ class BackWebSocket extends StubWebSocket {
   }
 
   private async start() {
-    const [koishi, console, help, dataview, sandbox] = await Promise.all([
-      import(/* @vite-ignore */ config.endpoint + '/koishi/index.js'),
-      import(/* @vite-ignore */ config.endpoint + '/@koishijs/plugin-console/index.js'),
-      import(/* @vite-ignore */ config.endpoint + '/@koishijs/plugin-help/index.js'),
-      import(/* @vite-ignore */ config.endpoint + '/@koishijs/plugin-dataview/index.js'),
-      import(/* @vite-ignore */ config.endpoint + '/@koishijs/plugin-sandbox/index.js'),
-    ]) as [
-      typeof import('koishi'),
-      typeof import('@koishijs/plugin-console'),
-      typeof import('@koishijs/plugin-help'),
-      typeof import('@koishijs/plugin-dataview'),
-      typeof import('@koishijs/plugin-sandbox'),
-    ]
-
-    koishi.Context.service('console')
-    this.app = new koishi.Context()
-    this.app.plugin(console.default)
-    this.app.plugin(help)
-    this.app.plugin(dataview.default)
-    this.app.plugin(sandbox.default)
-
-    this.app.start().then(() => {
-      // eslint-disable-next-line no-new
-      new console.SocketHandle(this.app, this)
-    })
+    const tasks = [import(/* @vite-ignore */ config.endpoint + '/koishi/index.js')]
+    for (const key in plugins) {
+      tasks.push(import(/* @vite-ignore */ config.endpoint + '/' + key + '/index.js').then(value => [key, value]))
+    }
+    const [{ Context }, ...entries] = await Promise.all(tasks)
+    Context.service('console')
+    this.app = new Context()
+    this.app[Symbol.for('koishi.socket')] = this
+    for (const [key, exports] of entries) {
+      this.app.plugin(unwrap(exports), plugins[key])
+    }
   }
 }
 
