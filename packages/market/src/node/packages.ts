@@ -4,7 +4,6 @@ import { conclude, Manifest, PackageJson } from '@koishijs/registry'
 import { promises as fsp } from 'fs'
 import { dirname } from 'path'
 import ns from 'ns-require'
-import {} from '@koishijs/cli'
 import { loadManifest } from './utils'
 
 const logger = new Logger('market')
@@ -41,10 +40,6 @@ class PackageProvider extends DataService<Dict<PackageProvider.Data>> {
     this.ctx.on('internal/fork', (fork) => {
       this.updatePackage(fork)
     })
-  }
-
-  get registry() {
-    return this.ctx.registry
   }
 
   private updatePackage(state: State) {
@@ -130,12 +125,12 @@ class PackageProvider extends DataService<Dict<PackageProvider.Data>> {
     result.manifest = conclude(data)
     result.peerDependencies = { ...data.peerDependencies }
 
-    // check adapter
+    // check schema
     const exports = getExports(name)
     result.schema = exports?.Config || exports?.schema
 
     // check plugin state
-    const runtime = this.registry.get(exports)
+    const runtime = this.ctx.registry.get(exports)
     if (runtime) this.parseRuntime(runtime, result)
 
     // make sure that result can be serialized into json

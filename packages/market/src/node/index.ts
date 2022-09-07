@@ -53,7 +53,7 @@ export function apply(ctx: Context, config: Config) {
   ctx.plugin(ConfigWriter)
 
   ctx.console.addEntry({
-    dev: resolve(__dirname, '../client/index.ts'),
-    prod: resolve(__dirname, '../dist'),
+    dev: resolve(__dirname, '../../client/index.ts'),
+    prod: resolve(__dirname, '../../dist'),
   })
 }

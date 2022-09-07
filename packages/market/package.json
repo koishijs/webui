@@ -2,12 +2,12 @@
   "name": "@koishijs/plugin-market",
   "description": "Manage your bots and plugins with console",
   "version": "1.2.5",
-  "main": "lib/index.cjs",
+  "main": "lib/node/index.js",
   "typings": "lib/index.d.ts",
   "exports": {
     ".": {
-      "require": "./lib/index.cjs",
-      "import": "./lib/index.mjs"
+      "node": "./lib/node/index.js",
+      "browser": "./lib/browser/index.mjs"
     },
     "./package.json": "./package.json"
   },
@@ -60,7 +60,7 @@
     "@types/which-pm-runs": "^1.0.0"
   },
   "dependencies": {
-    "@koishijs/registry": "^4.0.0",
+    "@koishijs/registry": "^4.0.1",
     "execa": "^5.1.1",
     "get-registry": "^1.1.0",
     "ns-require": "^1.1.4",

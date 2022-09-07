@@ -72,7 +72,7 @@ class MarketProvider extends DataService<MarketProvider.Payload> {
         }
         this.tempCache[name] = this.fullCache[name] = {
           ...item,
-          versions: valueMap(versions, item => pick(item, ['peerDependencies'] as any)),
+          versions: valueMap(versions, item => pick(item, ['peerDependencies'])),
         }
       },
       after: () => this.flushData(),
@@ -102,6 +102,7 @@ namespace MarketProvider {
 
   export interface Payload {
     data: Dict<AnalyzedPackage>
+    failed: number
     total: number
     progress: number
   }
