@@ -25,39 +25,10 @@
 
 import { computed } from 'vue'
 import { store } from '@koishijs/client'
-import { config, active } from '../utils'
+import { active } from '../utils'
 
 const props = defineProps({
   name: String,
-})
-
-const value = computed({
-  get() {
-    const target = config.override[props.name]
-    return target === '' ? '移除依赖' : target?.replace(/^[\^~]/, '')
-  },
-  set(target: string) {
-    if (target === '' && !local.value) {
-      delete config.override[props.name]
-    } else {
-      config.override[props.name] = prefix.value + target
-      if (config.override[props.name] === local.value?.request) {
-        delete config.override[props.name]
-      }
-    }
-  },
-})
-
-const prefix = computed({
-  get() {
-    return /^[\^~]?/.exec(config.override[props.name] || local.value.request)[0]
-  },
-  set(prefix: string) {
-    config.override[props.name] = prefix + (config.override[props.name] || local.value.request).replace(/^[\^~]/, '')
-    if (config.override[props.name] === local.value?.request) {
-      delete config.override[props.name]
-    }
-  },
 })
 
 const local = computed(() => {

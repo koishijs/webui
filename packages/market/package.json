@@ -51,12 +51,12 @@
     }
   },
   "peerDependencies": {
-    "@koishijs/cli": "^4.8.7",
-    "@koishijs/plugin-console": "^4.4.16",
-    "koishi": "^4.8.7"
+    "@koishijs/cli": "^4.9.0",
+    "@koishijs/plugin-console": "^4.5.0",
+    "koishi": "^4.9.0"
   },
   "devDependencies": {
-    "@koishijs/client": "^4.4.16",
+    "@koishijs/client": "^4.5.0",
     "@types/which-pm-runs": "^1.0.0"
   },
   "dependencies": {

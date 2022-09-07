@@ -11,7 +11,7 @@
     </k-comment>
 
     <!-- external -->
-    <k-comment type="warning" v-if="!local.workspace && !store.dependencies[name]">
+    <k-comment type="warning" v-if="!local.workspace && store.dependencies && !store.dependencies[name]">
       <p>尚未将当前插件列入依赖，<a @click="send('market/install', { [name]: local.version })">点击添加</a>。</p>
     </k-comment>
 

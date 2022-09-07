@@ -1,8 +1,7 @@
 import { DataService } from '@koishijs/plugin-console'
 import { Context, remove } from 'koishi'
-import { Loader } from '@koishijs/cli'
+import { Loader } from '@koishijs/loader'
 import { LocalPackage } from './utils'
-import { readFileSync } from 'fs'
 import { conclude } from '@koishijs/registry'
 
 declare module '@koishijs/plugin-console' {
@@ -67,7 +66,7 @@ class ConfigWriter extends DataService<Context.Config> {
     ctx.on('config', () => this.refresh())
   }
 
-  getGroup(plugins: any, ctx: Context) {
+  async getGroup(plugins: any, ctx: Context) {
     const result = { ...plugins }
     result.$deps = {}
     for (const key in plugins) {
@@ -78,7 +77,7 @@ class ConfigWriter extends DataService<Context.Config> {
       // handle plugin groups
       if (name === 'group') {
         const fork = ctx.state[Loader.kRecord][key]
-        result[key] = this.getGroup(value, fork.ctx)
+        result[key] = await this.getGroup(value, fork.ctx)
         for (const name in result[key].$deps) {
           if (result[key].$isolate?.includes(name)) continue
           result.$deps[name] ??= result[key].$deps[name]
@@ -88,8 +87,7 @@ class ConfigWriter extends DataService<Context.Config> {
 
       // handle ordinary plugins
       try {
-        const filename = this.loader.scope.resolve(name + '/package.json')
-        const meta: LocalPackage = JSON.parse(readFileSync(filename, 'utf8'))
+        const meta: LocalPackage = await this.loader.getPluginMeta(name)
         const { required, optional, implements: impl } = conclude(meta).service
         for (const name of [...required, ...optional, ...impl]) {
           result.$deps[name] ??= ctx[name]?.[Context.source]?.state.uid ?? 0
@@ -101,7 +99,7 @@ class ConfigWriter extends DataService<Context.Config> {
 
   async get() {
     const result = { ...this.loader.config }
-    result.plugins = this.getGroup(result.plugins, this.loader.entry)
+    result.plugins = await this.getGroup(result.plugins, this.loader.entry)
     return result
   }
 

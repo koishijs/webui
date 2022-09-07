@@ -47,7 +47,7 @@ export default (ctx: Context) => {
     icon: 'activity:plugin',
     order: 630,
     authority: 4,
-    fields: ['config', 'packages', 'dependencies'],
+    fields: ['config', 'packages'],
     component: Settings,
   })
 
@@ -57,7 +57,7 @@ export default (ctx: Context) => {
     icon: 'activity:market',
     order: 620,
     authority: 4,
-    fields: ['config', 'market', 'packages'],
+    fields: ['market', 'packages'],
     component: Market,
   })
 
