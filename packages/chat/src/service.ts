@@ -215,24 +215,25 @@ export class MessageService extends Service {
     }
   }
 
-  static adaptMessage(session: Partial<Session>, bot: Bot = session.bot, guildId: string = session.guildId): Message {
-    const seg = segment.parse(session.content)
-    const quote = seg.find(v => v.type === 'quote')
-    if (quote) {
-      session.content = session.content.slice(quote.capture[0].length)
+  static adaptMessage(message: Partial<Session>, bot: Bot = message.bot, guildId: string = message.guildId): Message {
+    const elements = segment.parse(message.content)
+    let quoteId: string = null
+    if (elements[0]?.type === 'quote') {
+      quoteId = elements.shift().attrs.id
+      message.content = elements.join('')
     }
     return {
-      messageId: session.messageId,
-      content: session.content,
+      messageId: message.messageId,
+      content: message.content,
       platform: bot.platform,
-      guildId: session.guildId || guildId, // eg. discord
-      timestamp: new Date(session.timestamp),
-      userId: session.userId || session.author.userId,
-      username: session.author.username,
-      nickname: session.author.nickname,
-      channelId: session.channelId,
+      guildId: message.guildId || guildId, // eg. discord
+      timestamp: new Date(message.timestamp),
+      userId: message.userId || message.author.userId,
+      username: message.author.username,
+      nickname: message.author.nickname,
+      channelId: message.channelId,
       selfId: bot.selfId,
-      quoteId: quote?.data?.id || null,
+      quoteId,
     }
   }
 

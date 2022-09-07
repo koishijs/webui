@@ -172,7 +172,6 @@ export default function receiver(ctx: Context, config: RefreshConfig = {}) {
   }
 
   async function prepareContent(session: Session, message: Message, timestamp: number) {
-    message.content = await session.preprocess()
     const tasks = [prepareAbstract(session, message, timestamp)]
     // eslint-disable-next-line no-cond-assign
     if (message.quote = session.quote) {
