@@ -13,22 +13,6 @@ class StubWebSocket implements AbstractWebSocket {
   }
 }
 
-const plugins = {
-  '@koishijs/plugin-console': {},
-  '@koishijs/plugin-echo': {},
-  '@koishijs/plugin-dataview': {},
-  '@koishijs/plugin-insight': {},
-  '@koishijs/plugin-help': {},
-  '@koishijs/plugin-sandbox': {},
-  '@koishijs/plugin-suggest': {},
-  '@koishijs/plugin-repeater': {},
-  'koishi-plugin-hangman': {},
-}
-
-function unwrap(module: any) {
-  return module?.default || module
-}
-
 class BackWebSocket extends StubWebSocket {
   app: Context
 
@@ -38,17 +22,30 @@ class BackWebSocket extends StubWebSocket {
   }
 
   private async start() {
-    const tasks = [import(/* @vite-ignore */ config.endpoint + '/koishi/index.js')]
-    for (const key in plugins) {
-      tasks.push(import(/* @vite-ignore */ config.endpoint + '/' + key + '/index.js').then(value => [key, value]))
-    }
-    const [{ Context }, ...entries] = await Promise.all(tasks)
+    const tasks: [
+      Promise<typeof import('@koishijs/loader')>,
+      Promise<typeof import('koishi')>,
+    ] = [
+      import(/* @vite-ignore */ config.endpoint + '/modules/@koishijs/loader/index.js'),
+      import(/* @vite-ignore */ config.endpoint + '/modules/koishi/index.js'),
+    ]
+    const [{ default: Loader }, { Context }] = await Promise.all(tasks)
     Context.service('console')
-    this.app = new Context()
-    this.app[Symbol.for('koishi.socket')] = this
-    for (const [key, exports] of entries) {
-      this.app.plugin(unwrap(exports), plugins[key])
+    const loader = new Loader(config.endpoint)
+    loader.config.plugins = {
+      'console': {},
+      'echo': {},
+      'insight': {},
+      'help': {},
+      'sandbox': {},
+      'market': {},
+      'suggest': {},
+      // 'repeater': {},
+      // 'hangman': {},
     }
+    this.app = await loader.createApp()
+    this.app[Symbol.for('koishi.socket')] = this
+    await this.app.start()
   }
 }
 

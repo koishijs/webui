@@ -8,10 +8,10 @@ import open from 'open'
 export * from '../shared'
 
 interface ClientConfig {
-  client?: boolean
   devMode: boolean
   uiPath: string
   endpoint: string
+  static?: boolean
 }
 
 class NodeConsole extends Console {

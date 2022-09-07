@@ -21,7 +21,7 @@ router.get('(/.+)*', async (ctx, next) => {
 function transformHtml(template: string) {
   template = template.replace(/(href|src)="(?=\/)/g, (_, $1) => `${$1}="${endpoint}/@koishijs/plugin-console/dist`)
   const headInjection = `<script>KOISHI_CONFIG = ${JSON.stringify({
-    client: true,
+    static: true,
     uiPath: '/',
     endpoint,
   })}</script>`

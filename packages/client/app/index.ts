@@ -30,7 +30,7 @@ router.afterEach((route) => {
 
 app.mount('#app')
 
-if (config.client) {
+if (config.static) {
   connect(new FrontWebSocket())
 } else {
   const endpoint = new URL(config.endpoint, location.origin).toString()

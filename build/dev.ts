@@ -69,10 +69,10 @@ router.get('/modules(/.+)+/index.js', async (ctx) => {
 async function transformHtml(template: string) {
   template = await vite.transformIndexHtml(uiPath, template)
   const headInjection = `<script>KOISHI_CONFIG = ${JSON.stringify({
-    client: true,
+    static: true,
     devMode: true,
     uiPath,
-    endpoint: '/modules',
+    endpoint: '',
   })}</script>`
   return template.replace('</title>', '</title>' + headInjection)
 }

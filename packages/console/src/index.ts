@@ -1,4 +1,4 @@
-// note: this is only a placeholder file
+// placeholder file, do not modify
 import Console from './node'
 
 export default Console

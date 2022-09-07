@@ -27,6 +27,8 @@ declare const KOISHI_CONFIG: ClientConfig
 export const config = KOISHI_CONFIG
 export const store = reactive<Store>({})
 
+export { config as global }
+
 export const socket = ref<AbstractWebSocket>(null)
 const listeners: Record<string, (data: any) => void> = {}
 const responseHooks: Record<string, [Function, Function]> = {}
