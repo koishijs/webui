@@ -3,17 +3,16 @@ import { resolve } from 'path'
 import Installer from './installer'
 import MarketProvider from './market'
 import PackageProvider from './packages'
-import ConfigWriter from './writer'
+import { ConfigWriter } from '../shared'
 
 export * from './market'
 export * from './packages'
-export * from './writer'
+export * from '../shared'
 
 export {
   Installer,
   MarketProvider,
   PackageProvider,
-  ConfigWriter,
 }
 
 declare module '@koishijs/plugin-console' {

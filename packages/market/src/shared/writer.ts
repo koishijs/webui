@@ -1,8 +1,6 @@
 import { DataService } from '@koishijs/plugin-console'
 import { Context, remove } from 'koishi'
 import { Loader } from '@koishijs/loader'
-import { LocalPackage } from './utils'
-import { conclude } from '@koishijs/registry'
 
 declare module '@koishijs/plugin-console' {
   interface Events {
@@ -46,9 +44,11 @@ function dropKey(plugins: {}, name: string) {
   return { [name]: value }
 }
 
-class ConfigWriter extends DataService<Context.Config> {
-  private loader: Loader
-  private plugins: {}
+export class ConfigWriter extends DataService<Context.Config> {
+  static using = ['console.packages']
+
+  protected loader: Loader
+  protected plugins: {}
 
   constructor(ctx: Context) {
     super(ctx, 'config', { authority: 4 })
@@ -87,8 +87,8 @@ class ConfigWriter extends DataService<Context.Config> {
 
       // handle ordinary plugins
       try {
-        const meta: LocalPackage = await this.loader.getPluginMeta(name)
-        const { required, optional, implements: impl } = conclude(meta).service
+        const manifest = await this.ctx.console.packages.getManifest(name)
+        const { required, optional, implements: impl } = manifest.service
         for (const name of [...required, ...optional, ...impl]) {
           result.$deps[name] ??= ctx[name]?.[Context.source]?.state.uid ?? 0
         }
@@ -216,5 +216,3 @@ class ConfigWriter extends DataService<Context.Config> {
     this.loader.writeConfig()
   }
 }
-
-export default ConfigWriter

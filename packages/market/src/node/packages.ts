@@ -1,4 +1,4 @@
-import { Context, Dict, Logger, pick, remove, Runtime, Schema, State } from 'koishi'
+import { Context, Dict, Logger, pick, remove, Runtime, Schema, scope, State } from 'koishi'
 import { DataService } from '@koishijs/plugin-console'
 import { conclude, Manifest, PackageJson } from '@koishijs/registry'
 import { promises as fsp } from 'fs'
@@ -137,6 +137,11 @@ class PackageProvider extends DataService<Dict<PackageProvider.Data>> {
     JSON.stringify(result)
 
     return result
+  }
+
+  async getManifest(name: string) {
+    const filename = scope.resolve(name + '/package.json')
+    return conclude(JSON.parse(await fsp.readFile(filename, 'utf8')))
   }
 
   parseRuntime(runtime: Runtime, result: PackageProvider.Data) {

@@ -1,12 +1,11 @@
 import { Context, Dict, pick, Runtime, Schema } from 'koishi'
 import { DataService } from '@koishijs/plugin-console'
 import { Manifest, MarketResult, PackageJson } from '@koishijs/registry'
-
-function unwrap(module: any) {
-  return module?.default || module
-}
+import { unwrapExports } from '@koishijs/loader'
 
 class PackageProvider extends DataService<Dict<PackageProvider.Data>> {
+  protected _task: Promise<MarketResult>
+
   constructor(ctx: Context, config: PackageProvider.Config) {
     super(ctx, 'packages', { authority: 4 })
 
@@ -19,9 +18,24 @@ class PackageProvider extends DataService<Dict<PackageProvider.Data>> {
     })
   }
 
-  async get(forced = false) {
+  async _prepare(): Promise<MarketResult> {
     const response = await fetch('https://registry.koishi.chat/market.json')
-    const market: MarketResult = await response.json()
+    return await response.json()
+  }
+
+  async prepare() {
+    return this._task ||= this._prepare()
+  }
+
+  async getManifest(name: string) {
+    const market = await this.prepare()
+    return market.objects.find(item => {
+      return name === item.name.replace(/(koishi-|^@koishijs\/)plugin-/, '')
+    })?.manifest
+  }
+
+  async get(forced = false) {
+    const market = await this.prepare()
 
     const packages = await Promise.all(market.objects.map(async (data) => {
       const result = pick(data, [
@@ -29,12 +43,13 @@ class PackageProvider extends DataService<Dict<PackageProvider.Data>> {
         'version',
         'description',
         'portable',
+        'manifest',
       ]) as PackageProvider.Data
       result.shortname = data.name.replace(/(koishi-|^@koishijs\/)plugin-/, '')
       result.manifest = data.manifest
       result.peerDependencies = { ...data.versions[data.version].peerDependencies }
       if (!result.portable) return
-      const exports = unwrap(await import(/* @vite-ignore */ `https://registry.koishi.chat/modules/${data.name}/index.js`))
+      const exports = unwrapExports(await import(/* @vite-ignore */ `https://registry.koishi.chat/modules/${data.name}/index.js`))
       result.schema = exports?.Config || exports?.schema
       const runtime = this.ctx.registry.get(exports)
       if (runtime) this.parseRuntime(runtime, result)
