@@ -1,7 +1,6 @@
 import { Context, Dict, Logger, pick, Schema, Time, valueMap } from 'koishi'
 import { DataService } from '@koishijs/plugin-console'
 import Scanner, { AnalyzedPackage, SearchResult } from '@koishijs/registry'
-import { createHash } from 'crypto'
 
 declare module '@koishijs/registry' {
   interface User {
@@ -59,17 +58,13 @@ class MarketProvider extends DataService<MarketProvider.Payload> {
 
     this.failed = []
     this.scanner = scanner
-    const mirror = process.env.GRAVATAR_MIRROR || 'https://s.gravatar.com'
     await scanner.analyze({
       version: '4',
       onFailure: (name) => {
         this.failed.push(name)
       },
       onSuccess: (item) => {
-        const { name, versions, maintainers } = item
-        for (const user of maintainers) {
-          user.avatar = mirror + '/avatar/' + createHash('md5').update(user.email).digest('hex') + '?d=mp'
-        }
+        const { name, versions } = item
         this.tempCache[name] = this.fullCache[name] = {
           ...item,
           versions: valueMap(versions, item => pick(item, ['peerDependencies'])),
@@ -85,6 +80,7 @@ class MarketProvider extends DataService<MarketProvider.Payload> {
       failed: this.failed.length,
       total: this.scanner?.total || 0,
       progress: this.scanner?.progress || -1,
+      gravatar: process.env.GRAVATAR_MIRROR,
     }
   }
 }
@@ -105,6 +101,7 @@ namespace MarketProvider {
     failed: number
     total: number
     progress: number
+    gravater?: string
   }
 }
 

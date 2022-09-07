@@ -15,10 +15,10 @@
       </div>
       <div class="market-filter">
         共搜索到 {{ realWords.length ? packages.length + ' / ' : '' }}{{ Object.keys(store.market.data).length }} 个插件。
-        <el-checkbox v-model="config.showInstalled">显示已下载的插件</el-checkbox>
+        <el-checkbox v-model="config.showInstalled">{{ global.static ? '只显示可用插件' : '显示已下载的插件' }}</el-checkbox>
       </div>
       <div class="market-container">
-        <package-view v-for="data in packages" :key="data.name" :data="data" @click="active = data.name" @query="onQuery"></package-view>
+        <package-view v-for="data in packages" :key="data.name" :data="data" @query="onQuery"></package-view>
       </div>
     </el-scrollbar>
 
@@ -43,10 +43,10 @@
 
 <script setup lang="ts">
 
-import { router, store } from '@koishijs/client'
+import { router, store, global } from '@koishijs/client'
 import { computed, reactive, watch } from 'vue'
 import { useRoute } from 'vue-router'
-import { config, active } from '../utils'
+import { config } from '../utils'
 import { validate } from './utils'
 import PackageView from './package.vue'
 
@@ -97,8 +97,10 @@ function onQuery(word: string) {
 const packages = computed(() => {
   return Object.values(store.market.data)
     .filter(data => words.every(word => validate(data, word)))
-    .filter(item => config.showInstalled || !store.packages[item.name])
-    .sort((a, b) => b.score.final - a.score.final)
+    .filter(item => global.static
+      ? !config.showInstalled || store.packages[item.name]
+      : config.showInstalled || !store.packages[item.name])
+    .sort((a, b) => (global.static ? +b.portable - +a.portable : 0) || b.score.final - a.score.final)
 })
 
 </script>

@@ -28,11 +28,12 @@ class PackageProvider extends DataService<Dict<PackageProvider.Data>> {
         'name',
         'version',
         'description',
+        'portable',
       ]) as PackageProvider.Data
       result.shortname = data.name.replace(/(koishi-|^@koishijs\/)plugin-/, '')
       result.manifest = data.manifest
       result.peerDependencies = { ...data.versions[data.version].peerDependencies }
-      if (!result['hasBundle']) return
+      if (!result.portable) return
       const exports = unwrap(await import(/* @vite-ignore */ `https://registry.koishi.chat/modules/${data.name}/index.js`))
       result.schema = exports?.Config || exports?.schema
       const runtime = this.ctx.registry.get(exports)
@@ -61,6 +62,7 @@ namespace PackageProvider {
 
   export interface Data extends Partial<PackageJson> {
     id?: number
+    portable?: boolean
     forkable?: boolean
     shortname?: string
     schema?: Schema

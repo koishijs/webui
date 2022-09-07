@@ -16,8 +16,8 @@
             <k-icon v-for="(name, index) in formatRating(data.score.final)" :key="index" :name="name"></k-icon>
           </div>
         </el-tooltip>
-        <k-button v-if="!store.packages[data.name]" solid class="right" @click="$emit('click')">添加</k-button>
-        <k-button v-else type="success" solid class="right" @click="$emit('click')">修改</k-button>
+        <k-button v-if="store.packages[data.name]" type="success" solid class="right" @click="handleClick">修改</k-button>
+        <k-button v-else :disabled="config.static" solid class="right" @click="handleClick">添加</k-button>
       </div>
     </div>
     <k-markdown inline class="desc" :source="meta.manifest.description.zh || meta.manifest.description.en"></k-markdown>
@@ -37,9 +37,9 @@
         </span>
       </div>
       <div class="avatars">
-        <el-tooltip v-for="({ email, avatar, username }) in data.maintainers" :key="email" :content="username">
+        <el-tooltip v-for="({ email, username }) in data.maintainers" :key="email" :content="username">
           <a @click="$emit('query', 'email:' + email)">
-            <img :src="avatar">
+            <img :src="getAvatar(email)">
           </a>
         </el-tooltip>
       </div>
@@ -50,17 +50,22 @@
 <script lang="ts" setup>
 
 import { computed, PropType } from 'vue'
-import { MarketProvider } from '@koishijs/plugin-market'
-import { store } from '@koishijs/client'
-import { getMixedMeta } from '../utils'
+import { AnalyzedPackage } from '@koishijs/registry'
+import { store, config } from '@koishijs/client'
+import { active, getMixedMeta } from '../utils'
+import md5 from 'spark-md5'
 
 defineEmits(['query', 'click'])
 
 const props = defineProps({
-  data: {} as PropType<MarketProvider.Data>,
+  data: {} as PropType<AnalyzedPackage>,
 })
 
 const meta = computed(() => getMixedMeta(props.data.name))
+
+function handleClick() {
+  active.value = props.data.name
+}
 
 const categories = ['console', 'game', 'business', 'storage', 'tool']
 
@@ -74,6 +79,10 @@ function formatRating(value: number) {
   return Array(5).fill(null).map((_, index) => {
     return index < value ? 'star-full' : 'star-empty'
   })
+}
+
+function getAvatar(email: string) {
+  return (store.market.gravatar || 'https://s.gravatar.com') + '/avatar/' + md5.hash(email) + '?d=mp'
 }
 
 function formatValue(value: number) {
