@@ -1,6 +1,6 @@
-import { Context, Dict, Logger, pick, Schema, Time } from 'koishi'
+import { Context, Dict, Logger, pick, Schema, Time, valueMap } from 'koishi'
 import { DataService } from '@koishijs/plugin-console'
-import Scanner, { AnalyzedPackage, PackageJson, SearchResult } from '@koishijs/registry'
+import Scanner, { AnalyzedPackage, SearchResult } from '@koishijs/registry'
 import { createHash } from 'crypto'
 
 declare module '@koishijs/registry' {
@@ -17,8 +17,8 @@ class MarketProvider extends DataService<MarketProvider.Payload> {
   private timestamp = 0
   private failed: string[] = []
   private scanner: Scanner
-  private fullCache: Dict<MarketProvider.Data> = {}
-  private tempCache: Dict<MarketProvider.Data> = {}
+  private fullCache: Dict<AnalyzedPackage> = {}
+  private tempCache: Dict<AnalyzedPackage> = {}
 
   constructor(ctx: Context, public config: MarketProvider.Config) {
     super(ctx, 'market', { authority: 4 })
@@ -72,7 +72,7 @@ class MarketProvider extends DataService<MarketProvider.Payload> {
         }
         this.tempCache[name] = this.fullCache[name] = {
           ...item,
-          versions: Object.fromEntries(versions.map(item => [item.version, pick(item, ['peerDependencies'])] as const)),
+          versions: valueMap(versions, item => pick(item, ['peerDependencies'] as any)),
         }
       },
       after: () => this.flushData(),
@@ -100,12 +100,8 @@ namespace MarketProvider {
     timeout: Schema.number().role('time').default(Time.second * 30).description('搜索插件市场的超时时间。'),
   }).description('搜索设置')
 
-  export interface Data extends Omit<AnalyzedPackage, 'versions'> {
-    versions: Dict<Partial<PackageJson>>
-  }
-
   export interface Payload {
-    data: Dict<Data>
+    data: Dict<AnalyzedPackage>
     total: number
     progress: number
   }

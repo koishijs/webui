@@ -6,6 +6,7 @@ import { promises as fsp } from 'fs'
 import { loadManifest } from './utils'
 import { satisfies } from 'semver'
 import {} from '@koishijs/cli'
+import getRegistry from 'get-registry'
 import which from 'which-pm-runs'
 import spawn from 'execa'
 import pMap from 'p-map'
@@ -56,34 +57,9 @@ class Installer extends DataService<Dict<Dependency>> {
     return this.ctx.app.baseDir
   }
 
-  private async getRegistry() {
-    const stdout = await new Promise<string>((resolve, reject) => {
-      let stdout = ''
-      const agent = which()
-      const key = agent?.name === 'yarn' && !agent?.version.startsWith('1.') ? 'npmRegistryServer' : 'registry'
-      const child = spawn(this.agent, ['config', 'get', key], { cwd: this.cwd })
-      child.on('exit', (code) => {
-        if (!code) return resolve(stdout)
-        reject(new Error(`child process failed with code ${code}`))
-      })
-      child.on('error', reject)
-      child.stdout.on('data', (data) => {
-        stdout += data.toString()
-      })
-      child.stderr.on('data', (data) => {
-        data = data.toString().trim()
-        if (!data) return
-        for (const line of data.split('\n')) {
-          logger.warn(line)
-        }
-      })
-    })
-    return stdout.trim()
-  }
-
   async start() {
     const { endpoint, timeout } = this.config
-    this.registry = endpoint || await this.getRegistry()
+    this.registry = endpoint || await getRegistry()
     this.http = this.ctx.http.extend({ endpoint: this.registry, timeout })
   }
 
