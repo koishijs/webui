@@ -1,8 +1,7 @@
 import { Dict } from 'koishi'
 import { computed } from 'vue'
-import { MarketProvider } from '@koishijs/plugin-market'
+import { AnalyzedPackage } from '@koishijs/registry'
 import { router, send, store } from '@koishijs/client'
-import {} from '@koishijs/cli'
 
 interface DepInfo {
   required: boolean
@@ -16,7 +15,7 @@ export interface EnvInfo {
   console?: boolean
 }
 
-function isAvailable(name: string, remote: MarketProvider.Data) {
+function isAvailable(name: string, remote: AnalyzedPackage) {
   return {
     ...remote.versions[remote.version],
     ...store.packages[remote.name],

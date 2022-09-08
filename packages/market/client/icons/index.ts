@@ -13,6 +13,7 @@ import CategoryTool from './category/tool.vue'
 
 import Balance from './market/balance.vue'
 import Download from './market/download.vue'
+import Refresh from './market/refresh.vue'
 import StarEmpty from './market/star-empty.vue'
 import StarFull from './market/star-full.vue'
 import StarHalf from './market/star-half.vue'
@@ -39,6 +40,7 @@ icons.register('category:tool', CategoryTool)
 
 icons.register('balance', Balance)
 icons.register('download', Download)
+icons.register('refresh', Refresh)
 icons.register('star-empty', StarEmpty)
 icons.register('star-full', StarFull)
 icons.register('star-half', StarHalf)

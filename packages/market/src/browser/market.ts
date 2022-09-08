@@ -7,11 +7,8 @@ export default class MarketProvider extends BaseMarketProvider {
   }
 
   async get() {
-    console.log(1)
     const market = await this.prepare()
-    console.log(12, market)
     if (!market) return { data: {}, failed: 0, total: 0, progress: 0 }
-    console.log(123)
     return {
       data: Object.fromEntries(market.objects.map(item => [item.name, item])),
       failed: 0,

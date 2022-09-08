@@ -98,6 +98,19 @@ import { isLeftAsideOpen } from './utils'
     cursor: pointer;
     transition: var(--color-transition);
 
+    &.spin {
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% {
+        transform: rotate(0deg);
+      }
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+
     &.disabled {
       opacity: 0.3;
       pointer-events: none;

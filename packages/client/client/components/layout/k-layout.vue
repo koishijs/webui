@@ -11,8 +11,8 @@
           <slot name="header">{{ $route.name }}</slot>
         </template>
         <template #right>
-          <el-tooltip v-for="{ icon, label, disabled, action } in menu || []" :disabled="!!disabled" :content="label" placement="bottom">
-            <span class="menu-item" :class="{ disabled }" @click="action()">
+          <el-tooltip v-for="{ icon, label, type, disabled, action } in menu || []" :disabled="!!disabled" :content="label" placement="bottom">
+            <span class="menu-item" :class="[type, { disabled }]" @click="action()">
               <k-icon class="menu-icon" :name="icon"></k-icon>
             </span>
           </el-tooltip>
@@ -37,6 +37,7 @@ import LayoutHeader from './layout-header.vue'
 export interface MenuItem {
   icon: string
   label: string
+  type?: string
   disabled?: boolean
   action?: Function
 }

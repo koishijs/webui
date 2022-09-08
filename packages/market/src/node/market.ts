@@ -17,13 +17,16 @@ class MarketProvider extends BaseMarketProvider {
 
   async start() {
     super.start()
+    this.failed = []
+    this.fullCache = {}
+    this.tempCache = {}
     await this.prepare()
     this.refresh()
   }
 
   flushData() {
     const now = Date.now()
-    if (now - this.timestamp < 100) return
+    if (now - this.timestamp < 500) return
     this.timestamp = now
     this.ctx.console.broadcast('market/patch', {
       data: this.tempCache,
@@ -65,7 +68,7 @@ class MarketProvider extends BaseMarketProvider {
 
   async get() {
     await this.prepare()
-    if (!this._error) return { data: {}, failed: 0, total: 0, progress: 0 }
+    if (this._error) return { data: {}, failed: 0, total: 0, progress: 0 }
     return {
       data: this.fullCache,
       failed: this.failed.length,
