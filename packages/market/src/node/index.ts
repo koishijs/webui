@@ -5,23 +5,14 @@ import MarketProvider from './market'
 import PackageProvider from './packages'
 import { ConfigWriter } from '../shared'
 
-export * from './market'
-export * from './packages'
 export * from '../shared'
 
-export {
-  Installer,
-  MarketProvider,
-  PackageProvider,
-}
+export { Installer }
 
 declare module '@koishijs/plugin-console' {
   namespace Console {
     interface Services {
       dependencies: Installer
-      market: MarketProvider
-      packages: PackageProvider
-      config: ConfigWriter
     }
   }
 }

@@ -19,5 +19,5 @@ export const getMixedMeta = (name: string) => ({
   keywords: [],
   peerDependencies: {},
   ...store.market.data[name],
-  ...store.packages[name],
+  ...store.packages?.[name],
 })

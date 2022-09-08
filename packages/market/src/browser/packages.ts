@@ -1,41 +1,19 @@
-import { Context, Dict, pick, Runtime, Schema } from 'koishi'
-import { DataService } from '@koishijs/plugin-console'
-import { Manifest, MarketResult, PackageJson } from '@koishijs/registry'
+import { Context, pick } from 'koishi'
 import { unwrapExports } from '@koishijs/loader'
+import { PackageProvider as BasePackageProvider } from '../shared'
 
-class PackageProvider extends DataService<Dict<PackageProvider.Data>> {
-  protected _task: Promise<MarketResult>
-
-  constructor(ctx: Context, config: PackageProvider.Config) {
-    super(ctx, 'packages', { authority: 4 })
-
-    ctx.on('internal/runtime', (runtime) => {
-      this.refresh()
-    })
-
-    ctx.on('internal/fork', (fork) => {
-      this.refresh()
-    })
-  }
-
-  async _prepare(): Promise<MarketResult> {
-    const response = await fetch('https://registry.koishi.chat/market.json')
-    return await response.json()
-  }
-
-  async prepare() {
-    return this._task ||= this._prepare()
-  }
+export default class PackageProvider extends BasePackageProvider {
+  static using = ['console.market']
 
   async getManifest(name: string) {
-    const market = await this.prepare()
+    const market = await this.ctx.console.market.prepare()
     return market.objects.find(item => {
       return name === item.name.replace(/(koishi-|^@koishijs\/)plugin-/, '')
     })?.manifest
   }
 
   async get(forced = false) {
-    const market = await this.prepare()
+    const market = await this.ctx.console.market.prepare()
 
     const packages = await Promise.all(market.objects.map(async (data) => {
       const result = pick(data, [
@@ -44,7 +22,7 @@ class PackageProvider extends DataService<Dict<PackageProvider.Data>> {
         'description',
         'portable',
         'manifest',
-      ]) as PackageProvider.Data
+      ]) as BasePackageProvider.Data
       result.shortname = data.name.replace(/(koishi-|^@koishijs\/)plugin-/, '')
       result.manifest = data.manifest
       result.peerDependencies = { ...data.versions[data.version].peerDependencies }
@@ -65,25 +43,4 @@ class PackageProvider extends DataService<Dict<PackageProvider.Data>> {
 
     return Object.fromEntries(packages.filter(x => x).map(data => [data.name, data]))
   }
-
-  parseRuntime(runtime: Runtime, result: PackageProvider.Data) {
-    result.id = runtime.uid
-    result.forkable = runtime.isForkable
-  }
 }
-
-namespace PackageProvider {
-  export interface Config {}
-
-  export interface Data extends Partial<PackageJson> {
-    id?: number
-    portable?: boolean
-    forkable?: boolean
-    shortname?: string
-    schema?: Schema
-    workspace?: boolean
-    manifest?: Manifest
-  }
-}
-
-export default PackageProvider

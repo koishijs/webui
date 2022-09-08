@@ -16,8 +16,10 @@
             <k-icon v-for="(name, index) in formatRating(data.score.final)" :key="index" :name="name"></k-icon>
           </div>
         </el-tooltip>
-        <k-button v-if="store.packages[data.name]" type="success" solid class="right" @click="handleClick">修改</k-button>
-        <k-button v-else :disabled="config.static" solid class="right" @click="handleClick">添加</k-button>
+        <template v-if="store.packages">
+          <k-button v-if="store.packages[data.name]" type="success" solid class="right" @click="handleClick">修改</k-button>
+          <k-button v-else :disabled="config.static" solid class="right" @click="handleClick">添加</k-button>
+        </template>
       </div>
     </div>
     <k-markdown inline class="desc" :source="meta.manifest.description.zh || meta.manifest.description.en"></k-markdown>

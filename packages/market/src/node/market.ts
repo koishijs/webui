@@ -1,16 +1,8 @@
-import { Context, Dict, Logger, pick, Schema, Time, valueMap } from 'koishi'
-import { DataService } from '@koishijs/plugin-console'
+import { Context, Dict, pick, Schema, Time, valueMap } from 'koishi'
 import Scanner, { AnalyzedPackage, SearchResult } from '@koishijs/registry'
+import { MarketProvider as BaseMarketProvider } from '../shared'
 
-declare module '@koishijs/registry' {
-  interface User {
-    avatar?: string
-  }
-}
-
-const logger = new Logger('market')
-
-class MarketProvider extends DataService<MarketProvider.Payload> {
+class MarketProvider extends BaseMarketProvider {
   static using = ['console.dependencies']
 
   private timestamp = 0
@@ -20,15 +12,12 @@ class MarketProvider extends DataService<MarketProvider.Payload> {
   private tempCache: Dict<AnalyzedPackage> = {}
 
   constructor(ctx: Context, public config: MarketProvider.Config) {
-    super(ctx, 'market', { authority: 4 })
+    super(ctx)
   }
 
   async start() {
-    await this.prepare().catch((e) => {
-      logger.warn(e)
-      this.scanner.total = -1
-      this.scanner.progress = -1
-    })
+    super.start()
+    await this.prepare()
     this.refresh()
   }
 
@@ -45,20 +34,19 @@ class MarketProvider extends DataService<MarketProvider.Payload> {
     this.tempCache = {}
   }
 
-  async prepare() {
+  async collect() {
     const { endpoint, timeout } = this.config
-    const scanner = new Scanner(this.ctx.console.dependencies.http.get)
+    this.failed = []
+    this.scanner = new Scanner(this.ctx.console.dependencies.http.get)
     if (endpoint) {
       const result = await this.ctx.http.get<SearchResult>(endpoint, { timeout })
-      scanner.objects = result.objects.filter(object => !object.ignored)
-      scanner.total = scanner.objects.length
+      this.scanner.objects = result.objects.filter(object => !object.ignored)
+      this.scanner.total = this.scanner.objects.length
     } else {
-      await scanner.collect({ timeout })
+      await this.scanner.collect({ timeout })
     }
 
-    this.failed = []
-    this.scanner = scanner
-    await scanner.analyze({
+    this.scanner.analyze({
       version: '4',
       onFailure: (name) => {
         this.failed.push(name)
@@ -72,15 +60,18 @@ class MarketProvider extends DataService<MarketProvider.Payload> {
       },
       after: () => this.flushData(),
     })
+    return null
   }
 
   async get() {
+    await this.prepare()
+    if (!this._error) return { data: {}, failed: 0, total: 0, progress: 0 }
     return {
       data: this.fullCache,
       failed: this.failed.length,
-      total: this.scanner?.total || 0,
-      progress: this.scanner?.progress || -1,
-      gravatar: process.env.GRAVATAR_MIRROR,
+      total: this.scanner.total,
+      progress: this.scanner.progress,
+      gtavatar: process.env.GRAVATAR_MIRROR,
     }
   }
 }
@@ -95,14 +86,6 @@ namespace MarketProvider {
     endpoint: Schema.string().role('link').description('用于搜索插件市场的网址。默认跟随 registry 设置。'),
     timeout: Schema.number().role('time').default(Time.second * 30).description('搜索插件市场的超时时间。'),
   }).description('搜索设置')
-
-  export interface Payload {
-    data: Dict<AnalyzedPackage>
-    failed: number
-    total: number
-    progress: number
-    gravater?: string
-  }
 }
 
 export default MarketProvider

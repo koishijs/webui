@@ -1,10 +1,10 @@
-import { Context, Dict, Logger, pick, remove, Runtime, Schema, scope, State } from 'koishi'
-import { DataService } from '@koishijs/plugin-console'
+import { Context, Dict, Logger, pick, remove, Schema, scope, State } from 'koishi'
 import { conclude, Manifest, PackageJson } from '@koishijs/registry'
 import { promises as fsp } from 'fs'
 import { dirname } from 'path'
-import ns from 'ns-require'
+import { unwrapExports } from '@koishijs/loader'
 import { loadManifest } from './utils'
+import { PackageProvider as BasePackageProvider } from '../shared'
 
 const logger = new Logger('market')
 
@@ -23,28 +23,16 @@ function getExports(id: string) {
       }
     }
   }
-  return ns.unwrapExports(result.exports)
+  return unwrapExports(result.exports)
 }
 
-class PackageProvider extends DataService<Dict<PackageProvider.Data>> {
+class PackageProvider extends BasePackageProvider {
   cache: Dict<PackageProvider.Data> = {}
   task: Promise<void>
 
-  constructor(ctx: Context, config: PackageProvider.Config) {
-    super(ctx, 'packages', { authority: 4 })
-
-    this.ctx.on('internal/runtime', (runtime) => {
-      this.updatePackage(runtime)
-    })
-
-    this.ctx.on('internal/fork', (fork) => {
-      this.updatePackage(fork)
-    })
-  }
-
-  private updatePackage(state: State) {
+  update(state: State) {
     const entry = Object.keys(require.cache).find((key) => {
-      return ns.unwrapExports(require.cache[key].exports) === state.runtime.plugin
+      return unwrapExports(require.cache[key].exports) === state.runtime.plugin
     })
     if (!this.cache[entry]) return
     const data = this.cache[entry]
@@ -142,11 +130,6 @@ class PackageProvider extends DataService<Dict<PackageProvider.Data>> {
   async getManifest(name: string) {
     const filename = scope.resolve(name + '/package.json')
     return conclude(JSON.parse(await fsp.readFile(filename, 'utf8')))
-  }
-
-  parseRuntime(runtime: Runtime, result: PackageProvider.Data) {
-    result.id = runtime.uid
-    result.forkable = runtime.isForkable
   }
 }
 

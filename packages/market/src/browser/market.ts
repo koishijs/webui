@@ -1,21 +1,17 @@
-import { Context, Dict } from 'koishi'
-import { DataService } from '@koishijs/plugin-console'
-import { AnalyzedPackage, MarketResult } from '@koishijs/registry'
+import { MarketProvider as BaseMarketProvider } from '../shared'
 
-declare module '@koishijs/registry' {
-  interface User {
-    avatar?: string
-  }
-}
-
-class MarketProvider extends DataService<MarketProvider.Payload> {
-  constructor(ctx: Context) {
-    super(ctx, 'market', { authority: 4 })
+export default class MarketProvider extends BaseMarketProvider {
+  async collect() {
+    const response = await fetch('https://registry.koishi.chat/market.json')
+    return await response.json()
   }
 
   async get() {
-    const response = await fetch('https://registry.koishi.chat/market.json')
-    const market: MarketResult = await response.json()
+    console.log(1)
+    const market = await this.prepare()
+    console.log(12, market)
+    if (!market) return { data: {}, failed: 0, total: 0, progress: 0 }
+    console.log(123)
     return {
       data: Object.fromEntries(market.objects.map(item => [item.name, item])),
       failed: 0,
@@ -24,13 +20,3 @@ class MarketProvider extends DataService<MarketProvider.Payload> {
     }
   }
 }
-
-namespace MarketProvider {
-  export interface Payload {
-    data: Dict<AnalyzedPackage>
-    total: number
-    progress: number
-  }
-}
-
-export default MarketProvider
