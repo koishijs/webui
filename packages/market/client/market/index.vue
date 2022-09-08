@@ -180,7 +180,7 @@ const menu = computed(() => [{
 
 .market-container {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(336px, 1fr));
   gap: var(--card-margin);
   margin: var(--card-margin) 0;
   justify-items: center;

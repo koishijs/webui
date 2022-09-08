@@ -2,16 +2,9 @@
   <el-dialog v-model="showDialog" custom-class="install-panel" @closed="active = ''">
     <template v-if="active" #header="{ titleId, titleClass }">
       <span :id="titleId" :class="[titleClass, '']">
-        {{ active }} @
-        <template v-if="store.dependencies[active]">
-          {{ store.dependencies[active].request }}&nbsp;&nbsp;→ 
-        </template>
+        {{ active.replace(/(koishi-|^@koishijs\/)plugin-/, '') + (workspace ? ' (工作区)' : '') }}
       </span>
-      <el-button
-        class="prefix right-adjacent"
-        @click="prefix = transition[prefix]"
-      >{{ prefix || '=' }}</el-button>
-      <el-select :disabled="workspace" class="left-adjacent" v-model="version">
+      <el-select v-if="!workspace" :disabled="workspace" v-model="selectVersion">
         <el-option v-for="({ result }, version) in data" :key="version" :value="version">
           {{ version }}
           <template v-if="version === current">(当前版本)</template>
@@ -20,28 +13,26 @@
       </el-select>
     </template>
 
-    <table v-if="active && !workspace">
-      <tr>
-        <td>依赖名称</td>
-        <td>版本区间</td>
-        <td>当前版本</td>
-        <td>可用性</td>
-      </tr>
-      <tr v-for="({ request, resolved, result }, name) in data[version].peers" :key="name">
-        <td class="name">{{ name }}</td>
-        <td>{{ request }}</td>
-        <td>{{ resolved }}</td>
-        <td :class="['theme-color', result]">
-          <span v-if="result === 'warning'"><k-icon name="exclamation-full"></k-icon>未下载</span>
-          <span v-else-if="result === 'success'"><k-icon name="check-full"></k-icon>已下载</span>
-          <span v-else><k-icon name="times-full"></k-icon>不兼容</span>
-        </td>
-      </tr>
-    </table>
-
-    <div v-if="workspace">
-      这是一个工作区插件。
-    </div>
+    <el-scrollbar v-if="active && !workspace">
+      <table>
+        <tr>
+          <td>依赖名称</td>
+          <td>版本区间</td>
+          <td>当前版本</td>
+          <td>可用性</td>
+        </tr>
+        <tr v-for="({ request, resolved, result }, name) in data[version].peers" :key="name">
+          <td class="name">{{ name }}</td>
+          <td>{{ request }}</td>
+          <td>{{ resolved }}</td>
+          <td :class="['theme-color', result]">
+            <span v-if="result === 'warning'"><k-icon name="exclamation-full"></k-icon>未下载</span>
+            <span v-else-if="result === 'success'"><k-icon name="check-full"></k-icon>已下载</span>
+            <span v-else><k-icon name="times-full"></k-icon>不兼容</span>
+          </td>
+        </tr>
+      </table>
+    </el-scrollbar>
 
     <template v-if="active" #footer>
       <div class="left">
@@ -56,7 +47,7 @@
         </template>
         <template v-else-if="current">
           <el-button @click="install(true)">移除</el-button>
-          <el-button @click="install(false)" :disabled="unchanged">修改</el-button>
+          <el-button v-if="!workspace" @click="install(false)" :disabled="unchanged">修改</el-button>
         </template>
         <template v-else>
           <el-button @click="install(true)" :disabled="unchanged">添加</el-button>
@@ -71,9 +62,7 @@
 import { computed, ref, watch } from 'vue'
 import { loading, message, router, send, socket, store, valueMap } from '@koishijs/client'
 import { satisfies } from 'semver'
-import { config, active } from '../utils'
-
-const transition = { '': '^', '^': '~', '~': '' }
+import { active } from '../utils'
 
 const showDialog = ref(false)
 
@@ -89,7 +78,7 @@ async function install(remove = false) {
   try {
     showDialog.value = false
     const code = await send('market/install', {
-      [active.value]: remove ? null : prefix.value + version.value,
+      [active.value]: remove ? null : version.value,
     })
     if (code) {
       message.error('安装失败！')
@@ -104,13 +93,22 @@ async function install(remove = false) {
   }
 }
 
-const prefix = ref<string>()
-
 const version = ref<string>()
 
-const request = computed(() => prefix.value + version.value)
+const selectVersion = computed({
+  get() {
+    if (store.dependencies[active.value]?.request === version.value) {
+      return version.value + ' (当前版本)'
+    } else {
+      return version.value
+    }
+  },
+  set(value) {
+    version.value = value
+  },
+})
 
-const unchanged = computed(() => request.value === store.dependencies[active.value]?.request)
+const unchanged = computed(() => version.value === store.dependencies[active.value]?.request)
 
 const current = computed(() => store.dependencies[active.value]?.resolved)
 
@@ -149,19 +147,8 @@ watch(() => active.value, (value) => {
   showDialog.value = !!value
   if (!value) return
   const request = store.dependencies[active.value]?.request
-  if (request) {
-    const capture = request.match(/^[~^]?/)
-    prefix.value = capture[0]
-    version.value = request.slice(capture[0].length)
-  } else {
-    prefix.value = config.prefix
-    version.value = store.market.data[value].version
-  }
+  version.value = request || store.market.data[value].version
 }, { immediate: true })
-
-watch(() => prefix.value, (value) => {
-  config.prefix = value
-})
 
 function* find(target: string, plugins: {}, prefix: string): IterableIterator<string> {
   for (let key in plugins) {
@@ -192,15 +179,40 @@ function configure() {
 <style lang="scss">
 
 .install-panel {
-  .el-dialog__title {
-    font-weight: 500;
-    color: var(--fg1);
-    margin-right: 0.5rem;
+  .el-dialog__header {
+    display: flex;
+    gap: 0 0.5em;
+    align-items: center;
+    padding-right: 36px;
+
+    .el-dialog__title {
+      font-weight: 500;
+      color: var(--fg1);
+      margin-right: 0.5rem;
+      flex: 0 0 auto;
+    }
+
+    .el-select {
+      flex: 1 1 auto;
+      max-width: 12.5rem;
+      margin: -2px 0 -4px;
+    }
   }
 
   .version-badges {
     float: right;
     margin-right: -12px;
+  }
+
+  .el-dialog__body {
+    padding: 20px 20px;
+  }
+
+  table {
+    td, th {
+      padding: 0.5em 0.875em;
+      white-space: nowrap;
+    }
   }
 
   td.name {
@@ -211,15 +223,6 @@ function configure() {
     display: inline-flex;
     align-items: center;
     gap: 0.25rem;
-  }
-
-  $prefix-size: 2rem;
-
-  .el-button.prefix {
-    width: $prefix-size;
-    height: $prefix-size;
-    vertical-align: bottom;
-    padding: 0;
   }
 
   .el-button + .el-button {

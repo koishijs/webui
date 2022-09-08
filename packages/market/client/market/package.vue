@@ -7,11 +7,13 @@
       <div class="right">
         <h2>
           <a :href="data.links.homepage" target="_blank" rel="noopener noreferrer">{{ data.shortname }}</a>
-          <span class="verified" v-if="data.verified">
-            <k-icon name="verified"></k-icon>
-          </span>
+          <el-tooltip v-if="data.verified" content="官方认证" placement="right">
+            <span class="verified">
+              <k-icon name="verified"></k-icon>
+            </span>
+          </el-tooltip>
         </h2>
-        <el-tooltip :content="data.score.final.toFixed(3)" placement="right">
+        <el-tooltip :content="(data.score.final * 5).toFixed(1)" placement="right">
           <div class="rating">
             <k-icon v-for="(name, index) in formatRating(data.score.final)" :key="index" :name="name"></k-icon>
           </div>

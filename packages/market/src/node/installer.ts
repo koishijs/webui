@@ -22,7 +22,7 @@ const logger = new Logger('market')
 export interface Dependency {
   /**
    * requested semver range
-   * @example `^1.2.3`
+   * @example `^1.2.3` -> `1.2.3`
    */
   request: string
   /**
@@ -64,7 +64,9 @@ class Installer extends DataService<Dict<Dependency>> {
   }
 
   private async _get() {
-    const result = valueMap<string, Dependency>(this.manifest.dependencies, request => ({ request }))
+    const result = valueMap(this.manifest.dependencies, (request) => {
+      return { request: request.replace(/^[~^]/, '') } as Dependency
+    })
     await pMap(Object.keys(result), async (name) => {
       try {
         // some dependencies may be left with no local installation
