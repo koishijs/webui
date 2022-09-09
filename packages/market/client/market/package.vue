@@ -13,9 +13,9 @@
             </span>
           </el-tooltip>
         </h2>
-        <el-tooltip :content="(data.score.final * 5).toFixed(1)" placement="right">
+        <el-tooltip :content="rating.toFixed(1)" placement="right">
           <div class="rating">
-            <k-icon v-for="(name, index) in formatRating(data.score.final)" :key="index" :name="name"></k-icon>
+            <k-icon v-for="(_, index) in Array(5).fill(null)" :key="index" :name="index + 0.5 < rating ? 'star-full' : 'star-empty'"></k-icon>
           </div>
         </el-tooltip>
         <template v-if="store.packages">
@@ -78,12 +78,7 @@ function resolveCategory(name: string) {
   return 'other'
 }
 
-function formatRating(value: number) {
-  value = (value - 0.3) * 10
-  return Array(5).fill(null).map((_, index) => {
-    return index < value ? 'star-full' : 'star-empty'
-  })
-}
+const rating = computed(() => Math.min(Math.max((props.data.score.final - 0.3) * 10, 0), 5))
 
 function getAvatar(email: string) {
   return (store.market.gravatar || 'https://s.gravatar.com') + '/avatar/' + md5.hash(email) + '?d=mp'

@@ -34,10 +34,24 @@
       </table>
     </el-scrollbar>
 
+    <div v-if="local && paths.length">
+      点击以前往配置页面：
+      <ul>
+        <li v-for="([path, active]) of paths" :key="path">
+          <span class="link" @click.stop="configure(path)">{{ path }}</span>
+          ({{ active ? '运行中' : '闲置' }})
+        </li>
+        <li v-if="!store.packages?.[active]?.id">
+          <span class="link" @click.stop="configure(true)">添加新配置</span>
+        </li>
+      </ul>
+    </div>
+    <div v-else-if="local">
+      <span class="link" @click.stop="configure(true)">你尚未配置此插件，点击立即配置。</span>
+    </div>
+
     <template v-if="active" #footer>
-      <div class="left">
-        <el-button v-if="local" type="primary" @click="configure">点击配置</el-button>
-      </div>
+      <div class="left"></div>
       <div class="right">
         <el-button @click="showDialog = false">取消</el-button>
         <template v-if="!workspace">
@@ -84,6 +98,10 @@ async function install(remove = false) {
       message.error('安装失败！')
     } else {
       message.success('安装成功！')
+      if (!paths.value.length) {
+        const path = shortname.value + ':' + Math.random().toString(36).slice(2, 8)
+        send('manager/unload', path, {})
+      }
     }
   } catch (err) {
     message.error('安装超时！')
@@ -122,7 +140,7 @@ const workspace = computed(() => {
 
 const data = computed(() => {
   if (!active.value || workspace.value) return
-  const { versions } = store.dependencies[active.value] || store.market.data[active.value]
+  const { versions } = store.market.data[active.value] || store.dependencies[active.value]
   return valueMap(versions, (item) => {
     const peers = valueMap({ ...item.peerDependencies }, (request, name) => {
       const resolved = store.dependencies[name]?.resolved || store.packages[name]?.version
@@ -150,28 +168,30 @@ watch(() => active.value, (value) => {
   version.value = request || store.market.data[value].version
 }, { immediate: true })
 
-function* find(target: string, plugins: {}, prefix: string): IterableIterator<string> {
+function* find(target: string, plugins: {}, prefix: string): IterableIterator<[string, boolean]> {
   for (let key in plugins) {
     const config = plugins[key]
-    if (key.startsWith('~')) key = key.slice(1)
+    const active = !key.startsWith('~')
+    if (!active) key = key.slice(1)
     const request = key.split(':')[0]
-    if (request === target) yield prefix + key
+    if (request === target) yield [prefix + key, active]
     if (request === 'group') {
       yield* find(target, config, prefix + key + '/')
     }
   }
 }
 
-function configure() {
+const shortname = computed(() => active.value.replace(/(koishi-|^@koishijs\/)plugin-/, ''))
+
+const paths = computed(() => [...find(shortname.value, store.config.plugins, '')])
+
+function configure(path: string | true) {
   showDialog.value = false
-  const name = local.value.shortname
-  const paths = [...find(name, store.config.plugins, '')]
-  if (paths.length) {
-    router.push('/plugins/' + paths[0])
-  } else {
-    send('manager/unload', name, {})
-    router.push('/plugins/' + name)
+  if (path === true) {
+    path = shortname.value + ':' + Math.random().toString(36).slice(2, 8)
+    send('manager/unload', path, {})
   }
+  router.push('/plugins/' + path)
 }
 
 </script>
@@ -205,7 +225,11 @@ function configure() {
   }
 
   .el-dialog__body {
-    padding: 20px 20px;
+    padding: 0 20px;
+
+    > div {
+      margin: 1rem 0;
+    }
   }
 
   table {
@@ -223,6 +247,13 @@ function configure() {
     display: inline-flex;
     align-items: center;
     gap: 0.25rem;
+  }
+
+  span.link {
+    &:hover {
+      cursor: pointer;
+      text-decoration: underline;
+    }
   }
 
   .el-button + .el-button {
