@@ -33,7 +33,18 @@ declare module '@koishijs/plugin-console' {
   }
 }
 
-function clear(ctx: Context) {
+function shared(ctx: Context) {
+  ctx.console.addEntry(process.env.KOISHI_BASE ? [
+    process.env.KOISHI_BASE + '/dist/index.js',
+    process.env.KOISHI_BASE + '/dist/style.css',
+  ] : process.env.KOISHI_ENV === 'browser' ? [
+    // @ts-ignore
+    import.meta.url.replace(/\/lib\/[^/]+$/, '/client/index.ts'),
+  ] : {
+    dev: resolve(__dirname, '../client/index.ts'),
+    prod: resolve(__dirname, '../dist'),
+  })
+
   ctx.i18n.define('zh', require('./locales/zh'))
 
   ctx.platform('sandbox').command('clear')
@@ -56,19 +67,8 @@ class SandboxBot extends Bot {
       selfId: 'koishi',
     })
 
-    ctx.plugin(clear)
+    ctx.plugin(shared)
     ctx.plugin(UserProvider)
-
-    ctx.console.addEntry(process.env.KOISHI_BASE ? [
-      process.env.KOISHI_BASE + '/dist/index.js',
-      process.env.KOISHI_BASE + '/dist/style.css',
-    ] : process.env.KOISHI_ENV === 'browser' ? [
-      // @ts-ignore
-      import.meta.url.replace(/\/lib\/[^/]+$/, '/client/index.ts'),
-    ] : {
-      dev: resolve(__dirname, '../client/index.ts'),
-      prod: resolve(__dirname, '../dist'),
-    })
 
     const self = this
     ctx.console.addListener('sandbox/message', async function (user, channel, content) {

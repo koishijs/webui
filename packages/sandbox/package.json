@@ -1,7 +1,7 @@
 {
   "name": "@koishijs/plugin-sandbox",
   "description": "Test Your Virtual Bot in Console",
-  "version": "2.2.9",
+  "version": "2.2.10",
   "main": "lib/index.cjs",
   "typings": "lib/index.d.ts",
   "exports": {
@@ -55,11 +55,11 @@
     }
   },
   "peerDependencies": {
-    "@koishijs/plugin-console": "^4.4.12",
-    "koishi": "^4.8.7"
+    "@koishijs/plugin-console": "^4.5.3",
+    "koishi": "^4.9.0"
   },
   "devDependencies": {
-    "@koishijs/client": "^4.4.12",
-    "@koishijs/plugin-console": "^4.4.12"
+    "@koishijs/client": "^4.5.3",
+    "@koishijs/plugin-console": "^4.5.3"
   }
 }
