@@ -25,6 +25,7 @@ export interface SlotOptions {
 
 export interface PageExtension {
   name: string
+  desc?: string
   fields?: Field[]
   badge?: () => number
 }

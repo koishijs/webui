@@ -1,5 +1,9 @@
 <template>
-  <el-tooltip :content="route.name" placement="right">
+  <el-tooltip placement="right" popper-class="activity-item-tooltip" :visible="true">
+    <template #content>
+      <div class="title">{{ route.name }}</div>
+      <div class="desc" v-if="route.meta.desc">{{ route.meta.desc }}</div>
+    </template>
     <router-link class="navbar-item" :to="target">
       <k-icon class="menu-icon" :name="route.meta.icon || 'application'"></k-icon>
     </router-link>
@@ -80,6 +84,20 @@ const loaded = computed(() => {
     font-size: 0.75rem;
     font-weight: bolder;
     transition: var(--color-transition);
+  }
+}
+
+.activity-item-tooltip {
+  padding: 6px 11px;
+  line-height: 1.6;
+
+  .title {
+    font-size: 13px;
+    font-weight: 500;
+  }
+
+  .desc {
+    font-size: 12px;
   }
 }
 

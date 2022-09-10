@@ -237,6 +237,20 @@ html.dark .el-switch {
   --el-switch-off-color: #72767d;
 }
 
+html.dark .el-popper.is-dark {
+  color: var(--fg1);
+  background-color: var(--bg1);
+  border: 1px solid var(--border);
+  box-shadow: var(--card-shadow);
+  transition: var(--color-transition);
+
+  .el-popper__arrow::before {
+    border: 1px solid var(--border);
+    background: var(--bg1);
+    transition: var(--color-transition);
+  }
+}
+
 .right-adjacent {
   &.el-button, &.el-select .el-input__wrapper {
     border-top-right-radius: 0;
@@ -273,6 +287,7 @@ html.dark .el-switch {
 
   .el-dialog {
     margin: 0;
+    min-width: 480px;
   }
 
   @media screen and (max-width: 768px) {
@@ -280,6 +295,7 @@ html.dark .el-switch {
 
     .el-dialog {
       width: 100%;
+      min-width: unset;
     }
   }
 }

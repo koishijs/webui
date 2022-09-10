@@ -40,11 +40,6 @@ export default {
 .el-popper.k-status-tooltip {
   padding: 0 0;
   border-radius: 8px;
-  color: var(--fg1);
-  background-color: var(--card-bg);
-  border: 1px solid var(--border);
-  box-shadow: var(--card-shadow);
-  transition: var(--color-transition);
 
   .el-popper__empty + .el-popper__arrow {
     display: none;
