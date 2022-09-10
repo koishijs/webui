@@ -57,6 +57,7 @@ import { computed, PropType } from 'vue'
 import { AnalyzedPackage } from '@koishijs/registry'
 import { store, config } from '@koishijs/client'
 import { active, getMixedMeta } from '../utils'
+import { resolveCategory } from './utils'
 import md5 from 'spark-md5'
 
 defineEmits(['query', 'click'])
@@ -69,13 +70,6 @@ const meta = computed(() => getMixedMeta(props.data.name))
 
 function handleClick() {
   active.value = props.data.name
-}
-
-const categories = ['console', 'game', 'business', 'storage', 'tool']
-
-function resolveCategory(name: string) {
-  if (categories.includes(name)) return name
-  return 'other'
 }
 
 const rating = computed(() => Math.min(Math.max((props.data.score.final - 0.3) * 10, 0), 5))
@@ -204,6 +198,7 @@ function formatSize(value: number) {
     margin: 0;
     font-size: 15px;
     flex: 1 1 auto;
+    line-height: 1.5;
   }
 
   .footer {

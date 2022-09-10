@@ -51,6 +51,7 @@ import TreeView from './tree.vue'
 import PluginSettings from './plugin.vue'
 import KAlias from './alias.vue'
 import { clone, send, store } from '@koishijs/client'
+import { showSelect } from '../utils'
 
 const route = useRoute()
 const router = useRouter()
@@ -132,7 +133,8 @@ const menu = computed(() => {
     icon: 'add-plugin',
     label: '添加插件',
     disabled: isPlugin,
-    action: () => addItem(current.value.path, 'unload', ''),
+    action: () => showSelect.value = true,
+    // addItem(current.value.path, 'unload', '')
   }, {
     icon: 'add-group',
     label: '添加分组',

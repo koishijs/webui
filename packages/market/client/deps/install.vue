@@ -226,6 +226,7 @@ function configure(path: string | true) {
 
   .el-dialog__body {
     padding: 0 20px;
+    min-height: 40px;
 
     > div {
       margin: 1rem 0;

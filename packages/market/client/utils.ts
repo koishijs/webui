@@ -14,6 +14,7 @@ export const config = createStorage<ManagerConfig>('manager', 2, () => ({
 }))
 
 export const active = ref('')
+export const showSelect = ref(false)
 
 export const getMixedMeta = (name: string) => ({
   keywords: [],

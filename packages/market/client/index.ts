@@ -5,6 +5,7 @@ import Install from './deps/install.vue'
 import Dependencies from './deps/index.vue'
 import Settings from './settings/index.vue'
 import Market from './market/index.vue'
+import Select from './market/select.vue'
 import Progress from './market/progress.vue'
 import './icons'
 
@@ -33,6 +34,11 @@ export default (ctx: Context) => {
   ctx.slot({
     type: 'global',
     component: Install,
+  })
+
+  ctx.slot({
+    type: 'global',
+    component: Select,
   })
 
   ctx.slot({
