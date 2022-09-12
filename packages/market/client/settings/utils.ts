@@ -147,7 +147,9 @@ export function setPath(oldPath: string, newPath: string) {
   router.replace('/plugins/' + newPath)
 }
 
-export const separator = /(?<!@[\w-]+)\//g
+export function splitPath(path: string) {
+  return path.split(/\/?(@[\w-]+\/[\w:-]+|[\w:-]+)\/?/).filter(Boolean)
+}
 
 export function addItem(path: string, action: 'group' | 'unload', name: string) {
   const id = Math.random().toString(36).slice(2, 8)
@@ -160,7 +162,7 @@ export function addItem(path: string, action: 'group' | 'unload', name: string) 
 
 export function removeItem(path: string) {
   send('manager/remove', path)
-  const segments = path.split(separator)
+  const segments = splitPath(path)
   segments.pop()
   router.replace('/plugins/' + segments.join('/'))
 }

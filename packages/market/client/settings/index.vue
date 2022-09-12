@@ -44,7 +44,7 @@
 
 import { computed, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { addItem, envMap, plugins, removeItem, separator, Tree } from './utils'
+import { addItem, envMap, plugins, removeItem, splitPath, Tree } from './utils'
 import GlobalSettings from './global.vue'
 import GroupSettings from './group.vue'
 import TreeView from './tree.vue'
@@ -146,7 +146,7 @@ const menu = computed(() => {
 function execute(event: 'unload' | 'reload') {
   send(`manager/${event}`, current.value.path, config.value, current.value.target)
   if (current.value.target) {
-    const segments = current.value.path.split(separator)
+    const segments = splitPath(current.value.path)
     segments[segments.length - 1] = current.value.target
     router.replace('/plugins/' + segments.join('/'))
   }

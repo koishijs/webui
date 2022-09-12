@@ -15,7 +15,9 @@ declare module '@koishijs/plugin-console' {
   }
 }
 
-const separator = /(?<!@[\w-]+)\//g
+export function splitPath(path: string) {
+  return path.split(/\/?(@[\w-]+\/[\w:-]+|[\w:-]+)\/?/).filter(Boolean)
+}
 
 function insertKey(object: {}, temp: {}, rest: string[]) {
   for (const key of rest) {
@@ -111,7 +113,7 @@ export class ConfigWriter extends DataService<Context.Config> {
   }
 
   private resolve(path: string) {
-    const segments = path.split(separator)
+    const segments = splitPath(path)
     let ctx = this.loader.entry
     let name = segments.shift()
     while (segments.length) {
