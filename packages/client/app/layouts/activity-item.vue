@@ -1,5 +1,5 @@
 <template>
-  <el-tooltip placement="right" popper-class="activity-item-tooltip" :visible="true">
+  <el-tooltip placement="right" popper-class="activity-item-tooltip">
     <template #content>
       <div class="title">{{ route.name }}</div>
       <div class="desc" v-if="route.meta.desc">{{ route.meta.desc }}</div>

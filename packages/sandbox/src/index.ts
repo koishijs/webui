@@ -90,7 +90,7 @@ class SandboxBot extends Bot {
   }
 
   async sendMessage(channel: string, content: string) {
-    content = segment.transform(content, {
+    content = segment.transform(content.toString(), {
       image(data) {
         if (!data.url.startsWith('base64://')) return segment('image', data)
         return segment.image('data:image/png;base64,' + data.url.slice(9))

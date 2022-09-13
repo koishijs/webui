@@ -102,7 +102,9 @@ export abstract class Console extends DataService<string[]> {
 
   constructor(public ctx: Context) {
     super(ctx, 'entry', { immediate: true })
-    ctx.console = this as any
+    ctx.setTimeout(() => {
+      ctx.console = this as any
+    }, 0)
   }
 
   abstract resolveEntry(entry: string | string[] | Entry): string | string[]
