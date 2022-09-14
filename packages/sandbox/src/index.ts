@@ -1,6 +1,7 @@
 import { Bot, Context, Dict, observe, Random, Schema, segment, User } from 'koishi'
 import { DataService, SocketHandle } from '@koishijs/plugin-console'
 import { resolve } from 'path'
+import zh from './locales/zh.yml'
 
 declare module 'koishi' {
   interface User {
@@ -33,42 +34,15 @@ declare module '@koishijs/plugin-console' {
   }
 }
 
-function shared(ctx: Context) {
-  ctx.console.addEntry(process.env.KOISHI_BASE ? [
-    process.env.KOISHI_BASE + '/dist/index.js',
-    process.env.KOISHI_BASE + '/dist/style.css',
-  ] : process.env.KOISHI_ENV === 'browser' ? [
-    // @ts-ignore
-    import.meta.url.replace(/\/lib\/[^/]+$/, '/client/index.ts'),
-  ] : {
-    dev: resolve(__dirname, '../client/index.ts'),
-    prod: resolve(__dirname, '../dist'),
-  })
-
-  ctx.i18n.define('zh', require('./locales/zh'))
-
-  ctx.platform('sandbox').command('clear')
-    .action(({ session }) => {
-      session.handle.send({
-        type: 'sandbox/clear',
-      })
-    })
-}
-
 class SandboxBot extends Bot {
-  static using = ['console'] as const
-
   username = 'koishi'
   hidden = true
 
-  constructor(public ctx: Context, config: SandboxBot.Config) {
+  constructor(public ctx: Context) {
     super(ctx, {
       platform: 'sandbox',
       selfId: 'koishi',
     })
-
-    ctx.plugin(shared)
-    ctx.plugin(UserProvider)
 
     const self = this
     ctx.console.addListener('sandbox/message', async function (user, channel, content) {
@@ -99,15 +73,14 @@ class SandboxBot extends Bot {
     this.ctx.console.broadcast('sandbox', { content, user: 'Koishi', channel })
     return [Random.id()]
   }
+
+  async getGuildMemberList(guildId: string) {
+    return words.map((word) => ({
+      nickname: word,
+      userId: word,
+    }))
+  }
 }
-
-namespace SandboxBot {
-  export interface Config {}
-
-  export const Config: Schema<Config> = Schema.object({})
-}
-
-export default SandboxBot
 
 export interface Message {
   user: string
@@ -174,4 +147,37 @@ export class UserProvider extends DataService<Dict<User>> {
   async get() {
     return this.task ||= this.prepare()
   }
+}
+
+export const name = 'sandbox'
+
+export const using = ['console']
+
+export interface Config {}
+
+export const Config: Schema<Config> = Schema.object({})
+
+export function apply(ctx: Context, config: Config) {
+  ctx.plugin(SandboxBot)
+  ctx.plugin(UserProvider)
+
+  ctx.console.addEntry(process.env.KOISHI_BASE ? [
+    process.env.KOISHI_BASE + '/dist/index.js',
+    process.env.KOISHI_BASE + '/dist/style.css',
+  ] : process.env.KOISHI_ENV === 'browser' ? [
+    // @ts-ignore
+    import.meta.url.replace(/\/src\/[^/]+$/, '/client/index.ts'),
+  ] : {
+    dev: resolve(__dirname, '../client/index.ts'),
+    prod: resolve(__dirname, '../dist'),
+  })
+
+  ctx.i18n.define('zh', zh)
+
+  ctx.platform('sandbox').command('clear')
+    .action(({ session }) => {
+      session.handle.send({
+        type: 'sandbox/clear',
+      })
+    })
 }
