@@ -1,4 +1,4 @@
-import { Awaitable, coerce, Context, Dict, Logger, makeArray, Random } from 'koishi'
+import { Awaitable, coerce, Context, Dict, Logger, makeArray, Random, Service } from 'koishi'
 import { DataService } from './service'
 import NodeConsole from '../node'
 
@@ -38,9 +38,11 @@ export class SocketHandle {
   readonly id: string = Random.id()
 
   constructor(readonly ctx: Context, public socket: AbstractWebSocket) {
-    this.refresh()
-    ctx.console.handles[this.id] = this
     socket.onmessage = this.receive.bind(this)
+    ctx.on('ready', () => {
+      ctx.console.handles[this.id] = this
+      this.refresh()
+    })
   }
 
   send(payload: any) {
@@ -93,18 +95,28 @@ export interface Entry {
   prod: string | string[]
 }
 
-Context.service('console')
+export class EntryProvider extends DataService<string[]> {
+  constructor(ctx: Context) {
+    super(ctx, 'entry', { immediate: true })
+  }
 
-export abstract class Console extends DataService<string[]> {
-  readonly listeners: Dict<Listener> = {}
-  readonly handles: Dict<SocketHandle> = {}
-  readonly entries: Dict<string[]> = {}
+  async get() {
+    return this.ctx.console.get()
+  }
+}
+
+export abstract class Console extends Service {
+  readonly entries: Dict<string[]> = Object.create(null)
+  readonly listeners: Dict<Listener> = Object.create(null)
+  readonly handles: Dict<SocketHandle> = Object.create(null)
 
   constructor(public ctx: Context) {
-    super(ctx, 'entry', { immediate: true })
-    ctx.setTimeout(() => {
-      ctx.console = this as any
-    }, 0)
+    super(ctx, 'console', true)
+    ctx.plugin(EntryProvider)
+  }
+
+  async get() {
+    return Object.values(this.entries).flat()
   }
 
   abstract resolveEntry(entry: string | string[] | Entry): string | string[]
@@ -112,15 +124,11 @@ export abstract class Console extends DataService<string[]> {
   addEntry(entry: string | string[] | Entry) {
     const key = 'extension-' + Random.id()
     this.entries[key] = makeArray(this.resolveEntry(entry))
-    this.refresh()
+    this.entry.refresh()
     this.caller?.on('dispose', () => {
       delete this.entries[key]
-      this.refresh()
+      this.entry?.refresh()
     })
-  }
-
-  async get() {
-    return Object.values(this.entries).flat()
   }
 
   addListener<K extends keyof Events>(event: K, callback: Events[K], options?: DataService.Options) {
@@ -142,7 +150,7 @@ export interface Events {}
 
 export namespace Console {
   export interface Services {
-    entry: Console
+    entry: EntryProvider
   }
 }
 

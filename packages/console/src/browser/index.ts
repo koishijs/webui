@@ -1,13 +1,12 @@
-import { Context, Schema } from 'koishi'
+import { Schema } from 'koishi'
 import { Console, Entry, SocketHandle } from '../shared'
 
 export * from '../shared'
 
 class BrowserConsole extends Console {
-  constructor(public ctx: Context) {
-    super(ctx)
+  start() {
     // eslint-disable-next-line no-new
-    new SocketHandle(ctx, ctx[Symbol.for('koishi.socket')])
+    new SocketHandle(this.ctx, this.ctx[Symbol.for('koishi.socket')])
   }
 
   resolveEntry(entry: string | string[] | Entry) {

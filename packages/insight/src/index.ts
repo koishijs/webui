@@ -2,7 +2,7 @@ import { camelize, capitalize, Context, Fork, Plugin, Schema, State } from 'kois
 import { debounce } from 'throttle-debounce'
 import { DataService } from '@koishijs/plugin-console'
 import { resolve } from 'path'
-import {} from '@koishijs/cli'
+import {} from '@koishijs/loader'
 
 declare module '@koishijs/plugin-console' {
   namespace Console {
@@ -40,7 +40,7 @@ class Insight extends DataService<Insight.Payload> {
       process.env.KOISHI_BASE + '/dist/style.css',
     ] : process.env.KOISHI_ENV === 'browser' ? [
       // @ts-ignore
-      import.meta.url.replace(/\/lib\/[^/]+$/, '/client/index.ts'),
+      import.meta.url.replace(/\/src\/[^/]+$/, '/client/index.ts'),
     ] : {
       dev: resolve(__dirname, '../client/index.ts'),
       prod: resolve(__dirname, '../dist'),

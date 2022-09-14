@@ -29,6 +29,6 @@ export function apply(ctx: Context, config: Config) {
     process.env.KOISHI_BASE + '/dist/style.css',
   ] : [
     // @ts-ignore
-    import.meta.url.replace(/\/lib\/[^/]+\/[^/]+$/, '/client/index.ts'),
+    import.meta.url.replace(/\/src\/[^/]+\/[^/]+$/, '/client/index.ts'),
   ])
 }

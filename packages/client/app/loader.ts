@@ -24,13 +24,10 @@ class BackWebSocket extends StubWebSocket {
   private async start() {
     const tasks: [
       Promise<typeof import('@koishijs/loader')>,
-      Promise<typeof import('koishi')>,
     ] = [
       import(/* @vite-ignore */ config.endpoint + '/modules/@koishijs/loader/index.js'),
-      import(/* @vite-ignore */ config.endpoint + '/modules/koishi/index.js'),
     ]
-    const [{ default: Loader }, { Context }] = await Promise.all(tasks)
-    Context.service('console')
+    const [{ default: Loader }] = await Promise.all(tasks)
     const loader = new Loader(config.endpoint)
     loader.config.plugins = {
       'console': {},
@@ -40,7 +37,7 @@ class BackWebSocket extends StubWebSocket {
       'sandbox': {},
       'market': {},
       'suggest': {},
-      // 'repeater': {},
+      'repeater': {},
       // 'hangman': {},
     }
     this.app = await loader.createApp()

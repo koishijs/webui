@@ -3,6 +3,7 @@ import { readFile, stat } from 'fs/promises'
 import { extname, resolve } from 'path'
 import { ViteDevServer } from 'vite'
 import { noop } from '@koishijs/utils'
+import yaml from '@rollup/plugin-yaml'
 import Koa from 'koa'
 import Router from '@koa/router'
 
@@ -43,27 +44,23 @@ router.get(uiPath + '(/.+)*', async (ctx, next) => {
   ctx.body = await transformHtml(template)
 })
 
-export function locateEntry(meta) {
-  if (typeof meta.exports === 'string') {
-    return meta.exports
-  } else if (meta.exports) {
-    const entry = meta.exports['.']
-    if (typeof entry === 'string') {
-      return entry
-    } else {
-      const result = entry.browser || entry.import || entry.default
-      if (typeof result === 'string') return result
-    }
-  }
-  return meta.module
+const browserEntries = {
+  '@koishijs/loader': '../src/browser.ts',
+  '@koishijs/plugin-console': '../src/browser/index.ts',
+  '@koishijs/plugin-market': '../src/browser/index.ts',
 }
 
 router.get('/modules(/.+)+/index.js', async (ctx) => {
   let name = ctx.params[0].slice(1)
   if (name === 'koishi') name = '@koishijs/core'
-  const meta = require(name + '/package.json')
-  const entry = resolve(require.resolve(name + '/package.json'), '..', locateEntry(meta))
-  ctx.redirect(`/vite/@fs${entry}`)
+  try {
+    const entry = resolve(require.resolve(name + '/package.json'), browserEntries[name] || '../src/index.ts')
+    ctx.redirect(`/vite/@fs${entry}`)
+    console.log(entry)
+  } catch {
+    ctx.body = 'throw new Error()'
+    ctx.type = '.js'
+  }
 })
 
 async function transformHtml(template: string) {
@@ -91,11 +88,14 @@ async function createVite() {
         strict: false,
       },
     },
-    plugins: [vue()],
+    plugins: [vue(), yaml()],
     resolve: {
+      extensions: ['.ts', '.js', '.json', '.yml', '.yaml'],
       dedupe: ['vue'],
       alias: {
-        'koishi': '@koishijs/core/lib/index.mjs',
+        'koishi': '@koishijs/core/src/index.ts',
+        '@koishijs/loader': '@koishijs/loader/src/browser.ts',
+        '@koishijs/plugin-console': '@koishijs/plugin-console/src/browser/index.ts',
         'path': 'rollup-plugin-node-polyfills/polyfills/path',
       },
     },
