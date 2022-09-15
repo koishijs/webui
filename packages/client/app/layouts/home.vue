@@ -2,6 +2,7 @@
   <k-layout main="darker" class="page-home">
     <el-scrollbar>
       <welcome></welcome>
+      <k-slot name="home"></k-slot>
       <k-slot name="numeric" class="card-grid profile-grid"></k-slot>
       <k-slot name="chart" class="card-grid chart-grid"></k-slot>
     </el-scrollbar>

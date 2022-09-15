@@ -1,6 +1,8 @@
 import type { AbstractWebSocket } from '@koishijs/plugin-console'
 import type { Context } from 'koishi'
-import { config } from '@koishijs/client'
+import { root } from '@koishijs/client'
+import { activate, data, getLoader } from './utils'
+import Instances from './index.vue'
 
 class StubWebSocket implements AbstractWebSocket {
   remote: StubWebSocket
@@ -22,27 +24,9 @@ class BackWebSocket extends StubWebSocket {
   }
 
   private async start() {
-    const tasks: [
-      Promise<typeof import('@koishijs/loader')>,
-    ] = [
-      import(/* @vite-ignore */ config.endpoint + '/modules/@koishijs/loader/index.js'),
-    ]
-    const [{ default: Loader }] = await Promise.all(tasks)
-    const loader = new Loader(config.endpoint)
-    loader.config.plugins = {
-      'console': {},
-      'echo': {},
-      'insight': {},
-      'help': {},
-      'sandbox': {},
-      'market': {},
-      'suggest': {},
-      'repeater': {},
-      // 'hangman': {},
-    }
-    this.app = await loader.createApp()
-    this.app[Symbol.for('koishi.socket')] = this
-    await this.app.start()
+    const loader = await getLoader()
+    loader[Symbol.for('koishi.socket')] = this
+    await activate(data.value.current)
   }
 }
 
@@ -52,5 +36,11 @@ export default class FrontWebSocket extends StubWebSocket {
   constructor() {
     super()
     this.onopen({})
+
+    root.slot({
+      type: 'home',
+      order: 900,
+      component: Instances,
+    })
   }
 }

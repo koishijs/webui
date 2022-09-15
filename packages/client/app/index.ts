@@ -2,7 +2,7 @@ import { createApp } from 'vue'
 import client, { config, connect, root, router } from '@koishijs/client'
 import App from './layouts/index.vue'
 import Home from './layouts/home.vue'
-import FrontWebSocket from './loader'
+import FrontWebSocket from './play'
 
 import './index.scss'
 
@@ -12,8 +12,6 @@ app.use(client)
 
 app.provide('ecTheme', 'dark-blue')
 
-app.use(router)
-
 root.page({
   path: '/',
   name: '欢迎',
@@ -21,6 +19,8 @@ root.page({
   order: 1000,
   component: Home,
 })
+
+app.use(router)
 
 router.afterEach((route) => {
   if (typeof route.name === 'string') {

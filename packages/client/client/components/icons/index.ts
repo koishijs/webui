@@ -11,6 +11,7 @@ import ChevronLeft from './svg/chevron-left.vue'
 import ChevronRight from './svg/chevron-right.vue'
 import ChevronUp from './svg/chevron-up.vue'
 import ClipboardList from './svg/clipboard-list.vue'
+import Delete from './svg/delete.vue'
 import Edit from './svg/edit.vue'
 import ExclamationFull from './svg/exclamation-full.vue'
 import Expand from './svg/expand.vue'
@@ -29,6 +30,7 @@ import SearchMinus from './svg/search-minus.vue'
 import SearchPlus from './svg/search-plus.vue'
 import StarEmpty from './svg/star-empty.vue'
 import StarFull from './svg/star-full.vue'
+import Start from './svg/start.vue'
 import Tag from './svg/tag.vue'
 import TimesFull from './svg/times-full.vue'
 import Tools from './svg/tools.vue'
@@ -51,6 +53,7 @@ register('chevron-left', ChevronLeft)
 register('chevron-right', ChevronRight)
 register('chevron-up', ChevronUp)
 register('clipboard-list', ClipboardList)
+register('delete', Delete)
 register('edit', Edit)
 register('exclamation-full', ExclamationFull)
 register('expand', Expand)
@@ -72,6 +75,7 @@ register('search-minus', SearchMinus)
 register('search-plus', SearchPlus)
 register('star-empty', StarEmpty)
 register('star-full', StarFull)
+register('start', Start)
 register('tag', Tag)
 register('times-full', TimesFull)
 register('tools', Tools)
