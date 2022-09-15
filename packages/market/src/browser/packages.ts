@@ -1,5 +1,4 @@
 import { Context, pick } from 'koishi'
-import { unwrapExports } from '@koishijs/loader'
 import { PackageProvider as BasePackageProvider } from '../shared'
 
 export default class PackageProvider extends BasePackageProvider {
@@ -27,7 +26,7 @@ export default class PackageProvider extends BasePackageProvider {
       result.manifest = data.manifest
       result.peerDependencies = { ...data.versions[data.version].peerDependencies }
       if (!result.portable) return
-      const exports = unwrapExports(await import(/* @vite-ignore */ `https://registry.koishi.chat/modules/${data.name}/index.js`))
+      const exports = await this.ctx.loader.resolvePlugin(data.shortname)
       result.schema = exports?.Config || exports?.schema
       const runtime = this.ctx.registry.get(exports)
       if (runtime) this.parseRuntime(runtime, result)

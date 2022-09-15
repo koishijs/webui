@@ -56,7 +56,6 @@ router.get('/modules(/.+)+/index.js', async (ctx) => {
   try {
     const entry = resolve(require.resolve(name + '/package.json'), browserEntries[name] || '../src/index.ts')
     ctx.redirect(`/vite/@fs${entry}`)
-    console.log(entry)
   } catch {
     ctx.body = 'throw new Error()'
     ctx.type = '.js'
