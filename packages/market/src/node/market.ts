@@ -1,11 +1,11 @@
 import { Context, Dict, pick, Schema, Time, valueMap } from 'koishi'
 import Scanner, { AnalyzedPackage, SearchResult } from '@koishijs/registry'
 import { MarketProvider as BaseMarketProvider } from '../shared'
+import { throttle } from 'throttle-debounce'
 
 class MarketProvider extends BaseMarketProvider {
   static using = ['console.dependencies']
 
-  private timestamp = 0
   private failed: string[] = []
   private scanner: Scanner
   private fullCache: Dict<AnalyzedPackage> = {}
@@ -24,10 +24,11 @@ class MarketProvider extends BaseMarketProvider {
     this.refresh()
   }
 
-  flushData() {
-    const now = Date.now()
-    if (now - this.timestamp < 500) return
-    this.timestamp = now
+  stop() {
+    this.flushData.cancel()
+  }
+
+  flushData = throttle(500, () => {
     this.ctx.console.broadcast('market/patch', {
       data: this.tempCache,
       failed: this.failed.length,
@@ -35,7 +36,7 @@ class MarketProvider extends BaseMarketProvider {
       progress: this.scanner.progress,
     })
     this.tempCache = {}
-  }
+  })
 
   async collect() {
     const { endpoint, timeout } = this.config
@@ -74,7 +75,7 @@ class MarketProvider extends BaseMarketProvider {
       failed: this.failed.length,
       total: this.scanner.total,
       progress: this.scanner.progress,
-      gtavatar: process.env.GRAVATAR_MIRROR,
+      gravatar: process.env.GRAVATAR_MIRROR,
     }
   }
 }

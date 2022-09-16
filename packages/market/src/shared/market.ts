@@ -41,6 +41,6 @@ export namespace MarketProvider {
     total: number
     failed: number
     progress: number
-    gtavatar?: string
+    gravatar?: string
   }
 }
