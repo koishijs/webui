@@ -43,10 +43,10 @@
 
 <script setup lang="ts">
 
-import { router, store, global, send } from '@koishijs/client'
+import { router, store, global } from '@koishijs/client'
 import { computed, reactive, watch } from 'vue'
 import { useRoute } from 'vue-router'
-import { config } from '../utils'
+import { config, menu } from '../utils'
 import { validate } from './utils'
 import PackageView from './package.vue'
 
@@ -102,13 +102,6 @@ const objects = computed(() => {
       : config.showInstalled || !store.packages[item.name])
     .sort((a, b) => (global.static ? +b.portable - +a.portable : 0) || b.score.final - a.score.final)
 })
-
-const menu = computed(() => [{
-  icon: 'refresh',
-  label: '刷新',
-  type: !store.market || store.market.progress < store.market.total ? 'spin disabled' : '',
-  action: () => send('market/refresh'),
-}])
 
 </script>
 

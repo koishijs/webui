@@ -1,6 +1,11 @@
 import { MarketProvider as BaseMarketProvider } from '../shared'
 
 export default class MarketProvider extends BaseMarketProvider {
+  start() {
+    super.start()
+    this.refresh()
+  }
+
   async collect() {
     const response = await fetch('https://registry.koishi.chat/market.json')
     return await response.json()

@@ -22,7 +22,6 @@ export abstract class MarketProvider extends DataService<MarketProvider.Payload>
 
   start() {
     this._task = null
-    this.refresh()
   }
 
   abstract collect(): Promise<any>

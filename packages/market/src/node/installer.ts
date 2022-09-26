@@ -57,10 +57,14 @@ class Installer extends DataService<Dict<Dependency>> {
     return this.ctx.app.baseDir
   }
 
-  async start() {
+  async prepare() {
     const { endpoint, timeout } = this.config
     this.registry = endpoint || await getRegistry()
     this.http = this.ctx.http.extend({ endpoint: this.registry, timeout })
+  }
+
+  async start() {
+    await this.prepare()
   }
 
   private async _get() {

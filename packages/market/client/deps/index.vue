@@ -1,5 +1,5 @@
 <template>
-  <k-layout main="page-deps">
+  <k-layout main="page-deps" :menu="menu">
     <div class="controls">
       <el-checkbox v-model="config.hideWorkspace">忽略工作区依赖</el-checkbox>
     </div>
@@ -42,7 +42,7 @@
 
 import { computed } from 'vue'
 import { store } from '@koishijs/client'
-import { config } from '../utils'
+import { config, menu } from '../utils'
 import PackageView from './package.vue'
 
 const names = computed(() => {

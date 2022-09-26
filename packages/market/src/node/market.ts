@@ -20,6 +20,7 @@ class MarketProvider extends BaseMarketProvider {
     this.failed = []
     this.fullCache = {}
     this.tempCache = {}
+    this.ctx.console.dependencies.refresh()
     await this.prepare()
     this.refresh()
   }

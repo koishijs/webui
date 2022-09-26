@@ -1,5 +1,5 @@
-import { ref } from 'vue'
-import { createStorage, store } from '@koishijs/client'
+import { computed, ref } from 'vue'
+import { createStorage, send, store } from '@koishijs/client'
 
 interface ManagerConfig {
   prefix: string
@@ -22,3 +22,10 @@ export const getMixedMeta = (name: string) => ({
   ...store.market.data[name],
   ...store.packages?.[name],
 })
+
+export const menu = computed(() => [{
+  icon: 'refresh',
+  label: '刷新',
+  type: !store.market || store.market.progress < store.market.total ? 'spin disabled' : '',
+  action: () => send('market/refresh'),
+}])

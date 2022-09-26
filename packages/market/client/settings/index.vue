@@ -133,8 +133,8 @@ const menu = computed(() => {
     icon: 'add-plugin',
     label: '添加插件',
     disabled: isPlugin,
-    action: () => showSelect.value = true,
-    // addItem(current.value.path, 'unload', '')
+    // action: () => showSelect.value = true,
+    action: () => addItem(current.value.path, 'unload', '')
   }, {
     icon: 'add-group',
     label: '添加分组',
