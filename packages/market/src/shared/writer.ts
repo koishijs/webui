@@ -115,6 +115,7 @@ export class ConfigWriter extends DataService<Context.Config> {
 
   private resolve(path: string) {
     const segments = splitPath(path)
+    if (path.endsWith('/')) segments.push('')
     let ctx = this.loader.entry
     let name = segments.shift()
     while (segments.length) {
