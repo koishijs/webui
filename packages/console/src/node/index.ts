@@ -137,7 +137,7 @@ class NodeConsole extends Console {
       },
       plugins: [vue()],
       resolve: {
-        dedupe: ['vue'],
+        dedupe: ['vue', 'vue-router', 'element-plus'],
         alias: {
           '../client.js': '@koishijs/client',
           '../vue.js': 'vue',
@@ -147,7 +147,8 @@ class NodeConsole extends Console {
       },
       optimizeDeps: {
         include: [
-          'schemastery',
+          'vue',
+          'vue-router',
           'element-plus',
         ],
       },
