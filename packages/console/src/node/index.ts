@@ -16,6 +16,7 @@ interface ClientConfig {
 
 class NodeConsole extends Console {
   private vite: ViteDevServer
+  public root: string
   public global = {} as ClientConfig
   readonly layer: WebSocketLayer
 
@@ -32,7 +33,7 @@ class NodeConsole extends Console {
       new SocketHandle(ctx, socket)
     })
 
-    config.root ||= config.devMode
+    this.root = config.root || config.devMode
       ? resolve(require.resolve('@koishijs/client/package.json'), '../app')
       : resolve(__dirname, '../../dist')
   }
@@ -74,7 +75,7 @@ class NodeConsole extends Console {
   }
 
   private serveAssets() {
-    const { uiPath, root } = this.config
+    const { uiPath } = this.config
 
     this.ctx.router.get(uiPath + '(/.+)*', async (ctx, next) => {
       await next()
@@ -94,15 +95,15 @@ class NodeConsole extends Console {
         // FIXME
         if (this.entries[key]) return sendFile(this.entries[key][0] + name.slice(18))
       }
-      const filename = resolve(root, name)
-      if (!filename.startsWith(root) && !filename.includes('node_modules')) {
+      const filename = resolve(this.root, name)
+      if (!filename.startsWith(this.root) && !filename.includes('node_modules')) {
         return ctx.status = 403
       }
       const stats = await fsp.stat(filename).catch<Stats>(noop)
       if (stats?.isFile()) return sendFile(filename)
       const ext = extname(filename)
       if (ext && ext !== '.html') return ctx.status = 404
-      const template = await fsp.readFile(resolve(root, 'index.html'), 'utf8')
+      const template = await fsp.readFile(resolve(this.root, 'index.html'), 'utf8')
       ctx.type = 'html'
       ctx.body = await this.transformHtml(template)
     })
@@ -120,12 +121,12 @@ class NodeConsole extends Console {
   }
 
   private async createVite() {
-    const { root, cacheDir } = this.config
+    const { cacheDir } = this.config
     const { createServer } = require('vite') as typeof import('vite')
     const { default: vue } = require('@vitejs/plugin-vue') as typeof import('@vitejs/plugin-vue')
 
     this.vite = await createServer({
-      root,
+      root: this.root,
       base: '/vite/',
       cacheDir: resolve(this.ctx.baseDir, cacheDir),
       server: {
@@ -152,7 +153,7 @@ class NodeConsole extends Console {
       },
       build: {
         rollupOptions: {
-          input: this.config.root + '/index.html',
+          input: this.root + '/index.html',
         },
       },
     })
@@ -181,6 +182,7 @@ namespace NodeConsole {
   }
 
   export const Config: Schema<Config> = Schema.object({
+    root: Schema.string().description('前端页面的根目录。').hidden(),
     uiPath: Schema.string().description('前端页面呈现的路径。').default(''),
     apiPath: Schema.string().description('后端 API 服务的路径。').default('/status'),
     selfUrl: Schema.string().description('Koishi 服务暴露在公网的地址。').role('link').default(''),
