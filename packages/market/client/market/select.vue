@@ -1,5 +1,5 @@
 <template>
-  <el-dialog v-model="showSelect" custom-class="plugin-select" :title="width <= 768 ? categories[active] : '选择插件'">
+  <el-dialog v-model="showSelect" class="plugin-select" :title="width <= 768 ? categories[active] : '选择插件'">
     <div class="tabs">
       <span class="tab-item" v-for="(text, key) in categories" :key="key" @click.stop="active = key" :class="{ active: active === key }">
         <k-icon :name="'category:' + (key || 'other')"></k-icon>

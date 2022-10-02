@@ -52,12 +52,12 @@
     }
   },
   "peerDependencies": {
-    "@koishijs/plugin-console": "^4.6.2",
-    "koishi": "^4.9.1"
+    "@koishijs/plugin-console": "^4.6.4",
+    "koishi": "^4.9.3"
   },
   "devDependencies": {
-    "@koishijs/client": "^4.6.2",
-    "@koishijs/loader": "^2.0.9",
+    "@koishijs/client": "^4.6.4",
+    "@koishijs/loader": "^2.1.0",
     "@types/d3-force": "^3.0.3",
     "@types/throttle-debounce": "^2.1.0"
   },

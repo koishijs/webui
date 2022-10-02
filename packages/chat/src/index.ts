@@ -2,6 +2,7 @@ import { Context, Logger, Quester, Schema, segment } from 'koishi'
 import { resolve } from 'path'
 import receiver, { Message, RefreshConfig } from './receiver'
 import {} from '@koishijs/plugin-console'
+import zh from './locales/zh.yml'
 import internal from 'stream'
 
 export * from './receiver'
@@ -61,7 +62,7 @@ export const Config: Schema<Config> = Schema.object({
 const logger = new Logger('message')
 
 export function apply(ctx: Context, options: Config = {}) {
-  ctx.i18n.define('zh', require('./locales/zh'))
+  ctx.i18n.define('zh', zh)
 
   options = { ...defaultOptions, ...options }
   ctx.plugin(receiver, options.refresh)
