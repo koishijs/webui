@@ -43,7 +43,7 @@ class NodeConsole extends Console {
     this.serveAssets()
 
     if (this.config.open && !process.env.KOISHI_AGENT) {
-      const { host, port } = this.ctx.app.options
+      const { host, port } = this.ctx.root.config
       open(`http://${host || 'localhost'}:${port}${this.config.uiPath}`)
     }
   }
@@ -137,7 +137,7 @@ class NodeConsole extends Console {
       },
       plugins: [vue()],
       resolve: {
-        dedupe: ['vue', 'vue-router', 'element-plus'],
+        dedupe: ['vue', 'vue-router', 'element-plus', '@vueuse/core', '@popperjs/core'],
         alias: {
           '../client.js': '@koishijs/client',
           '../vue.js': 'vue',
@@ -150,6 +150,8 @@ class NodeConsole extends Console {
           'vue',
           'vue-router',
           'element-plus',
+          '@vueuse/core',
+          '@popperjs/core',
         ],
       },
       build: {
