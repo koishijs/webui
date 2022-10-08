@@ -63,15 +63,41 @@ class SandboxBot extends Bot {
     }, { authority: 4 })
   }
 
-  async sendMessage(channel: string, content: string) {
-    content = segment.transform(content.toString(), {
-      image(data) {
-        if (!data.url.startsWith('base64://')) return segment('image', data)
-        return segment.image('data:image/png;base64,' + data.url.slice(9))
-      },
-    })
-    this.ctx.console.broadcast('sandbox', { content, user: 'Koishi', channel })
-    return [Random.id()]
+  async sendMessage(channel: string, content: string | segment) {
+    const elements = segment.normalize(content).children
+    const ids: string[] = []
+    const render = (elements: segment[]) => {
+      let buffer = ''
+      const flush = () => {
+        if (!buffer.trim()) return
+        content = segment.transform(buffer.trim(), {
+          image(data) {
+            if (!data.url.startsWith('base64://')) return segment('image', data)
+            return segment.image('data:image/png;base64,' + data.url.slice(9))
+          },
+        })
+        this.ctx.console.broadcast('sandbox', { content, user: 'Koishi', channel })
+        ids.push(Random.id())
+        buffer = ''
+      }
+
+      for (const element of elements) {
+        const { type, attrs, children } = element
+        if (type === 'message') {
+          flush()
+          if ('quote' in attrs) {
+            buffer += element.toString()
+          } else {
+            render(children)
+          }
+        } else {
+          buffer += element.toString()
+        }
+      }
+      flush()
+    }
+    render(elements)
+    return ids
   }
 
   async getGuildMemberList(guildId: string) {
