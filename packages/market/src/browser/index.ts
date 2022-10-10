@@ -2,7 +2,7 @@ import { Context, Schema } from 'koishi'
 import Installer from './installer'
 import MarketProvider from './market'
 import PackageProvider from './packages'
-import { ConfigWriter } from '../shared'
+import { ConfigWriter, ServiceProvider } from '../shared'
 
 export * from './installer'
 export * from './market'
@@ -27,6 +27,7 @@ export function apply(ctx: Context, config: Config) {
   ctx.plugin(MarketProvider)
   ctx.plugin(PackageProvider)
   ctx.plugin(ConfigWriter)
+  ctx.plugin(ServiceProvider)
 
   ctx.console.addEntry(process.env.KOISHI_BASE ? [
     process.env.KOISHI_BASE + '/dist/index.js',

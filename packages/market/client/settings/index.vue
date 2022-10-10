@@ -93,7 +93,7 @@ const type = computed(() => {
   if (!env) return
   if (env.warning && current.value.disabled) return 'warning'
   for (const name in env.using) {
-    if (current.value.parent.config.$deps[name]) {
+    if (store.services?.[name]) {
       if (env.impl.includes(name)) return 'warning'
     } else {
       if (env.using[name].required) return 'warning'

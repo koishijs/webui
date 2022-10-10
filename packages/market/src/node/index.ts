@@ -3,7 +3,7 @@ import { resolve } from 'path'
 import Installer from './installer'
 import MarketProvider from './market'
 import PackageProvider from './packages'
-import { ConfigWriter } from '../shared'
+import { ConfigWriter, ServiceProvider } from '../shared'
 
 export * from '../shared'
 
@@ -40,6 +40,7 @@ export function apply(ctx: Context, config: Config) {
   ctx.plugin(Installer, config.registry)
   ctx.plugin(MarketProvider, config.search)
   ctx.plugin(PackageProvider)
+  ctx.plugin(ServiceProvider)
   ctx.plugin(ConfigWriter)
 
   ctx.console.addEntry({

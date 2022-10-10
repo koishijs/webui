@@ -1,18 +1,4 @@
 <template>
-  <div class="k-form" v-if="current.config.$isolate?.length">
-    <h2>隔离服务</h2>
-    <ul>
-      <li v-for="name in current.config.$isolate">
-        {{ name }} ({{ current.config.$deps[name] ? '已' : '未' }}实现)
-      </li>
-    </ul>
-  </div>
-  <!-- <k-form
-    v-if="Object.keys(current.config.$deps).length"
-    :schema="services.schema"
-    :initial="services.initial"
-    v-model="services.value"
-  ></k-form> -->
   <div class="k-form" v-if="Object.keys(current.config.$filter || {}).length">
     <h2>过滤器</h2>
     <ul>
@@ -26,9 +12,8 @@
 <script lang="ts" setup>
 
 import { Schema, clone } from '@koishijs/client'
-import { computed, ref, watch } from 'vue'
-import { Tree, removeItem, addItem } from './utils'
-import KAlias from './alias.vue'
+import { ref, watch } from 'vue'
+import { Tree } from './utils'
 
 const props = defineProps<{
   current: Tree
@@ -40,13 +25,6 @@ const config = ref()
 watch(() => props.current.config, (value) => {
   config.value = clone(value)
 }, { immediate: true })
-
-const services = computed(() => {
-  const { $deps } = props.current.config
-  return Schema.object(Object.fromEntries(Object.keys($deps).map(key => {
-    return [key, Schema.boolean()]
-  }))).description('隔离服务')
-})
 
 const filter = Schema.object({
   user: Schema.array(String).description('用户列表'),

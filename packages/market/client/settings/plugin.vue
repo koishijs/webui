@@ -75,7 +75,15 @@ const config = computed({
   set: value => emit('update:modelValue', value),
 })
 
-const deps = computed(() => props.current.parent.config.$deps)
+const deps = computed(() => {
+  if (!local.value) return {}
+  const { required, optional, implements: impl } = local.value.manifest.service
+  const deps = {}
+  for (const name of [...required, ...optional, ...impl]) {
+    deps[name] = store.services?.[name]
+  }
+  return deps
+})
 
 const name = computed(() => {
   const { label, target } = props.current

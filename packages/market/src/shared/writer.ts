@@ -69,9 +69,8 @@ export class ConfigWriter extends DataService<Context.Config> {
     ctx.on('config', () => this.refresh())
   }
 
-  async getGroup(plugins: any, ctx: Context) {
+  getGroup(plugins: any, ctx: Context) {
     const result = { ...plugins }
-    result.$deps = {}
     for (const key in plugins) {
       if (key.startsWith('$')) continue
       const value = plugins[key]
@@ -80,29 +79,15 @@ export class ConfigWriter extends DataService<Context.Config> {
       // handle plugin groups
       if (name === 'group') {
         const fork = ctx.state[Loader.kRecord][key]
-        result[key] = await this.getGroup(value, fork.ctx)
-        for (const name in result[key].$deps) {
-          if (result[key].$isolate?.includes(name)) continue
-          result.$deps[name] ??= result[key].$deps[name]
-        }
-        continue
+        result[key] = this.getGroup(value, fork.ctx)
       }
-
-      // handle ordinary plugins
-      try {
-        const manifest = await this.ctx.console.packages.getManifest(name)
-        const { required, optional, implements: impl } = manifest.service
-        for (const name of [...required, ...optional, ...impl]) {
-          result.$deps[name] ??= ctx[name]?.[Context.source]?.state.uid ?? 0
-        }
-      } catch (err) {}
     }
     return result
   }
 
   async get() {
     const result = { ...this.loader.config }
-    result.plugins = await this.getGroup(result.plugins, this.loader.entry)
+    result.plugins = this.getGroup(result.plugins, this.loader.entry)
     return result
   }
 
