@@ -152,6 +152,13 @@ class NodeConsole extends Console {
           'element-plus',
           '@vueuse/core',
           '@popperjs/core',
+          // insight
+          'd3-force',
+          // market
+          'semver',
+          'spark-md5',
+          // logger
+          'ansi_up',
         ],
       },
       build: {

@@ -50,7 +50,7 @@ import GroupSettings from './group.vue'
 import TreeView from './tree.vue'
 import PluginSettings from './plugin.vue'
 import KAlias from './alias.vue'
-import { clone, send, store } from '@koishijs/client'
+import { clone, message, send, store } from '@koishijs/client'
 import { showSelect } from '../utils'
 
 const route = useRoute()
@@ -110,17 +110,21 @@ const menu = computed(() => {
     icon: isDisabled ? 'play' : 'stop',
     label: isDisabled ? '启用插件' : '停用插件',
     disabled: !isPlugin || !name.value,
-    action: () => execute(isDisabled ? 'reload' : 'unload'),
+    action: async () => {
+      await execute(isDisabled ? 'reload' : 'unload')
+      message.success(isDisabled ? '插件已启用。' : '插件已停用。')
+    },
   }, {
     type: isDisabled ? type.value : '',
     icon: isDisabled ? 'save' : 'check',
     label: isDisabled ? '保存配置' : '重载配置',
     disabled: isGroup || !isGlobal && !name.value,
-    action: () => {
+    async action() {
       if (isGlobal) {
         send('manager/app-reload', config.value)
       } else {
-        execute(isDisabled ? 'unload' : 'reload')
+        await execute(isDisabled ? 'unload' : 'reload')
+        message.success(isDisabled ? '配置已保存。' : '配置已重载。')
       }
     },
   }, {
@@ -143,8 +147,8 @@ const menu = computed(() => {
   }]
 })
 
-function execute(event: 'unload' | 'reload') {
-  send(`manager/${event}`, current.value.path, config.value, current.value.target)
+async function execute(event: 'unload' | 'reload') {
+  await send(`manager/${event}`, current.value.path, config.value, current.value.target)
   if (current.value.target) {
     const segments = splitPath(current.value.path)
     segments[segments.length - 1] = current.value.target

@@ -158,12 +158,12 @@ export class ConfigWriter extends DataService<Context.Config> {
     this.loader.writeConfig()
   }
 
-  reload(path: string, config: any, newKey?: string) {
+  async reload(path: string, config: any, newKey?: string) {
     const [parent, oldKey] = this.resolve(path)
     if (newKey) {
       this.loader.unloadPlugin(parent.ctx, oldKey)
     }
-    this.loader.reloadPlugin(parent.ctx, newKey || oldKey, config)
+    await this.loader.reloadPlugin(parent.ctx, newKey || oldKey, config)
     rename(parent.config, oldKey, newKey || oldKey, config)
     this.loader.writeConfig()
     this.refresh()
@@ -186,10 +186,10 @@ export class ConfigWriter extends DataService<Context.Config> {
     this.refresh()
   }
 
-  group(path: string) {
+  async group(path: string) {
     const [parent, oldKey] = this.resolve(path)
     const config = parent.config[oldKey] = {}
-    this.loader.reloadPlugin(parent.ctx, oldKey, config)
+    await this.loader.reloadPlugin(parent.ctx, oldKey, config)
     this.loader.writeConfig()
     this.refresh()
   }
