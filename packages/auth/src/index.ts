@@ -23,7 +23,7 @@ declare module '@koishijs/plugin-console' {
   }
 
   interface Events {
-    'login/platform'(this: SocketHandle, platform: string, userId: string): Awaitable<UserLogin>
+    'login/platform'(this: SocketHandle, platform: string, userId: string, merge: boolean): Awaitable<UserLogin>
     'login/password'(this: SocketHandle, name: string, password: string): void
     'login/token'(this: SocketHandle, id: string, token: string): void
     'user/update'(this: SocketHandle, data: UserUpdate): void
@@ -65,7 +65,7 @@ class AuthService extends DataService<UserAuth> {
 
   initLogin() {
     const { ctx, config } = this
-    const states: Record<string, [string, number, SocketHandle]> = {}
+    const states: Record<string, [string, number, SocketHandle, boolean]> = {}
 
     ctx.console.addListener('login/password', async function (name, password) {
       const user = await ctx.database.getUser('name', name, ['password', ...authFields])
@@ -85,39 +85,40 @@ class AuthService extends DataService<UserAuth> {
       setAuthUser(this, user)
     })
 
-    ctx.console.addListener('login/platform', async function (platform, userId) {
+    ctx.console.addListener('login/platform', async function (platform, userId, merge) {
       const user = await ctx.database.getUser(platform, userId, ['name'])
       if (!user) throw new Error('找不到此账户。')
       const id = `${platform}:${userId}`
       const token = v4()
       const expire = Date.now() + config.loginTokenExpire
-      states[id] = [token, expire, this]
+      states[id] = [token, expire, this, merge]
 
       const listener = () => {
         delete states[id]
         dispose()
-        this.socket.onclose = () => {}
+        this.socket.removeEventListener('close', dispose)
       }
       const dispose = ctx.setTimeout(() => {
         if (states[id]?.[1] >= Date.now()) listener()
       }, config.loginTokenExpire)
-      this.socket.onclose = listener
+      this.socket.addEventListener('close', listener)
 
       return { id: user.id, name: user.name, token, expire }
     })
 
     ctx.any().private().middleware(async (session, next) => {
       const state = states[session.uid]
-      if (state && state[0] === session.content) {
-        const user = await session.observeUser(authFields)
-        if (!user.expire || user.expire < Date.now()) {
-          user.token = v4()
-          user.expire = Date.now() + config.authTokenExpire
-          await user.$update()
-        }
-        return setAuthUser(state[2], user)
+      if (!state || state[0] !== session.content.trim()) {
+        return next()
       }
-      return next()
+
+      const user = await session.observeUser(authFields)
+      if (!user.expire || user.expire < Date.now()) {
+        user.token = v4()
+        user.expire = Date.now() + config.authTokenExpire
+        await user.$update()
+      }
+      return setAuthUser(state[2], user)
     }, true)
 
     ctx.on('console/intercept', (handle, listener) => {

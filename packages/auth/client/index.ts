@@ -8,6 +8,7 @@ import Lock from './icons/lock.vue'
 import SignIn from './icons/sign-in.vue'
 import SignOut from './icons/sign-out.vue'
 import UserFull from './icons/user-full.vue'
+import BindDialog from './bind-dialog.vue'
 
 icons.register('at', At)
 icons.register('check', Check)
@@ -52,5 +53,10 @@ export default (ctx: Context) => {
     fields: ['user'],
     position: () => store.user ? 'bottom' : 'hidden',
     component: Profile,
+  })
+
+  ctx.slot({
+    type: 'global',
+    component: BindDialog,
   })
 }

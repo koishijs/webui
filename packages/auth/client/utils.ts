@@ -1,4 +1,4 @@
-import { watch } from 'vue'
+import { ref, watch } from 'vue'
 import { createStorage, message, router, store } from '@koishijs/client'
 import { UserAuth } from '@koishijs/plugin-auth'
 
@@ -13,6 +13,8 @@ interface AuthConfig extends Partial<UserAuth> {
 export const config = createStorage<AuthConfig>('auth', 1, () => ({
   authType: 0,
 }))
+
+export const showDialog = ref(false)
 
 watch(() => store.user, (value) => {
   if (!value) {

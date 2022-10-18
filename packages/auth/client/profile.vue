@@ -1,7 +1,11 @@
 <template>
   <k-layout main="page-profile" :menu="menu">
     <k-content>
-      <k-form :schema="schema" v-model="diff" :show-header="false"></k-form>
+      <k-form :schema="schema" v-model="diff"></k-form>
+      <h2 class="k-schema-header">
+        平台账户绑定
+        <el-button solid @click="showDialog = true">添加</el-button>
+      </h2>
     </k-content>
   </k-layout>
 </template>
@@ -9,7 +13,7 @@
 <script lang="ts" setup>
 
 import { send, store } from '@koishijs/client'
-import { sha256, config } from './utils'
+import { sha256, config, showDialog } from './utils'
 import { computed, ref } from 'vue'
 import { message, Schema } from '@koishijs/client'
 import { UserUpdate } from '@koishijs/plugin-auth'
