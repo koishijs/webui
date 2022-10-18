@@ -1,11 +1,8 @@
 <template>
-  <k-layout main="page-profile">
-    <h1>
-      基本资料
-      <k-button class="float-right" solid type="error" @click="logout">退出登录</k-button>
-      <k-button class="float-right" solid :disabled="!Object.keys(diff).length" @click="update">应用更改</k-button>
-    </h1>
-    <k-form :schema="schema" v-model="diff" :show-header="false"></k-form>
+  <k-layout main="page-profile" :menu="menu">
+    <k-content>
+      <k-form :schema="schema" v-model="diff" :show-header="false"></k-form>
+    </k-content>
   </k-layout>
 </template>
 
@@ -22,7 +19,7 @@ const diff = ref<UserUpdate>({})
 const schema = computed(() => {
   const result: Schema<UserUpdate> = Schema.object({
     name: Schema.string().description('用户名').default(config.name),
-  })
+  }).description('基本资料')
   if (isSecureContext) {
     result.dict.password = Schema.string().role('secret').description('密码').default(config.password)
   }
@@ -52,14 +49,23 @@ async function update() {
   }
 }
 
+const menu = computed(() => [{
+  icon: 'check',
+  label: '应用更改',
+  disabled: !diff.value || !Object.keys(diff.value).length,
+  action: update,
+}, {
+  type: 'error',
+  icon: 'sign-out',
+  label: '退出登录',
+  action: logout,
+}])
+
 </script>
 
 <style lang="scss">
 
 .page-profile {
-  max-width: 50rem;
-  margin: 2rem auto;
-
   h1 {
     font-size: 1.375rem;
     margin: 1.5rem 0;
