@@ -1,6 +1,6 @@
 <template>
   <el-dialog center v-model="showDialog" class="bind-dialog">
-    <login-form merge></login-form>
+    <login-form></login-form>
   </el-dialog>
 </template>
 

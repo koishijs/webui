@@ -16,11 +16,13 @@ export const config = createStorage<AuthConfig>('auth', 1, () => ({
 
 export const showDialog = ref(false)
 
-watch(() => store.user, (value) => {
+watch(() => store.user, (value, oldValue) => {
+  showDialog.value = false
   if (!value) {
     return router.push('/login')
   }
 
+  if (oldValue) return
   message.success(`欢迎回来，${value.name || 'Koishi 用户'}！`)
   Object.assign(config, value)
   const from = router.currentRoute.value.redirectedFrom

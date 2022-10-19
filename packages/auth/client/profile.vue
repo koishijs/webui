@@ -1,11 +1,21 @@
 <template>
   <k-layout main="page-profile" :menu="menu">
     <k-content>
-      <k-form :schema="schema" v-model="diff"></k-form>
-      <h2 class="k-schema-header">
-        平台账户绑定
-        <el-button solid @click="showDialog = true">添加</el-button>
-      </h2>
+      <k-form :schema="schema" v-model="diff" #epilog>
+        <h2 class="k-schema-header">
+          平台账户绑定
+          <el-button solid @click="showDialog = true">添加</el-button>
+        </h2>
+        <div class="schema-item" v-for="({ platform, id }) in store.user['accounts']">
+          <div class="header">
+            <div class="left">{{ platform }} ({{ id }})</div>
+            <div class="right">
+              <!-- temporarily disable this feature for security reasons -->
+              <!-- <el-button>解绑</el-button> -->
+            </div>
+          </div>
+        </div>
+      </k-form>
     </k-content>
   </k-layout>
 </template>

@@ -1,4 +1,4 @@
-import { Awaitable, Context, omit, pick, Schema, Time, User } from 'koishi'
+import { Awaitable, Context, isNullable, omit, pick, Schema, Time, User } from 'koishi'
 import { DataService, SocketHandle } from '@koishijs/plugin-console'
 import { resolve } from 'path'
 import { v4 } from 'uuid'
@@ -23,7 +23,7 @@ declare module '@koishijs/plugin-console' {
   }
 
   interface Events {
-    'login/platform'(this: SocketHandle, platform: string, userId: string, merge: boolean): Awaitable<UserLogin>
+    'login/platform'(this: SocketHandle, platform: string, userId: string, id?: string): Awaitable<UserLogin>
     'login/password'(this: SocketHandle, name: string, password: string): void
     'login/token'(this: SocketHandle, id: string, token: string): void
     'user/update'(this: SocketHandle, data: UserUpdate): void
@@ -31,13 +31,22 @@ declare module '@koishijs/plugin-console' {
   }
 }
 
-export type UserAuth = Pick<User, 'id' | 'name' | 'authority' | 'token' | 'expire'>
+export type UserAuth = Pick<User, AuthFields>
 export type UserLogin = Pick<User, 'id' | 'name' | 'token' | 'expire'>
 export type UserUpdate = Partial<Pick<User, 'name' | 'password'>>
 
-const authFields = ['name', 'authority', 'id', 'expire', 'token'] as (keyof UserAuth)[]
+type AuthFields = typeof authFields[number]
+const authFields = ['name', 'authority', 'id', 'expire', 'token'] as const
 
-function setAuthUser(handle: SocketHandle, value: UserAuth) {
+function setAuthUser(handle: SocketHandle, value: UserAuth, platforms: Set<any>) {
+  if (value) {
+    value = {
+      ...omit(value, ['password', ...platforms]),
+      accounts: Object.entries(pick(value, platforms))
+        .filter(([, value]) => value)
+        .map(([platform, id]) => ({ platform, id })),
+    } as any
+  }
   handle.user = value
   handle.send({ type: 'data', body: { key: 'user', value } })
   handle.refresh()
@@ -65,60 +74,86 @@ class AuthService extends DataService<UserAuth> {
 
   initLogin() {
     const { ctx, config } = this
-    const states: Record<string, [string, number, SocketHandle, boolean]> = {}
+    const states: Record<string, [string, number, SocketHandle, string]> = {}
+
+    let platforms: Set<never> = getPlatforms()
+    function getPlatforms() {
+      return new Set(ctx.bots.filter(bot => !bot.hidden).map(bot => bot.platform as never))
+    }
+
+    ctx.on('bot-added', () => {
+      platforms = getPlatforms()
+    })
+
+    ctx.on('bot-removed', () => {
+      platforms = getPlatforms()
+    })
 
     ctx.console.addListener('login/password', async function (name, password) {
-      const user = await ctx.database.getUser('name', name, ['password', ...authFields])
+      const user = await ctx.database.getUser('name', name, ['password', ...platforms, ...authFields])
       if (!user || user.password !== password) throw new Error('用户名或密码错误。')
       if (!user.expire || user.expire < Date.now()) {
         user.token = v4()
         user.expire = Date.now() + config.authTokenExpire
         await ctx.database.setUser('name', name, pick(user, ['token', 'expire']))
       }
-      setAuthUser(this, omit(user, ['password']))
+      setAuthUser(this, user, platforms)
     })
 
     ctx.console.addListener('login/token', async function (id, token) {
-      const user = await ctx.database.getUser('id', id, authFields)
+      const user = await ctx.database.getUser('id', id, ['name', ...platforms, ...authFields])
       if (!user) throw new Error('用户不存在。')
       if (user.token !== token || user.expire <= Date.now()) throw new Error('令牌已失效。')
-      setAuthUser(this, user)
+      setAuthUser(this, user, platforms)
     })
 
-    ctx.console.addListener('login/platform', async function (platform, userId, merge) {
+    ctx.console.addListener('login/platform', async function (platform, userId, id) {
       const user = await ctx.database.getUser(platform, userId, ['name'])
       if (!user) throw new Error('找不到此账户。')
-      const id = `${platform}:${userId}`
+      if (id === user.id) throw new Error('你已经绑定了此账户。')
+
+      const key = `${platform}:${userId}`
       const token = v4()
       const expire = Date.now() + config.loginTokenExpire
-      states[id] = [token, expire, this, merge]
+      states[key] = [token, expire, this, id]
 
       const listener = () => {
-        delete states[id]
+        delete states[key]
         dispose()
         this.socket.removeEventListener('close', dispose)
       }
       const dispose = ctx.setTimeout(() => {
-        if (states[id]?.[1] >= Date.now()) listener()
+        if (states[key]?.[1] >= Date.now()) listener()
       }, config.loginTokenExpire)
       this.socket.addEventListener('close', listener)
 
       return { id: user.id, name: user.name, token, expire }
     })
 
-    ctx.any().private().middleware(async (session, next) => {
+    ctx.middleware(async (session, next) => {
       const state = states[session.uid]
       if (!state || state[0] !== session.content.trim()) {
         return next()
       }
 
-      const user = await session.observeUser(authFields)
+      if (!isNullable(state[3])) {
+        const old = await session.observeUser()
+        await ctx.database.remove('user', { [session.platform]: session.userId })
+        await ctx.database.setUser('id', state[3], {
+          [session.platform]: session.userId,
+          ...omit(old, ['id', 'name', ...authFields, ...platforms] as any),
+        })
+        const user = await ctx.database.getUser('id', state[3], ['name', ...platforms, ...authFields])
+        return setAuthUser(state[2], user, platforms)
+      }
+
+      const user = await session.observeUser(['name', ...platforms, ...authFields])
       if (!user.expire || user.expire < Date.now()) {
         user.token = v4()
         user.expire = Date.now() + config.authTokenExpire
         await user.$update()
       }
-      return setAuthUser(state[2], user)
+      return setAuthUser(state[2], user, platforms)
     }, true)
 
     ctx.on('console/intercept', (handle, listener) => {
