@@ -1,5 +1,6 @@
-import { Awaitable, Context, isNullable, omit, pick, Schema, Time, User } from 'koishi'
+import { $, Awaitable, Context, isNullable, omit, pick, Schema, Time, User } from 'koishi'
 import { DataService, SocketHandle } from '@koishijs/plugin-console'
+import { createHash } from 'crypto'
 import { resolve } from 'path'
 import { v4 } from 'uuid'
 
@@ -70,6 +71,16 @@ class AuthService extends DataService<UserAuth> {
     })
 
     this.initLogin()
+  }
+
+  async start() {
+    // check if there is an authoized user
+    const count = await this.ctx.database.select('user', {
+      authority: { $gte: 4 },
+    }).evaluate(_ => $.count(_.id)).execute()
+    if (count) return
+    const password = createHash('sha256').update('123456').digest('hex')
+    await this.ctx.database.create('user', { id: '0', name: 'admin', authority: 5, password })
   }
 
   initLogin() {
@@ -164,12 +175,14 @@ class AuthService extends DataService<UserAuth> {
     })
 
     ctx.console.addListener('user/logout', async function () {
-      setAuthUser(this, null)
+      setAuthUser(this, null, platforms)
     })
 
     ctx.console.addListener('user/update', async function (data) {
       if (!this.user) throw new Error('请先登录。')
       await ctx.database.setUser('id', this.user.id, data)
+      Object.assign(this.user, data)
+      setAuthUser(this, this.user, platforms)
     })
   }
 }

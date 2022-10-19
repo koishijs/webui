@@ -23,7 +23,7 @@ export default (ctx: Context) => {
   }
 
   ctx.on('activity', (meta) => {
-    return meta.authority && (!store.user || store.user.authority < meta.authority)
+    return meta.authority > 0 && (!store.user || store.user.authority < meta.authority)
   })
 
   ctx.state.disposables.push(router.beforeEach((route) => {
