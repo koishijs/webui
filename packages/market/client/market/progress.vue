@@ -12,6 +12,7 @@ import { store } from '@koishijs/client'
 import { computed } from 'vue'
 
 const isLoading = computed(() => {
+  if (!store['user'] || store['user'].authority < 4) return false
   return !store.market || store.market.total > store.market.progress
 })
 
