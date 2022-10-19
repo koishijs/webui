@@ -46,8 +46,8 @@
     }
   },
   "peerDependencies": {
-    "@koishijs/plugin-console": "^4.6.7",
-    "koishi": "^4.9.5"
+    "@koishijs/plugin-console": "^4.6.8",
+    "koishi": "^4.9.6"
   },
   "peerDependenciesMeta": {
     "@koishijs/plugin-console": {
@@ -55,7 +55,7 @@
     }
   },
   "devDependencies": {
-    "@koishijs/client": "^4.6.7",
-    "@koishijs/plugin-console": "^4.6.7"
+    "@koishijs/client": "^4.6.8",
+    "@koishijs/plugin-console": "^4.6.8"
   }
 }
