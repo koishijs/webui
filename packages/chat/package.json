@@ -1,7 +1,7 @@
 {
   "name": "@koishijs/plugin-chat",
   "description": "Display and respond to messages for Koishi",
-  "version": "3.1.7",
+  "version": "3.1.8",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
   "files": [
@@ -46,8 +46,8 @@
     }
   },
   "peerDependencies": {
-    "@koishijs/plugin-console": "^4.6.8",
-    "koishi": "^4.9.6"
+    "@koishijs/plugin-console": "^4.6.9",
+    "koishi": "^4.9.7"
   },
   "peerDependenciesMeta": {
     "@koishijs/plugin-console": {
@@ -55,7 +55,7 @@
     }
   },
   "devDependencies": {
-    "@koishijs/client": "^4.6.8",
-    "@koishijs/plugin-console": "^4.6.8"
+    "@koishijs/client": "^4.6.9",
+    "@koishijs/plugin-console": "^4.6.9"
   }
 }

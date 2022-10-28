@@ -1,5 +1,4 @@
-import { Bot, Context, Logger, segment, Service, Session } from 'koishi'
-import * as satori from '@satorijs/core'
+import { Bot, Context, Logger, segment, Service, Session, Universal } from 'koishi'
 
 export interface Message {
   id?: number
@@ -237,9 +236,9 @@ export class MessageService extends Service {
     }
   }
 
-  async getMessageBetween(bot: Bot, channelId: string, from: string, to?: string): Promise<satori.Message[]> {
+  async getMessageBetween(bot: Bot, channelId: string, from: string, to?: string): Promise<Universal.Message[]> {
     // from: older, to: newer
-    let toMessage: satori.Message
+    let toMessage: Universal.Message
     if (!to) {
       logger.debug('!to')
       const latestMessages = await bot.getMessageList(channelId)
