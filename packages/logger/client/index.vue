@@ -12,7 +12,7 @@
 
 <script lang="ts" setup>
 
-import { watch, ref, nextTick, onMounted } from 'vue'
+import { watch, ref, nextTick, onActivated } from 'vue'
 import { store } from '@koishijs/client'
 import ansi from 'ansi_up'
 
@@ -20,19 +20,20 @@ const root = ref<HTMLElement>()
 
 const hint = `app\u001b[0m \u001b[38;5;15;1mKoishi/`
 
-const converter = new (ansi as any as typeof import('ansi_up')).default()
+// this package does not have consistent exports in different environments
+const converter = new (ansi['default'] || ansi)()
 
 function renderLine(line: string) {
   return converter.ansi_to_html(line)
 }
 
-onMounted(() => {
-  const wrapper = root.value.parentElement.parentElement.parentElement
+onActivated(() => {
+  const wrapper = root.value.parentElement.parentElement
   wrapper.scrollTop = wrapper.scrollHeight
 })
 
 watch(() => store.logs.length, async () => {
-  const wrapper = root.value.parentElement.parentElement.parentElement
+  const wrapper = root.value.parentElement.parentElement
   const { scrollTop, clientHeight, scrollHeight } = wrapper
   if (Math.abs(scrollTop + clientHeight - scrollHeight) < 1) {
     await nextTick()
