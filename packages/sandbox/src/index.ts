@@ -1,4 +1,4 @@
-import { Bot, Context, Dict, observe, Random, Schema, segment, User } from 'koishi'
+import { Bot, Context, Dict, Fragment, observe, Random, Schema, segment, User } from 'koishi'
 import { DataService, SocketHandle } from '@koishijs/plugin-console'
 import { resolve } from 'path'
 import zh from './locales/zh.yml'
@@ -7,9 +7,7 @@ declare module 'koishi' {
   interface User {
     sandbox: string
   }
-}
 
-declare module '@satorijs/core' {
   namespace Session {
     interface Payload {
       handle: SocketHandle
@@ -63,40 +61,39 @@ class SandboxBot extends Bot {
     }, { authority: 4 })
   }
 
-  async sendMessage(channel: string, content: string | segment) {
-    const elements = segment.normalize(content).children
+  async sendMessage(channel: string, content: Fragment) {
+    const elements = segment.normalize(content)
     const ids: string[] = []
-    const render = (elements: segment[]) => {
-      let buffer = ''
-      const flush = () => {
-        if (!buffer.trim()) return
-        content = segment.transform(buffer.trim(), {
-          image(data) {
-            if (!data.url.startsWith('base64://')) return segment('image', data)
-            return segment.image('data:image/png;base64,' + data.url.slice(9))
-          },
-        })
-        this.ctx.console.broadcast('sandbox', { content, user: 'Koishi', channel })
-        ids.push(Random.id())
-        buffer = ''
-      }
 
+    let buffer = ''
+    const flush = () => {
+      if (!buffer.trim()) return
+      content = segment.transform(buffer.trim(), {
+        image(data) {
+          // for backward compatibility
+          if (!data.url.startsWith('base64://')) return segment('image', data)
+          return segment.image('data:image/png;base64,' + data.url.slice(9))
+        },
+      })
+      this.ctx.console.broadcast('sandbox', { content, user: 'Koishi', channel })
+      ids.push(Random.id())
+      buffer = ''
+    }
+
+    const render = (elements: segment[]) => {
       for (const element of elements) {
-        const { type, attrs, children } = element
+        const { type, children } = element
         if (type === 'message') {
           flush()
-          if ('quote' in attrs) {
-            buffer += element.toString()
-          } else {
-            render(children)
-          }
+          render(children)
+          flush()
         } else {
           buffer += element.toString()
         }
       }
-      flush()
     }
     render(elements)
+    flush()
     return ids
   }
 

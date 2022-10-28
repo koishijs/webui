@@ -1,7 +1,7 @@
 {
   "name": "@koishijs/plugin-sandbox",
   "description": "Test Your Virtual Bot in Console",
-  "version": "2.3.2",
+  "version": "2.3.3",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
   "files": [
