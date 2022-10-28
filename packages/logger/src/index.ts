@@ -38,7 +38,7 @@ class LogProvider extends DataService<string[]> {
   }
 
   prepareWriter() {
-    this.root = resolve(this.ctx.app.baseDir, this.config.root)
+    this.root = resolve(this.ctx.baseDir, this.config.root)
     mkdirSync(this.root, { recursive: true })
 
     for (const filename of readdirSync(this.root)) {
@@ -69,11 +69,11 @@ class LogProvider extends DataService<string[]> {
   }
 
   prepareLogger() {
-    if (this.ctx.app.prologue) {
-      for (const line of this.ctx.app.prologue) {
+    if (this.ctx.prologue) {
+      for (const line of this.ctx.prologue) {
         this.printText(line)
       }
-      this.ctx.app.prologue = null
+      this.ctx.root.prologue = null
     }
 
     const target: Logger.Target = {

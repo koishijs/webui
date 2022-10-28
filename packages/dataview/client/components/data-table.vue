@@ -346,7 +346,7 @@ function isCellChanged({ row, column, $index }, checkValue = true) {
 
 /* Just to get $index */
 function onOuterCellClick(_row, _column, element) {
-  element.querySelector('.inner-cell').dispatchEvent(new Event('parent-dblclick'))
+  element.querySelector('.inner-cell')?.dispatchEvent(new Event('parent-dblclick'))
 }
 function onCellDblClick({ row, column, $index }) {
   if (isCellChanged({ row, column, $index }, false)) return // Change record exists

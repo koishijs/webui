@@ -42,7 +42,7 @@ class PackageProvider extends BasePackageProvider {
 
   async prepare() {
     this.cache = {}
-    let { baseDir } = this.ctx.app
+    let { baseDir } = this.ctx
     const tasks: Promise<void>[] = []
     while (1) {
       tasks.push(this.loadDirectory(baseDir))

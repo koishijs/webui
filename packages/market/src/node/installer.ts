@@ -54,7 +54,7 @@ class Installer extends DataService<Dict<Dependency>> {
   }
 
   get cwd() {
-    return this.ctx.app.baseDir
+    return this.ctx.baseDir
   }
 
   async prepare() {

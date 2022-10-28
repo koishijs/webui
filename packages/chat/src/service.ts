@@ -203,7 +203,7 @@ export class MessageService extends Service {
       if (session) {
         this.#syncingItem = session
         logger.debug('queue item %o', session)
-        this.ctx.app.emit('messages/syncing', session.cid)
+        this.ctx.emit('messages/syncing', session.cid)
         try {
           await this.#syncMessages(session.bot, session.guildId, session.channelId)
         } catch (e) {

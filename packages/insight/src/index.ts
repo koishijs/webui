@@ -63,7 +63,7 @@ class Insight extends DataService<Insight.Payload> {
     const nodes: Insight.Node[] = []
     const edges: Insight.Link[] = []
 
-    for (const runtime of this.ctx.app.registry.values()) {
+    for (const runtime of this.ctx.registry.values()) {
       // Suppose we have the following types of nodes:
       // - A, B: parent plugin states
       // - X, Y: target fork states
@@ -80,7 +80,7 @@ class Insight extends DataService<Insight.Payload> {
 
       function isActive(state: State) {
         // exclude plugins that don't work due to missing dependencies
-        return runtime.using.every(name => state.context[name])
+        return runtime.using.every(name => state.ctx[name])
       }
 
       const name = getName(runtime.plugin)
@@ -99,7 +99,7 @@ class Insight extends DataService<Insight.Payload> {
 
       function addDeps(state: State) {
         for (const name of runtime.using) {
-          const ctx = state.context[name][Context.source]
+          const ctx = state.ctx[name][Context.source]
           const uid = ctx?.state.uid
           if (!uid) continue
           addEdge('dashed', state.uid, uid)

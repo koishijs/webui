@@ -100,7 +100,7 @@ export function apply(ctx: Context, options: Config = {}) {
 
     ctx.on('chat/receive', async (message) => {
       message.content = segment.transform(message.content, {
-        image: (data) => {
+        image(data) {
           if (whitelist.some(prefix => data.url.startsWith(prefix))) {
             data.url = apiPath + '/proxy/' + encodeURIComponent(data.url)
           }
