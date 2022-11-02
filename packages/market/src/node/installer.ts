@@ -4,7 +4,7 @@ import { PackageJson, Registry } from '@koishijs/registry'
 import { resolve } from 'path'
 import { promises as fsp } from 'fs'
 import { loadManifest } from './utils'
-import { satisfies } from 'semver'
+import { compare, satisfies } from 'semver'
 import {} from '@koishijs/loader'
 import getRegistry from 'get-registry'
 import which from 'which-pm-runs'
@@ -84,7 +84,7 @@ class Installer extends DataService<Dict<Dependency>> {
         const registry = await this.http.get<Registry>(`/${name}`)
         const entries = Object.values(registry.versions)
           .map(item => [item.version, pick(item, ['peerDependencies'])] as const)
-          .reverse()
+          .sort(([a], [b]) => compare(b, a))
         result[name].latest = entries[0][0]
         result[name].versions = Object.fromEntries(entries)
       } catch (e) {
