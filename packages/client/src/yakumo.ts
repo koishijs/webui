@@ -13,6 +13,12 @@ declare module 'yakumo' {
 register('client', async (project) => {
   for (const path in project.targets) {
     const meta = project.targets[path]
+    const deps = {
+      ...meta.dependencies,
+      ...meta.devDependencies,
+      ...meta.peerDependencies,
+      ...meta.optionalDependencies,
+    }
     let config: UserConfig = {}
     if (meta.yakumo?.client) {
       const require = createRequire(project.cwd + path + '/package.json')
@@ -22,6 +28,8 @@ register('client', async (project) => {
         continue
       }
       config = exports
+    } else if (!deps['@koishijs/client']) {
+      continue
     }
     await buildExtension(project.cwd + path, config)
   }

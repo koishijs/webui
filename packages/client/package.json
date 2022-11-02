@@ -1,7 +1,7 @@
 {
   "name": "@koishijs/client",
   "description": "Koishi Console Client",
-  "version": "4.6.9",
+  "version": "4.6.10",
   "main": "client/index.ts",
   "files": [
     "app",
