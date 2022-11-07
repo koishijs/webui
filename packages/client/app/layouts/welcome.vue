@@ -14,7 +14,7 @@
 <script lang="ts" setup>
 
 function openDocs() {
-  window.open('https://koishi.js.org', '_blank')
+  window.open('https://koishi.chat', '_blank')
 }
 
 </script>
