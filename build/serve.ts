@@ -9,7 +9,7 @@ const router = new Router()
 app.use(router.routes())
 app.use(router.allowedMethods())
 
-const endpoint = 'https://koishi.js.org/registry/modules'
+const endpoint = 'https://registry.koishi.chat/modules'
 const filename = resolve(require.resolve('@koishijs/plugin-console/package.json'), '../dist/index.html')
 
 router.get('(/.+)*', async (ctx, next) => {

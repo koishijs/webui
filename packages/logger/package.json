@@ -1,7 +1,7 @@
 {
   "name": "@koishijs/plugin-logger",
   "description": "Dump log files for Koishi",
-  "version": "2.1.6",
+  "version": "2.1.7",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
   "files": [
@@ -45,12 +45,12 @@
     }
   },
   "peerDependencies": {
-    "@koishijs/plugin-console": "^4.6.10",
-    "koishi": "^4.9.9"
+    "@koishijs/plugin-console": "^4.6.11",
+    "koishi": "^4.10.0"
   },
   "devDependencies": {
-    "@koishijs/client": "^4.6.10",
-    "@koishijs/cli": "^4.9.9",
+    "@koishijs/client": "^4.6.11",
+    "@koishijs/cli": "^4.10.0",
     "ansi_up": "^5.1.0"
   }
 }

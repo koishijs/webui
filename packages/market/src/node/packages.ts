@@ -95,7 +95,7 @@ class PackageProvider extends BasePackageProvider {
       this.cache[require.resolve(name)] = this.parsePackage(name)
     } catch (error) {
       logger.warn('failed to parse %c', name)
-      logger.debug(error)
+      logger.warn(error)
     }
   }
 
