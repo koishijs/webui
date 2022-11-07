@@ -24,9 +24,9 @@ declare module '@koishijs/plugin-console' {
   }
 
   interface Events {
-    'login/platform'(this: SocketHandle, platform: string, userId: string, id?: string): Awaitable<UserLogin>
+    'login/platform'(this: SocketHandle, platform: string, userId: string, id?: number): Awaitable<UserLogin>
     'login/password'(this: SocketHandle, name: string, password: string): void
-    'login/token'(this: SocketHandle, id: string, token: string): void
+    'login/token'(this: SocketHandle, id: number, token: string): void
     'user/update'(this: SocketHandle, data: UserUpdate): void
     'user/logout'(this: SocketHandle): void
   }
@@ -80,12 +80,12 @@ class AuthService extends DataService<UserAuth> {
     }).evaluate(_ => $.count(_.id)).execute()
     if (count) return
     const password = createHash('sha256').update('123456').digest('hex')
-    await this.ctx.database.create('user', { id: '0', name: 'admin', authority: 5, password })
+    await this.ctx.database.create('user', { id: 0, name: 'admin', authority: 5, password })
   }
 
   initLogin() {
     const { ctx, config } = this
-    const states: Record<string, [string, number, SocketHandle, string]> = {}
+    const states: Record<string, [string, number, SocketHandle, number]> = {}
 
     let platforms: Set<never> = getPlatforms()
     function getPlatforms() {
@@ -112,14 +112,14 @@ class AuthService extends DataService<UserAuth> {
     })
 
     ctx.console.addListener('login/token', async function (id, token) {
-      const user = await ctx.database.getUser('id', id, ['name', ...platforms, ...authFields])
+      const [user] = await ctx.database.get('user', { id }, ['name', ...platforms, ...authFields])
       if (!user) throw new Error('用户不存在。')
       if (user.token !== token || user.expire <= Date.now()) throw new Error('令牌已失效。')
       setAuthUser(this, user, platforms)
     })
 
     ctx.console.addListener('login/platform', async function (platform, userId, id) {
-      const user = await ctx.database.getUser(platform, userId, ['name'])
+      const user = await ctx.database.getUser(platform, userId, ['id', 'name'])
       if (!user) throw new Error('找不到此账户。')
       if (id === user.id) throw new Error('你已经绑定了此账户。')
 
@@ -150,11 +150,11 @@ class AuthService extends DataService<UserAuth> {
       if (!isNullable(state[3])) {
         const old = await session.observeUser()
         await ctx.database.remove('user', { [session.platform]: session.userId })
-        await ctx.database.setUser('id', state[3], {
+        await ctx.database.set('user', { id: state[3] }, {
           [session.platform]: session.userId,
           ...omit(old, ['id', 'name', ...authFields, ...platforms] as any),
         })
-        const user = await ctx.database.getUser('id', state[3], ['name', ...platforms, ...authFields])
+        const [user] = await ctx.database.get('user', { id: state[3] }, ['name', ...platforms, ...authFields])
         return setAuthUser(state[2], user, platforms)
       }
 
@@ -180,7 +180,7 @@ class AuthService extends DataService<UserAuth> {
 
     ctx.console.addListener('user/update', async function (data) {
       if (!this.user) throw new Error('请先登录。')
-      await ctx.database.setUser('id', this.user.id, data)
+      await ctx.database.set('user', { id: this.user.id }, data)
       Object.assign(this.user, data)
       setAuthUser(this, this.user, platforms)
     })
