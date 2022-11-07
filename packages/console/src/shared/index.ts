@@ -124,10 +124,11 @@ export abstract class Console extends Service {
   abstract resolveEntry(entry: string | string[] | Entry): string | string[]
 
   addEntry(entry: string | string[] | Entry) {
+    const caller = this.caller
     const key = 'extension-' + Random.id()
     this.entries[key] = makeArray(this.resolveEntry(entry))
     this.entry.refresh()
-    this.caller?.on('dispose', () => {
+    caller?.on('dispose', () => {
       delete this.entries[key]
       this.entry?.refresh()
     })
