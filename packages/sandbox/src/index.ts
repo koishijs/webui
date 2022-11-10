@@ -1,4 +1,4 @@
-import { Bot, Context, Dict, Fragment, observe, Random, Schema, segment, User } from 'koishi'
+import { Bot, Context, defineProperty, Dict, Fragment, observe, Random, Schema, segment, User } from 'koishi'
 import { DataService, SocketHandle } from '@koishijs/plugin-console'
 import { resolve } from 'path'
 import zh from './locales/zh.yml'
@@ -45,19 +45,20 @@ class SandboxBot extends Bot {
     const self = this
     ctx.console.addListener('sandbox/message', async function (user, channel, content) {
       ctx.console.broadcast('sandbox', { content, user, channel })
-      self.dispatch(self.session({
+      const session = self.session({
         userId: user,
         content,
         channelId: channel,
         guildId: channel === '@' + user ? undefined : channel,
         type: 'message',
         subtype: channel === '@' + user ? 'private' : 'group',
-        handle: this,
         author: {
           userId: user,
           username: user,
         },
-      }))
+      })
+      defineProperty(session, 'handle', this)
+      self.dispatch(session)
     }, { authority: 4 })
   }
 
