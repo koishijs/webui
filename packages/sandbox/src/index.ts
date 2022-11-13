@@ -98,6 +98,8 @@ class SandboxBot extends Bot {
     return ids
   }
 
+  async deleteMessage(){} //empty function, fix https://github.com/koishijs/novelai-bot/issues/114
+
   async getGuildMemberList(guildId: string) {
     return words.map((word) => ({
       nickname: word,
