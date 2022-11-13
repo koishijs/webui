@@ -1,4 +1,4 @@
-import { Bot, Context, defineProperty, Dict, Fragment, observe, Random, Schema, segment, User } from 'koishi'
+import { Bot, Context, defineProperty, Dict, Fragment, observe, Random, Schema, segment, User, noop } from 'koishi'
 import { DataService, SocketHandle } from '@koishijs/plugin-console'
 import { resolve } from 'path'
 import zh from './locales/zh.yml'
@@ -98,7 +98,7 @@ class SandboxBot extends Bot {
     return ids
   }
 
-  async deleteMessage(){} //empty function, fix https://github.com/koishijs/novelai-bot/issues/114
+  async deleteMessage(){noop()} //empty function, fix https://github.com/koishijs/novelai-bot/issues/114
 
   async getGuildMemberList(guildId: string) {
     return words.map((word) => ({
