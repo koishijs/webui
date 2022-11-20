@@ -32,6 +32,12 @@ receive('sandbox', (message: Message) => {
   (config.messages[message.channel] ||= []).push(message)
 })
 
+receive('sandbox/delete', ({ id, channel }) => {
+  const messages = config.messages[channel]
+  if (!messages) return
+  config.messages[channel] = messages.filter(msg => msg.id !== id)
+})
+
 receive('sandbox/clear', () => {
   config.messages[channel.value] = []
 })

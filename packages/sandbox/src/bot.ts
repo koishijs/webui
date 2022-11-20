@@ -13,12 +13,13 @@ class SandboxMessenger extends Messenger<SandboxBot> {
       },
     })
     const session = this.bot.session(this.session)
+    session.messageId = Random.id()
     session.app.console.broadcast('sandbox', {
       content,
       user: 'Koishi',
       channel: session.channelId,
+      id: session.messageId,
     })
-    session.messageId = Random.id()
     this.results.push(session)
     this.buffer = ''
   }
@@ -48,10 +49,12 @@ export class SandboxBot extends Bot {
 
     const self = this
     ctx.console.addListener('sandbox/message', async function (user, channel, content) {
-      ctx.console.broadcast('sandbox', { content, user, channel })
+      const id = Random.id()
+      ctx.console.broadcast('sandbox', { id, content, user, channel })
       const session = self.session({
         userId: user,
         content,
+        messageId: id,
         channelId: channel,
         guildId: channel === '@' + user ? undefined : channel,
         type: 'message',
@@ -68,6 +71,10 @@ export class SandboxBot extends Bot {
 
   async sendMessage(channelId: string, fragment: Fragment, guildId?: string) {
     return new SandboxMessenger(this, channelId, guildId).send(fragment)
+  }
+
+  async deleteMessage(channelId: string, messageId: string) {
+    this.ctx.console.broadcast('sandbox/delete', { id: messageId, channel: channelId })
   }
 
   async getGuildMemberList(guildId: string) {
