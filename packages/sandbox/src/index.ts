@@ -1,6 +1,7 @@
-import { Bot, Context, defineProperty, Dict, Fragment, observe, Random, Schema, segment, User } from 'koishi'
+import { Context, Dict, observe, Schema, User } from 'koishi'
 import { DataService, SocketHandle } from '@koishijs/plugin-console'
 import { resolve } from 'path'
+import { SandboxBot, words } from './bot'
 import zh from './locales/zh.yml'
 
 declare module 'koishi' {
@@ -32,92 +33,11 @@ declare module '@koishijs/plugin-console' {
   }
 }
 
-class SandboxBot extends Bot {
-  username = 'koishi'
-  hidden = true
-
-  constructor(public ctx: Context) {
-    super(ctx, {
-      platform: 'sandbox',
-      selfId: 'koishi',
-    })
-
-    const self = this
-    ctx.console.addListener('sandbox/message', async function (user, channel, content) {
-      ctx.console.broadcast('sandbox', { content, user, channel })
-      const session = self.session({
-        userId: user,
-        content,
-        channelId: channel,
-        guildId: channel === '@' + user ? undefined : channel,
-        type: 'message',
-        subtype: channel === '@' + user ? 'private' : 'group',
-        author: {
-          userId: user,
-          username: user,
-        },
-      })
-      defineProperty(session, 'handle', this)
-      self.dispatch(session)
-    }, { authority: 4 })
-  }
-
-  async sendMessage(channel: string, content: Fragment) {
-    const elements = segment.normalize(content)
-    const ids: string[] = []
-
-    let buffer = ''
-    const flush = () => {
-      if (!buffer.trim()) return
-      content = segment.transform(buffer.trim(), {
-        image(data) {
-          // for backward compatibility
-          if (!data.url.startsWith('base64://')) return segment('image', data)
-          return segment.image('data:image/png;base64,' + data.url.slice(9))
-        },
-      })
-      this.ctx.console.broadcast('sandbox', { content, user: 'Koishi', channel })
-      ids.push(Random.id())
-      buffer = ''
-    }
-
-    const render = (elements: segment[]) => {
-      for (const element of elements) {
-        const { type, children } = element
-        if (type === 'message') {
-          flush()
-          render(children)
-          flush()
-        } else {
-          buffer += element.toString()
-        }
-      }
-    }
-    render(elements)
-    flush()
-    return ids
-  }
-
-  async getGuildMemberList(guildId: string) {
-    return words.map((word) => ({
-      nickname: word,
-      userId: word,
-    }))
-  }
-}
-
 export interface Message {
   user: string
   channel: string
   content: string
 }
-
-export const words = [
-  'Alice', 'Bob', 'Carol', 'Dave', 'Eve', 'Frank', 'Grace',
-  'Hank', 'Ivy', 'Jack', 'Kathy', 'Lily', 'Mandy', 'Nancy',
-  'Oscar', 'Peggy', 'Quinn', 'Randy', 'Sandy', 'Toby',
-  'Uma', 'Vicky', 'Wendy', 'Xander', 'Yvonne', 'Zoe',
-]
 
 export class UserProvider extends DataService<Dict<User>> {
   static using = ['database'] as const
