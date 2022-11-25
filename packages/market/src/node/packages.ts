@@ -1,4 +1,4 @@
-import { Context, Dict, Logger, pick, remove, Schema, scope, State } from 'koishi'
+import { Context, Dict, EffectScope, Logger, pick, remove, Schema, scope } from 'koishi'
 import { conclude, Manifest, PackageJson } from '@koishijs/registry'
 import { promises as fsp } from 'fs'
 import { dirname } from 'path'
@@ -30,7 +30,7 @@ class PackageProvider extends BasePackageProvider {
   cache: Dict<PackageProvider.Data> = {}
   task: Promise<void>
 
-  update(state: State) {
+  update(state: EffectScope) {
     const entry = Object.keys(require.cache).find((key) => {
       return unwrapExports(require.cache[key].exports) === state.runtime.plugin
     })

@@ -1,4 +1,4 @@
-import { camelize, capitalize, Context, Fork, Plugin, Schema, State } from 'koishi'
+import { camelize, capitalize, Context, EffectScope, ForkScope, Plugin, Schema } from 'koishi'
 import { debounce } from 'throttle-debounce'
 import { DataService } from '@koishijs/plugin-console'
 import { resolve } from 'path'
@@ -22,7 +22,7 @@ function getName(plugin: Plugin) {
   return format(plugin.name)
 }
 
-function getSourceId(child: Fork) {
+function getSourceId(child: ForkScope) {
   const { state } = child.parent
   if (state.runtime.isForkable) {
     return state.uid
@@ -78,14 +78,14 @@ class Insight extends DataService<Insight.Payload> {
       // 3. non-reusable plugins
       //    will be displayed as A -> M -> S, B -> M -> S
 
-      function isActive(state: State) {
+      function isActive(state: EffectScope) {
         // exclude plugins that don't work due to missing dependencies
         return runtime.using.every(name => state.ctx[name])
       }
 
       const name = getName(runtime.plugin)
 
-      function addNode(state: State) {
+      function addNode(state: EffectScope) {
         const { uid, alias, disposables } = state
         const weight = disposables.length
         const node = { uid, name, weight }
@@ -97,7 +97,7 @@ class Insight extends DataService<Insight.Payload> {
         edges.push({ type, source, target })
       }
 
-      function addDeps(state: State) {
+      function addDeps(state: EffectScope) {
         for (const name of runtime.using) {
           const ctx = state.ctx[name][Context.source]
           const uid = ctx?.state.uid

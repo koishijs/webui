@@ -1,5 +1,6 @@
 import { $, Argv, Assets, Context, noop, Schema, Time } from 'koishi'
 import { DataService } from '@koishijs/plugin-console'
+import {} from '@koishijs/assets'
 
 declare module 'koishi' {
   interface User {

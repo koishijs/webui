@@ -49,11 +49,11 @@
     }
   },
   "peerDependencies": {
-    "@koishijs/plugin-console": "^4.6.11",
-    "koishi": "^4.10.2"
+    "@koishijs/plugin-console": "^4.7.0",
+    "koishi": "^4.10.3"
   },
   "devDependencies": {
-    "@koishijs/client": "^4.6.11",
-    "@koishijs/plugin-console": "^4.6.11"
+    "@koishijs/client": "^4.7.0",
+    "@koishijs/plugin-console": "^4.7.0"
   }
 }

@@ -1,4 +1,4 @@
-import { Context, Dict, Runtime, Schema, State } from 'koishi'
+import { Context, Dict, EffectScope, MainScope, Schema } from 'koishi'
 import { DataService } from '@koishijs/plugin-console'
 import { Manifest, PackageJson } from '@koishijs/registry'
 
@@ -17,11 +17,11 @@ export abstract class PackageProvider extends DataService<Dict<PackageProvider.D
 
   abstract getManifest(name: string): Promise<Manifest>
 
-  update(state: State) {
+  update(state: EffectScope) {
     this.refresh()
   }
 
-  parseRuntime(runtime: Runtime, result: PackageProvider.Data) {
+  parseRuntime(runtime: MainScope, result: PackageProvider.Data) {
     result.id = runtime.uid
     result.forkable = runtime.isForkable
   }

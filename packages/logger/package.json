@@ -45,12 +45,12 @@
     }
   },
   "peerDependencies": {
-    "@koishijs/plugin-console": "^4.6.11",
-    "koishi": "^4.10.2"
+    "@koishijs/plugin-console": "^4.7.0",
+    "koishi": "^4.10.3"
   },
   "devDependencies": {
-    "@koishijs/client": "^4.6.11",
-    "@koishijs/cli": "^4.10.2",
+    "@koishijs/client": "^4.7.0",
+    "@koishijs/cli": "^4.10.3",
     "ansi_up": "^5.1.0"
   }
 }

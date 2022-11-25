@@ -2,6 +2,7 @@ import { Context, Logger, Quester, Schema, segment } from 'koishi'
 import { resolve } from 'path'
 import receiver, { Message, RefreshConfig } from './receiver'
 import {} from '@koishijs/plugin-console'
+import {} from '@koishijs/assets'
 import zh from './locales/zh.yml'
 import internal from 'stream'
 
