@@ -36,14 +36,14 @@ function toggle() {
 
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 
 .layout-activity {
   position: fixed;
   box-sizing: border-box;
   z-index: 100;
   top: 0;
-  bottom: var(--footer-height);
+  bottom: 0;
   width: var(--activity-width);
   background-color: var(--bg1);
   display: flex;

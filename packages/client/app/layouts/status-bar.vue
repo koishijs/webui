@@ -13,7 +13,7 @@
   z-index: 100;
   bottom: 0;
   height: var(--footer-height);
-  left: 0;
+  left: var(--activity-width);
   right: 0;
   background-color: var(--card-bg);
   display: flex;
