@@ -22,7 +22,7 @@
     "client/index.d.ts"
   ],
   "author": "Shigma <shigma10826@gmail.com>",
-  "license": "GPL-3.0",
+  "license": "AGPL-3.0",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/koishijs/console.git",
