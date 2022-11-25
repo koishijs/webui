@@ -23,7 +23,7 @@
 <script lang="ts" setup>
 
 import { send, store } from '@koishijs/client'
-import { sha256, config, showDialog } from './utils'
+import { config, showDialog } from './utils'
 import { computed, ref } from 'vue'
 import { message, Schema } from '@koishijs/client'
 import { UserUpdate } from '@koishijs/plugin-auth'
@@ -34,9 +34,7 @@ const schema = computed(() => {
   const result: Schema<UserUpdate> = Schema.object({
     name: Schema.string().description('用户名').default(config.name),
   }).description('基本资料')
-  if (isSecureContext) {
-    result.dict.password = Schema.string().role('secret').description('密码').default(config.password)
-  }
+  result.dict.password = Schema.string().role('secret').description('密码').default(config.password)
   return result
 })
 
@@ -48,15 +46,11 @@ async function logout() {
 }
 
 async function update() {
-  const update: UserUpdate = { ...diff.value }
-  if (update.password) {
-    update.password = await sha256(update.password)
-  }
   try {
-    await send('user/update', update)
+    await send('user/update', diff.value)
     message.success('修改成功！')
     Object.assign(config, diff)
-    Object.assign(store.user, update)
+    Object.assign(store.user, diff.value)
     diff.value = {}
   } catch (e) {
     message.error(e.message)

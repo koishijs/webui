@@ -13,10 +13,9 @@
 
     <template v-else>
       <h1 v-if="store.user"><span>平台账户绑定</span></h1>
-      <h1 v-else-if="secure">
+      <h1>
         <k-tab :data="['平台账户登录', '用户名密码登录']" v-model="config.authType"></k-tab>
       </h1>
-      <h1 v-else><span>平台账户登录</span></h1>
 
       <template v-if="store.user || config.authType === 0">
         <el-input placeholder="平台名" v-model="config.platform" #prefix>
@@ -57,12 +56,9 @@
 
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { config, sha256, showDialog } from './utils'
-import { send, store, message } from '@koishijs/client'
+import { config, showDialog } from './utils'
+import { send, store } from '@koishijs/client'
 import { UserLogin } from '@koishijs/plugin-auth'
-
-const secure = isSecureContext
-if (!secure) config.authType = 0
 
 const error = ref<string>()
 const user = ref<UserLogin>()
@@ -84,7 +80,7 @@ async function loginWithAccount() {
 async function loginWithPassword() {
   const { name, password } = config
   try {
-    await send('login/password', name, await sha256(password))
+    await send('login/password', name, password)
   } catch (e) {
     error.value = e.message
   }

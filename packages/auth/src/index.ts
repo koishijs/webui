@@ -53,6 +53,10 @@ function setAuthUser(handle: SocketHandle, value: UserAuth, platforms: Set<any>)
   handle.refresh()
 }
 
+function toHash(password: string) {
+  return createHash('sha256').update(password).digest('hex')
+}
+
 class AuthService extends DataService<UserAuth> {
   static using = ['console', 'database'] as const
 
@@ -60,8 +64,8 @@ class AuthService extends DataService<UserAuth> {
     super(ctx, 'user')
 
     ctx.model.extend('user', {
-      password: 'string(63)',
-      token: 'string(63)',
+      password: 'string(255)',
+      token: 'string(255)',
       expire: 'unsigned(20)',
     })
 
@@ -77,9 +81,9 @@ class AuthService extends DataService<UserAuth> {
     // check if there is an authoized user
     const count = await this.ctx.database.select('user', {
       authority: { $gte: 4 },
-    }).evaluate(_ => $.count(_.id)).execute()
+    }).execute(_ => $.count(_.id))
     if (count) return
-    const password = createHash('sha256').update('123456').digest('hex')
+    const password = toHash('123456')
     await this.ctx.database.create('user', { id: 0, name: 'admin', authority: 5, password })
   }
 
@@ -101,6 +105,7 @@ class AuthService extends DataService<UserAuth> {
     })
 
     ctx.console.addListener('login/password', async function (name, password) {
+      password = toHash(password)
       const user = await ctx.database.getUser('name', name, ['password', ...platforms, ...authFields])
       if (!user || user.password !== password) throw new Error('用户名或密码错误。')
       if (!user.expire || user.expire < Date.now()) {
@@ -180,6 +185,7 @@ class AuthService extends DataService<UserAuth> {
 
     ctx.console.addListener('user/update', async function (data) {
       if (!this.user) throw new Error('请先登录。')
+      if (data.password) data.password = toHash(data.password)
       await ctx.database.set('user', { id: this.user.id }, data)
       Object.assign(this.user, data)
       setAuthUser(this, this.user, platforms)

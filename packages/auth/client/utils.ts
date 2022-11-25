@@ -32,14 +32,3 @@ watch(() => store.user, (value, oldValue) => {
     router.push('/profile')
   }
 })
-
-export async function sha256(password: string) {
-  const data = new TextEncoder().encode(password)
-  const buffer = await crypto.subtle.digest('SHA-256', data)
-  const view = new DataView(buffer)
-  let output = ''
-  for (let i = 0; i < view.byteLength; i += 4) {
-    output += ('00000000' + view.getUint32(i).toString(16)).slice(-8)
-  }
-  return output
-}
