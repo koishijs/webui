@@ -1,8 +1,9 @@
 import { Bot, Context, Dict, pick, Schema, Time } from 'koishi'
 import { cpus, freemem, totalmem } from 'os'
 import { DataService } from '@koishijs/plugin-console'
+import zhCN from './locales/zh-CN.yml'
 
-declare module '@satorijs/core' {
+declare module 'koishi' {
   interface Bot {
     _messageSent: TickCounter
     _messageReceived: TickCounter
@@ -82,6 +83,8 @@ class ProfileProvider extends DataService<ProfileProvider.Payload> {
   constructor(ctx: Context, private config: ProfileProvider.Config) {
     super(ctx, 'profile')
 
+    ctx.i18n.define('zh', zhCN)
+
     const { tickInterval } = config
     ctx.on('ready', () => {
       ctx.setInterval(() => {
@@ -114,6 +117,16 @@ class ProfileProvider extends DataService<ProfileProvider.Payload> {
     ctx.on('bot-status-updated', () => {
       this.refresh()
     })
+
+    ctx.command('status')
+      .action(async ({ session }) => {
+        const data = await this.get()
+        const output = Object.values(data.bots).map((bot) => {
+          return session.text('.bot', bot)
+        })
+        output.push(session.text('.epilog', data))
+        return output.join('\n')
+      })
   }
 
   async get(forced = false) {
