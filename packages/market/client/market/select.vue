@@ -2,14 +2,14 @@
   <el-dialog v-model="showSelect" class="plugin-select" :title="width <= 768 ? categories[active] : '选择插件'">
     <div class="tabs">
       <span class="tab-item" v-for="(text, key) in categories" :key="key" @click.stop="active = key" :class="{ active: active === key }">
-        <k-icon :name="'category:' + (key || 'other')"></k-icon>
+        <k-icon :name="'category:' + key"></k-icon>
         <span class="title">{{ text }}</span>
       </span>
     </div>
     <div class="content">
       <el-scrollbar>
         <template v-for="({ name, shortname, manifest }) in store.packages">
-          <div class="package" v-if="name && (!active || manifest.category === active)" @click.stop="configure(shortname)">
+          <div class="package" v-if="name && (active === 'all' || resolveCategory(manifest.category) === active)" @click.stop="configure(shortname)">
             <h3>{{ shortname }}</h3>
             <k-markdown inline class="desc" :source="manifest.description.zh || manifest.description.en"></k-markdown>
           </div>
@@ -25,9 +25,9 @@ import { router, send, store } from '@koishijs/client'
 import { ref } from 'vue'
 import { useWindowSize } from '@vueuse/core'
 import { showSelect } from '../utils'
-import { categories } from './utils'
+import { categories, resolveCategory } from './utils'
 
-const active = ref('')
+const active = ref('all')
 const { width } = useWindowSize()
 
 function configure(path: string) {

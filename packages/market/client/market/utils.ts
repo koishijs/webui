@@ -3,7 +3,7 @@ import { AnalyzedPackage } from '@koishijs/registry'
 import { getMixedMeta } from '../utils'
 
 export const categories = {
-  '': '所有插件',
+  all: '所有插件',
   other: '未分类',
   console: '控制台',
   business: '业务功能',

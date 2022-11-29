@@ -4,6 +4,7 @@ import NavDeps from './activity/deps.vue'
 import NavMarket from './activity/market.vue'
 import NavPlugin from './activity/plugin.vue'
 
+import CategoryAll from './category/all.vue'
 import CategoryBusiness from './category/business.vue'
 import CategoryConsole from './category/console.vue'
 import CategoryGame from './category/game.vue'
@@ -31,6 +32,7 @@ icons.register('activity:deps', NavDeps)
 icons.register('activity:market', NavMarket)
 icons.register('activity:plugin', NavPlugin)
 
+icons.register('category:all', CategoryAll)
 icons.register('category:business', CategoryBusiness)
 icons.register('category:console', CategoryConsole)
 icons.register('category:game', CategoryGame)
