@@ -54,17 +54,15 @@
       <div class="left"></div>
       <div class="right">
         <el-button @click="showDialog = false">取消</el-button>
-        <template v-if="!workspace">
-          <el-button :type="data[version].result" @click="install(false)" :disabled="unchanged">
-            {{ current ? '更新' : '安装' }}
-          </el-button>
-        </template>
-        <template v-else-if="current">
-          <el-button @click="install(true)">移除</el-button>
-          <el-button v-if="!workspace" @click="install(false)" :disabled="unchanged">修改</el-button>
+        <template v-if="workspace">
+          <el-button v-if="current" @click="install(null)">移除</el-button>
+          <el-button v-else @click="install(version)" :disabled="unchanged">添加</el-button>
         </template>
         <template v-else>
-          <el-button @click="install(true)" :disabled="unchanged">添加</el-button>
+          <el-button @click="install(null)">移除</el-button>
+          <el-button v-if="current" :type="data[version].result" @click="install(version)" :disabled="unchanged">
+            {{ current ? '更新' : '安装' }}
+          </el-button>
         </template>
       </div>
     </template>
@@ -76,11 +74,11 @@
 import { computed, ref, watch } from 'vue'
 import { loading, message, router, send, socket, store, valueMap } from '@koishijs/client'
 import { satisfies } from 'semver'
-import { active } from '../utils'
+import { active, config } from '../utils'
 
 const showDialog = ref(false)
 
-async function install(remove = false) {
+async function install(version: string) {
   const instance = loading({
     text: '正在更新依赖……',
   })
@@ -92,7 +90,7 @@ async function install(remove = false) {
   try {
     showDialog.value = false
     const code = await send('market/install', {
-      [active.value]: remove ? null : version.value,
+      [active.value]: version,
     })
     if (code) {
       message.error('安装失败！')
@@ -164,8 +162,9 @@ const data = computed(() => {
 watch(() => active.value, (value) => {
   showDialog.value = !!value
   if (!value) return
-  const request = store.dependencies[active.value]?.request
-  version.value = request || store.market.data[value].version
+  version.value = config.override[active.value]
+    || store.dependencies[active.value]?.request
+    || store.market.data[value].version
 }, { immediate: true })
 
 function* find(target: string, plugins: {}, prefix: string): IterableIterator<[string, boolean]> {

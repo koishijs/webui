@@ -1,14 +1,16 @@
 import { computed, ref } from 'vue'
-import { createStorage, send, store } from '@koishijs/client'
+import { createStorage, Dict, send, store } from '@koishijs/client'
 
 interface ManagerConfig {
   prefix: string
+  override: Dict<string>
   showInstalled?: boolean
   hideWorkspace?: boolean
 }
 
 export const config = createStorage<ManagerConfig>('manager', 2, () => ({
   prefix: '^',
+  override: {},
   showInstalled: false,
   hideWorkspace: true,
 }))

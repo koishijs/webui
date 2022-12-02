@@ -1,9 +1,6 @@
 <template>
   <k-layout main="page-deps" :menu="menu">
-    <div class="controls">
-      <el-checkbox v-model="config.hideWorkspace">忽略工作区依赖</el-checkbox>
-    </div>
-    <table>
+    <table class="table-head">
       <colgroup>
         <col width="auto">
         <col width="15%">
@@ -42,15 +39,14 @@
 
 import { computed } from 'vue'
 import { store } from '@koishijs/client'
-import { config, menu } from '../utils'
+import { menu } from '../utils'
 import PackageView from './package.vue'
 
 const names = computed(() => {
-  let data = Object.keys(store.dependencies)
-  if (config.hideWorkspace) {
-    data = data.filter(name => !store.dependencies[name].workspace)
-  }
-  return data.sort((a, b) => a > b ? 1 : -1)
+  return Object
+    .keys(store.dependencies)
+    .filter(name => !store.dependencies[name].workspace)
+    .sort((a, b) => a > b ? 1 : -1)
 })
 
 </script>
@@ -61,16 +57,15 @@ const names = computed(() => {
   display: flex;
   flex-flow: column;
 
-  .controls {
-    height: 2rem;
-    padding: 0 2rem;
-    line-height: 2rem;
-    margin: 1rem 0;
-  }
-
   .body-container {
     transform: translateY(1px);
     margin-top: -1px;
+  }
+
+  table {
+    tr:first-child {
+      border-top: none;
+    }
   }
 
   tbody {
@@ -80,10 +75,6 @@ const names = computed(() => {
 
     tr:hover {
       background-color: var(--hover-bg);
-    }
-
-    tr:first-child {
-      border-top: none;
     }
   }
 }
