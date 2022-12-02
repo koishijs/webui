@@ -7,13 +7,14 @@
       <el-select v-if="!workspace" :disabled="workspace" v-model="selectVersion">
         <el-option v-for="({ result }, version) in data" :key="version" :value="version">
           {{ version }}
-          <template v-if="version === current">(当前版本)</template>
+          <template v-if="version === current">(当前)</template>
           <span :class="[result, 'theme-color', 'dot-hint']"></span>
         </el-option>
       </el-select>
     </template>
 
-    <el-scrollbar v-if="active && !workspace">
+    <div class="padding" v-if="!active || workspace || !Object.keys(data[version].peers).length"></div>
+    <el-scrollbar v-else>
       <table>
         <tr>
           <td>依赖名称</td>
@@ -55,12 +56,12 @@
       <div class="right">
         <el-button @click="showDialog = false">取消</el-button>
         <template v-if="workspace">
-          <el-button v-if="current" @click="install(null)">移除</el-button>
-          <el-button v-else @click="install(version)" :disabled="unchanged">添加</el-button>
+          <el-button v-if="current" @click="installDep('')">移除</el-button>
+          <el-button v-else @click="installDep(version)" :disabled="unchanged">添加</el-button>
         </template>
         <template v-else>
-          <el-button @click="install(null)">移除</el-button>
-          <el-button v-if="current" :type="data[version].result" @click="install(version)" :disabled="unchanged">
+          <el-button v-if="current" @click="installDep('')">移除</el-button>
+          <el-button :type="data[version].result" @click="installDep(version)" :disabled="unchanged">
             {{ current ? '更新' : '安装' }}
           </el-button>
         </template>
@@ -72,41 +73,16 @@
 <script lang="ts" setup>
 
 import { computed, ref, watch } from 'vue'
-import { loading, message, router, send, socket, store, valueMap } from '@koishijs/client'
-import { satisfies } from 'semver'
+import { router, send, store } from '@koishijs/client'
+import { analyzeVersions, showDialog, install } from './utils'
 import { active, config } from '../utils'
 
-const showDialog = ref(false)
-
-async function install(version: string) {
-  const instance = loading({
-    text: '正在更新依赖……',
+function installDep(version: string) {
+  install({ [active.value]: version }, () => {
+    if (paths.value.length) return
+    const path = shortname.value + ':' + Math.random().toString(36).slice(2, 8)
+    send('manager/unload', path, {})
   })
-  const dispose = watch(socket, () => {
-    message.success('安装成功！')
-    dispose()
-    instance.close()
-  })
-  try {
-    showDialog.value = false
-    const code = await send('market/install', {
-      [active.value]: version,
-    })
-    if (code) {
-      message.error('安装失败！')
-    } else {
-      message.success('安装成功！')
-      if (!paths.value.length) {
-        const path = shortname.value + ':' + Math.random().toString(36).slice(2, 8)
-        send('manager/unload', path, {})
-      }
-    }
-  } catch (err) {
-    message.error('安装超时！')
-  } finally {
-    dispose()
-    instance.close()
-  }
 }
 
 const version = ref<string>()
@@ -114,7 +90,7 @@ const version = ref<string>()
 const selectVersion = computed({
   get() {
     if (store.dependencies[active.value]?.request === version.value) {
-      return version.value + ' (当前版本)'
+      return version.value + ' (当前)'
     } else {
       return version.value
     }
@@ -138,25 +114,7 @@ const workspace = computed(() => {
 
 const data = computed(() => {
   if (!active.value || workspace.value) return
-  const { versions } = store.market.data[active.value] || store.dependencies[active.value]
-  return valueMap(versions, (item) => {
-    const peers = valueMap({ ...item.peerDependencies }, (request, name) => {
-      const resolved = store.dependencies[name]?.resolved || store.packages[name]?.version
-      const result = !resolved ? 'warning' : satisfies(resolved, request) ? 'success' : 'danger'
-      return { request, resolved, result }
-    })
-    let result: 'success' | 'warning' | 'danger' = 'success'
-    for (const peer of Object.values(peers)) {
-      if (peer.result === 'danger') {
-        result = 'danger'
-        break
-      }
-      if (result === 'warning') {
-        result = 'warning'
-      }
-    }
-    return { peers, result }
-  })
+  return analyzeVersions(active.value)
 })
 
 watch(() => active.value, (value) => {
@@ -216,6 +174,10 @@ function configure(path: string | true) {
       max-width: 12.5rem;
       margin: -2px 0 -4px;
     }
+  }
+
+  .padding {
+    height: 2rem;
   }
 
   .version-badges {

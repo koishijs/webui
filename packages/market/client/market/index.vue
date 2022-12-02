@@ -46,7 +46,7 @@
 import { router, store, global } from '@koishijs/client'
 import { computed, reactive, watch } from 'vue'
 import { useRoute } from 'vue-router'
-import { config, menu } from '../utils'
+import { config, refresh } from '../utils'
 import { validate } from './utils'
 import PackageView from './package.vue'
 
@@ -102,6 +102,8 @@ const objects = computed(() => {
       : config.showInstalled || !store.packages[item.name])
     .sort((a, b) => (global.static ? +b.portable - +a.portable : 0) || b.score.final - a.score.final)
 })
+
+const menu = computed(() => [refresh.value])
 
 </script>
 

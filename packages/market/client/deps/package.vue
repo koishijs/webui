@@ -2,14 +2,23 @@
   <tr class="dep-package-view">
     <td class="name">{{ name }}</td>
 
-    <td class="current">{{ local.resolved }}</td>
-
-    <td>{{ local.request }}</td>
+    <td class="current">
+      <template v-if="local.workspace">工作区</template>
+      <template v-else>
+        {{ local.resolved }}
+        ({{ local.resolved === local.latest ? '最新' : '可更新' }})
+      </template>
+    </td>
 
     <td>
-      <template v-if="local.workspace">工作区</template>
-      <template v-else-if="local.resolved === local.latest">最新</template>
-      <template v-else>可更新</template>
+      <el-select v-if="!local.workspace" v-model="version">
+        <el-option value="">移除依赖</el-option>
+        <el-option v-for="({ result }, version) in data" :key="version" :value="version">
+          {{ version }}
+          <template v-if="version === local.resolved">(当前)</template>
+          <span :class="[result, 'theme-color', 'dot-hint']"></span>
+        </el-option>
+      </el-select>
     </td>
 
     <td>
@@ -25,7 +34,8 @@
 
 import { computed } from 'vue'
 import { store } from '@koishijs/client'
-import { active } from '../utils'
+import { active, config } from '../utils'
+import { analyzeVersions } from './utils'
 
 const props = defineProps({
   name: String,
@@ -34,6 +44,27 @@ const props = defineProps({
 const local = computed(() => {
   return store.dependencies[props.name]
 })
+
+const version = computed({
+  get() {
+    const value = config.override[props.name]
+    if (local.value.resolved === value) {
+      return
+    } else {
+      return value === '' ? '移除依赖' : value
+    }
+  },
+  set(value) {
+    if (local.value.resolved === value) {
+      delete config.override[props.name]
+    } else {
+      config.override[props.name] = value
+    }
+    console.log(config.override)
+  },
+})
+
+const data = computed(() => analyzeVersions(props.name))
 
 </script>
 

@@ -158,7 +158,7 @@ class Installer extends DataService<Dict<Dependency>> {
     const newPayload = await this.get()
     for (const name in oldPayload) {
       const { resolved, workspace } = oldPayload[name]
-      if (workspace) continue
+      if (workspace || !newPayload[name]) continue
       if (newPayload[name].resolved === resolved) continue
       if (!(require.resolve(name) in require.cache)) continue
       this.ctx.loader.fullReload()

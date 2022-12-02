@@ -4,8 +4,7 @@
       <colgroup>
         <col width="auto">
         <col width="15%">
-        <col width="15%">
-        <col width="15%">
+        <col width="30%">
         <col width="15%">
       </colgroup>
       <thead>
@@ -13,7 +12,6 @@
           <th>依赖名称</th>
           <th>本地版本</th>
           <th>目标版本</th>
-          <th>状态</th>
           <th>操作</th>
         </tr>
       </thead>
@@ -23,8 +21,7 @@
         <colgroup>
           <col width="auto">
           <col width="15%">
-          <col width="15%">
-          <col width="15%">
+          <col width="30%">
           <col width="15%">
         </colgroup>
         <tbody>
@@ -39,7 +36,8 @@
 
 import { computed } from 'vue'
 import { store } from '@koishijs/client'
-import { menu } from '../utils'
+import { config, refresh } from '../utils'
+import { install } from './utils'
 import PackageView from './package.vue'
 
 const names = computed(() => {
@@ -48,6 +46,15 @@ const names = computed(() => {
     .filter(name => !store.dependencies[name].workspace)
     .sort((a, b) => a > b ? 1 : -1)
 })
+
+const menu = computed(() => [{
+  icon: 'check',
+  label: '应用更改',
+  disabled: !Object.keys(config.override).length,
+  async action() {
+    return install(config.override)
+  },
+}, refresh.value])
 
 </script>
 
@@ -75,6 +82,12 @@ const names = computed(() => {
 
     tr:hover {
       background-color: var(--hover-bg);
+    }
+  }
+
+  @media (max-width: 768px) {
+    td {
+      padding: 0.5em 0.5em;
     }
   }
 }
