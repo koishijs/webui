@@ -1,5 +1,6 @@
 import { App, Component, defineComponent, h } from 'vue'
 import { IconExternal, IconEye, IconEyeSlash } from 'schemastery-vue'
+import Ellipsis from './activity/ellipsis.vue'
 import Home from './activity/home.vue'
 import Moon from './activity/moon.vue'
 import Sun from './activity/sun.vue'
@@ -41,6 +42,7 @@ import './style.scss'
 
 const registry: Record<string, Component> = {}
 
+register('ellipsis', Ellipsis)
 register('activity:home', Home)
 register('activity:moon', Moon)
 register('activity:sun', Sun)
