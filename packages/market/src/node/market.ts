@@ -1,4 +1,4 @@
-import { Context, Dict, pick, Schema, Time, valueMap } from 'koishi'
+import { Context, Dict, pick, Quester, Schema, Time, valueMap } from 'koishi'
 import Scanner, { AnalyzedPackage, SearchResult } from '@koishijs/registry'
 import { MarketProvider as BaseMarketProvider } from '../shared'
 import { throttle } from 'throttle-debounce'
@@ -6,6 +6,7 @@ import { throttle } from 'throttle-debounce'
 class MarketProvider extends BaseMarketProvider {
   static using = ['console.dependencies']
 
+  private http: Quester
   private failed: string[] = []
   private scanner: Scanner
   private fullCache: Dict<AnalyzedPackage> = {}
@@ -13,6 +14,7 @@ class MarketProvider extends BaseMarketProvider {
 
   constructor(ctx: Context, public config: MarketProvider.Config) {
     super(ctx)
+    if (config.endpoint) this.http = ctx.http.extend(config)
   }
 
   async start() {
@@ -40,11 +42,11 @@ class MarketProvider extends BaseMarketProvider {
   })
 
   async collect() {
-    const { endpoint, timeout } = this.config
+    const { timeout } = this.config
     this.failed = []
     this.scanner = new Scanner(this.ctx.console.dependencies.http.get)
-    if (endpoint) {
-      const result = await this.ctx.http.get<SearchResult>(endpoint, { timeout })
+    if (this.http) {
+      const result = await this.http.get<SearchResult>('')
       this.scanner.objects = result.objects.filter(object => !object.ignored)
       this.scanner.total = this.scanner.objects.length
     } else {
@@ -90,6 +92,7 @@ namespace MarketProvider {
   export const Config: Schema<Config> = Schema.object({
     endpoint: Schema.string().role('link').description('用于搜索插件市场的网址。默认跟随 registry 设置。'),
     timeout: Schema.number().role('time').default(Time.second * 30).description('搜索插件市场的超时时间。'),
+    proxyAgent: Schema.string().role('link').description('用于搜索插件市场的代理。'),
   }).description('搜索设置')
 }
 
