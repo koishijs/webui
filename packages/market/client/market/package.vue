@@ -99,13 +99,13 @@ function formatSize(value: number) {
 .market-view {
   width: 100%;
   max-width: 540px;
-  height: 12.5rem;
+  height: calc(12.5rem + 2px);
   margin: 0;
-  padding: 1.25rem;
+  padding: 1rem 1.25rem;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 0.75rem;
 
   .header, .footer {
     flex: 0 0 auto;
@@ -117,6 +117,7 @@ function formatSize(value: number) {
     gap: 1rem;
 
     .left {
+      flex: 0 0 auto;
       width: 3.5rem;
       height: 3.5rem;
       border-radius: 8px;
@@ -135,12 +136,24 @@ function formatSize(value: number) {
       display: flex;
       flex-flow: column;
       justify-content: space-around;
+      overflow: hidden;
     }
 
     h2 {
       font-size: 1.125rem;
       margin: 0;
       line-height: 1;
+      padding-right: 4rem;
+      display: flex;
+      align-items: center;
+
+      a {
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        width: 100%;
+        overflow: hidden;
+        line-height: 1.25rem;
+      }
 
       .verified {
         margin-left: 0.6rem;
@@ -173,7 +186,7 @@ function formatSize(value: number) {
     }
 
     .rating {
-      height: 1rem;
+      height: 1.25rem;
       display: flex;
       align-items: center;
       gap: 0 0.25rem;
@@ -189,7 +202,7 @@ function formatSize(value: number) {
     button.right {
       position: absolute;
       right: 0;
-      top: -3px;
+      top: -1px;
       padding: 0.35em 0.85em;
     }
   }

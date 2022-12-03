@@ -22,7 +22,7 @@
     "test:html": "shx rm -rf coverage && c8 -r html yarn test"
   },
   "devDependencies": {
-    "@koishijs/plugin-database-memory": "^2.0.0",
+    "@koishijs/plugin-database-memory": "^2.0.1",
     "@koishijs/plugin-help": "^2.0.0",
     "@koishijs/plugin-mock": "^2.3.1",
     "@rollup/plugin-yaml": "^3.1.0",
