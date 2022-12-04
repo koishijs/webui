@@ -5,8 +5,12 @@ class SandboxMessenger extends Messenger<SandboxBot> {
 
   async flush() {
     if (!this.buffer.trim()) return
-    const content = segment.transform(this.buffer.trim(), {
-      image(data) {
+    const content = await segment.transformAsync(this.buffer.trim(), {
+      image: async (data) => {
+        if (data.url.startsWith('file://') && process.env.KOISHI_ENV !== 'browser') {
+          const file = await this.bot.ctx.http.file(data.url)
+          return segment.image(`data:${file.mime};base64,` + Buffer.from(file.data).toString('base64'))
+        }
         // for backward compatibility
         if (!data.url.startsWith('base64://')) return segment('image', data)
         return segment.image('data:image/png;base64,' + data.url.slice(9))
