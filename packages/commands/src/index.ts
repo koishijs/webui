@@ -1,4 +1,4 @@
-import { Command, Context, Dict, pick, remove, Schema } from 'koishi'
+import { Argv, Command, Context, Dict, pick, remove, Schema } from 'koishi'
 // import CommandProvider from './service'
 
 export * from './service'
@@ -7,6 +7,7 @@ export interface Override {
   name?: string
   alias?: string[]
   create?: boolean
+  options?: Dict<Argv.OptionConfig>
 }
 
 export const Override: Schema<Override> = Schema.object({
@@ -63,13 +64,19 @@ export function apply(ctx: Context, config: Dict<Config>) {
   }
 
   function accept(target: Command, config: Config) {
-    const { name, create, ...options } = config
+    const { name, create, options = {}, ...rest } = config
     const command = create ? target : patch(target)
 
     const snapshot: Snapshot = pick(target, ['name', 'parent'])
-    for (const key in options) {
+    for (const key in rest) {
       snapshot[key] = command.config[key]
-      command.config[key] = options[key]
+      command.config[key] = rest[key]
+    }
+
+    for (const key in options) {
+      const option = command._options[key]
+      if (!option) continue
+      Object.assign(option, options[key])
     }
 
     if (name) {

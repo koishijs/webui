@@ -1,7 +1,7 @@
 {
   "name": "@koishijs/plugin-commands",
   "description": "Override Command Config for Koishi",
-  "version": "2.1.5",
+  "version": "2.2.0",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
   "files": [
@@ -37,7 +37,7 @@
     }
   },
   "peerDependencies": {
-    "koishi": "^4.10.4"
+    "koishi": "^4.10.5"
   },
   "devDependencies": {
     "@koishijs/client": "^4.7.1",

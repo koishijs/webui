@@ -1,6 +1,6 @@
 import { App } from 'koishi'
 import mock from '@koishijs/plugin-mock'
-import help from '@koishijs/plugin-help'
+import * as help from '@koishijs/plugin-help'
 import * as commands from '@koishijs/plugin-commands'
 import { expect } from 'chai'
 
