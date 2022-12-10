@@ -7,7 +7,7 @@ export function analyzeVersions(name: string) {
   return valueMap(versions, (item) => {
     const peers = valueMap({ ...item.peerDependencies }, (request, name) => {
       const resolved = store.dependencies[name]?.resolved || store.packages[name]?.version
-      const result = !resolved ? 'warning' : satisfies(resolved, request) ? 'success' : 'danger'
+      const result = !resolved ? 'warning' : satisfies(resolved, request, { includePrerelease: true }) ? 'success' : 'danger'
       return { request, resolved, result }
     })
     let result: 'success' | 'warning' | 'danger' = 'success'

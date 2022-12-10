@@ -141,7 +141,7 @@ class Installer extends DataService<Dict<Dependency>> {
     let shouldInstall = false
     for (const name in deps) {
       const { resolved } = oldPayload[name] || {}
-      if (deps[name] && resolved && satisfies(resolved, deps[name])) continue
+      if (deps[name] && resolved && satisfies(resolved, deps[name], { includePrerelease: true })) continue
       shouldInstall = true
       break
     }

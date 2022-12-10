@@ -37,7 +37,7 @@ class Installer extends DataService<Dict<Dependency>> {
 
   async get(force = false) {
     const market = await this.ctx.console.market.prepare()
-    const objects = [...market.objects.filter(o => o.portable), ...market.shared]
+    const objects = market.objects.filter(o => o.portable)
     return Object.fromEntries(objects.map((object) => [object.name, {
       request: object.version,
       resolved: object.version,

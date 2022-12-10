@@ -24,7 +24,7 @@ export abstract class MarketProvider extends DataService<MarketProvider.Payload>
     this._task = null
   }
 
-  abstract collect(): Promise<any>
+  abstract collect(): Promise<void | MarketResult>
 
   async prepare(): Promise<MarketResult> {
     return this._task ||= this.collect().catch((error) => {
