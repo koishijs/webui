@@ -26,20 +26,28 @@
     </div>
     <k-markdown inline class="desc" :source="meta.manifest.description.zh || meta.manifest.description.en"></k-markdown>
     <div class="footer">
-      <div class="info">
-        <a :href="data.links.npm" target="_blank" rel="noopener noreferrer">
-          <k-icon name="tag"></k-icon>{{ data.version }}
-        </a>
-        <a v-if="data.installSize" :href="data.links.size" target="_blank" rel="noopener noreferrer">
+      <a class="shrink" :href="data.links.npm" target="_blank" rel="noopener noreferrer">
+        <k-icon name="tag"></k-icon>{{ data.version }}
+      </a>
+      <template v-if="data.installSize">
+        <span class="spacer"></span>
+        <a :href="data.links.size" target="_blank" rel="noopener noreferrer">
           <k-icon name="file-archive"></k-icon>{{ formatSize(data.installSize) }}
         </a>
-        <span v-if="data.downloads">
+      </template>
+      <template v-if="data.downloads">
+        <span class="spacer"></span>
+        <span>
           <k-icon name="download"></k-icon>{{ data.downloads.lastMonth }}
         </span>
-        <span v-if="!data.installSize && !data.downloads">
+      </template>
+      <template v-if="!data.installSize && !data.downloads">
+        <span class="spacer"></span>
+        <span>
           <k-icon name="balance"></k-icon>{{ data.license }}
         </span>
-      </div>
+      </template>
+      <span class="spacer grow"></span>
       <div class="avatars">
         <el-tooltip v-for="({ email, username }) in data.maintainers" :key="email" :content="username">
           <a @click="$emit('query', 'email:' + email)">
@@ -72,7 +80,7 @@ function handleClick() {
   active.value = props.data.name
 }
 
-const rating = computed(() => Math.min(Math.max((props.data.score.final - 0.3) * 10, 0), 5))
+const rating = computed(() => Math.min(Math.max((props.data.score.final - 0.25) * 10, 0), 5))
 
 function getAvatar(email: string) {
   return (store.market.gravatar || 'https://s.gravatar.com') + '/avatar/' + md5.hash(email) + '?d=mp'
@@ -152,7 +160,7 @@ function formatSize(value: number) {
         white-space: nowrap;
         width: 100%;
         overflow: hidden;
-        line-height: 1.25rem;
+        line-height: 1.5rem;
       }
 
       .verified {
@@ -186,7 +194,7 @@ function formatSize(value: number) {
     }
 
     .rating {
-      height: 1.25rem;
+      height: 1.5rem;
       display: flex;
       align-items: center;
       gap: 0 0.25rem;
@@ -217,25 +225,36 @@ function formatSize(value: number) {
   .footer {
     display: flex;
     align-items: center;
-    justify-content: space-between;
     height: 1.5rem;
-    gap: 0 1.5rem;
     margin-bottom: -0.25rem;
     cursor: default;
+    font-size: 14px;
+    color: var(--el-text-color-regular);
+    transition: color 0.3s ease;
+    display: flex;
+    overflow: hidden;
 
-    .info {
-      font-size: 14px;
-      color: var(--el-text-color-regular);
-      transition: color 0.3s ease;
-      display: flex;
-      gap: 1.5rem;
+    .spacer {
+      flex: 0 5 1.5rem;
+    }
 
-      .k-icon {
-        height: 12px;
-        width: 16px;
-        margin-right: 6px;
-        vertical-align: -1px;
-      }
+    .grow {
+      flex-grow: 1;
+      flex-shrink: 1;
+    }
+
+    .k-icon {
+      height: 12px;
+      width: 16px;
+      margin-right: 6px;
+      vertical-align: -1px;
+    }
+
+    > * {
+      flex: 0 0 auto;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
     .avatars {
