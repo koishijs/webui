@@ -1,6 +1,6 @@
 <template>
   <span class="k-badge" :class="type">
-    <slot/>
+    <slot></slot>
   </span>
 </template>
 
@@ -28,6 +28,7 @@ defineProps<{ type?: 'warning' }>()
   margin-right: 0.5rem;
   color: white;
   font-weight: 500;
+  white-space: nowrap;
   vertical-align: baseline;
 
   @include apply-color(primary);
