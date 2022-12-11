@@ -4,7 +4,7 @@ import { PackageJson, Registry } from '@koishijs/registry'
 import { resolve } from 'path'
 import { promises as fsp } from 'fs'
 import { loadManifest } from './utils'
-import { compare, satisfies } from 'semver'
+import { compare, satisfies, valid } from 'semver'
 import {} from '@koishijs/loader'
 import getRegistry from 'get-registry'
 import which from 'which-pm-runs'
@@ -36,6 +36,8 @@ export interface Dependency {
   versions?: Dict<Partial<PackageJson>>
   /** latest version */
   latest?: string
+  /** valid (unsupported) syntax */
+  invalid?: boolean
 }
 
 class Installer extends DataService<Dict<Dependency>> {
@@ -79,6 +81,11 @@ class Installer extends DataService<Dict<Dependency>> {
         result[name].workspace = meta.$workspace
         if (meta.$workspace) return
       } catch {}
+
+      if (!valid(result[name].request)) {
+        result[name].invalid = true
+        return
+      }
 
       try {
         const registry = await this.http.get<Registry>(`/${name}`)

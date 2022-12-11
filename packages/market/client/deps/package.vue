@@ -6,12 +6,14 @@
       <template v-if="local.workspace">工作区</template>
       <template v-else>
         {{ local.resolved }}
-        ({{ local.resolved === local.latest ? '最新' : '可更新' }})
+        <template v-if="!local.invalid">
+          ({{ local.resolved === local.latest ? '最新' : '可更新' }})
+        </template>
       </template>
     </td>
 
     <td>
-      <el-select v-if="!local.workspace" v-model="version">
+      <el-select v-if="!local.workspace && !local.invalid" v-model="version">
         <el-option value="">移除依赖</el-option>
         <el-option v-for="({ result }, version) in data" :key="version" :value="version">
           {{ version }}
@@ -23,9 +25,8 @@
 
     <td>
       <el-button v-if="local.workspace || local.versions" @click="active = name">修改</el-button>
-      <template v-else>
-        版本获取失败
-      </template>
+      <template v-else-if="local.invalid">暂不支持</template>
+      <template v-else>版本获取失败</template>
     </td>
   </tr>
 </template>
