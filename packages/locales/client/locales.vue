@@ -1,22 +1,42 @@
 <template>
-  <k-layout>
+  <k-layout class="page-locales">
     <template #header>
-      本地化
+      本地化 - {{ active }}
+    </template>
+
+    <template #menu>
+      <el-dropdown placement="bottom" popper-class="k-dropdown">
+        <span class="menu-item">
+          <k-icon class="menu-icon" name="globe"></k-icon>
+        </span>
+        <template #dropdown>
+          <el-checkbox-group v-model="displayLocales">
+            <template v-for="(_, locale) in store.locales" :key="locale">
+              <el-checkbox v-if="locale && !locale.startsWith('$')" :label="locale">
+                {{ locale }}
+              </el-checkbox>
+            </template>
+          </el-checkbox-group>
+        </template>
+      </el-dropdown>
     </template>
 
     <template #left>
-      <h3>语言</h3>
-      <el-checkbox-group v-model="displayLocales">
-        <template v-for="(_, locale) in store.locales" :key="locale">
-          <el-checkbox v-if="locale && !locale.startsWith('$')" :label="locale">
-            {{ locale }}
-          </el-checkbox>
-        </template>
-      </el-checkbox-group>
+      <el-scrollbar>
+        <el-tree
+          :data="data"
+          :props="{ class: getClass }"
+          :default-expand-all="true"
+          :expand-on-click-node="false"
+          @node-click="handleClick"
+        ></el-tree>
+      </el-scrollbar>
     </template>
 
     <el-scrollbar>
-      <div v-for="path in paths" :key="path">{{ path }}</div>
+      <template v-for="path in activePaths" :key="path">
+        <div>{{ path }}</div>
+      </template>
     </el-scrollbar>
   </k-layout>
 </template>
@@ -26,7 +46,19 @@
 import { store } from '@koishijs/client'
 import { computed, ref } from 'vue'
 
-const displayLocales = ref([])
+const displayLocales = ref(['zh'])
+
+const active = ref('')
+
+function getClass(tree: Tree) {
+  const words: string[] = []
+  if (tree.id === active.value) words.push('is-active')
+  return words.join(' ')
+}
+
+function handleClick(tree: Tree) {
+  active.value = tree.id
+}
 
 const paths = computed(() => {
   const result = {}
@@ -37,4 +69,81 @@ const paths = computed(() => {
   return Object.keys(result).filter(path => !path.includes('._'))
 })
 
+const activePaths = computed(() => {
+  return paths.value
+    .filter(path => path.startsWith(active.value + '.'))
+    .map(path => path.slice(active.value.length + 1))
+    .filter(path => active.value.split('.').length >= 2 || !path.includes('.'))
+})
+
+interface Tree {
+  id: string
+  label: string
+  children?: Tree[]
+}
+
+const data = computed(() => {
+  const result: Tree[] = []
+  for (const path of paths.value) {
+    const parts = path.split('.')
+    let node = result
+    for (let i = 0; i < Math.min(parts.length - 1, 2); i++) {
+      const label = parts[i]
+      if (!label) break
+      const id = parts.slice(0, i + 1).join('.')
+      let child = node.find(item => item.id === id)
+      if (!child) {
+        child = { id, label }
+        node.push(child)
+      }
+      node = child.children ??= []
+    }
+  }
+  return result
+})
+
 </script>
+
+<style lang="scss">
+
+.page-locales {
+  .layout-left .el-scrollbar__view {
+    padding: 1rem 0;
+    line-height: 2.25rem;
+  }
+
+  .el-tree-node__expand-icon {
+    margin-left: 8px;
+  }
+
+  .el-tree-node {
+    &.is-active > .el-tree-node__content {
+      background-color: var(--hover-bg);
+      color: var(--active);
+    }
+  }
+
+  .el-tree-node__content {
+    line-height: 2.25rem;
+    height: 2.25rem;
+    transition: var(--color-transition);
+
+    &:hover {
+      background-color: var(--hover-bg);
+    }
+  }
+
+  .el-tree-node__label {
+    font-size: 16px;
+  }
+}
+
+.k-dropdown {
+  .el-checkbox {
+    display: flex;
+    margin-right: 0;
+    padding: 0 1rem;
+  }
+}
+
+</style>
