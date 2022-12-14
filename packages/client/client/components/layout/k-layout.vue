@@ -8,14 +8,16 @@
       <div class="mask" @click="isLeftAsideOpen = !isLeftAsideOpen"></div>
       <layout-header>
         <template #left>
-          <slot name="header">{{ $route.name }}</slot>
+          <slot name="header">{{ route.name }}</slot>
         </template>
         <template #right>
-          <el-tooltip v-for="{ icon, label, type, disabled, action } in menu || []" :disabled="!!disabled" :content="label" placement="bottom">
-            <span class="menu-item" :class="[type, { disabled }]" @click="action()">
-              <k-icon class="menu-icon" :name="icon"></k-icon>
-            </span>
-          </el-tooltip>
+          <slot name="menu">
+            <el-tooltip v-for="{ icon, label, type, disabled, action } in menu || []" :disabled="!!disabled" :content="label" placement="bottom">
+              <span class="menu-item" :class="[type, { disabled }]" @click="action()">
+                <k-icon class="menu-icon" :name="icon"></k-icon>
+              </span>
+            </el-tooltip>
+          </slot>
         </template>
       </layout-header>
       <main class="layout-main" :class="main">
@@ -31,6 +33,7 @@
 
 <script lang="ts" setup>
 
+import { useRoute } from 'vue-router'
 import { isLeftAsideOpen } from './utils'
 import LayoutHeader from './layout-header.vue'
 
@@ -49,6 +52,8 @@ defineProps<{
   container?: string
   menu?: MenuItem[]
 }>()
+
+const route = useRoute()
 
 </script>
 

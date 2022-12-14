@@ -33,20 +33,31 @@
       </el-scrollbar>
     </template>
 
-    <el-scrollbar>
+    <k-content>
       <template v-for="path in activePaths" :key="path">
-        <div>{{ path }}</div>
+        <h3>{{ path }}</h3>
+        <div class="translation" v-for="locale in displayLocales" :key="locale">
+          <span class="locale">{{ locale }}</span>
+          <el-input
+            autosize
+            type="textarea"
+            :modelValue="store.locales['$' + locale]?.[`${active}.${path}`]"
+            :placeholder="store.locales[locale][`${active}.${path}`]"
+            @update:modelValue="handleUpdate(locale, path, $event)"
+          ></el-input>
+        </div>
       </template>
-    </el-scrollbar>
+    </k-content>
   </k-layout>
 </template>
 
 <script lang="ts" setup>
 
-import { store } from '@koishijs/client'
+import { send, store } from '@koishijs/client'
 import { computed, ref } from 'vue'
+import { debounce } from 'throttle-debounce'
 
-const displayLocales = ref(['zh'])
+const displayLocales = ref(['zh', 'en'])
 
 const active = ref('')
 
@@ -66,7 +77,7 @@ const paths = computed(() => {
     if (!locale) continue
     Object.assign(result, store.locales[locale])
   }
-  return Object.keys(result).filter(path => !path.includes('._'))
+  return Object.keys(result).filter(path => !path.includes('._') && !path.includes('@'))
 })
 
 const activePaths = computed(() => {
@@ -102,6 +113,21 @@ const data = computed(() => {
   return result
 })
 
+const update = debounce(1000, () => {
+  const result = {}
+  for (const locale in store.locales) {
+    if (!locale.startsWith('$')) continue
+    result[locale.slice(1)] = store.locales[locale]
+  }
+  send('l10n', result)
+})
+
+function handleUpdate(locale: string, path: string, value: string) {
+  const root = store.locales['$' + locale] ??= {}
+  root[`${active.value}.${path}`] = value
+  update()
+}
+
 </script>
 
 <style lang="scss">
@@ -135,6 +161,19 @@ const data = computed(() => {
 
   .el-tree-node__label {
     font-size: 16px;
+  }
+
+  .translation {
+    display: flex;
+    margin: 0.5rem;
+
+    span.locale {
+      width: 4rem;
+      height: 2rem;
+      flex: 0 0 auto;
+      padding: 0.25rem 0.5rem;
+      box-sizing: border-box;
+    }
   }
 }
 
