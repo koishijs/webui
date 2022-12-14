@@ -5,6 +5,12 @@ import { extname, resolve } from 'path'
 import { createReadStream, existsSync, promises as fsp, Stats } from 'fs'
 import open from 'open'
 
+declare module 'koishi' {
+  interface SharedData {
+    clientCount: number
+  }
+}
+
 export * from '../shared'
 
 interface ClientConfig {
@@ -31,6 +37,11 @@ class NodeConsole extends Console {
     this.layer = ctx.router.ws(config.apiPath, (socket) => {
       // eslint-disable-next-line no-new
       new SocketHandle(ctx, socket)
+
+      ctx.shared.clientCount = this.layer.clients.size
+      socket.on('close', () => {
+        ctx.shared.clientCount = this.layer.clients.size
+      })
     })
 
     this.root = config.root || config.devMode
@@ -42,7 +53,7 @@ class NodeConsole extends Console {
     if (this.config.devMode) await this.createVite()
     this.serveAssets()
 
-    if (this.config.open && !process.env.KOISHI_AGENT) {
+    if (this.config.open && !this.ctx.shared.clientCount && !process.env.KOISHI_AGENT) {
       const { host, port } = this.ctx.root.config
       open(`http://${host || 'localhost'}:${port}${this.config.uiPath}`)
     }
