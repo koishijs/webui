@@ -55,12 +55,12 @@
     }
   },
   "peerDependencies": {
-    "@koishijs/cli": "^4.10.5",
-    "@koishijs/plugin-console": "^4.7.2",
-    "koishi": "^4.10.5"
+    "@koishijs/cli": "^4.10.6",
+    "@koishijs/plugin-console": "^4.8.1",
+    "koishi": "^4.10.6"
   },
   "devDependencies": {
-    "@koishijs/client": "^4.7.2",
+    "@koishijs/client": "^4.8.1",
     "@types/spark-md5": "^3.0.2",
     "@types/throttle-debounce": "^2.1.0",
     "@types/which-pm-runs": "^1.0.0"
