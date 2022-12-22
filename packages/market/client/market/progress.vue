@@ -8,11 +8,11 @@
 
 <script lang="ts" setup>
 
-import { store } from '@koishijs/client'
+import { store, activities, root } from '@koishijs/client'
 import { computed } from 'vue'
 
 const isLoading = computed(() => {
-  if (!store['user'] || store['user'].authority < 4) return false
+  if (root.bail('activity', activities['market'])) return false
   return !store.market || store.market.total > store.market.progress
 })
 

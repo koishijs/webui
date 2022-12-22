@@ -58,6 +58,7 @@ export default (ctx: Context) => {
   })
 
   ctx.page({
+    id: 'market',
     path: '/market',
     name: '插件市场',
     icon: 'activity:market',
