@@ -1,5 +1,11 @@
 <template>
-  <el-dialog v-model="showSelect" class="plugin-select" :title="width <= 768 ? categories[active] : '选择插件'">
+  <el-dialog v-model="showSelect" class="plugin-select">
+    <template #title>
+      <span class="title">{{ categories[active] }} ({{ packages.length }})</span>
+      <el-input v-model="keyword" #suffix>
+        <k-icon name="search"></k-icon>
+      </el-input>
+    </template>
     <div class="tabs">
       <span class="tab-item" v-for="(text, key) in categories" :key="key" @click.stop="active = key" :class="{ active: active === key }">
         <k-icon :name="'category:' + key"></k-icon>
@@ -8,12 +14,10 @@
     </div>
     <div class="content">
       <el-scrollbar>
-        <template v-for="({ name, shortname, manifest }) in store.packages">
-          <div class="package" v-if="name && (active === 'all' || resolveCategory(manifest.category) === active)" @click.stop="configure(shortname)">
-            <h3>{{ shortname }}</h3>
-            <k-markdown inline class="desc" :source="manifest.description.zh || manifest.description.en"></k-markdown>
-          </div>
-        </template>
+        <div class="package" v-for="({ name, shortname, manifest }) in packages" :key="name" @click.stop="configure(shortname)">
+          <h3>{{ shortname }}</h3>
+          <k-markdown inline class="desc" :source="manifest.description.zh || manifest.description.en"></k-markdown>
+        </div>
       </el-scrollbar>
     </div>
   </el-dialog>
@@ -22,13 +26,18 @@
 <script lang="ts" setup>
 
 import { router, send, store } from '@koishijs/client'
-import { ref } from 'vue'
-import { useWindowSize } from '@vueuse/core'
+import { computed, ref } from 'vue'
 import { showSelect } from '../utils'
 import { categories, resolveCategory } from './utils'
 
 const active = ref('all')
-const { width } = useWindowSize()
+const keyword = ref('')
+
+const packages = computed(() => Object.values(store.packages).filter(({ name, shortname, manifest }) => {
+  return name
+    && shortname.includes(keyword.value)
+    && (active.value === 'all' || resolveCategory(manifest.category) === active.value)
+}))
 
 function configure(path: string) {
   showSelect.value = false
@@ -44,11 +53,24 @@ function configure(path: string) {
 .plugin-select {
   .el-dialog__header {
     margin-right: 0;
-    padding: 16px 20px;
+    padding: 12px 20px;
     border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 
     button {
       top: 2px;
+    }
+
+    .title {
+      flex: 0 0 auto;
+    }
+
+    .el-input {
+      display: inline-block;
+      width: 220px;
+      height: 2rem;
     }
   }
 
@@ -58,19 +80,13 @@ function configure(path: string) {
     height: 50vh;
 
     .tabs {
-      // padding 2rem
-      // icon 1.5rem
-      // text 4rem
-      // gap 0.5rem
       width: 8rem;
       border-right: 1px solid var(--border);
       font-size: 15px;
       flex: 0 0 auto;
 
       @media screen and (max-width: 768px) {
-        // padding 2rem
-        // icon 1.5rem
-        width: 3.5rem;
+        width: 3rem;
       }
 
       .tab-item {
@@ -79,6 +95,11 @@ function configure(path: string) {
         height: 2.5rem;
         padding: 0 1rem;
         cursor: pointer;
+
+        @media screen and (max-width: 768px) {
+          padding: 0 0;
+          justify-content: center;
+        }
 
         .k-icon {
           width: 1.5rem;

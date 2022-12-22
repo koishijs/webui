@@ -1,7 +1,7 @@
 {
   "name": "@koishijs/plugin-auth",
   "description": "Console User Authentication",
-  "version": "2.4.0",
+  "version": "2.4.1",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
   "files": [
@@ -38,8 +38,8 @@
       "dist"
     ],
     "description": {
-      "en": "Console user authentication (highly recommended for console deployed to public network)",
-      "zh": "控制台用户登录 (如果你的控制台要部署到公网，强烈建议安装此插件以确保安全性)"
+      "en": "Console user authentication (recommended for console deployed to public network)",
+      "zh": "控制台用户登录 (如果你的控制台要部署到公网，建议安装此插件以确保安全性)"
     },
     "service": {
       "required": [
