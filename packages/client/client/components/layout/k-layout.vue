@@ -8,7 +8,7 @@
       <div class="mask" @click="isLeftAsideOpen = !isLeftAsideOpen"></div>
       <layout-header>
         <template #left>
-          <slot name="header">{{ route.name }}</slot>
+          <slot name="header">{{ route.meta.activity?.name }}</slot>
         </template>
         <template #right>
           <slot name="menu">

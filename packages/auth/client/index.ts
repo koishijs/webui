@@ -22,17 +22,19 @@ export default (ctx: Context) => {
     send('login/token', config.id, config.token).catch(e => message.error(e.message))
   }
 
-  ctx.on('activity', (meta) => {
-    return meta.authority > 0 && (!store.user || store.user.authority < meta.authority)
+  ctx.on('activity', (data) => {
+    return data.authority > 0 && (!store.user || store.user.authority < data.authority)
   })
 
   ctx.state.disposables.push(router.beforeEach((route) => {
-    if ((route.meta.authority || route.meta.fields.includes('user')) && !store.user) {
+    const { activity } = route.meta
+    if (!activity) return
+    if ((activity.authority || activity.fields.includes('user')) && !store.user) {
       // handle router.back()
       return history.state.forward === '/login' ? '/' : '/login'
     }
 
-    if (route.meta.authority && route.meta.authority > store.user.authority) {
+    if (activity.authority && activity.authority > store.user.authority) {
       message.error('权限不足。')
       return false
     }
@@ -42,7 +44,8 @@ export default (ctx: Context) => {
     path: '/login',
     name: '登录',
     icon: 'sign-in',
-    position: () => store.user ? 'hidden' : 'bottom',
+    position: 'bottom',
+    when: () => !store.user,
     component: Login,
   })
 
@@ -51,7 +54,7 @@ export default (ctx: Context) => {
     name: '用户资料',
     icon: 'user-full',
     fields: ['user'],
-    position: () => store.user ? 'bottom' : 'hidden',
+    position: 'bottom',
     component: Profile,
   })
 

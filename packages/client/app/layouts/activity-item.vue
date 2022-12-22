@@ -1,38 +1,30 @@
 <template>
-  <el-tooltip placement="right" popper-class="activity-item-tooltip">
+  <el-tooltip :placement="placement" popper-class="activity-item-tooltip">
     <template #content>
-      <div class="title">{{ route.name }}</div>
-      <div class="desc" v-if="route.meta.desc">{{ route.meta.desc }}</div>
+      <div class="title">{{ data.name }}</div>
+      <div class="desc" v-if="data.desc">{{ data.desc }}</div>
     </template>
-    <router-link class="navbar-item" :to="target">
-      <k-icon class="menu-icon" :name="route.meta.icon || 'application'"></k-icon>
+    <router-link v-if="data.path" class="navbar-item" :to="target">
+      <k-icon class="menu-icon" :name="data.icon"></k-icon>
     </router-link>
-    <span class="badge" v-if="badge">{{ badge }}</span>
+    <div v-else class="navbar-item" @click.stop="data.action">
+      <k-icon class="menu-icon" :name="data.icon"></k-icon>
+    </div>
   </el-tooltip>
 </template>
 
 <script lang="ts" setup>
 
-import { computed, PropType } from 'vue'
-import { RouteRecordNormalized } from 'vue-router'
-import { routeCache, store } from './utils'
+import { computed } from 'vue'
+import { Activity, routeCache } from './utils'
 
-const props = defineProps({
-  route: {} as PropType<RouteRecordNormalized>,
-})
+const props = defineProps<{
+  data: Activity,
+  placement: string,
+}>()
 
 const target = computed(() => {
-  return routeCache[props.route.name] || props.route.path.replace(/:.+/, '')
-})
-
-const badge = computed(() => {
-  if (!loaded.value) return 0
-  return props.route.meta.badge.reduce((prev, curr) => prev + curr(), 0)
-})
-
-const loaded = computed(() => {
-  if (!props.route.meta.fields) return true
-  return props.route.meta.fields.every((key) => store[key])
+  return routeCache[props.data.id] || props.data.path.replace(/:.+/, '')
 })
 
 </script>
@@ -41,11 +33,13 @@ const loaded = computed(() => {
 
 .navbar-item {
   height: var(--activity-width);
+  width: var(--activity-width);
   display: flex;
   justify-content: center;
   align-items: center;
   position: relative;
   transition: var(--color-transition);
+  cursor: pointer;
 
   .menu-icon {
     height: var(--activity-icon-size);
@@ -57,7 +51,7 @@ const loaded = computed(() => {
     color: var(--active);
   }
 
-  &.active::before {
+  .layout-activity &.active::before {
     content: '';
     position: absolute;
     top: 50%;

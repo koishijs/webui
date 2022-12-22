@@ -1,12 +1,14 @@
 import { Console } from '@koishijs/plugin-console'
 import { Dict } from 'koishi'
-import { App, Component, defineComponent, h, markRaw, reactive, ref, Ref, resolveComponent, watch } from 'vue'
-import { createRouter, createWebHistory, RouteMeta, RouteRecordNormalized, START_LOCATION } from 'vue-router'
+import { App, Component, defineComponent, h, markRaw, reactive, resolveComponent, watch } from 'vue'
+import { createRouter, createWebHistory, START_LOCATION } from 'vue-router'
 import { config, Store, store } from './data'
 import install, { isNullable, remove } from './components'
 import Overlay from './components/chat/overlay.vue'
 import * as cordis from 'cordis'
+import { activities, Activity } from './activity'
 
+export * from './activity'
 export * from './components'
 export * from './data'
 
@@ -23,34 +25,7 @@ export interface SlotOptions {
   component: Component
 }
 
-export interface PageExtension {
-  name: string
-  desc?: string
-  fields?: Field[]
-  badge?: () => number
-}
-
-interface RouteMetaExtension {
-  icon?: string
-  order?: number
-  authority?: number
-  position?: Computed<'top' | 'bottom' | 'hidden'>
-}
-
-export interface PageOptions extends RouteMetaExtension, PageExtension {
-  path: string
-  strict?: boolean
-  component: Component
-}
-
-declare module 'vue-router' {
-  interface RouteMeta extends RouteMetaExtension {
-    fields?: Field[]
-    badge?: (() => number)[]
-  }
-}
-
-export const views = reactive<Record<string, SlotOptions[]>>({})
+export const views = reactive<Dict<SlotOptions[]>>({})
 
 export const router = createRouter({
   history: createWebHistory(config.uiPath),
@@ -58,9 +33,7 @@ export const router = createRouter({
   routes: [],
 })
 
-export const extensions = reactive<Dict<cordis.Fork<Context>>>({})
-
-export const routes: Ref<RouteRecordNormalized[]> = ref([])
+export const extensions = reactive<Dict<cordis.ForkScope<Context>>>({})
 
 export type Disposable = () => void
 export type Extension = (ctx: Context) => void
@@ -70,7 +43,7 @@ export function getValue<T>(computed: Computed<T>): T {
 }
 
 export interface Events<C extends Context> extends cordis.Events<C> {
-  'activity'(meta: RouteMeta): boolean
+  'activity'(activity: Activity): boolean
 }
 
 export interface Context {
@@ -86,7 +59,7 @@ export class Context extends cordis.Context {
   }
 
   /** @deprecated */
-  addPage(options: PageOptions) {
+  addPage(options: Activity.Options) {
     return this.page(options)
   }
 
@@ -103,35 +76,15 @@ export class Context extends cordis.Context {
     return this.state.collect('view', () => remove(list, options))
   }
 
-  page(options: PageOptions) {
-    const { path, name, component, badge, fields = [], ...rest } = options
-    const dispose = router.addRoute({
-      path,
-      name,
-      component,
-      meta: {
-        order: 0,
-        authority: 0,
-        position: 'top',
-        fields,
-        badge: badge ? [badge] : [],
-        ...rest,
-      },
-    })
-    routes.value = router.getRoutes()
+  page(options: Activity.Options) {
+    const activity = new Activity(options)
     return this.state.collect('page', () => {
-      dispose()
-      routes.value = router.getRoutes()
-      return true
+      return activity.dispose()
     })
   }
 }
 
 export const root = new Context()
-
-root.on('activity', (options) => {
-  return !options.fields.every(key => store[key])
-})
 
 root.slot({
   type: 'global',
@@ -196,9 +149,9 @@ router.beforeEach(async (to, from) => {
     if (to.matched.length) return to
   }
 
-  const routes = router.getRoutes()
-    .filter(item => item.meta.position === 'top')
-    .sort((a, b) => b.meta.order - a.meta.order)
+  const routes = Object.values(activities)
+    .filter(item => getValue(item.position) === 'top')
+    .sort((a, b) => b.order - a.order)
   const path = routes[0]?.path || '/blank'
   return {
     path,

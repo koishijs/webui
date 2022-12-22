@@ -1,4 +1,5 @@
 import { createApp } from 'vue'
+import { useDark } from '@vueuse/core'
 import client, { config, connect, root, router } from '@koishijs/client'
 import App from './layouts/index.vue'
 import Home from './layouts/home.vue'
@@ -18,6 +19,17 @@ root.page({
   icon: 'activity:home',
   order: 1000,
   component: Home,
+})
+
+const isDark = useDark()
+
+root.page({
+  id: 'dark-mode',
+  position: 'bottom',
+  order: -100,
+  name: () => isDark.value ? '暗黑模式' : '明亮模式',
+  icon: () => 'activity:' + (isDark.value ? 'moon' : 'sun'),
+  action: () => isDark.value = !isDark.value,
 })
 
 app.use(router)
