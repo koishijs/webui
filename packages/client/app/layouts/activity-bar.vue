@@ -1,22 +1,23 @@
 <template>
   <nav class="layout-activity">
-    <div class="top">
-      <activity-item v-for="data in getActivities('top')" placement="right" :key="data.id" :data="data"></activity-item>
-    </div>
-    <activity-group>
-      <activity-item v-for="data in getActivities('top')" placement="bottom" :key="data.id" :data="data"></activity-item>
+    <activity-item v-for="data in groups.top" placement="right" :key="data.id" :data="data"></activity-item>
+    <activity-group v-if="groups.hidden">
+      <activity-item v-for="data in groups.hidden" placement="bottom" :key="data.id" :data="data"></activity-item>
     </activity-group>
-    <div class="bottom">
-      <activity-item v-for="data in getActivities('bottom')" placement="right" :key="data.id" :data="data"></activity-item>
-    </div>
+    <div v-else class="spacer"></div>
+    <activity-item v-for="data in groups.bottom" placement="right" :key="data.id" :data="data"></activity-item>
   </nav>
 </template>
 
 <script lang="ts" setup>
 
-import { activities } from '@koishijs/client'
+import { computed } from 'vue'
+import { useWindowSize } from '@vueuse/core'
+import { activities, Activity } from '@koishijs/client'
 import ActivityItem from './activity-item.vue'
 import ActivityGroup from './activity-group.vue'
+
+const { height } = useWindowSize()
 
 function getActivities(position: 'top' | 'bottom') {
   const scale = position === 'top' ? 1 : -1
@@ -24,6 +25,27 @@ function getActivities(position: 'top' | 'bottom') {
     .filter(data => data.position === position)
     .sort((a, b) => scale * (b.order - a.order))
 }
+
+const groups = computed(() => {
+  let hidden: Activity[]
+  const list = Object.values(activities)
+    .filter(data => data.position)
+    .sort((a, b) => a.order - b.order)
+  if (list.length * 64 > height.value) {
+    hidden = list
+      .splice(0, list.length + 1 - Math.floor(height.value / 64))
+      .sort((a, b) => {
+        const scale = a.position === 'top' ? -1 : 1
+        if (a.position === b.position) {
+          return scale * (a.order - b.order)
+        }
+        return scale
+      })
+  }
+  const top = list.filter(data => data.position === 'top').reverse()
+  const bottom = list.filter(data => data.position === 'bottom')
+  return { top, bottom, hidden }
+})
 
 </script>
 
@@ -39,9 +61,13 @@ function getActivities(position: 'top' | 'bottom') {
   background-color: var(--bg1);
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: space-evenly;
   border-right: var(--border) 1px solid;
   transition: var(--color-transition);
+
+  .spacer {
+    flex: 1 0 auto;
+  }
 }
 
 </style>

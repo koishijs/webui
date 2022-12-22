@@ -47,7 +47,7 @@ export interface Activity extends Activity.BaseOptions {
 export class Activity {
   _disposables: Disposable[] = []
 
-  constructor(private options: Activity.Options) {
+  constructor(public options: Activity.Options) {
     Object.assign(this, omit(options, ['icon', 'name', 'desc', 'position']))
     if ('path' in options) {
       const { path, id = path, component } = options

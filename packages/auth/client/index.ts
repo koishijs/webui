@@ -45,6 +45,7 @@ export default (ctx: Context) => {
     name: '登录',
     icon: 'sign-in',
     position: 'bottom',
+    order: 500,
     when: () => !store.user,
     component: Login,
   })
@@ -55,6 +56,7 @@ export default (ctx: Context) => {
     icon: 'user-full',
     fields: ['user'],
     position: 'bottom',
+    order: 500,
     component: Profile,
   })
 

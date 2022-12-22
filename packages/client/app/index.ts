@@ -35,8 +35,8 @@ root.page({
 app.use(router)
 
 router.afterEach((route) => {
-  if (typeof route.name === 'string') {
-    document.title = `${route.name} | Koishi 控制台`
+  if (route.meta.activity) {
+    document.title = `${route.meta.activity.name} | Koishi 控制台`
   }
 })
 
