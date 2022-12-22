@@ -1,6 +1,6 @@
 <template>
   <el-dialog v-model="showSelect" class="plugin-select">
-    <template #title>
+    <template #header>
       <span class="title">{{ categories[active] }} ({{ packages.length }})</span>
       <el-input v-model="keyword" #suffix>
         <k-icon name="search"></k-icon>

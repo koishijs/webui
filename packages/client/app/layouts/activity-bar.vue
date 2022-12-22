@@ -1,37 +1,28 @@
 <template>
   <nav class="layout-activity">
     <div class="top">
-      <activity-item v-for="route in getRoutes('top')" :key="route.name" :route="route"></activity-item>
+      <activity-item v-for="data in getActivities('top')" placement="right" :key="data.id" :data="data"></activity-item>
     </div>
+    <activity-group>
+      <activity-item v-for="data in getActivities('top')" placement="bottom" :key="data.id" :data="data"></activity-item>
+    </activity-group>
     <div class="bottom">
-      <div class="navbar-item" @click="toggle">
-        <k-icon class="menu-icon" :name="'activity:' + (isDark ? 'moon' : 'sun')"></k-icon>
-      </div>
-      <activity-item v-for="route in getRoutes('bottom')" :key="route.name" :route="route"></activity-item>
+      <activity-item v-for="data in getActivities('bottom')" placement="right" :key="data.id" :data="data"></activity-item>
     </div>
   </nav>
 </template>
 
 <script lang="ts" setup>
 
-import { routes, getValue, root } from '@koishijs/client'
-import { useDark } from '@vueuse/core'
+import { activities } from '@koishijs/client'
 import ActivityItem from './activity-item.vue'
+import ActivityGroup from './activity-group.vue'
 
-function getRoutes(position: 'top' | 'bottom') {
+function getActivities(position: 'top' | 'bottom') {
   const scale = position === 'top' ? 1 : -1
-  return routes.value
-    .filter((route) => {
-      if (root.bail('activity', route.meta)) return false
-      return getValue(route.meta.position) === position
-    })
-    .sort((a, b) => scale * (b.meta.order - a.meta.order))
-}
-
-const isDark = useDark()
-
-function toggle() {
-  isDark.value = !isDark.value
+  return Object.values(activities)
+    .filter(data => data.position === position)
+    .sort((a, b) => scale * (b.order - a.order))
 }
 
 </script>
@@ -48,13 +39,9 @@ function toggle() {
   background-color: var(--bg1);
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: center;
   border-right: var(--border) 1px solid;
   transition: var(--color-transition);
-
-  @media screen and (max-width: 768px) {
-    bottom: 0;
-  }
 }
 
 </style>
