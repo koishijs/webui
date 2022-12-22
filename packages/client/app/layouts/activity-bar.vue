@@ -19,13 +19,6 @@ import ActivityGroup from './activity-group.vue'
 
 const { height } = useWindowSize()
 
-function getActivities(position: 'top' | 'bottom') {
-  const scale = position === 'top' ? 1 : -1
-  return Object.values(activities)
-    .filter(data => data.position === position)
-    .sort((a, b) => scale * (b.order - a.order))
-}
-
 const groups = computed(() => {
   let hidden: Activity[]
   const list = Object.values(activities)

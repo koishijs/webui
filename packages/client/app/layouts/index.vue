@@ -24,8 +24,8 @@ import StatusBar from './status-bar.vue'
 const route = useRoute()
 
 const loaded = computed(() => {
-  if (!route.meta.fields) return true
-  return route.meta.fields.every((key) => store[key])
+  if (!route.meta.activity?.fields) return true
+  return route.meta.activity.fields.every((key) => store[key])
 })
 
 </script>

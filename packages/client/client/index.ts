@@ -91,6 +91,8 @@ root.slot({
   component: Overlay,
 })
 
+root.on('activity', data => !data)
+
 export function defineExtension(callback: Extension) {
   return callback
 }

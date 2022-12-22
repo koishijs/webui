@@ -81,7 +81,7 @@ export class Activity {
 
   dispose() {
     this._disposables.forEach(dispose => dispose())
-    if (activities[this.id] === this) {
+    if (activities[this.id]) {
       delete activities[this.id]
       return true
     }

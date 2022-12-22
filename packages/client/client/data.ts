@@ -91,10 +91,15 @@ export function connect(value: AbstractWebSocket) {
       store[key] = undefined
     }
     console.log('[koishi] websocket disconnected, will retry in 1s...')
-    setTimeout(() => connect(value), 1000)
+    setInterval(() => {
+      connect(value).then(location.reload, () => {
+        console.log('[koishi] websocket disconnected, will retry in 1s...')
+      })
+    }, 1000)
   }
 
-  return new Promise<Event>((resolve) => {
+  return new Promise<Event>((resolve, reject) => {
     socket.value.onopen = resolve
+    socket.value.onerror = reject
   })
 }
