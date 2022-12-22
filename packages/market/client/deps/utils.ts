@@ -41,8 +41,8 @@ export async function install(override: Dict<string>, callback?: () => void) {
     if (code) {
       message.error('安装失败！')
     } else {
+      await callback?.()
       message.success('安装成功！')
-      callback?.()
     }
   } catch (err) {
     message.error('安装超时！')

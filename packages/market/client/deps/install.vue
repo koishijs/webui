@@ -78,10 +78,12 @@ import { analyzeVersions, showDialog, install } from './utils'
 import { active, config } from '../utils'
 
 function installDep(version: string) {
-  install({ [active.value]: version }, () => {
-    if (paths.value.length) return
-    const path = shortname.value + ':' + Math.random().toString(36).slice(2, 8)
-    send('manager/unload', path, {})
+  const target = shortname.value
+  install({ [active.value]: version }, async () => {
+    if (getPaths(target).length) return
+    const path = target + ':' + Math.random().toString(36).slice(2, 8)
+    await send('manager/unload', path, {})
+    await router.push('/plugins/' + path)
   })
 }
 
@@ -140,7 +142,11 @@ function* find(target: string, plugins: {}, prefix: string): IterableIterator<[s
 
 const shortname = computed(() => active.value.replace(/(koishi-|^@koishijs\/)plugin-/, ''))
 
-const paths = computed(() => [...find(shortname.value, store.config.plugins, '')])
+const paths = computed(() => getPaths(shortname.value))
+
+function getPaths(target: string) {
+  return [...find(target, store.config.plugins, '')]
+}
 
 function configure(path: string | true) {
   showDialog.value = false
