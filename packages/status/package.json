@@ -53,7 +53,7 @@
     "@koishijs/assets": "^1.0.1",
     "@koishijs/client": "^4.8.1",
     "@koishijs/cli": "^4.10.6",
-    "echarts": "^5.4.0",
-    "vue-echarts": "^6.2.3"
+    "echarts": "^5.4.1",
+    "vue-echarts": "^6.3.3"
   }
 }

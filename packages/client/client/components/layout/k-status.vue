@@ -27,6 +27,8 @@ export default {
   display: inline-flex;
   align-items: center;
   transition: var(--color-transition);
+  user-select: none;
+  cursor: pointer;
 
   &:hover {
     background-color: var(--hover-bg);
