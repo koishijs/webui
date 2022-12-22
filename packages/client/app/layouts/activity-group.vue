@@ -4,7 +4,7 @@
       <slot></slot>
     </template>
     <div class="navbar-item">
-      <k-icon class="menu-icon" :name="'ellipsis'"></k-icon>
+      <k-icon class="menu-icon" name="activity:ellipsis"></k-icon>
     </div>
   </el-tooltip>
 </template>

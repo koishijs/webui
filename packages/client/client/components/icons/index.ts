@@ -42,7 +42,7 @@ import './style.scss'
 
 const registry: Record<string, Component> = {}
 
-register('ellipsis', Ellipsis)
+register('activity:ellipsis', Ellipsis)
 register('activity:home', Home)
 register('activity:moon', Moon)
 register('activity:sun', Sun)
