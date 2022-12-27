@@ -27,7 +27,8 @@
           <td>{{ request }}</td>
           <td>{{ resolved }}</td>
           <td :class="['theme-color', result]">
-            <span v-if="result === 'warning'"><k-icon name="exclamation-full"></k-icon>未下载</span>
+            <span v-if="result === 'primary'"><k-icon name="info-full"></k-icon>可选</span>
+            <span v-else-if="result === 'warning'"><k-icon name="exclamation-full"></k-icon>未下载</span>
             <span v-else-if="result === 'success'"><k-icon name="check-full"></k-icon>已下载</span>
             <span v-else><k-icon name="times-full"></k-icon>不兼容</span>
           </td>

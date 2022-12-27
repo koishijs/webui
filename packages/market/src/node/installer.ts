@@ -90,7 +90,7 @@ class Installer extends DataService<Dict<Dependency>> {
       try {
         const registry = await this.http.get<Registry>(`/${name}`)
         const entries = Object.values(registry.versions)
-          .map(item => [item.version, pick(item, ['peerDependencies'])] as const)
+          .map(item => [item.version, pick(item, ['peerDependencies', 'peerDependenciesMeta'])] as const)
           .sort(([a], [b]) => compare(b, a))
         result[name].latest = entries[0][0]
         result[name].versions = Object.fromEntries(entries)

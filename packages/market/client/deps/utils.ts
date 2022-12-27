@@ -3,11 +3,13 @@ import { satisfies } from 'semver'
 import { ref, watch } from 'vue'
 
 export function analyzeVersions(name: string) {
-  const { versions } = store.market?.data[name] || store.dependencies[name]
+  const { versions = {} } = store.market?.data[name] || store.dependencies[name]
   return valueMap(versions, (item) => {
     const peers = valueMap({ ...item.peerDependencies }, (request, name) => {
       const resolved = store.dependencies[name]?.resolved || store.packages[name]?.version
-      const result = !resolved ? 'warning' : satisfies(resolved, request, { includePrerelease: true }) ? 'success' : 'danger'
+      const result = !resolved
+        ? item.peerDependenciesMeta?.[name]?.optional ? 'primary' : 'warning'
+        : satisfies(resolved, request, { includePrerelease: true }) ? 'success' : 'danger'
       return { request, resolved, result }
     })
     let result: 'success' | 'warning' | 'danger' = 'success'
