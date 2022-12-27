@@ -21,9 +21,21 @@
         <p>此插件将会提供 {{ name }} 服务，但此服务已被其他插件实现。</p>
       </k-comment>
       <k-comment v-else :type="current.disabled ? 'primary' : 'success'">
-        <p>此插件{{ current.disabled ? '将会提供' : '提供了' }} {{ name }} 服务。</p>
+        <p>此插件{{ current.disabled ? '启用后将会提供' : '提供了' }} {{ name }} 服务。</p>
       </k-comment>
     </template>
+    
+    <!-- peer -->
+    <k-comment
+      v-for="({ required, active }, name) in env.peer" :key="name"
+      :type="active ? 'success' : required ? 'warning' : 'primary'">
+      <p>
+        {{ required ? '必需' : '可选' }}依赖：<k-dep-link :name="name"></k-dep-link>
+        <span v-if="active"> (已加载)</span>
+        <span v-else-if="name in store.packages"> (点击配置)</span>
+        <span v-else> (点击添加)</span>
+      </p>
+    </k-comment>
 
     <!-- using -->
     <k-comment
@@ -31,9 +43,11 @@
       :type="deps[name] ? 'success' : required ? 'warning' : 'primary'">
       <p>
         {{ required ? '必需' : '可选' }}服务：{{ name }}
-        {{ deps[name] ? '(已加载)' : '(未加载，启用下列任一插件可实现此服务)' }}
+        <span v-if="deps[name]">(已加载)</span>
+        <span v-else-if="available.length">(未加载，启用下列任一插件可实现此服务)</span>
+        <span v-else>(未加载)</span>
       </p>
-      <ul v-if="!deps[name]">
+      <ul v-if="!deps[name] && available.length">
         <li v-for="name in available">
           <k-dep-link :name="name"></k-dep-link> (点击{{ name in store.packages ? '配置' : '添加' }})
         </li>

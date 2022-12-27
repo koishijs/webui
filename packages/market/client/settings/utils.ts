@@ -1,6 +1,5 @@
 import { Dict } from 'koishi'
 import { computed } from 'vue'
-import { AnalyzedPackage } from '@koishijs/registry'
 import { router, send, store } from '@koishijs/client'
 
 interface DepInfo {
@@ -8,35 +7,52 @@ interface DepInfo {
   available: string[]
 }
 
+interface PeerInfo {
+  required: boolean
+  active: boolean
+}
+
 export interface EnvInfo {
   impl: string[]
   using: Dict<DepInfo>
+  peer: Dict<PeerInfo>
   warning?: boolean
   console?: boolean
 }
 
-function isAvailable(name: string, remote: AnalyzedPackage) {
-  return {
-    ...remote.versions[remote.version],
-    ...store.packages[remote.name],
-  }.manifest?.service.implements.includes(name)
-}
+const getImplements = (name: string) => ({
+  ...store.market?.data[name],
+  ...store.packages[name],
+}.manifest?.service.implements ?? [])
 
 function getEnvInfo(name: string) {
   function setService(name: string, required: boolean) {
+    if (services.has(name)) return
     if (name === 'console') {
       result.console = true
       return
     }
 
     const available = Object.values(store.market?.data ?? {})
-      .filter(data => isAvailable(name, data))
+      .filter(data => getImplements(data.name).includes(name))
       .map(data => data.name)
     result.using[name] = { required, available }
   }
 
   const local = store.packages[name]
-  const result: EnvInfo = { impl: [], using: {} }
+  const result: EnvInfo = { impl: [], using: {}, peer: {} }
+  const services = new Set<string>()
+
+  // check peer dependencies
+  for (const name in local.peerDependencies ?? {}) {
+    if (!name.includes('@koishijs/plugin-') && !name.includes('koishi-plugin-')) continue
+    const required = !local.peerDependenciesMeta?.[name]?.optional
+    const active = !!store.packages[name]?.id
+    result.peer[name] = { required, active }
+    for (const service of getImplements(name)) {
+      services.add(service)
+    }
+  }
 
   // check implementations
   for (const name of local.manifest.service.implements) {

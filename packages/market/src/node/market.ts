@@ -62,7 +62,7 @@ class MarketProvider extends BaseMarketProvider {
         const { name, versions } = item
         this.tempCache[name] = this.fullCache[name] = {
           ...item,
-          versions: valueMap(versions, item => pick(item, ['peerDependencies'])),
+          versions: valueMap(versions, item => pick(item, ['peerDependencies', 'peerDependenciesMeta'])),
         }
       },
       after: () => this.flushData(),
