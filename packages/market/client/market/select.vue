@@ -26,13 +26,16 @@
 <script lang="ts" setup>
 
 import { router, send, store } from '@koishijs/client'
-import { computed, ref, watch } from 'vue'
+import { computed, nextTick, ref, watch } from 'vue'
 import { showSelect } from '../utils'
 import { categories, resolveCategory } from './utils'
+import { useRoute } from 'vue-router'
 
 const active = ref('all')
 const keyword = ref('')
 const input = ref()
+
+const route = useRoute()
 
 const packages = computed(() => Object.values(store.packages).filter(({ name, shortname, manifest }) => {
   return name
@@ -40,16 +43,20 @@ const packages = computed(() => Object.values(store.packages).filter(({ name, sh
     && (active.value === 'all' || resolveCategory(manifest.category) === active.value)
 }))
 
-function configure(path: string) {
+function configure(shortname: string) {
   showSelect.value = false
-  path += ':' + Math.random().toString(36).slice(2, 8)
+  let path = route.path.slice(9).replace(/@global/, '')
+  if (path) path += '/'
+  path += shortname + ':' + Math.random().toString(36).slice(2, 8)
   send('manager/unload', path, {})
   router.push('/plugins/' + path)
 }
 
-watch(showSelect, (value, oldValue) => {
-  if (value) input.value.focus()
-})
+watch(showSelect, async (value, oldValue) => {
+  if (!value) return
+  await nextTick()
+  await input.value.focus()
+}, { flush: 'post' })
 
 </script>
 
