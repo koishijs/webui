@@ -6,7 +6,7 @@ import { createReadStream, existsSync, promises as fsp, Stats } from 'fs'
 import open from 'open'
 
 declare module 'koishi' {
-  interface SharedData {
+  interface EnvData {
     clientCount: number
   }
 }
@@ -38,9 +38,9 @@ class NodeConsole extends Console {
       // eslint-disable-next-line no-new
       new SocketHandle(ctx, socket)
 
-      ctx.shared.clientCount = this.layer.clients.size
+      ctx.envData.clientCount = this.layer.clients.size
       socket.on('close', () => {
-        ctx.shared.clientCount = this.layer.clients.size
+        ctx.envData.clientCount = this.layer.clients.size
       })
     })
 
@@ -53,7 +53,7 @@ class NodeConsole extends Console {
     if (this.config.devMode) await this.createVite()
     this.serveAssets()
 
-    if (this.config.open && !this.ctx.shared.clientCount && !process.env.KOISHI_AGENT) {
+    if (this.config.open && !this.ctx.envData.clientCount && !process.env.KOISHI_AGENT) {
       const { host, port } = this.ctx.root.config
       open(`http://${host || 'localhost'}:${port}${this.config.uiPath}`)
     }

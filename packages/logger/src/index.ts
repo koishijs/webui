@@ -3,7 +3,6 @@ import { DataService } from '@koishijs/plugin-console'
 import { resolve } from 'path'
 import { promises as fsp, mkdirSync, readdirSync } from 'fs'
 import { FileHandle } from 'fs/promises'
-import {} from '@koishijs/cli'
 
 const { open, rm } = fsp
 

@@ -1,7 +1,6 @@
 import { DataService } from '@koishijs/plugin-console'
 import { Context, remove } from 'koishi'
 import { Loader } from '@koishijs/loader'
-import {} from '@koishijs/cli'
 
 declare module '@koishijs/plugin-console' {
   interface Events {

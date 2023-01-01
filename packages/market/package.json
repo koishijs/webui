@@ -55,18 +55,18 @@
     }
   },
   "peerDependencies": {
-    "@koishijs/cli": "^4.10.6",
-    "@koishijs/plugin-console": "^5.0.0",
-    "koishi": "^4.10.6"
+    "@koishijs/plugin-console": "^5.0.2",
+    "koishi": "^4.11.0"
   },
   "devDependencies": {
-    "@koishijs/client": "^5.0.0",
+    "@koishijs/client": "^5.0.2",
+    "@types/semver": "^7.3.13",
     "@types/spark-md5": "^3.0.2",
     "@types/throttle-debounce": "^2.1.0",
     "@types/which-pm-runs": "^1.0.0"
   },
   "dependencies": {
-    "@koishijs/registry": "^4.2.3",
+    "@koishijs/registry": "^4.2.7",
     "execa": "^5.1.1",
     "get-registry": "^1.1.0",
     "ns-require": "^1.1.4",

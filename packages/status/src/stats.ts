@@ -1,6 +1,5 @@
 import { $, Bot, Channel, Context, Dict, Logger, Schema, Session, Time, valueMap } from 'koishi'
 import { DataService } from '@koishijs/plugin-console'
-import {} from '@koishijs/cli'
 
 declare module 'koishi' {
   interface Session {
