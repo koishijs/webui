@@ -33,21 +33,6 @@ watch(() => store.dependencies, (value) => {
 export const active = ref('')
 export const showSelect = ref(false)
 
-watch(showSelect, (count, prevCount) => {
-  console.log(count, prevCount);
-  let waitForLoad = setInterval(() => {
-    try {
-      document.getElementById("addPlugins_searchInput");
-    } catch {
-      return;
-    }
-    clearTimeout(waitForLoad);
-    if (count == true) {
-      document.getElementById("addPlugins_searchInput").focus();
-    }
-  }, 400);
-});
-
 export const getMixedMeta = (name: string) => ({
   keywords: [],
   peerDependencies: {},
