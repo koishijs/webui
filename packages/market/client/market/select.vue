@@ -2,7 +2,7 @@
   <el-dialog v-model="showSelect" class="plugin-select">
     <template #header>
       <span class="title">{{ categories[active] }} ({{ packages.length }})</span>
-      <el-input v-model="keyword" #suffix>
+      <el-input ref="input" v-model="keyword" #suffix>
         <k-icon name="search"></k-icon>
       </el-input>
     </template>
@@ -26,12 +26,13 @@
 <script lang="ts" setup>
 
 import { router, send, store } from '@koishijs/client'
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { showSelect } from '../utils'
 import { categories, resolveCategory } from './utils'
 
 const active = ref('all')
 const keyword = ref('')
+const input = ref()
 
 const packages = computed(() => Object.values(store.packages).filter(({ name, shortname, manifest }) => {
   return name
@@ -45,6 +46,10 @@ function configure(path: string) {
   send('manager/unload', path, {})
   router.push('/plugins/' + path)
 }
+
+watch(showSelect, (value, oldValue) => {
+  if (value) input.value.focus()
+})
 
 </script>
 

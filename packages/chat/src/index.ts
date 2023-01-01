@@ -1,4 +1,4 @@
-import { Context, Logger, Quester, Schema, segment } from 'koishi'
+import { Context, Logger, Quester, Schema, segment, Session } from 'koishi'
 import { resolve } from 'path'
 import receiver, { Message, RefreshConfig } from './receiver'
 import {} from '@koishijs/plugin-console'
