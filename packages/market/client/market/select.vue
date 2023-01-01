@@ -2,19 +2,21 @@
   <el-dialog v-model="showSelect" class="plugin-select">
     <template #header>
       <span class="title">{{ categories[active] }} ({{ packages.length }})</span>
-      <el-input v-model="keyword" #suffix>
+      <el-input id="addPlugins_searchInput" v-model="keyword" #suffix>
         <k-icon name="search"></k-icon>
       </el-input>
     </template>
     <div class="tabs">
-      <span class="tab-item" v-for="(text, key) in categories" :key="key" @click.stop="active = key" :class="{ active: active === key }">
+      <span class="tab-item" v-for="(text, key) in categories" :key="key" @click.stop="active = key"
+        :class="{ active: active === key }">
         <k-icon :name="'category:' + key"></k-icon>
         <span class="title">{{ text }}</span>
       </span>
     </div>
     <div class="content">
       <el-scrollbar>
-        <div class="package" v-for="({ name, shortname, manifest }) in packages" :key="name" @click.stop="configure(shortname)">
+        <div class="package" v-for="({ name, shortname, manifest }) in packages" :key="name"
+          @click.stop="configure(shortname)">
           <h3>{{ shortname }}</h3>
           <k-markdown inline class="desc" :source="manifest.description.zh || manifest.description.en"></k-markdown>
         </div>
@@ -49,7 +51,6 @@ function configure(path: string) {
 </script>
 
 <style lang="scss">
-
 .plugin-select {
   .el-dialog__header {
     margin-right: 0;
@@ -112,6 +113,7 @@ function configure(path: string) {
 
         .title {
           margin-left: 0.5rem;
+
           @media screen and (max-width: 768px) {
             display: none;
           }
@@ -145,5 +147,4 @@ function configure(path: string) {
     }
   }
 }
-
 </style>
