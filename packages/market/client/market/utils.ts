@@ -30,8 +30,8 @@ export function validate(data: AnalyzedPackage, word: string) {
   } else if (word.startsWith('using:')) {
     const name = word.slice(6)
     return service.required.includes(name) || service.optional.includes(name)
-  } else if (word.startsWith('email:')) {
-    return data.maintainers.some(user => user.email === word.slice(6))
+  } else if (word.startsWith('user:')) {
+    return data.contributors.some(user => user.name === word.slice(5))
   } else if (word.startsWith('is:')) {
     if (word === 'is:verified') {
       return data.verified

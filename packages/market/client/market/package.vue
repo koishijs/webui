@@ -49,8 +49,8 @@
       </template>
       <span class="spacer grow"></span>
       <div class="avatars">
-        <el-tooltip v-for="({ email, username }) in data.maintainers" :key="email" :content="username">
-          <a @click="$emit('query', 'email:' + email)">
+        <el-tooltip v-for="({ email, name }) in data.contributors" :key="name" :content="name">
+          <a @click="$emit('query', 'user:' + name)">
             <img :src="getAvatar(email)">
           </a>
         </el-tooltip>
@@ -83,7 +83,10 @@ function handleClick() {
 const rating = computed(() => Math.min(Math.max((props.data.score.final - 0.25) * 10, 0), 5))
 
 function getAvatar(email: string) {
-  return (store.market.gravatar || 'https://s.gravatar.com') + '/avatar/' + md5.hash(email) + '?d=mp'
+  return (store.market.gravatar || 'https://s.gravatar.com')
+    + '/avatar/'
+    + (email ? md5.hash(email.toLowerCase()) : '')
+    + '?d=mp'
 }
 
 function formatValue(value: number) {
