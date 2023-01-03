@@ -54,6 +54,8 @@
       </ul>
     </k-comment>
 
+    <k-markdown class="usage" v-if="local.usage" :source="local.usage"></k-markdown>
+
     <k-slot name="market-settings"></k-slot>
 
     <!-- schema -->
@@ -151,6 +153,14 @@ provide('manager.settings.current', computed(() => props.current))
     &:hover {
       cursor: pointer;
       text-decoration: underline;
+    }
+  }
+
+  .k-markdown.usage {
+    margin-bottom: 2rem;
+
+    h2 {
+      font-size: 1.25rem;
     }
   }
 }

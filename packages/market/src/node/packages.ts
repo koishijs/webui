@@ -1,4 +1,4 @@
-import { Context, Dict, EffectScope, Logger, pick, remove, Schema, scope } from 'koishi'
+import { Context, Dict, EffectScope, Logger, pick, remove, Schema } from 'koishi'
 import { conclude, Manifest, PackageJson } from '@koishijs/registry'
 import { promises as fsp } from 'fs'
 import { dirname } from 'path'
@@ -116,6 +116,7 @@ class PackageProvider extends BasePackageProvider {
     // check schema
     const exports = getExports(name)
     result.schema = exports?.Config || exports?.schema
+    result.usage = exports?.usage
 
     // check plugin state
     const runtime = this.ctx.registry.get(exports)
@@ -128,7 +129,7 @@ class PackageProvider extends BasePackageProvider {
   }
 
   async getManifest(name: string) {
-    const filename = scope.resolve(name + '/package.json')
+    const filename = await this.ctx.loader.resolve(name + '/package.json')
     return conclude(JSON.parse(await fsp.readFile(filename, 'utf8')))
   }
 }
@@ -141,6 +142,7 @@ namespace PackageProvider {
     forkable?: boolean
     shortname?: string
     schema?: Schema
+    usage?: string
     workspace?: boolean
     manifest?: Manifest
   }

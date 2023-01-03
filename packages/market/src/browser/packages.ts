@@ -28,6 +28,7 @@ export default class PackageProvider extends BasePackageProvider {
       if (!result.portable) return
       const exports = await this.ctx.loader.resolvePlugin(data.shortname)
       result.schema = exports?.Config || exports?.schema
+      result.usage = exports?.usage
       const runtime = this.ctx.registry.get(exports)
       if (runtime) this.parseRuntime(runtime, result)
       return result

@@ -34,6 +34,7 @@ export namespace PackageProvider {
     forkable?: boolean
     shortname?: string
     schema?: Schema
+    usage?: string
     workspace?: boolean
     manifest?: Manifest
   }
