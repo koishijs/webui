@@ -1,7 +1,8 @@
 import { Context, Schema } from 'koishi'
 import { resolve } from 'path'
 import {} from '@koishijs/plugin-console'
-import ProfileProvider from './profile'
+import MetaProvider from './meta'
+import StatisticsProvider from './stats'
 
 export type Activity = Record<number, number>
 
@@ -15,24 +16,28 @@ declare module 'koishi' {
 declare module '@koishijs/plugin-console' {
   namespace Console {
     interface Services {
-      profile: ProfileProvider
+      meta: MetaProvider
+      stats: StatisticsProvider
     }
   }
 }
 
 export {
-  ProfileProvider,
+  MetaProvider,
+  StatisticsProvider,
 }
 
-export * from './profile'
+export * from './meta'
+export * from './stats'
 
 export const name = 'status'
 export const using = ['console'] as const
 
-export interface Config extends ProfileProvider.Config {}
+export interface Config extends MetaProvider.Config, StatisticsProvider.Config {}
 
 export const Config: Schema<Config> = Schema.intersect([
-  ProfileProvider.Config,
+  MetaProvider.Config,
+  StatisticsProvider.Config,
 ])
 
 export function apply(ctx: Context, config: Config) {
@@ -41,5 +46,6 @@ export function apply(ctx: Context, config: Config) {
     prod: resolve(__dirname, '../dist'),
   })
 
-  ctx.plugin(ProfileProvider, config)
+  ctx.plugin(MetaProvider, config)
+  ctx.plugin(StatisticsProvider, config)
 }

@@ -1,7 +1,7 @@
 {
-  "name": "@koishijs/plugin-status",
-  "description": "Status view for Koishi",
-  "version": "7.0.0",
+  "name": "@koishijs/plugin-analytics",
+  "description": "Show statistics for Koishi application",
+  "version": "1.0.0",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
   "files": [
@@ -13,19 +13,22 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/koishijs/console.git",
-    "directory": "packages/status"
+    "directory": "packages/analytics"
   },
   "bugs": {
     "url": "https://github.com/koishijs/console/issues"
   },
-  "homepage": "https://koishi.chat/plugins/console/status.html",
+  "homepage": "https://koishi.chat/plugins/console/analytics.html",
   "keywords": [
     "bot",
     "chatbot",
     "koishi",
     "plugin",
-    "status",
-    "server"
+    "chart",
+    "console",
+    "statistics",
+    "analytics",
+    "status"
   ],
   "yakumo": {
     "client": "./build/client"
@@ -33,8 +36,8 @@
   "koishi": {
     "category": "console",
     "description": {
-      "en": "Display running status in the console",
-      "zh": "在控制台中显示运行状态"
+      "en": "Show statistics for Koishi application",
+      "zh": "在控制台中显示统计数据"
     },
     "service": {
       "required": [
