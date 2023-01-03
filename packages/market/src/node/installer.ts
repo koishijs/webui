@@ -141,6 +141,13 @@ class Installer extends DataService<Dict<Dependency>> {
     await fsp.writeFile(filename, JSON.stringify(this.manifest, null, 2))
   }
 
+  install() {
+    const args: string[] = []
+    if (this.agent !== 'yarn') args.push('install')
+    args.push('--registry', this.registry)
+    return this.exec(this.agent, args)
+  }
+
   installDep = async (deps: Dict<string>) => {
     const oldPayload = await this.get()
     await this.override(deps)
@@ -154,10 +161,7 @@ class Installer extends DataService<Dict<Dependency>> {
     }
 
     if (shouldInstall) {
-      const args: string[] = []
-      if (this.agent !== 'yarn') args.push('install')
-      args.push('--registry', this.registry)
-      const code = await this.exec(this.agent, args)
+      const code = await this.install()
       if (code) return code
     }
 

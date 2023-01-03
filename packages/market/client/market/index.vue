@@ -24,7 +24,9 @@
       </div>
       <div class="market-filter">
         共搜索到 {{ realWords.length ? objects.length + ' / ' : '' }}{{ Object.keys(store.market.data).length }} 个插件。
-        <el-checkbox v-if="store.packages" v-model="config.showInstalled">{{ global.static ? '只显示可用插件' : '显示已下载的插件' }}</el-checkbox>
+        <el-checkbox v-if="store.packages" v-model="config.showInstalled">
+          {{ global.static ? '只显示可用插件' : `显示已下载的插件 (共 ${installed} 个)` }}
+        </el-checkbox>
       </div>
       <div class="market-container">
         <package-view v-for="data in objects" :key="data.name" :data="data" @query="onQuery"></package-view>
@@ -94,13 +96,24 @@ function onQuery(word: string) {
   words.push('')
 }
 
-const objects = computed(() => {
-  return Object.values(store.market.data)
+const all = computed(() => {
+  return Object
+    .values(store.market.data)
     .filter(data => words.every(word => validate(data, word)))
+})
+
+const installed = computed(() => {
+  return all.value.filter(item => store.packages[item.name]).length
+})
+
+const objects = computed(() => {
+  return all.value
     .filter(item => global.static
       ? !config.showInstalled || store.packages[item.name]
       : config.showInstalled || !store.packages[item.name])
-    .sort((a, b) => (global.static ? +b.portable - +a.portable : 0) || b.score.final - a.score.final)
+    .sort((a, b) => 0
+      || (global.static ? +b.portable - +a.portable : 0)
+      || b.score.final - a.score.final)
 })
 
 const menu = computed(() => [refresh.value])
