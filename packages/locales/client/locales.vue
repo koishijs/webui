@@ -23,9 +23,16 @@
 
     <template #left>
       <el-scrollbar>
+        <div class="search">
+          <el-input v-model="keyword" #suffix>
+            <k-icon name="search"></k-icon>
+          </el-input>
+        </div>
         <el-tree
+          ref="tree"
           :data="data"
           :props="{ class: getClass }"
+          :filter-node-method="filterNode"
           :default-expand-all="true"
           :expand-on-click-node="false"
           @node-click="handleClick"
@@ -54,12 +61,21 @@
 <script lang="ts" setup>
 
 import { send, store } from '@koishijs/client'
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { debounce } from 'throttle-debounce'
 
 const displayLocales = ref(['zh', 'en'])
-
+const tree = ref(null)
 const active = ref('')
+const keyword = ref('')
+
+watch(keyword, (val) => {
+  tree.value.filter(val)
+})
+
+function filterNode(value: string, data: Tree) {
+  return data.label.includes(keyword.value)
+}
 
 function getClass(tree: Tree) {
   const words: string[] = []
@@ -136,6 +152,10 @@ function handleUpdate(locale: string, path: string, value: string) {
   .layout-left .el-scrollbar__view {
     padding: 1rem 0;
     line-height: 2.25rem;
+  }
+
+  .search {
+    padding: 0 1.5rem;
   }
 
   .el-tree-node__expand-icon {
