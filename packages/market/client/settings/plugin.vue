@@ -55,6 +55,11 @@
     </k-comment>
 
     <k-markdown class="usage" v-if="local.usage" :source="local.usage"></k-markdown>
+    <h2 class="navigation" v-if="links">插件导航</h2>
+    <a class="k-button navigation" target="_blank" v-if="links?.homepage" :href="links.homepage">插件主页</a>
+    <a class="k-button navigation" target="_blank" v-if="links?.npm" :href="links.npm">插件npm主页</a>
+    <a class="k-button navigation" target="_blank" v-if="links?.repository" :href="links.repository">存储库</a>
+    <a class="k-button navigation" target="_blank" v-if="links?.bugs" :href="links.bugs">问题反馈</a>
 
     <k-slot name="market-settings"></k-slot>
 
@@ -114,6 +119,12 @@ const name = computed(() => {
   ].find(name => name in store.packages)
 })
 
+const links = computed(() => {
+  const links = store?.market?.data[name.value]?.links
+  if (!(links && Object.keys(links))) return undefined
+  return links
+})
+
 const local = computed(() => store.packages[name.value])
 const remote = computed(() => store.market?.data[name.value])
 const env = computed(() => envMap.value[name.value])
@@ -162,6 +173,14 @@ provide('manager.settings.current', computed(() => props.current))
     h2 {
       font-size: 1.25rem;
     }
+  }
+
+  a.navigation {
+    margin-right: 10px;
+  }
+
+  h2.navigation {
+    font-size: 1.25rem;
   }
 }
 
