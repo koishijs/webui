@@ -11,7 +11,7 @@ interface ManagerConfig {
 export const config = createStorage<ManagerConfig>('manager', 2, () => ({
   prefix: '^',
   override: {},
-  showInstalled: false,
+  showInstalled: true,
   hideWorkspace: true,
 }))
 
