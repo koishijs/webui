@@ -4,8 +4,7 @@
 
 <script lang="ts" setup>
 
-import { clone } from '@koishijs/client'
-import { ref, watch } from 'vue'
+import { computed } from 'vue'
 import { Tree } from './utils'
 import KModifier from './modifier.vue'
 
@@ -14,11 +13,12 @@ const props = defineProps<{
   modelValue: any
 }>()
 
-const config = ref()
+const emit = defineEmits(['update:modelValue'])
 
-watch(() => props.current.config, (value) => {
-  config.value = clone(value)
-}, { immediate: true })
+const config = computed({
+  get: () => props.modelValue,
+  set: value => emit('update:modelValue', value),
+})
 
 </script>
 

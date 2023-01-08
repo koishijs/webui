@@ -16,7 +16,7 @@ const props = defineProps<{
 const emit = defineEmits(['update:modelValue'])
 
 const filter = computed({
-  get: () => props.modelValue.$filter,
+  get: () => props.modelValue?.$filter,
   set: value => emit('update:modelValue', {
     ...props.modelValue,
     $filter: value,

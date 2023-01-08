@@ -52,7 +52,7 @@ const types = {
   number: ['$eq', '$ne', '$gt', '$lt', '$gte', '$lte'],
 }
 
-watch(props.modelValue, () => {
+watch(() => props.modelValue, () => {
   operator.value = Object.keys(props.modelValue)[0]
   entity.value = props.modelValue[operator.value]?.[0].$
   value.value = props.modelValue[operator.value]?.[1].toString()
@@ -63,18 +63,14 @@ const type = computed(() => {
 })
 
 watch([entity, operator, value], ([entity, operator, value]) => {
-  console.log(1234, !entities[entity], !operators[operator], !value)
   if (!entities[entity] || !operators[operator] || !value) return
   let result: any = value
   if (types.number.includes(operator)) result = +value
   if (types.array.includes(operator)) result = value.split(/\s*,\s*/g)
-  console.log('update:modelValue', {
-    [operator]: [{ $: entity }, result],
-  })
   emit('update:modelValue', {
     [operator]: [{ $: entity }, result],
   })
-}, { immediate: true })
+})
 
 </script>
 
