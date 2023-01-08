@@ -56,6 +56,8 @@
 
     <k-markdown class="usage" v-if="local.usage" :source="local.usage"></k-markdown>
 
+    <k-modifier v-model="config"></k-modifier>
+
     <k-slot name="market-settings"></k-slot>
 
     <!-- schema -->
@@ -78,6 +80,7 @@ import { send, store, router } from '@koishijs/client'
 import { computed, provide } from 'vue'
 import { envMap, Tree } from './utils'
 import KDepLink from './dep-link.vue'
+import KModifier from './modifier.vue'
 
 const props = defineProps<{
   current: Tree
