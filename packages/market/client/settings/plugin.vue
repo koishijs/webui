@@ -1,5 +1,12 @@
 <template>
   <template v-if="name">
+    <div class="navigation" v-if="remote">
+      <a class="k-button" target="_blank" v-if="remote.links.homepage" :href="remote.links.homepage">插件主页</a>
+      <a class="k-button" target="_blank" v-if="remote.links.npm" :href="remote.links.npm">最新版：{{ remote.version }}</a>
+      <a class="k-button" target="_blank" v-if="remote.links.repository" :href="remote.links.repository">存储库</a>
+      <a class="k-button" target="_blank" v-if="remote.links.bugs" :href="remote.links.bugs">问题反馈</a>
+    </div>
+
     <!-- reusability -->
     <k-comment v-if="local.id && !local.forkable && current.disabled" type="warning">
       <p>此插件已在运行且不可重用，启用可能会导致非预期的问题。</p>
@@ -7,7 +14,7 @@
 
     <!-- latest -->
     <k-comment v-if="hasUpdate">
-      <p>当前的插件版本不是最新，<router-link to="/dependencies">点击前往依赖管理</router-link>。</p>
+      <p>当前的插件版本 ({{ local.version }}) 不是最新，<router-link to="/dependencies">点击前往依赖管理</router-link>。</p>
     </k-comment>
 
     <!-- external -->
@@ -55,11 +62,6 @@
     </k-comment>
 
     <k-markdown class="usage" v-if="local.usage" :source="local.usage"></k-markdown>
-    <h2 class="navigation" v-if="links">插件导航</h2>
-    <a class="k-button navigation" target="_blank" v-if="links?.homepage" :href="links.homepage">插件主页</a>
-    <a class="k-button navigation" target="_blank" v-if="links?.npm" :href="links.npm">插件npm主页</a>
-    <a class="k-button navigation" target="_blank" v-if="links?.repository" :href="links.repository">存储库</a>
-    <a class="k-button navigation" target="_blank" v-if="links?.bugs" :href="links.bugs">问题反馈</a>
 
     <k-modifier v-model="config"></k-modifier>
 
@@ -122,12 +124,6 @@ const name = computed(() => {
   ].find(name => name in store.packages)
 })
 
-const links = computed(() => {
-  const links = store?.market?.data[name.value]?.links
-  if (!(links && Object.keys(links))) return undefined
-  return links
-})
-
 const local = computed(() => store.packages[name.value])
 const remote = computed(() => store.market?.data[name.value])
 const env = computed(() => envMap.value[name.value])
@@ -178,12 +174,10 @@ provide('manager.settings.current', computed(() => props.current))
     }
   }
 
-  a.navigation {
-    margin-right: 10px;
-  }
-
-  h2.navigation {
-    font-size: 1.25rem;
+  .navigation {
+    a.k-button {
+      margin-right: 1rem;
+    }
   }
 }
 
