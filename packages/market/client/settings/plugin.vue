@@ -1,5 +1,12 @@
 <template>
   <template v-if="name">
+    <div class="navigation" v-if="remote">
+      <a class="k-button" target="_blank" v-if="remote.links.homepage" :href="remote.links.homepage">插件主页</a>
+      <a class="k-button" target="_blank" v-if="remote.links.npm" :href="remote.links.npm">最新版：{{ remote.version }}</a>
+      <a class="k-button" target="_blank" v-if="remote.links.repository" :href="remote.links.repository">存储库</a>
+      <a class="k-button" target="_blank" v-if="remote.links.bugs" :href="remote.links.bugs">问题反馈</a>
+    </div>
+
     <!-- reusability -->
     <k-comment v-if="local.id && !local.forkable && current.disabled" type="warning">
       <p>此插件已在运行且不可重用，启用可能会导致非预期的问题。</p>
@@ -7,7 +14,7 @@
 
     <!-- latest -->
     <k-comment v-if="hasUpdate">
-      <p>当前的插件版本不是最新，<router-link to="/dependencies">点击前往依赖管理</router-link>。</p>
+      <p>当前的插件版本 ({{ local.version }}) 不是最新，<router-link to="/dependencies">点击前往依赖管理</router-link>。</p>
     </k-comment>
 
     <!-- external -->
@@ -164,6 +171,12 @@ provide('manager.settings.current', computed(() => props.current))
 
     h2 {
       font-size: 1.25rem;
+    }
+  }
+
+  .navigation {
+    a.k-button {
+      margin-right: 1rem;
     }
   }
 }
