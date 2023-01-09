@@ -118,7 +118,7 @@ const menu = computed(() => {
     type: isDisabled ? type.value : '',
     icon: isDisabled ? 'save' : 'check',
     label: isDisabled ? '保存配置' : '重载配置',
-    disabled: isGroup || !isGlobal && !name.value,
+    disabled: !isGlobal && !isGroup && !name.value,
     async action() {
       if (isGlobal) {
         send('manager/app-reload', config.value)

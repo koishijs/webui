@@ -61,6 +61,8 @@
     <a class="k-button navigation" target="_blank" v-if="links?.repository" :href="links.repository">存储库</a>
     <a class="k-button navigation" target="_blank" v-if="links?.bugs" :href="links.bugs">问题反馈</a>
 
+    <k-modifier v-model="config"></k-modifier>
+
     <k-slot name="market-settings"></k-slot>
 
     <!-- schema -->
@@ -83,6 +85,7 @@ import { send, store, router } from '@koishijs/client'
 import { computed, provide } from 'vue'
 import { envMap, Tree } from './utils'
 import KDepLink from './dep-link.vue'
+import KModifier from './modifier.vue'
 
 const props = defineProps<{
   current: Tree

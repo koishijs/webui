@@ -1,7 +1,7 @@
 {
   "name": "@koishijs/plugin-market",
   "description": "Manage your bots and plugins with console",
-  "version": "1.7.4",
+  "version": "1.8.0",
   "main": "lib/node/index.js",
   "typings": "lib/index.d.ts",
   "exports": {
@@ -46,7 +46,7 @@
     ],
     "description": {
       "en": "Manage your bots and plugins with console",
-      "zh": "使用控制台管理你的插件、机器人和依赖"
+      "zh": "使用控制台安装、卸载、配置、查看你的插件"
     },
     "service": {
       "required": [
@@ -55,11 +55,11 @@
     }
   },
   "peerDependencies": {
-    "@koishijs/plugin-console": "^5.0.2",
-    "koishi": "^4.11.0"
+    "@koishijs/plugin-console": "^5.1.0",
+    "koishi": "^4.11.1"
   },
   "devDependencies": {
-    "@koishijs/client": "^5.0.2",
+    "@koishijs/client": "^5.1.0",
     "@types/semver": "^7.3.13",
     "@types/spark-md5": "^3.0.2",
     "@types/throttle-debounce": "^2.1.0",

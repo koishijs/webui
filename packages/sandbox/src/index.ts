@@ -28,7 +28,7 @@ declare module '@koishijs/plugin-console' {
 
   namespace Console {
     interface Services {
-      users: UserProvider
+      sandbox: UserProvider
     }
   }
 }
@@ -44,7 +44,7 @@ export class UserProvider extends DataService<Dict<User>> {
   private task: Promise<Dict<User.Observed>>
 
   constructor(ctx: Context) {
-    super(ctx, 'users', { authority: 4 })
+    super(ctx, 'sandbox', { authority: 4 })
 
     ctx.console.addListener('sandbox/user', async (name, data) => {
       const users = await this.get()

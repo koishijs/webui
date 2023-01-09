@@ -22,8 +22,8 @@
     "test:html": "shx rm -rf coverage && c8 -r html yarn test"
   },
   "devDependencies": {
-    "@koishijs/plugin-database-memory": "^2.2.0",
-    "@koishijs/plugin-help": "^2.0.0",
+    "@koishijs/plugin-database-memory": "^2.2.2",
+    "@koishijs/plugin-help": "^2.0.2",
     "@koishijs/plugin-mock": "^2.3.2",
     "@rollup/plugin-yaml": "^3.1.0",
     "@sinonjs/fake-timers": "^6.0.1",
@@ -38,7 +38,7 @@
     "esbuild": "^0.14.54",
     "esbuild-register": "^3.4.2",
     "jest-mock": "^28.1.3",
-    "koishi": "^4.11.0",
+    "koishi": "^4.11.1",
     "mocha": "^9.2.2",
     "rollup-plugin-node-polyfills": "^0.2.1",
     "shx": "^0.3.4",
@@ -48,7 +48,7 @@
     "yakumo-esbuild": "^0.3.19",
     "yakumo-esbuild-yaml": "^0.3.1",
     "yakumo-mocha": "^0.3.1",
-    "yakumo-publish": "^0.3.1",
+    "yakumo-publish": "^0.3.2",
     "yakumo-publish-sync": "^0.3.2",
     "yakumo-tsc": "^0.3.7",
     "yakumo-upgrade": "^0.3.2",

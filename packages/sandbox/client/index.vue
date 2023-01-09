@@ -90,12 +90,12 @@ function removeUser(name: string) {
 
 const model = ref()
 
-watch(() => store.users?.[config.user], (value) => {
+watch(() => store.sandbox?.[config.user], (value) => {
   model.value = clone(value)
 }, { immediate: true })
 
 watch(model, (value) => {
-  if (deepEqual(value, store.users?.[config.user])) return
+  if (deepEqual(value, store.sandbox?.[config.user])) return
   send('sandbox/user', config.user, value)
 }, { deep: true })
 
