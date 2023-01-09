@@ -1,4 +1,4 @@
-import { Bot, Context, defineProperty, Fragment, Messenger, Random, segment } from 'koishi'
+import { Bot, Context, defineProperty, Fragment, Messenger, Random, segment, SendOptions } from 'koishi'
 
 class SandboxMessenger extends Messenger<SandboxBot> {
   private buffer = ''
@@ -73,8 +73,12 @@ export class SandboxBot extends Bot {
     }, { authority: 4 })
   }
 
-  async sendMessage(channelId: string, fragment: Fragment, guildId?: string) {
-    return new SandboxMessenger(this, channelId, guildId).send(fragment)
+  async sendMessage(channelId: string, fragment: Fragment, guildId?: string, options?: SendOptions) {
+    return new SandboxMessenger(this, channelId, guildId, options).send(fragment)
+  }
+
+  async sendPrivateMessage(userId: string, fragment: Fragment, options?: SendOptions) {
+    return new SandboxMessenger(this, '@' + userId, undefined, options).send(fragment)
   }
 
   async deleteMessage(channelId: string, messageId: string) {
