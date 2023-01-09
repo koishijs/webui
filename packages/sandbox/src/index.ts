@@ -28,7 +28,7 @@ declare module '@koishijs/plugin-console' {
 
   namespace Console {
     interface Services {
-      users: UserProvider
+      sandbox: UserProvider
     }
   }
 }
@@ -44,34 +44,34 @@ export class UserProvider extends DataService<Dict<User>> {
   private task: Promise<Dict<User.Observed>>
 
   constructor(ctx: Context) {
-    super(ctx, 'users', { authority: 4 })
+    super(ctx, 'sandbox', { authority: 4 })
 
     ctx.console.addListener('sandbox/user', async (name, data) => {
-      const users = await this.get()
-      if (!users[name]) {
+      const sandbox = await this.get()
+      if (!sandbox[name]) {
         if (!data) return
         const user = await this.ctx.database.createUser('sandbox', name, {
           authority: 1,
           ...data,
         })
-        return this.observe(user, users)
+        return this.observe(user, sandbox)
       } else if (!data) {
-        delete users[name]
+        delete sandbox[name]
         this.ctx.$internal._userCache.set('sandbox', 'sandbox:' + name, null)
         return this.ctx.database.remove('user', { sandbox: name })
       }
-      Object.assign(users[name], data)
-      return users[name].$update()
+      Object.assign(sandbox[name], data)
+      return sandbox[name].$update()
     }, { authority: 4 })
   }
 
-  observe(user: User, users: Dict<User.Observed>) {
+  observe(user: User, sandbox: Dict<User.Observed>) {
     const uid = 'sandbox:' + user.sandbox
-    users[user.sandbox] = observe(user, async (diff) => {
+    sandbox[user.sandbox] = observe(user, async (diff) => {
       await this.ctx.database.setUser('sandbox', user.sandbox, diff)
       this.refresh()
     })
-    this.ctx.$internal._userCache.set('sandbox', uid, users[user.sandbox])
+    this.ctx.$internal._userCache.set('sandbox', uid, sandbox[user.sandbox])
   }
 
   async prepare() {
