@@ -23,7 +23,7 @@
       </template>
     </div>
     <keep-alive>
-      <k-empty key="empty" v-if="!sandbox.length">
+      <k-empty key="empty" v-if="!users.length">
         <div>点击「添加用户」开始体验</div>
       </k-empty>
       <k-content :key="'profile' + channel" v-else-if="config.panelType === 'profile'">
@@ -52,7 +52,7 @@ const schema = Schema.object({
   authority: Schema.natural().description('权限等级').default(1),
 })
 
-const sandbox = computed(() => {
+const users = computed(() => {
   return Object
     .keys(config.messages)
     .filter(key => key.startsWith('@'))
@@ -60,31 +60,31 @@ const sandbox = computed(() => {
 })
 
 const userMap = computed(() => {
-  return Object.fromEntries(sandbox.value.map((name) => [name, { name }]))
+  return Object.fromEntries(users.value.map((name) => [name, { name }]))
 })
 
 const length = 10
 
 function createUser() {
-  if (sandbox.value.length >= length) {
+  if (users.value.length >= length) {
     return message.error('可创建的用户数量已达上限。')
   }
   let name: string
   do {
     name = words[config.index++]
     config.index %= length
-  } while (sandbox.value.includes(name))
+  } while (users.value.includes(name))
   config.user = name
   config.messages['@' + name] = []
   send('sandbox/user', config.user, {})
 }
 
 function removeUser(name: string) {
-  const index = sandbox.value.indexOf(name)
+  const index = users.value.indexOf(name)
   delete config.messages['@' + name]
   send('sandbox/user', config.user, null)
   if (config.user === name) {
-    config.user = sandbox.value[index] || ''
+    config.user = users.value[index] || ''
   }
 }
 

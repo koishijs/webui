@@ -47,31 +47,31 @@ export class UserProvider extends DataService<Dict<User>> {
     super(ctx, 'sandbox', { authority: 4 })
 
     ctx.console.addListener('sandbox/user', async (name, data) => {
-      const sandbox = await this.get()
-      if (!sandbox[name]) {
+      const users = await this.get()
+      if (!users[name]) {
         if (!data) return
         const user = await this.ctx.database.createUser('sandbox', name, {
           authority: 1,
           ...data,
         })
-        return this.observe(user, sandbox)
+        return this.observe(user, users)
       } else if (!data) {
-        delete sandbox[name]
+        delete users[name]
         this.ctx.$internal._userCache.set('sandbox', 'sandbox:' + name, null)
         return this.ctx.database.remove('user', { sandbox: name })
       }
-      Object.assign(sandbox[name], data)
-      return sandbox[name].$update()
+      Object.assign(users[name], data)
+      return users[name].$update()
     }, { authority: 4 })
   }
 
-  observe(user: User, sandbox: Dict<User.Observed>) {
+  observe(user: User, users: Dict<User.Observed>) {
     const uid = 'sandbox:' + user.sandbox
-    sandbox[user.sandbox] = observe(user, async (diff) => {
+    users[user.sandbox] = observe(user, async (diff) => {
       await this.ctx.database.setUser('sandbox', user.sandbox, diff)
       this.refresh()
     })
-    this.ctx.$internal._userCache.set('sandbox', uid, sandbox[user.sandbox])
+    this.ctx.$internal._userCache.set('sandbox', uid, users[user.sandbox])
   }
 
   async prepare() {
