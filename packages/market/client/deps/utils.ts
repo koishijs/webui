@@ -18,7 +18,7 @@ export function analyzeVersions(name: string) {
         result = 'danger'
         break
       }
-      if (result === 'warning') {
+      if (peer.result === 'warning') {
         result = 'warning'
       }
     }

@@ -13,8 +13,9 @@
       </el-select>
     </template>
 
-    <div class="padding" v-if="!active || workspace || !Object.keys(data[version].peers).length"></div>
-    <el-scrollbar v-else>
+    <p class="warning" v-if="warning">{{ warning }}</p>
+
+    <el-scrollbar v-if="active && !workspace && Object.keys(data[version].peers).length">
       <table>
         <tr>
           <td>依赖名称</td>
@@ -104,9 +105,7 @@ const selectVersion = computed({
 })
 
 const unchanged = computed(() => version.value === store.dependencies[active.value]?.request)
-
 const current = computed(() => store.dependencies[active.value]?.resolved)
-
 const local = computed(() => store.packages?.[active.value])
 
 const workspace = computed(() => {
@@ -118,6 +117,12 @@ const workspace = computed(() => {
 const data = computed(() => {
   if (!active.value || workspace.value) return
   return analyzeVersions(active.value)
+})
+
+const warning = computed(() => {
+  if (store.market?.data[active.value].insecure) {
+    return '警告：从此插件的最新版本中检测出含有兼容性较差的依赖。安装或升级此插件可能导致后续升级时出现严重问题。'
+  }
 })
 
 watch(() => active.value, (value) => {
@@ -168,6 +173,7 @@ function configure(path: string | true) {
     gap: 0 0.5em;
     align-items: center;
     padding-right: 36px;
+    padding-bottom: 4px;
 
     .el-dialog__title {
       font-weight: 500;
@@ -183,8 +189,8 @@ function configure(path: string | true) {
     }
   }
 
-  .padding {
-    height: 2rem;
+  .warning {
+    color: var(--danger);
   }
 
   .version-badges {

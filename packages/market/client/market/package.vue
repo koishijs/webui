@@ -8,8 +8,13 @@
         <h2>
           <a :href="data.links.homepage" target="_blank" rel="noopener noreferrer">{{ data.shortname }}</a>
           <el-tooltip v-if="data.verified" content="官方认证" placement="right">
-            <span class="verified">
+            <span class="icon verified">
               <k-icon name="verified"></k-icon>
+            </span>
+          </el-tooltip>
+          <el-tooltip v-else-if="data.insecure" content="含有不安全的依赖" placement="right">
+            <span class="icon insecure">
+              <k-icon name="insecure"></k-icon>
             </span>
           </el-tooltip>
         </h2>
@@ -166,7 +171,7 @@ function formatSize(value: number) {
         line-height: 1.5rem;
       }
 
-      .verified {
+      .icon {
         margin-left: 0.6rem;
         height: 1.125rem;
         width: 1.125rem;
@@ -175,7 +180,6 @@ function formatSize(value: number) {
         display: inline-block;
 
         .k-icon {
-          color: var(--success);
           height: 100%;
           transition: color 0.3s ease;
           z-index: 10;
@@ -193,6 +197,14 @@ function formatSize(value: number) {
           border-radius: 100%;
           background-color: white;
         }
+      }
+
+      .verified {
+        color: var(--success);
+      }
+
+      .insecure {
+        color: var(--danger);
       }
     }
 
