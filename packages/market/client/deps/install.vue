@@ -84,7 +84,7 @@ import { parse } from 'semver'
 function installDep(version: string) {
   const target = shortname.value
   install({ [active.value]: version }, async () => {
-    if (getPaths(target).length) return
+    if (!version || !target || getPaths(target).length) return
     const path = target + ':' + Math.random().toString(36).slice(2, 8)
     await send('manager/unload', path, {})
     await router.push('/plugins/' + path)
@@ -122,13 +122,13 @@ const data = computed(() => {
 })
 
 const danger = computed(() => {
-  if (store.market?.data[active.value].insecure) {
+  if (!workspace.value && store.market?.data[active.value]?.insecure) {
     return '警告：从此插件的最新版本中检测出含有兼容性较差的依赖。安装或升级此插件可能导致后续升级时出现严重问题。'
   }
 })
 
 const warning = computed(() => {
-  if (!version.value || !current.value) return
+  if (!version.value || !current.value || workspace.value) return
   try {
     const source = parse(current.value)
     const target = parse(version.value)
@@ -167,11 +167,17 @@ function* find(target: string, plugins: {}, prefix: string): IterableIterator<[s
   }
 }
 
-const shortname = computed(() => active.value.replace(/(koishi-|^@koishijs\/)plugin-/, ''))
+const pluginRegExp = /(koishi-|^@koishijs\/)plugin-/
+
+const shortname = computed(() => {
+  if (!pluginRegExp.test(active.value)) return ''
+  return active.value.replace(pluginRegExp, '')
+})
 
 const paths = computed(() => getPaths(shortname.value))
 
 function getPaths(target: string) {
+  if (!target) return []
   return [...find(target, store.config.plugins, '')]
 }
 
