@@ -13,6 +13,7 @@
       </el-select>
     </template>
 
+    <p class="danger" v-if="danger">{{ danger }}</p>
     <p class="warning" v-if="warning">{{ warning }}</p>
 
     <el-scrollbar v-if="active && !workspace && Object.keys(data[version].peers).length">
@@ -63,7 +64,7 @@
         </template>
         <template v-else>
           <el-button v-if="current" @click="installDep('')">移除</el-button>
-          <el-button :type="data[version].result" @click="installDep(version)" :disabled="unchanged">
+          <el-button :type="result" @click="installDep(version)" :disabled="unchanged">
             {{ current ? '更新' : '安装' }}
           </el-button>
         </template>
@@ -78,6 +79,7 @@ import { computed, ref, watch } from 'vue'
 import { router, send, store } from '@koishijs/client'
 import { analyzeVersions, showDialog, install } from './utils'
 import { active, config } from '../utils'
+import { parse } from 'semver'
 
 function installDep(version: string) {
   const target = shortname.value
@@ -119,10 +121,29 @@ const data = computed(() => {
   return analyzeVersions(active.value)
 })
 
-const warning = computed(() => {
+const danger = computed(() => {
   if (store.market?.data[active.value].insecure) {
     return '警告：从此插件的最新版本中检测出含有兼容性较差的依赖。安装或升级此插件可能导致后续升级时出现严重问题。'
   }
+})
+
+const warning = computed(() => {
+  if (!version.value || !current.value) return
+  try {
+    const source = parse(current.value)
+    const target = parse(version.value)
+    if (source.major !== target.major || !source.major && source.minor !== target.minor) {
+      return '提示：你正在更改依赖的主版本号。这可能导致不兼容的行为。'
+    }
+  } catch {}
+})
+
+const result = computed(() => {
+  if (!version.value) return
+  const { result } = data.value[version.value]
+  if (result === 'danger' || danger.value) return 'danger'
+  if (result === 'warning' || warning.value) return 'warning'
+  return result
 })
 
 watch(() => active.value, (value) => {
@@ -190,6 +211,10 @@ function configure(path: string | true) {
   }
 
   .warning {
+    color: var(--warning);
+  }
+
+  .danger {
     color: var(--danger);
   }
 
