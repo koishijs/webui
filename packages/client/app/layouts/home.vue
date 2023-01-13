@@ -1,16 +1,20 @@
 <template>
-  <k-layout main="darker" class="page-home">
-    <el-scrollbar>
+  <k-layout :main="`darker page-home${socket ? '' : ' loading'}`">
+    <el-scrollbar v-if="socket">
       <welcome></welcome>
       <k-slot name="home"></k-slot>
       <k-slot name="numeric" class="card-grid profile-grid"></k-slot>
       <k-slot name="chart" class="card-grid chart-grid"></k-slot>
     </el-scrollbar>
+    <div v-else>
+      <k-card class="connect">正在连接到 Koishi 服务器……</k-card>
+    </div>
   </k-layout>
 </template>
 
 <script lang="ts" setup>
 
+import { socket } from '@koishijs/client'
 import Welcome from './welcome.vue'
 
 </script>
@@ -18,6 +22,13 @@ import Welcome from './welcome.vue'
 <style lang="scss">
 
 .page-home {
+  &.loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
   .k-card.welcome {
     margin: var(--card-margin);
   }
@@ -25,6 +36,12 @@ import Welcome from './welcome.vue'
   .k-card-body {
     margin: var(--card-padding-vertical) 0;
     padding: 0 var(--card-padding-horizontal);
+  }
+
+  .k-card.connect {
+    width: 400px;
+    max-width: 400px;
+    text-align: center;
   }
 }
 

@@ -15,7 +15,7 @@
   height: var(--footer-height);
   left: var(--activity-width);
   right: 0;
-  background-color: var(--card-bg);
+  background-color: var(--bg3);
   display: flex;
   flex-direction: row;
   justify-content: space-between;
