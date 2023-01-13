@@ -22,8 +22,6 @@ const props = defineProps<{
 
 const emit = defineEmits(['update:modelValue'])
 
-const randomKey = () => Math.random().toString(36).slice(2)
-
 const conditions = computed(() => {
   if (!props.modelValue) {
     return []

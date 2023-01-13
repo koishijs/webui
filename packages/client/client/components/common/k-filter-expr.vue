@@ -7,9 +7,9 @@
       <el-option v-for="(name, key) in entities" :key="key" :label="name" :value="key"></el-option>
     </el-select>
     <el-select class="operator" v-model="operator">
-      <el-option v-for="(name, key) in operators" :key="key" :label="name" :value="key"></el-option>
+      <el-option v-for="key in availableOps" :key="key" :label="operators[key]" :value="key"></el-option>
     </el-select>
-    <el-input class="value" :type="type" v-model="value"></el-input>
+    <el-input :key="type" :type="type" class="value" v-model="value"></el-input>
   </div>
 </template>
 
@@ -25,7 +25,7 @@ const emit = defineEmits(['update:modelValue'])
 
 const entity = ref<string>()
 const operator = ref<string>()
-const value = ref<string>()
+const value = ref<any>()
 
 const entities = {
   'userId': '用户 ID',
@@ -47,26 +47,42 @@ const operators = {
   '$lte': '不大于',
 }
 
-const types = {
-  array: ['$in', '$nin'],
-  number: ['$eq', '$ne', '$gt', '$lt', '$gte', '$lte'],
-}
+const availableOps = computed(() => {
+  if (entity.value === 'user.authority') return ['$eq', '$ne', '$gt', '$lt', '$gte', '$lte']
+  if (entity.value) return ['$eq', '$ne', '$in', '$nin']
+  return []
+})
 
 watch(() => props.modelValue, () => {
   operator.value = Object.keys(props.modelValue)[0]
-  entity.value = props.modelValue[operator.value]?.[0].$
-  value.value = props.modelValue[operator.value]?.[1].toString()
+  const exprValue = props.modelValue[operator.value]
+  if (!exprValue) return
+  entity.value = exprValue[0].$
+  value.value = Array.isArray(exprValue[1])
+    ? exprValue[1].join(', ')
+    : entity.value === 'user.authority' ? +exprValue[1] : exprValue[1]
 }, { immediate: true })
 
 const type = computed(() => {
-  if (types.number.includes(operator.value)) return 'number'
+  if (entity.value === 'user.authority') return 'number'
+  return 'string'
+})
+
+watch(entity, () => {
+  value.value = null
+  if (!availableOps.value.includes(operator.value)) {
+    operator.value = availableOps.value[0]
+  }
 })
 
 watch([entity, operator, value], ([entity, operator, value]) => {
   if (!entities[entity] || !operators[operator] || !value) return
   let result: any = value
-  if (types.number.includes(operator)) result = +value
-  if (types.array.includes(operator)) result = value.split(/\s*,\s*/g)
+  if (['$in', '$nin'].includes(operator)) {
+    result = value.split(/\s*,\s*/g).filter(Boolean)
+  } else if (entity === 'user.authority') {
+    result = +value
+  }
   emit('update:modelValue', {
     [operator]: [{ $: entity }, result],
   })
