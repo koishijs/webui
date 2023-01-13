@@ -15,7 +15,7 @@ declare module 'koishi' {
 declare module '@koishijs/plugin-console' {
   namespace Console {
     interface Services {
-      profile: ProfileProvider
+      status: ProfileProvider
     }
   }
 }

@@ -1,13 +1,13 @@
 <template>
-  <k-status>
+  <k-status v-if="store.status">
     <template #tooltip>
       <div class="load">
-        <load-bar title="CPU" :rate="store.profile.cpu"/>
-        <load-bar title="内存" :rate="store.profile.memory"/>
+        <load-bar title="CPU" :rate="store.status.cpu"/>
+        <load-bar title="内存" :rate="store.status.memory"/>
       </div>
     </template>
-    CPU: {{ percentage(store.profile.cpu[1], 0) }}
-    内存: {{ percentage(store.profile.memory[1], 0) }}
+    CPU: {{ percentage(store.status.cpu[1], 0) }}
+    内存: {{ percentage(store.status.memory[1], 0) }}
   </k-status>
 </template>
 

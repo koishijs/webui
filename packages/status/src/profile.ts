@@ -81,7 +81,7 @@ class ProfileProvider extends DataService<ProfileProvider.Payload> {
   cached: ProfileProvider.Payload
 
   constructor(ctx: Context, private config: ProfileProvider.Config) {
-    super(ctx, 'profile')
+    super(ctx, 'status')
 
     ctx.i18n.define('zh', zhCN)
 

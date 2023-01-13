@@ -1,10 +1,10 @@
 <template>
-  <k-status>
+  <k-status v-if="store.status">
     <template #tooltip>
-      <span v-if="!store.profile.bots.length" class="el-popper__empty"></span>
-      <bot-preview v-for="(bot, key) in store.profile.bots" :key="key" :data="bot"></bot-preview>
+      <span v-if="!store.status.bots.length" class="el-popper__empty"></span>
+      <bot-preview v-for="(bot, key) in store.status.bots" :key="key" :data="bot"></bot-preview>
     </template>
-    <status-light v-for="(bot, key) in store.profile.bots" :key="key" :class="bot.status"></status-light>
+    <status-light v-for="(bot, key) in store.status.bots" :key="key" :class="bot.status"></status-light>
     <k-icon name="arrow-up"/>
     <span>{{ sent }}/min</span>
     <k-icon name="arrow-down"/>
@@ -20,11 +20,11 @@ import BotPreview from './preview.vue'
 import StatusLight from './light.vue'
 
 const sent = computed(() => {
-  return Object.values(store.profile.bots).reduce((acc, bot) => acc + bot.messageSent, 0)
+  return Object.values(store.status.bots).reduce((acc, bot) => acc + bot.messageSent, 0)
 })
 
 const received = computed(() => {
-  return Object.values(store.profile.bots).reduce((acc, bot) => acc + bot.messageReceived, 0)
+  return Object.values(store.status.bots).reduce((acc, bot) => acc + bot.messageReceived, 0)
 })
 
 </script>
