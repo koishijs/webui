@@ -122,9 +122,8 @@ const data = computed(() => {
 })
 
 const danger = computed(() => {
-  if (!workspace.value && store.market?.data[active.value]?.insecure) {
-    return '警告：从此插件的最新版本中检测出含有兼容性较差的依赖。安装或升级此插件可能导致后续升级时出现严重问题。'
-  }
+  if (workspace.value || !store.market?.data[active.value]?.insecure) return
+  return '警告：从此插件的最新版本中检测出安全性问题。安装或升级此插件可能导致严重问题。'
 })
 
 const warning = computed(() => {

@@ -12,9 +12,14 @@
               <k-icon name="verified"></k-icon>
             </span>
           </el-tooltip>
-          <el-tooltip v-else-if="data.insecure" content="含有不安全的依赖" placement="right">
+          <el-tooltip v-else-if="data.insecure" content="不安全" placement="right">
             <span class="icon insecure">
               <k-icon name="insecure"></k-icon>
+            </span>
+          </el-tooltip>
+          <el-tooltip v-else-if="data.manifest.preview" content="开发中" placement="right">
+            <span class="icon preview">
+              <k-icon name="preview"></k-icon>
             </span>
           </el-tooltip>
         </h2>
@@ -201,6 +206,10 @@ function formatSize(value: number) {
 
       .verified {
         color: var(--success);
+      }
+
+      .preview {
+        color: var(--warning);
       }
 
       .insecure {

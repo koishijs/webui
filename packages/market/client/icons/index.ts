@@ -15,6 +15,7 @@ import CategoryTool from './category/tool.vue'
 import Balance from './market/balance.vue'
 import Download from './market/download.vue'
 import Insecure from './market/insecure.vue'
+import Preview from './market/preview.vue'
 import Refresh from './market/refresh.vue'
 import StarEmpty from './market/star-empty.vue'
 import StarFull from './market/star-full.vue'
@@ -44,6 +45,7 @@ icons.register('category:tool', CategoryTool)
 icons.register('balance', Balance)
 icons.register('download', Download)
 icons.register('insecure', Insecure)
+icons.register('preview', Preview)
 icons.register('refresh', Refresh)
 icons.register('star-empty', StarEmpty)
 icons.register('star-full', StarFull)
