@@ -81,6 +81,13 @@ export class Activity {
 
   dispose() {
     this._disposables.forEach(dispose => dispose())
+    const current = router.currentRoute.value
+    if (current?.meta?.activity === this) {
+      router.push({
+        path: '/',
+        query: { redirect: current.fullPath },
+      })
+    }
     if (activities[this.id]) {
       delete activities[this.id]
       return true

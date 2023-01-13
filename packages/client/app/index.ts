@@ -43,8 +43,8 @@ router.afterEach((route) => {
 app.mount('#app')
 
 if (config.static) {
-  connect(new FrontWebSocket())
+  connect(() => new FrontWebSocket())
 } else {
   const endpoint = new URL(config.endpoint, location.origin).toString()
-  connect(new WebSocket(endpoint.replace(/^http/, 'ws')))
+  connect(() => new WebSocket(endpoint.replace(/^http/, 'ws')))
 }

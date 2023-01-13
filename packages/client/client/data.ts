@@ -74,10 +74,10 @@ receive('response', ({ id, value, error }) => {
   }
 })
 
-export function connect(value: AbstractWebSocket) {
-  socket.value = markRaw(value)
+export function connect(callback: () => AbstractWebSocket) {
+  const value = callback()
 
-  socket.value.onmessage = (ev) => {
+  value.onmessage = (ev) => {
     const data = JSON.parse(ev.data)
     console.debug('%c', 'color:purple', data.type, data.body)
     if (data.type in listeners) {
@@ -85,21 +85,24 @@ export function connect(value: AbstractWebSocket) {
     }
   }
 
-  socket.value.onclose = (ev) => {
+  value.onclose = (ev) => {
     socket.value = null
     for (const key in store) {
       store[key] = undefined
     }
     console.log('[koishi] websocket disconnected, will retry in 1s...')
-    setInterval(() => {
-      connect(value).then(location.reload, () => {
+    setTimeout(() => {
+      connect(callback).then(location.reload, () => {
         console.log('[koishi] websocket disconnected, will retry in 1s...')
       })
     }, 1000)
   }
 
   return new Promise<Event>((resolve, reject) => {
-    socket.value.onopen = resolve
-    socket.value.onerror = reject
+    value.onopen = (event) => {
+      socket.value = markRaw(value)
+      resolve(event)
+    }
+    value.onerror = reject
   })
 }

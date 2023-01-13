@@ -6,7 +6,7 @@ import { config, Store, store } from './data'
 import install, { isNullable, remove } from './components'
 import Overlay from './components/chat/overlay.vue'
 import * as cordis from 'cordis'
-import { activities, Activity } from './activity'
+import { Activity } from './activity'
 
 export * from './activity'
 export * from './components'
@@ -151,12 +151,8 @@ router.beforeEach(async (to, from) => {
     if (to.matched.length) return to
   }
 
-  const routes = Object.values(activities)
-    .filter(item => getValue(item.position) === 'top')
-    .sort((a, b) => b.order - a.order)
-  const path = routes[0]?.path || '/blank'
   return {
-    path,
+    path: '/',
     query: { redirect: to.fullPath },
   }
 })
