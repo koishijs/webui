@@ -25,7 +25,8 @@ class Initiator {
 
   async init(name: string) {
     name ||= await this.getName()
-    if (!/^(?:@[a-z0-9-*~][a-z0-9-*._~]*\/)?[a-z0-9-~][a-z0-9-._~]*$/.test(name)) {
+    name = name.replace(/_/g, '-')
+    if (!/^(?:@[a-z0-9-]+\/)?[a-z0-9-]+$/.test(name)) {
       console.log(red('error'), 'plugin name contains invalid character')
       process.exit(1)
     }
