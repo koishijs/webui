@@ -117,6 +117,7 @@ class PackageProvider extends BasePackageProvider {
     const exports = getExports(name)
     result.schema = exports?.Config || exports?.schema
     result.usage = exports?.usage
+    result.filter = exports?.filter
 
     // check plugin state
     const runtime = this.ctx.registry.get(exports)
@@ -143,6 +144,7 @@ namespace PackageProvider {
     shortname?: string
     schema?: Schema
     usage?: string
+    filter?: boolean
     workspace?: boolean
     manifest?: Manifest
   }

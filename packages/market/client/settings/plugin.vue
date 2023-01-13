@@ -63,7 +63,7 @@
 
     <k-markdown class="usage" v-if="local.usage" :source="local.usage"></k-markdown>
 
-    <k-modifier v-model="config"></k-modifier>
+    <k-modifier v-if="local.filter !== false" v-model="config"></k-modifier>
 
     <k-slot name="market-settings"></k-slot>
 
@@ -175,6 +175,8 @@ provide('manager.settings.current', computed(() => props.current))
   }
 
   .navigation {
+    margin: 2rem 0;
+
     a.k-button {
       margin-right: 1rem;
     }

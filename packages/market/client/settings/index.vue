@@ -174,4 +174,8 @@ async function execute(event: 'unload' | 'reload') {
   }
 }
 
+.plugin-view .k-content > *:first-child {
+  margin-top: 0;
+}
+
 </style>
