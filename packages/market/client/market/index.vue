@@ -23,7 +23,7 @@
         <k-icon name="search"></k-icon>
       </div>
       <div class="market-filter">
-        共搜索到 {{ realWords.length ? all.length + ' / ' : '' }}{{ Object.keys(store.market.data).length }} 个插件。
+        共搜索到 {{ realWords.length ? all.length + ' / ' : '' }}{{ visible.length }} 个插件。
         <el-checkbox v-if="store.packages" v-model="config.showInstalled">
           {{ global.static ? '只显示可用插件' : `显示已下载的插件 (共 ${installed} 个)` }}
         </el-checkbox>
@@ -96,9 +96,15 @@ function onQuery(word: string) {
   words.push('')
 }
 
-const all = computed(() => {
+const visible = computed(() => {
   return Object.values(store.market.data).filter((data) => {
-    return !data.manifest.hidden && words.every(word => validate(data, word))
+    return !data.manifest.hidden || words.includes('show:hidden')
+  })
+})
+
+const all = computed(() => {
+  return visible.value.filter((data) => {
+    return words.every(word => validate(data, word))
   })
 })
 
