@@ -49,7 +49,7 @@ import { router, store, global } from '@koishijs/client'
 import { computed, reactive, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { config, refresh } from '../utils'
-import { validate } from './utils'
+import { getUsers, validate } from './utils'
 import PackageView from './package.vue'
 
 const route = useRoute()
@@ -104,7 +104,8 @@ const visible = computed(() => {
 
 const all = computed(() => {
   return visible.value.filter((data) => {
-    return words.every(word => validate(data, word))
+    const users = getUsers(data)
+    return words.every(word => validate(data, word, users))
   })
 })
 
