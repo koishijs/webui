@@ -103,7 +103,7 @@ function getAvatar(email: string) {
   return (store.market.gravatar || 'https://s.gravatar.com')
     + '/avatar/'
     + (email ? md5.hash(email.toLowerCase()) : '')
-    + '?d=mp'
+    + '.png?d=mp'
 }
 
 function formatValue(value: number) {

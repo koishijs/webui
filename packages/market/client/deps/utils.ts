@@ -3,7 +3,7 @@ import { satisfies } from 'semver'
 import { ref, watch } from 'vue'
 
 export function analyzeVersions(name: string) {
-  const { versions = {} } = store.market?.data[name] || store.dependencies[name]
+  const { versions = {} } = store.dependencies[name] || store.market?.data[name]
   return valueMap(versions, (item) => {
     const peers = valueMap({ ...item.peerDependencies }, (request, name) => {
       const resolved = store.dependencies[name]?.resolved || store.packages[name]?.version
@@ -22,6 +22,7 @@ export function analyzeVersions(name: string) {
         result = 'warning'
       }
     }
+    if (item.deprecated) result = 'danger'
     return { peers, result }
   })
 }

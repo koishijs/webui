@@ -16,7 +16,7 @@
     <p class="danger" v-if="danger">{{ danger }}</p>
     <p class="warning" v-if="warning">{{ warning }}</p>
 
-    <el-scrollbar v-if="active && !workspace && Object.keys(data[version].peers).length">
+    <el-scrollbar v-if="active && !workspace && data[version] && Object.keys(data[version].peers).length">
       <table>
         <tr>
           <td>依赖名称</td>
@@ -122,8 +122,12 @@ const data = computed(() => {
 })
 
 const danger = computed(() => {
-  if (workspace.value || !store.market?.data[active.value]?.insecure) return
-  return '警告：从此插件的最新版本中检测出安全性问题。安装或升级此插件可能导致严重问题。'
+  if (workspace.value) return
+  const deprecated = store.dependencies[active.value]?.versions?.[version.value]?.deprecated
+  if (deprecated) return deprecated
+  if (store.market?.data[active.value]?.insecure) {
+    return '警告：从此插件的最新版本中检测出安全性问题。安装或升级此插件可能导致严重问题。'
+  }
 })
 
 const warning = computed(() => {

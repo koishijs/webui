@@ -17,6 +17,11 @@
       <p>当前的插件版本 ({{ local.version }}) 不是最新，<router-link to="/dependencies">点击前往依赖管理</router-link>。</p>
     </k-comment>
 
+    <!-- deprecated -->
+    <k-comment v-if="dep?.versions[dep?.resolved]?.deprecated" type="error">
+      <p>此版本已废弃，请尽快迁移：{{ dep?.versions[dep?.resolved]?.deprecated }}</p>
+    </k-comment>
+
     <!-- external -->
     <k-comment type="warning" v-if="!local.workspace && store.dependencies && !store.dependencies[name]">
       <p>尚未将当前插件列入依赖，<a @click="send('market/install', { [name]: local.version })">点击添加</a>。</p>
@@ -61,7 +66,7 @@
       </ul>
     </k-comment>
 
-    <k-markdown class="usage" v-if="local.usage" :source="local.usage"></k-markdown>
+    <k-markdown unsafe class="usage" v-if="local.usage" :source="local.usage"></k-markdown>
 
     <k-modifier v-if="local.filter !== false" v-model="config"></k-modifier>
 
@@ -125,6 +130,7 @@ const name = computed(() => {
 })
 
 const local = computed(() => store.packages[name.value])
+const dep = computed(() => store.dependencies[name.value])
 const remote = computed(() => store.market?.data[name.value])
 const env = computed(() => envMap.value[name.value])
 const hint = computed(() => local.value.workspace ? '，请检查源代码' : '，请联系插件作者')
@@ -166,7 +172,7 @@ provide('manager.settings.current', computed(() => props.current))
     }
   }
 
-  .k-markdown.usage {
+  .markdown.usage {
     margin-bottom: 2rem;
 
     h2 {

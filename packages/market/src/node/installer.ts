@@ -1,6 +1,6 @@
 import { Context, Dict, Logger, pick, Quester, Schema, Time, valueMap } from 'koishi'
 import { DataService } from '@koishijs/plugin-console'
-import { PackageJson, Registry } from '@koishijs/registry'
+import { PackageJson, Registry, RemotePackage } from '@koishijs/registry'
 import { resolve } from 'path'
 import { promises as fsp } from 'fs'
 import { loadManifest } from './utils'
@@ -19,6 +19,8 @@ declare module '@koishijs/plugin-console' {
 
 const logger = new Logger('market')
 
+const depKeys = ['peerDependencies', 'peerDependenciesMeta', 'deprecated'] as const
+
 export interface Dependency {
   /**
    * requested semver range
@@ -33,7 +35,7 @@ export interface Dependency {
   /** whether it is a workspace package */
   workspace?: boolean
   /** all available versions */
-  versions?: Dict<Partial<PackageJson>>
+  versions?: Dict<Pick<RemotePackage, typeof depKeys[number]>>
   /** latest version */
   latest?: string
   /** valid (unsupported) syntax */
@@ -90,7 +92,7 @@ class Installer extends DataService<Dict<Dependency>> {
       try {
         const registry = await this.http.get<Registry>(`/${name}`)
         const entries = Object.values(registry.versions)
-          .map(item => [item.version, pick(item, ['peerDependencies', 'peerDependenciesMeta'])] as const)
+          .map(item => [item.version, pick(item, depKeys)] as const)
           .sort(([a], [b]) => compare(b, a))
         result[name].latest = entries[0][0]
         result[name].versions = Object.fromEntries(entries)

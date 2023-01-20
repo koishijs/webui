@@ -17,7 +17,6 @@ export interface EnvInfo {
   using: Dict<DepInfo>
   peer: Dict<PeerInfo>
   warning?: boolean
-  console?: boolean
 }
 
 const getImplements = (name: string) => ({
@@ -25,13 +24,15 @@ const getImplements = (name: string) => ({
   ...store.packages[name],
 }.manifest?.service.implements ?? [])
 
+const builtinPeerDeps = [
+  '@koishijs/plugin-console',
+  '@koishijs/plugin-market',
+]
+
 function getEnvInfo(name: string) {
   function setService(name: string, required: boolean) {
     if (services.has(name)) return
-    if (name === 'console') {
-      result.console = true
-      return
-    }
+    if (name === 'console') return
 
     const available = Object.values(store.market?.data ?? {})
       .filter(data => getImplements(data.name).includes(name))
@@ -46,6 +47,7 @@ function getEnvInfo(name: string) {
   // check peer dependencies
   for (const name in local.peerDependencies ?? {}) {
     if (!name.includes('@koishijs/plugin-') && !name.includes('koishi-plugin-')) continue
+    if (builtinPeerDeps.includes(name)) continue
     const required = !local.peerDependenciesMeta?.[name]?.optional
     const active = !!store.packages[name]?.id
     result.peer[name] = { required, active }
