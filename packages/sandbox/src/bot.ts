@@ -1,21 +1,21 @@
-import { Bot, Context, defineProperty, Fragment, Messenger, Random, segment, SendOptions } from 'koishi'
+import { Bot, Context, defineProperty, Dict, Fragment, h, Messenger, Random, SendOptions } from 'koishi'
+import {} from '@koishijs/assets'
 
 class SandboxMessenger extends Messenger<SandboxBot> {
   private buffer = ''
 
+  private rules: Dict<h.AsyncTransformer> = Object.fromEntries(['image', 'audio', 'video', 'file'].map((type) => {
+    return [type, async (data) => {
+      if (data.url.startsWith('file:') && this.bot.ctx.assets) {
+        return h(type, { ...data, url: await this.bot.ctx.assets.upload(data.url, data.url) })
+      }
+      return h(type, data)
+    }]
+  }))
+
   async flush() {
     if (!this.buffer.trim()) return
-    const content = await segment.transformAsync(this.buffer.trim(), {
-      image: async (data) => {
-        if (data.url.startsWith('file://') && process.env.KOISHI_ENV !== 'browser') {
-          const file = await this.bot.ctx.http.file(data.url)
-          return segment.image(`data:${file.mime};base64,` + Buffer.from(file.data).toString('base64'))
-        }
-        // for backward compatibility
-        if (!data.url.startsWith('base64://')) return segment('image', data)
-        return segment.image('data:image/png;base64,' + data.url.slice(9))
-      },
-    })
+    const content = await h.transformAsync(this.buffer.trim(), this.rules)
     const session = this.bot.session(this.session)
     session.messageId = Random.id()
     session.app.console.broadcast('sandbox', {
@@ -28,7 +28,7 @@ class SandboxMessenger extends Messenger<SandboxBot> {
     this.buffer = ''
   }
 
-  async visit(element: segment) {
+  async visit(element: h) {
     const { type, children } = element
     if (type === 'message' || type === 'figure') {
       await this.flush()
