@@ -34,7 +34,7 @@
           <chat-message :data="data"></chat-message>
         </virtual-list>
         <div class="card-footer">
-          <chat-input @send="sendMessage"></chat-input>
+          <chat-input v-model="input" @send="sendMessage" @keydown="onKeydown"></chat-input>
         </div>
       </template>
     </keep-alive>
@@ -88,6 +88,30 @@ function removeUser(name: string) {
   }
 }
 
+const input = ref('')
+const offset = ref(0)
+
+function onKeydown(event: KeyboardEvent) {
+  if (event.key === 'ArrowUp') {
+    const list = config.messages[channel.value].filter(item => item.user === config.user)
+    let index = list.length - offset.value
+    if (list[index - 1]) {
+      offset.value++
+      input.value = list[index - 1].content
+    }
+  } else if (event.key === 'ArrowDown') {
+    const list = config.messages[channel.value].filter(item => item.user === config.user)
+    let index = list.length - offset.value
+    if (list[index + 1]) {
+      offset.value--
+      input.value = list[index + 1].content
+    } else if (offset.value) {
+      offset.value = 0
+      input.value = ''
+    }
+  }
+}
+
 const model = ref()
 
 watch(() => store.sandbox?.[config.user], (value) => {
@@ -100,6 +124,7 @@ watch(model, (value) => {
 }, { deep: true })
 
 function sendMessage(content: string) {
+  offset.value = 0
   send('sandbox/message', config.user, channel.value, content)
 }
 
