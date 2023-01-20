@@ -39,7 +39,7 @@
         </template>
       </div>
     </div>
-    <k-markdown inline class="desc" :source="meta.manifest.description.zh || meta.manifest.description.en"></k-markdown>
+    <k-markdown inline class="desc" :source="data.manifest.description.zh || data.manifest.description.en"></k-markdown>
     <div class="footer">
       <a class="shrink" :href="data.links.npm" target="_blank" rel="noopener noreferrer">
         <k-icon name="tag"></k-icon>{{ data.version }}
@@ -79,7 +79,7 @@
 import { computed, PropType } from 'vue'
 import { AnalyzedPackage } from '@koishijs/registry'
 import { store, config } from '@koishijs/client'
-import { active, getMixedMeta } from '../utils'
+import { active } from '../utils'
 import { getUsers, resolveCategory } from './utils'
 import md5 from 'spark-md5'
 
@@ -90,8 +90,6 @@ defineEmits(['query', 'click'])
 const props = defineProps({
   data: {} as PropType<AnalyzedPackage>,
 })
-
-const meta = computed(() => getMixedMeta(props.data.name))
 
 function handleClick() {
   active.value = props.data.name

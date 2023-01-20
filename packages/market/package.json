@@ -63,15 +63,15 @@
     "@types/semver": "^7.3.13",
     "@types/spark-md5": "^3.0.2",
     "@types/throttle-debounce": "^2.1.0",
-    "@types/which-pm-runs": "^1.0.0"
+    "@types/which-pm-runs": "^1.0.0",
+    "spark-md5": "^3.0.2"
   },
   "dependencies": {
-    "@koishijs/registry": "^4.4.2",
+    "@koishijs/registry": "^4.4.4",
     "execa": "^5.1.1",
     "get-registry": "^1.1.0",
     "ns-require": "^1.1.4",
     "semver": "^7.3.8",
-    "spark-md5": "^3.0.2",
     "throttle-debounce": "^3.0.1",
     "which-pm-runs": "^1.1.0"
   }
