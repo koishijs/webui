@@ -5,7 +5,6 @@
         <k-icon name="search"></k-icon>
       </el-input>
     </div>
-    <k-tab-item class="k-tab-group-title" label="@global" v-model="model">全局设置</k-tab-item>
     <el-tree
       ref="tree"
       node-key="id"
@@ -52,10 +51,6 @@ function filterNode(value: string, data: Tree) {
   return data.label.includes(keyword.value)
 }
 
-function allowDrag(node: Node) {
-  return node.data.path !== ''
-}
-
 interface Node {
   data: Tree
   parent: Node
@@ -64,10 +59,16 @@ interface Node {
   childNodes: Node[]
 }
 
+function allowDrag(node: Node) {
+  return node.data.path !== ''
+}
+
 function allowDrop(source: Node, target: Node, type: 'inner' | 'prev' | 'next') {
-  if (type !== 'inner') return target.data.path !== ''
+  if (type !== 'inner') {
+    return target.data.path !== '' || type === 'next'
+  }
   const segments = splitPath(target.data.path)
-  return segments[segments.length - 1].startsWith('group:')
+  return segments[segments.length - 1]?.startsWith('group:')
 }
 
 function handleClick(tree: Tree) {

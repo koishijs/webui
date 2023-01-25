@@ -2,7 +2,7 @@
   <k-layout :menu="menu">
     <template #header>
       <!-- root -->
-      <template v-if="current.path === '@global' || !current.path">
+      <template v-if="!current.path">
         {{ current.label }}
       </template>
 
@@ -33,7 +33,7 @@
     </template>
 
     <k-content class="plugin-view" :key="path">
-      <global-settings v-if="current.path === '@global'" :current="current" v-model="config"></global-settings>
+      <global-settings v-if="!current.path" :current="current" v-model="config"></global-settings>
       <group-settings v-else-if="current.children" v-model="config" :current="current"></group-settings>
       <plugin-settings v-else :current="current" v-model="config"></plugin-settings>
     </k-content>
@@ -59,10 +59,10 @@ const router = useRouter()
 const path = computed<string>({
   get() {
     const name = route.path.slice(9)
-    return name in plugins.value.paths ? name : '@global'
+    return name in plugins.value.paths ? name : ''
   },
   set(name) {
-    if (!(name in plugins.value.paths)) name = '@global'
+    if (!(name in plugins.value.paths)) name = ''
     router.replace('/plugins/' + name)
   },
 })
@@ -102,14 +102,13 @@ const type = computed(() => {
 })
 
 const menu = computed(() => {
-  const isGlobal = current.value.path === '@global'
-  const isGroup = current.value.children
-  const isPlugin = !isGlobal && !isGroup
+  const isGlobal = current.value.path === ''
+  const isGroup = !!current.value.children
   const isDisabled = current.value.disabled
   return [{
     icon: isDisabled ? 'play' : 'stop',
     label: isDisabled ? '启用插件' : '停用插件',
-    disabled: !isPlugin || !name.value,
+    disabled: isGroup || !name.value,
     action: async () => {
       await execute(isDisabled ? 'reload' : 'unload')
       message.success(isDisabled ? '插件已启用。' : '插件已停用。')
@@ -118,7 +117,7 @@ const menu = computed(() => {
     type: isDisabled ? type.value : '',
     icon: isDisabled ? 'save' : 'check',
     label: isDisabled ? '保存配置' : '重载配置',
-    disabled: !isGlobal && !isGroup && !name.value,
+    disabled: !isGroup && !name.value,
     async action() {
       if (isGlobal) {
         send('manager/app-reload', config.value)
@@ -131,18 +130,18 @@ const menu = computed(() => {
     type: 'error',
     icon: 'trash-can',
     label: isGroup ? '移除分组' : '移除插件',
-    disabled: !current.value.path || isGlobal,
+    disabled: isGlobal,
     action: () => removeItem(current.value.path),
   }, {
     icon: 'add-plugin',
     label: '添加插件',
-    disabled: isPlugin,
+    disabled: !isGroup,
     action: () => showSelect.value = true,
     // action: () => addItem(current.value.path, 'unload', '')
   }, {
     icon: 'add-group',
     label: '添加分组',
-    disabled: isPlugin,
+    disabled: !isGroup,
     action: () => addItem(current.value.path, 'group', 'group'),
   }]
 })

@@ -125,23 +125,22 @@ function getTree(parent: Tree, plugins: any): Tree[] {
 
 export const plugins = computed(() => {
   const root: Tree = {
-    label: '所有插件',
+    label: '全局设置',
     id: '',
     path: '',
     alias: '',
-    config: store.config.plugins,
+    config: store.config,
+    children: [],
   }
-  root.children = getTree(root, store.config.plugins)
-  const paths: Dict<Tree> = {
-    '@global': {
-      label: '全局设置',
-      path: '@global',
-      id: '@global',
-      alias: '',
-      config: store.config,
-    },
-  }
+  const data = [root]
   const expanded: string[] = []
+  const paths: Dict<Tree> = {
+    '': root,
+  }
+  for (const node of getTree(root, store.config.plugins)) {
+    data.push(node)
+    traverse(node)
+  }
   function traverse(tree: Tree) {
     if (!tree.config?.$collapsed && tree.children) {
       expanded.push(tree.id)
@@ -149,8 +148,7 @@ export const plugins = computed(() => {
     paths[tree.path] = tree
     tree.children?.forEach(traverse)
   }
-  traverse(root)
-  return { data: [root], paths, expanded }
+  return { data, paths, expanded }
 })
 
 export function setPath(oldPath: string, newPath: string) {
@@ -171,7 +169,6 @@ export function splitPath(path: string) {
 
 export function addItem(path: string, action: 'group' | 'unload', name: string) {
   const id = Math.random().toString(36).slice(2, 8)
-  if (path === '@global') path = ''
   if (path) path += '/'
   path += name + ':' + id
   send(`manager/${action}`, path)

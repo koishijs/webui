@@ -45,7 +45,7 @@ const packages = computed(() => Object.values(store.packages).filter(({ name, sh
 
 function configure(shortname: string) {
   showSelect.value = false
-  let path = route.path.slice(9).replace(/@global/, '')
+  let path = route.path.slice(9)
   if (path) path += '/'
   path += shortname + ':' + Math.random().toString(36).slice(2, 8)
   send('manager/unload', path, {})
