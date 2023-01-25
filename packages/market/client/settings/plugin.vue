@@ -18,7 +18,7 @@
     </k-comment>
 
     <!-- deprecated -->
-    <k-comment v-if="dep?.versions[dep?.resolved]?.deprecated" type="error">
+    <k-comment v-if="dep?.versions?.[dep?.resolved]?.deprecated" type="error">
       <p>此版本已废弃，请尽快迁移：{{ dep?.versions[dep?.resolved]?.deprecated }}</p>
     </k-comment>
 

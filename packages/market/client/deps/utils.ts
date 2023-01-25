@@ -1,4 +1,4 @@
-import { Dict, loading, message, send, socket, store, valueMap } from '@koishijs/client'
+import { Awaitable, Dict, loading, message, send, socket, store, valueMap } from '@koishijs/client'
 import { satisfies } from 'semver'
 import { ref, watch } from 'vue'
 
@@ -29,7 +29,7 @@ export function analyzeVersions(name: string) {
 
 export const showDialog = ref(false)
 
-export async function install(override: Dict<string>, callback?: () => void) {
+export async function install(override: Dict<string>, callback?: () => Awaitable<void>) {
   const instance = loading({
     text: '正在更新依赖……',
   })
