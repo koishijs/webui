@@ -9,24 +9,13 @@
         :viewBox="`-${width / 2} -${height / 2} ${width} ${height}`"
       >
         <g class="links">
-          <g class="link" v-for="(link, index) in links" :key="index" :class="{ highlight: subgraph.links.has(link) }">
-            <line
-              :x1="link.source.x"
-              :y1="link.source.y"
-              :x2="link.target.x"
-              :y2="link.target.y"
-              class="shadow"
-              @mouseenter.stop.prevent="onMouseEnterLink(link, $event)"
-              @mouseleave.stop.prevent="onMouseLeaveLink(link, $event)"
-            />
-            <line
-              :x1="link.source.x"
-              :y1="link.source.y"
-              :x2="link.target.x"
-              :y2="link.target.y"
-              :class="link.type"
-            />
-          </g>
+          <link-view
+            v-for="(link, index) in links" :key="index"
+            :link="link"
+            :class="{ highlight: subgraph.links.has(link) }"
+            @mouseenter="onMouseEnterLink"
+            @mouseleave="onMouseLeaveLink">
+          </link-view>
         </g>
         <g class="nodes">
           <g class="node"
@@ -58,10 +47,11 @@
 
 import { onMounted, ref, computed, watch, reactive } from 'vue'
 import { store } from '@koishijs/client'
-import Insight from '@koishijs/plugin-insight'
-import * as d3 from 'd3-force'
 import { useTooltip, getEventPoint } from './tooltip'
 import { useElementSize, useEventListener } from '@vueuse/core'
+import { Node, Link } from './utils'
+import * as d3 from 'd3-force'
+import LinkView from './link.vue'
 
 const root = ref<HTMLElement>()
 const { width, height } = useElementSize(root)
@@ -70,17 +60,6 @@ const tooltip = useTooltip()
 const dragged = ref<Node>(null)
 const fNode = ref<Node>(null) 
 const fLink = ref<Link>(null) 
-
-interface Node extends Insight.Node, d3.SimulationNodeDatum {
-  lastX?: number
-  lastY?: number
-  active?: boolean
-}
-
-interface Link extends Omit<Insight.Link, 'source' | 'target'>, d3.SimulationLinkDatum<Node> {
-  source: Node
-  target: Node
-}
 
 const nodes = reactive<Node[]>(store.insight.nodes as any)
 const links = computed<Link[]>(() => store.insight.edges as any)
@@ -146,7 +125,7 @@ function onMouseLeaveNode(node: Node, event: MouseEvent) {
 
 function onMouseEnterLink(link: Link, event: MouseEvent) {
   fLink.value = link
-  const type = link.type === 'dashed' ? '依赖' : '调用'
+  const type = link.type === 'dashed' ? '服务' : '调用'
   const text = `${type}：${link.source.name} → ${link.target.name}`
   tooltip.activate(text, event)
 }
@@ -268,33 +247,6 @@ g.node {
 
   .has-highlight &:not(.highlight) circle {
     fill: var(--bg4);
-  }
-}
-
-g.link {
-  line {
-    transition: 0.3s ease;
-    &:hover {
-      stroke-width: 5;
-    }
-    &.dashed {
-      stroke-dasharray: 6 6;
-    }
-    &.shadow {
-      stroke: transparent;
-      stroke-width: 6;
-      cursor: pointer;
-    }
-    &:not(.shadow) {
-      stroke: var(--fg3);
-      stroke-opacity: 0.3;
-      stroke-width: 3;
-      pointer-events: none;
-    }
-  }
-
-  .has-highlight &:not(.highlight) line:not(.shadow) {
-    stroke-opacity: 0.1;
   }
 }
 

@@ -103,7 +103,7 @@ class Insight extends DataService<Insight.Payload> {
         for (const name of runtime.using) {
           const uid = state.ctx[name]?.[Context.source]?.state.uid
           if (!uid) continue
-          addEdge('dashed', state.uid, uid)
+          addEdge('dashed', uid, state.uid)
         }
       }
 
