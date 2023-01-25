@@ -36,10 +36,10 @@ export function useTooltip() {
   })
 
   function activate(text: string, event: MouseEvent | TouchEvent) {
+    const pointer = getEventPoint(event)
     content.value = text
     active.value = true
     inactive.value = false
-    const pointer = getEventPoint(event)
     left.value = pointer.clientX
     top.value = pointer.clientY
   }

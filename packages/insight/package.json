@@ -1,7 +1,7 @@
 {
   "name": "@koishijs/plugin-insight",
   "description": "Show plugin dependency graph for Koishi",
-  "version": "3.2.0",
+  "version": "3.2.1",
   "main": "lib/index.cjs",
   "typings": "lib/index.d.ts",
   "exports": {

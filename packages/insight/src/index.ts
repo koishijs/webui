@@ -1,4 +1,4 @@
-import { camelize, capitalize, Context, EffectScope, ForkScope, Plugin, Schema } from 'koishi'
+import { camelize, capitalize, Context, EffectScope, ForkScope, Plugin, Schema, ScopeStatus } from 'koishi'
 import { debounce } from 'throttle-debounce'
 import { DataService } from '@koishijs/plugin-console'
 import { resolve } from 'path'
@@ -49,6 +49,7 @@ class Insight extends DataService<Insight.Payload> {
     ctx.on('internal/fork', this.update)
     ctx.on('internal/runtime', this.update)
     ctx.on('internal/service', this.update)
+    ctx.on('internal/status', this.update)
   }
 
   stop() {
@@ -80,15 +81,16 @@ class Insight extends DataService<Insight.Payload> {
 
       function isActive(state: EffectScope) {
         // exclude plugins that don't work due to missing dependencies
-        return runtime.using.every(name => state.ctx[name])
+        // return runtime.using.every(name => state.ctx[name])
+        return true
       }
 
       const name = getName(runtime.plugin)
 
       function addNode(state: EffectScope) {
-        const { uid, alias, disposables } = state
+        const { uid, alias, disposables, status } = state
         const weight = disposables.length
-        const node = { uid, name, weight }
+        const node = { uid, name, weight, status }
         if (alias) node.name += ` <${format(alias)}>`
         nodes.push(node)
       }
@@ -99,8 +101,7 @@ class Insight extends DataService<Insight.Payload> {
 
       function addDeps(state: EffectScope) {
         for (const name of runtime.using) {
-          const ctx = state.ctx[name][Context.source]
-          const uid = ctx?.state.uid
+          const uid = state.ctx[name]?.[Context.source]?.state.uid
           if (!uid) continue
           addEdge('dashed', state.uid, uid)
         }
@@ -144,6 +145,7 @@ namespace Insight {
     uid: number
     name: string
     weight: number
+    status: ScopeStatus
   }
 
   export interface Link {

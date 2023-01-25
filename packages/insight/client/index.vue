@@ -1,6 +1,6 @@
 <template>
   <k-layout main="darker">
-    <div ref="root" :class="{ insight: true, highlight: tooltip.active }">
+    <div ref="root" :class="{ insight: true, 'has-highlight': tooltip.active }">
       <svg
         ref="svg"
         id="couple"
@@ -9,7 +9,7 @@
         :viewBox="`-${width / 2} -${height / 2} ${width} ${height}`"
       >
         <g class="links">
-          <g class="link" v-for="(link, index) in links" :key="index" :class="{ active: subgraph.links.has(link) }">
+          <g class="link" v-for="(link, index) in links" :key="index" :class="{ highlight: subgraph.links.has(link) }">
             <line
               :x1="link.source.x"
               :y1="link.source.y"
@@ -31,10 +31,10 @@
         <g class="nodes">
           <g class="node"
             v-for="(node, index) in nodes" :key="index"
-            :class="{ active: subgraph.nodes.has(node) }"
+            :class="{ highlight: subgraph.nodes.has(node) }"
           >
             <circle
-              :r="fNode === node ? 12 : 10"
+              :r="fNode === node ? 12 : 9"
               :cx="node.x"
               :cy="node.y"
               @mouseenter.stop.prevent="onMouseEnterNode(node, $event)"
@@ -58,7 +58,7 @@
 
 import { onMounted, ref, computed, watch, reactive } from 'vue'
 import { store } from '@koishijs/client'
-import Insight from '../src'
+import Insight from '@koishijs/plugin-insight'
 import * as d3 from 'd3-force'
 import { useTooltip, getEventPoint } from './tooltip'
 import { useElementSize, useEventListener } from '@vueuse/core'
@@ -88,12 +88,12 @@ const links = computed<Link[]>(() => store.insight.edges as any)
 const forceLink = d3
   .forceLink<Node, Link>(links.value)
   .id(node => node.uid)
-  .distance(120)
+  .distance(100)
 
 const simulation = d3
   .forceSimulation(nodes)
   .force('link', forceLink)
-  .force('charge', d3.forceManyBody().strength(-400))
+  .force('charge', d3.forceManyBody().strength(-200))
   .force('x', d3.forceX().strength(0.05))
   .force('y', d3.forceY().strength(0.05))
   .stop()
@@ -266,7 +266,7 @@ g.node {
     }
   }
 
-  .highlight &:not(.active) circle {
+  .has-highlight &:not(.highlight) circle {
     fill: var(--bg4);
   }
 }
@@ -293,13 +293,13 @@ g.link {
     }
   }
 
-  .highlight &:not(.active) line:not(.shadow) {
+  .has-highlight &:not(.highlight) line:not(.shadow) {
     stroke-opacity: 0.1;
   }
 }
 
-.highlight g.links {
-  path.active {
+.has-highlight g.links {
+  g.highlight {
     stroke: var(--primary);
   }
 }
