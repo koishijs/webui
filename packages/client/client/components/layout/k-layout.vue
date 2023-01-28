@@ -126,7 +126,6 @@ const route = useRoute()
       position: fixed;
       top: 0;
       left: var(--activity-width);
-      right: var(--activity-width);
       bottom: 0;
     }
 

@@ -17,16 +17,17 @@ import { activities, Activity } from '@koishijs/client'
 import ActivityItem from './activity-item.vue'
 import ActivityGroup from './activity-group.vue'
 
-const { height } = useWindowSize()
+const { height, width } = useWindowSize()
 
 const groups = computed(() => {
   let hidden: Activity[]
+  const unit = width.value <= 768 ? 56 : 64
   const list = Object.values(activities)
     .filter(data => data.position)
     .sort((a, b) => a.order - b.order)
-  if (list.length * 64 > height.value) {
+  if (list.length * unit > height.value) {
     hidden = list
-      .splice(0, list.length + 1 - Math.floor(height.value / 64))
+      .splice(0, list.length + 1 - Math.floor(height.value / unit))
       .sort((a, b) => {
         const scale = a.position === 'top' ? -1 : 1
         if (a.position === b.position) {

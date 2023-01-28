@@ -40,9 +40,9 @@ const icon = computed(() => {
 }
 
 .k-comment {
-  padding: 1px 1.5rem !important;
+  padding: 1px 1.5rem;
   margin: 2rem 0;
-  border-left-width: 4px !important;
+  border-left-width: 4px;
   border-left-style: solid;
   position: relative;
   line-height: 1.7;

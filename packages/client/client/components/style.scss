@@ -85,12 +85,14 @@ html.dark {
   --card-padding-horizontal: 1.5rem;
 
   @media screen and (max-width: 768px) {
+    --activity-width: 3.5rem;
+    --activity-icon-size: 1.375rem;
     --card-margin: 1.5rem;
     --card-padding-vertical: 1rem;
     --card-padding-horizontal: 1rem;
   }
 
-  @media screen and (max-width: 420px) {
+  @media screen and (max-width: 480px) {
     --card-margin: 1rem;
     --card-padding-vertical: 0.75rem;
     --card-padding-horizontal: 0.875rem;
