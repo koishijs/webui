@@ -1,18 +1,15 @@
 import { Context, Dict, EffectScope, MainScope, Schema } from 'koishi'
 import { DataService } from '@koishijs/plugin-console'
 import { Manifest, PackageJson } from '@koishijs/registry'
+import { debounce } from 'throttle-debounce'
 
 export abstract class PackageProvider extends DataService<Dict<PackageProvider.Data>> {
   constructor(ctx: Context) {
     super(ctx, 'packages', { authority: 4 })
 
-    ctx.on('internal/runtime', (runtime) => {
-      this.update(runtime)
-    })
-
-    ctx.on('internal/fork', (fork) => {
-      this.update(fork)
-    })
+    const callback = debounce(0, this.update.bind(this))
+    ctx.on('internal/runtime', callback)
+    ctx.on('internal/fork', callback)
   }
 
   abstract getManifest(name: string): Promise<Manifest>
@@ -35,6 +32,7 @@ export namespace PackageProvider {
     shortname?: string
     schema?: Schema
     usage?: string
+    filter?: boolean
     workspace?: boolean
     manifest?: Manifest
   }

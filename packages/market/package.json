@@ -1,7 +1,7 @@
 {
   "name": "@koishijs/plugin-market",
   "description": "Manage your bots and plugins with console",
-  "version": "1.9.0",
+  "version": "1.9.2",
   "main": "lib/node/index.js",
   "typings": "lib/index.d.ts",
   "exports": {
@@ -67,7 +67,7 @@
     "spark-md5": "^3.0.2"
   },
   "dependencies": {
-    "@koishijs/registry": "^4.4.4",
+    "@koishijs/registry": "^4.4.5",
     "execa": "^5.1.1",
     "get-registry": "^1.1.0",
     "ns-require": "^1.1.4",

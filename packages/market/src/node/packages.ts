@@ -1,10 +1,10 @@
-import { Context, Dict, EffectScope, Logger, pick, remove, Schema } from 'koishi'
-import { conclude, Manifest, PackageJson } from '@koishijs/registry'
+import { Context, Dict, EffectScope, Logger, pick, remove } from 'koishi'
+import { conclude } from '@koishijs/registry'
 import { promises as fsp } from 'fs'
 import { dirname } from 'path'
 import { unwrapExports } from '@koishijs/loader'
 import { loadManifest } from './utils'
-import { PackageProvider as BasePackageProvider } from '../shared'
+import * as shared from '../shared'
 
 const logger = new Logger('market')
 
@@ -26,7 +26,7 @@ function getExports(id: string) {
   return unwrapExports(result.exports)
 }
 
-class PackageProvider extends BasePackageProvider {
+class PackageProvider extends shared.PackageProvider {
   cache: Dict<PackageProvider.Data> = {}
   task: Promise<void>
 
@@ -138,16 +138,7 @@ class PackageProvider extends BasePackageProvider {
 namespace PackageProvider {
   export interface Config {}
 
-  export interface Data extends Partial<PackageJson> {
-    id?: number
-    forkable?: boolean
-    shortname?: string
-    schema?: Schema
-    usage?: string
-    filter?: boolean
-    workspace?: boolean
-    manifest?: Manifest
-  }
+  export interface Data extends shared.PackageProvider.Data {}
 }
 
 export default PackageProvider
