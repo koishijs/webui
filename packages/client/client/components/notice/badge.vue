@@ -21,8 +21,7 @@ defineProps<{ type?: 'warning' }>()
 .k-badge {
   display: inline-block;
   font-size: 14px;
-  height: 24px;
-  line-height: 24px;
+  height: 1.25rem;
   border-radius: 4px;
   padding: 0 6px;
   margin-right: 0.5rem;

@@ -11,6 +11,9 @@
 
     <el-scrollbar v-else-if="store.market.total">
       <div class="search-box">
+        <div class="icon">
+          <k-icon name="search"></k-icon>
+        </div>
         <k-badge type="success" v-for="(word, index) in words.slice(0, -1)" :key="index" @click="words.splice(index, 1)">{{ word }}</k-badge>
         <input
           placeholder="输入想要查询的插件名"
@@ -20,7 +23,6 @@
           @keydown.backspace="onBackspace"
           @keypress.enter.prevent="onEnter"
           @keypress.space.prevent="onEnter"/>
-        <k-icon name="search"></k-icon>
       </div>
       <div class="market-filter">
         共搜索到 {{ realWords.length ? all.length + ' / ' : '' }}{{ visible.length }} 个插件。
@@ -134,25 +136,35 @@ const menu = computed(() => [refresh.value])
 }
 
 .search-box {
+  position: relative;
   margin: 2rem auto 0;
   display: flex;
-  justify-content: center;
+  flex-wrap: wrap;
   align-items: center;
   width: 100%;
   max-width: 600px;
   box-sizing: border-box;
-  height: 3rem;
   border-radius: 1.5rem;
   background-color: var(--card-bg);
-  align-items: center;
-  padding: 0 1.2rem;
+  gap: 8px 6px;
+  padding: 0.75rem 2rem 0.75rem 1rem;
   box-shadow: var(--card-shadow);
   transition: var(--color-transition);
 
+  .icon {
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 3rem;
+  }
+
   input {
-    height: 3rem;
-    width: 100%;
-    font-size: 1em;
+    // width: 100%;
+    font-size: 0.9em;
     background-color: transparent;
     border: none;
     outline: none;
@@ -160,12 +172,9 @@ const menu = computed(() => [refresh.value])
     transition: var(--color-transition);
   }
 
-  .badge {
+  .k-badge {
     flex-shrink: 0;
-  }
-
-  .badge + input {
-    margin-left: 0.4rem;
+    margin-right: 0;
   }
 }
 
