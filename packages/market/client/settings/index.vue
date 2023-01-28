@@ -37,6 +37,14 @@
       <group-settings v-else-if="current.children" v-model="config" :current="current"></group-settings>
       <plugin-settings v-else :current="current" v-model="config"></plugin-settings>
     </k-content>
+
+    <el-dialog v-model="showDialog" title="确认移除">
+      确定要移除{{ current.children ? `分组 ${current.alias} ` : `插件 ${current.label} ` }}吗？此操作不可撤销！
+      <template #footer>
+        <el-button @click="showDialog = false">取消</el-button>
+        <el-button type="danger" @click="(showDialog = false, removeItem(current.path))">确定</el-button>
+      </template>
+    </el-dialog>
   </k-layout>
 </template>
 
@@ -69,6 +77,8 @@ const path = computed<string>({
 
 const current = ref<Tree>()
 const config = ref()
+
+const showDialog = ref(false)
 
 watch(() => plugins.value.paths[path.value], (value) => {
   current.value = value
@@ -131,13 +141,12 @@ const menu = computed(() => {
     icon: 'trash-can',
     label: isGroup ? '移除分组' : '移除插件',
     disabled: isGlobal,
-    action: () => removeItem(current.value.path),
+    action: () => showDialog.value = true,
   }, {
     icon: 'add-plugin',
     label: '添加插件',
     disabled: !isGroup,
     action: () => showSelect.value = true,
-    // action: () => addItem(current.value.path, 'unload', '')
   }, {
     icon: 'add-group',
     label: '添加分组',
