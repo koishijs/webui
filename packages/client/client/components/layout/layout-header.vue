@@ -85,6 +85,7 @@ import { isLeftAsideOpen } from './utils'
 
   .right {
     margin-right: 0.5rem;
+    flex: 0 0 auto;
   }
 
   .menu-item {

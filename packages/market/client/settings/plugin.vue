@@ -182,10 +182,9 @@ provide('manager.settings.current', computed(() => props.current))
 
   .navigation {
     margin: 2rem 0;
-
-    a.k-button {
-      margin-right: 1rem;
-    }
+    display: flex;
+    gap: 0.5rem 1rem;
+    flex-wrap: wrap;
   }
 }
 
