@@ -1,13 +1,12 @@
 import { Schema } from 'koishi'
-import { Console, Entry, SocketHandle } from '../shared'
+import { Console, Entry } from '../shared'
 import {} from '@koishijs/loader'
 
 export * from '../shared'
 
 class BrowserConsole extends Console {
   start() {
-    // eslint-disable-next-line no-new
-    new SocketHandle(this.ctx, this.ctx.loader[Symbol.for('koishi.socket')])
+    this.accept(this.ctx.loader[Symbol.for('koishi.socket')])
   }
 
   resolveEntry(entry: string | string[] | Entry) {

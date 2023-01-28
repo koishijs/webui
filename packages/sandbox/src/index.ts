@@ -1,5 +1,5 @@
 import { Context, Dict, observe, Schema, User } from 'koishi'
-import { DataService, SocketHandle } from '@koishijs/plugin-console'
+import { Client, DataService } from '@koishijs/plugin-console'
 import { resolve } from 'path'
 import { SandboxBot, words } from './bot'
 import zh from './locales/zh.yml'
@@ -11,19 +11,19 @@ declare module 'koishi' {
 
   namespace Session {
     interface Payload {
-      handle: SocketHandle
+      client: Client
     }
   }
 }
 
 declare module '@koishijs/plugin-console' {
-  interface SocketHandle {
+  interface Client {
     sandbox: SandboxBot
   }
 
   interface Events {
-    'sandbox/message'(this: SocketHandle, user: string, channel: string, content: string): void
-    'sandbox/user'(this: SocketHandle, name: string, data: Partial<User>): void
+    'sandbox/message'(this: Client, user: string, channel: string, content: string): void
+    'sandbox/user'(this: Client, name: string, data: Partial<User>): void
   }
 
   namespace Console {
@@ -120,7 +120,7 @@ export function apply(ctx: Context, config: Config) {
 
   ctx.platform('sandbox').command('clear')
     .action(({ session }) => {
-      session.handle.send({
+      session.client.send({
         type: 'sandbox/clear',
       })
     })

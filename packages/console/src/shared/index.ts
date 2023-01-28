@@ -24,27 +24,25 @@ declare module 'koishi' {
   }
 
   interface Events {
-    'console/intercept'(handle: SocketHandle, listener: DataService.Options): Awaitable<boolean>
+    'console/connection'(client: Client): void
+    'console/intercept'(client: Client, listener: DataService.Options): Awaitable<boolean>
   }
 }
 
 export interface Console extends Console.Services {}
 
 export interface Listener extends DataService.Options {
-  callback(this: SocketHandle, ...args: any[]): Awaitable<any>
+  callback(this: Client, ...args: any[]): Awaitable<any>
 }
 
 const logger = new Logger('console')
 
-export class SocketHandle {
+export class Client {
   readonly id: string = Random.id()
 
   constructor(readonly ctx: Context, public socket: AbstractWebSocket) {
     socket.onmessage = this.receive.bind(this)
-    ctx.on('ready', () => {
-      ctx.console.handles[this.id] = this
-      this.refresh()
-    })
+    this.refresh()
   }
 
   send(payload: any) {
@@ -110,11 +108,21 @@ export class EntryProvider extends DataService<string[]> {
 export abstract class Console extends Service {
   readonly entries: Dict<string[]> = Object.create(null)
   readonly listeners: Dict<Listener> = Object.create(null)
-  readonly handles: Dict<SocketHandle> = Object.create(null)
+  readonly clients: Dict<Client> = Object.create(null)
 
   constructor(public ctx: Context) {
     super(ctx, 'console', true)
     ctx.plugin(EntryProvider)
+  }
+
+  protected accept(socket: AbstractWebSocket) {
+    const client = new Client(this.ctx, socket)
+    socket.onclose = () => {
+      delete this.clients[client.id]
+      this.ctx.emit('console/connection', client)
+    }
+    this.clients[client.id] = client
+    this.ctx.emit('console/connection', client)
   }
 
   async get() {
@@ -139,12 +147,12 @@ export abstract class Console extends Service {
   }
 
   broadcast(type: string, body: any, options: DataService.Options = {}) {
-    const handles = Object.values(this.handles)
+    const handles = Object.values(this.clients)
     if (!handles.length) return
     const data = JSON.stringify({ type, body })
-    Promise.all(Object.values(this.handles).map(async (handle) => {
-      if (await this.ctx.serial('console/intercept', handle, options)) return
-      handle.socket.send(data)
+    Promise.all(Object.values(this.clients).map(async (client) => {
+      if (await this.ctx.serial('console/intercept', client, options)) return
+      client.socket.send(data)
     }))
   }
 }

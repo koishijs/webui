@@ -68,7 +68,7 @@ export class SandboxBot extends Bot {
           username: user,
         },
       })
-      defineProperty(session, 'handle', this)
+      defineProperty(session, 'client', this)
       self.dispatch(session)
     }, { authority: 4 })
   }

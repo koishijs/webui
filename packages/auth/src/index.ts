@@ -1,5 +1,5 @@
 import { $, Awaitable, Context, isNullable, omit, pick, Schema, Time, User } from 'koishi'
-import { DataService, SocketHandle } from '@koishijs/plugin-console'
+import { Client, DataService } from '@koishijs/plugin-console'
 import { createHash } from 'crypto'
 import { resolve } from 'path'
 import { v4 } from 'uuid'
@@ -13,7 +13,7 @@ declare module 'koishi' {
 }
 
 declare module '@koishijs/plugin-console' {
-  interface SocketHandle {
+  interface Client {
     user?: UserAuth
   }
 
@@ -24,11 +24,11 @@ declare module '@koishijs/plugin-console' {
   }
 
   interface Events {
-    'login/platform'(this: SocketHandle, platform: string, userId: string, id?: number): Awaitable<UserLogin>
-    'login/password'(this: SocketHandle, name: string, password: string): void
-    'login/token'(this: SocketHandle, id: number, token: string): void
-    'user/update'(this: SocketHandle, data: UserUpdate): void
-    'user/logout'(this: SocketHandle): void
+    'login/platform'(this: Client, platform: string, userId: string, id?: number): Awaitable<UserLogin>
+    'login/password'(this: Client, name: string, password: string): void
+    'login/token'(this: Client, id: number, token: string): void
+    'user/update'(this: Client, data: UserUpdate): void
+    'user/logout'(this: Client): void
   }
 }
 
@@ -39,7 +39,7 @@ export type UserUpdate = Partial<Pick<User, 'name' | 'password'>>
 type AuthFields = typeof authFields[number]
 const authFields = ['name', 'authority', 'id', 'expire', 'token'] as const
 
-function setAuthUser(handle: SocketHandle, value: UserAuth, platforms: Set<any>) {
+function setAuthUser(client: Client, value: UserAuth, platforms: Set<any>) {
   if (value) {
     value = {
       ...omit(value, ['password', ...platforms]),
@@ -48,9 +48,9 @@ function setAuthUser(handle: SocketHandle, value: UserAuth, platforms: Set<any>)
         .map(([platform, id]) => ({ platform, id })),
     } as any
   }
-  handle.user = value
-  handle.send({ type: 'data', body: { key: 'user', value } })
-  handle.refresh()
+  client.user = value
+  client.send({ type: 'data', body: { key: 'user', value } })
+  client.refresh()
 }
 
 function toHash(password: string) {
@@ -89,7 +89,7 @@ class AuthService extends DataService<UserAuth> {
 
   initLogin() {
     const { ctx, config } = this
-    const states: Record<string, [string, number, SocketHandle, number]> = {}
+    const states: Record<string, [string, number, Client, number]> = {}
 
     let platforms: Set<never> = getPlatforms()
     function getPlatforms() {
@@ -172,11 +172,11 @@ class AuthService extends DataService<UserAuth> {
       return setAuthUser(state[2], user, platforms)
     }, true)
 
-    ctx.on('console/intercept', (handle, listener) => {
+    ctx.on('console/intercept', (client, listener) => {
       if (!listener.authority) return false
-      if (!handle.user) return true
-      if (handle.user.expire <= Date.now()) return true
-      return handle.user.authority < listener.authority
+      if (!client.user) return true
+      if (client.user.expire <= Date.now()) return true
+      return client.user.authority < listener.authority
     })
 
     ctx.console.addListener('user/logout', async function () {

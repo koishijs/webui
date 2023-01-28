@@ -1,5 +1,5 @@
 import { Context, noop, Schema, WebSocketLayer } from 'koishi'
-import { Console, Entry, SocketHandle } from '../shared'
+import { Console, Entry } from '../shared'
 import { ViteDevServer } from 'vite'
 import { extname, resolve } from 'path'
 import { createReadStream, existsSync, promises as fsp, Stats } from 'fs'
@@ -35,13 +35,11 @@ class NodeConsole extends Console {
     this.global.endpoint = selfUrl + apiPath
 
     this.layer = ctx.router.ws(config.apiPath, (socket) => {
-      // eslint-disable-next-line no-new
-      new SocketHandle(ctx, socket)
+      this.accept(socket)
+    })
 
+    ctx.on('console/connection', () => {
       ctx.envData.clientCount = this.layer.clients.size
-      socket.on('close', () => {
-        ctx.envData.clientCount = this.layer.clients.size
-      })
     })
 
     this.root = config.root || config.devMode
@@ -148,7 +146,7 @@ class NodeConsole extends Console {
       },
       plugins: [vue()],
       resolve: {
-        dedupe: ['vue', 'vue-router', 'element-plus', '@vueuse/core', '@popperjs/core'],
+        dedupe: ['vue', 'vue-demi', 'vue-router', 'element-plus', '@vueuse/core', '@popperjs/core', 'marked', 'xss'],
         alias: {
           '../client.js': '@koishijs/client',
           '../vue.js': 'vue',
