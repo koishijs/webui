@@ -125,7 +125,7 @@ class ProfileProvider extends DataService<ProfileProvider.Payload> {
           return session.text('.bot', bot)
         })
         output.push(session.text('.epilog', data))
-        return output.join('\n')
+        return output.join('<p/>')
       })
   }
 
