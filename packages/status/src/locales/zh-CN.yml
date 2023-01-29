@@ -8,7 +8,7 @@ commands:
         connect: 正在连接
         reconnect: 正在重连
         disconnect: 正在断开
-      bot: '{username}：<i18n path={"commands.status.messages.status." + status}/>'
+      bot: <p>{username}：<i18n path={"commands.status.messages.status." + status}/></p>
       epilog: |-
         ==========
         CPU 使用率：{ (cpu[0] * 100).toFixed() }% / { (cpu[1] * 100).toFixed() }%
