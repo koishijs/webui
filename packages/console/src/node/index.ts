@@ -52,8 +52,7 @@ class NodeConsole extends Console {
     this.serveAssets()
 
     if (this.config.open && !this.ctx.envData.clientCount && !process.env.KOISHI_AGENT) {
-      const { host, port } = this.ctx.root.config
-      open(`http://${host || 'localhost'}:${port}${this.config.uiPath}`)
+      open(this.ctx.router.selfUrl + this.config.uiPath)
     }
   }
 

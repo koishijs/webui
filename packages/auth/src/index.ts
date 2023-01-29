@@ -49,6 +49,7 @@ function setAuthUser(client: Client, value: UserAuth, platforms: Set<any>) {
     } as any
   }
   client.user = value
+  client.ctx.emit('console/connection', client)
   client.send({ type: 'data', body: { key: 'user', value } })
   client.refresh()
 }
