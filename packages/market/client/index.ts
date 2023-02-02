@@ -8,6 +8,7 @@ import Market from './market/index.vue'
 import Select from './market/select.vue'
 import Progress from './market/progress.vue'
 import './icons'
+import './index.scss'
 
 receive('market/patch', (data) => {
   store.market = {

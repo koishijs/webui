@@ -1,16 +1,18 @@
 <template>
   <el-dialog v-model="showSelect" class="plugin-select">
     <template #header>
-      <span class="title">{{ categories[active] }} ({{ packages.length }})</span>
+      <span class="title">{{ extended[active] }} ({{ packages.length }})</span>
       <el-input ref="input" v-model="keyword" #suffix>
         <k-icon name="search"></k-icon>
       </el-input>
     </template>
     <div class="tabs">
-      <span class="tab-item" v-for="(text, key) in categories" :key="key" @click.stop="active = key" :class="{ active: active === key }">
-        <k-icon :name="'category:' + key"></k-icon>
-        <span class="title">{{ text }}</span>
-      </span>
+      <el-scrollbar>
+        <span class="tab-item" v-for="(text, key) in extended" :key="key" @click.stop="active = key" :class="{ active: active === key }">
+          <market-icon :name="'solid:' + key"></market-icon>
+          <span class="title">{{ text }}</span>
+        </span>
+      </el-scrollbar>
     </div>
     <div class="content">
       <el-scrollbar>
@@ -28,8 +30,14 @@
 import { router, send, store } from '@koishijs/client'
 import { computed, nextTick, ref, watch } from 'vue'
 import { showSelect } from '../utils'
-import { categories, resolveCategory } from './utils'
+import { categories, resolveCategory, MarketIcon } from '@koishijs/client-market'
 import { useRoute } from 'vue-router'
+
+const extended = {
+  all: '所有插件',
+  other: '未分类',
+  ...categories,
+}
 
 const active = ref('all')
 const keyword = ref('')
@@ -38,9 +46,10 @@ const input = ref()
 const route = useRoute()
 
 const packages = computed(() => Object.values(store.packages).filter(({ name, shortname, manifest }) => {
+  const category = store.market?.data[name]?.category || manifest?.category
   return name
     && shortname.includes(keyword.value)
-    && (active.value === 'all' || resolveCategory(manifest.category) === active.value)
+    && (active.value === 'all' || resolveCategory(category) === active.value)
 }))
 
 function configure(shortname: string) {
@@ -113,7 +122,7 @@ watch(showSelect, async (value, oldValue) => {
           justify-content: center;
         }
 
-        .k-icon {
+        .market-icon {
           width: 1.5rem;
           height: 1.125rem;
         }

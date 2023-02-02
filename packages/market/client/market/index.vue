@@ -10,28 +10,23 @@
     </div>
 
     <el-scrollbar v-else-if="store.market.total">
-      <div class="search-box">
-        <div class="icon">
+      <market-search v-model="words"></market-search>
+        <!-- <div class="icon">
           <k-icon name="search"></k-icon>
-        </div>
-        <k-badge type="success" v-for="(word, index) in words.slice(0, -1)" :key="index" @click="words.splice(index, 1)">{{ word }}</k-badge>
-        <input
-          placeholder="输入想要查询的插件名"
-          v-model="words[words.length - 1]"
-          @blur="onEnter"
-          @keydown.escape="onEscape"
-          @keydown.backspace="onBackspace"
-          @keypress.enter.prevent="onEnter"
-          @keypress.space.prevent="onEnter"/>
-      </div>
+        </div> -->
       <div class="market-filter">
-        共搜索到 {{ realWords.length ? all.length + ' / ' : '' }}{{ visible.length }} 个插件。
-        <el-checkbox v-if="store.packages" v-model="config.showInstalled">
+        共搜索到 {{ realWords.length ? packages.length + ' / ' : '' }}{{ all.length }} 个插件。
+        <el-checkbox v-if="store.packages" v-model="_config.showInstalled">
           {{ global.static ? '只显示可用插件' : `显示已下载的插件 (共 ${installed} 个)` }}
         </el-checkbox>
       </div>
       <div class="market-container">
-        <package-view v-for="data in objects" :key="data.name" :data="data" @query="onQuery"></package-view>
+        <market-package v-for="data in objects" :key="data.name" :data="data" @query="onQuery">
+          <template #action v-if="store.packages">
+            <k-button v-if="store.packages[data.name]" type="success" solid @click="handleClick(data)">修改</k-button>
+            <k-button v-else :disabled="config.static" solid @click="handleClick(data)">添加</k-button>
+          </template>
+        </market-package>
       </div>
     </el-scrollbar>
 
@@ -47,20 +42,23 @@
 
 <script setup lang="ts">
 
-import { router, store, global } from '@koishijs/client'
-import { computed, reactive, watch } from 'vue'
+import { router, store, global, config } from '@koishijs/client'
+import { computed, watch } from 'vue'
 import { useRoute } from 'vue-router'
-import { config, refresh } from '../utils'
-import { getUsers, validate } from './utils'
-import PackageView from './package.vue'
+import { config as _config, refresh, active } from '../utils'
+import { useMarket, MarketPackage, MarketSearch } from '@koishijs/client-market'
+import { AnalyzedPackage } from '@koishijs/registry'
 
 const route = useRoute()
 
 const { keyword } = route.query
-const words = reactive(Array.isArray(keyword) ? keyword : (keyword || '').split(' '))
-if (words[words.length - 1]) words.push('')
 
-const realWords = computed(() => words.filter(w => w))
+const { all, packages, words } = useMarket(() => Object.values(store.market.data))
+
+words.value.splice(0, words.value.length, ...Array.isArray(keyword) ? keyword : (keyword || '').split(' '))
+if (words.value[words.value.length - 1]) words.value.push('')
+
+const realWords = computed(() => words.value.filter(w => w))
 
 watch(words, () => {
   const { keyword: _, ...rest } = route.query
@@ -72,54 +70,25 @@ watch(words, () => {
   }
 }, { deep: true })
 
-function onEnter(event: Event) {
-  const last = words[words.length - 1]
-  if (!last) return
-  if (words.slice(0, -1).includes(last)) {
-    words.pop()
-  }
-  words.push('')
-}
-
-function onEscape(event: KeyboardEvent) {
-  words[words.length - 1] = ''
-}
-
-function onBackspace(event: KeyboardEvent) {
-  if (words[words.length - 1] === '' && words.length > 1) {
-    event.preventDefault()
-    words.splice(words.length - 2, 1)
-  }
-}
-
 function onQuery(word: string) {
-  if (!words[words.length - 1]) words.pop()
-  if (!words.includes(word)) words.push(word)
-  words.push('')
+  if (!words.value[words.value.length - 1]) words.value.pop()
+  if (!words.value.includes(word)) words.value.push(word)
+  words.value.push('')
 }
 
-const visible = computed(() => {
-  return Object.values(store.market.data).filter((data) => {
-    return !data.manifest.hidden || words.includes('show:hidden')
-  })
-})
-
-const all = computed(() => {
-  return visible.value.filter((data) => {
-    const users = getUsers(data)
-    return words.every(word => validate(data, word, users))
-  })
-})
+function handleClick(data: AnalyzedPackage) {
+  active.value = data.name
+}
 
 const installed = computed(() => {
   return all.value.filter(item => store.packages[item.name]).length
 })
 
 const objects = computed(() => {
-  return all.value
+  return packages.value
     .filter(item => global.static
-      ? !config.showInstalled || store.packages[item.name]
-      : config.showInstalled || !store.packages[item.name])
+      ? !_config.showInstalled || store.packages[item.name]
+      : _config.showInstalled || !store.packages[item.name])
     .sort((a, b) => 0
       || (global.static ? +b.portable - +a.portable : 0)
       || b.score.final - a.score.final)
@@ -136,53 +105,9 @@ const menu = computed(() => [refresh.value])
 }
 
 .search-box {
-  position: relative;
-  margin: 2rem auto 0;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  width: 100%;
-  max-width: 600px;
-  box-sizing: border-box;
-  border-radius: 1.5rem;
   background-color: var(--card-bg);
-  gap: 8px 6px;
-  padding: 0.75rem 2rem 0.75rem 1rem;
   box-shadow: var(--card-shadow);
   transition: var(--color-transition);
-
-  .icon {
-    position: absolute;
-    right: 0;
-    top: 0;
-    bottom: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 3rem;
-  }
-
-  input {
-    // width: 100%;
-    font-size: 0.9em;
-    background-color: transparent;
-    border: none;
-    outline: none;
-    color: var(--fg1);
-    transition: var(--color-transition);
-  }
-
-  .k-badge {
-    flex-shrink: 0;
-    margin-right: 0;
-  }
-}
-
-.search-box, .market-container {
-  .k-badge {
-    cursor: pointer;
-    user-select: none;
-  }
 }
 
 .market-filter {
@@ -208,6 +133,12 @@ const menu = computed(() => [refresh.value])
   gap: var(--card-margin);
   margin: var(--card-margin) 0;
   justify-items: center;
+
+  .k-button {
+    padding: 0.35em 0.85em;
+    transform: translateY(-1px);
+    margin-left: 1rem;
+  }
 }
 
 .market-error.k-comment {
