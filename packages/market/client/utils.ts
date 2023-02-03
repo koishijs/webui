@@ -4,14 +4,12 @@ import { createStorage, Dict, send, store } from '@koishijs/client'
 interface ManagerConfig {
   prefix: string
   override: Dict<string>
-  showInstalled?: boolean
   hideWorkspace?: boolean
 }
 
 export const config = createStorage<ManagerConfig>('manager', 2, () => ({
   prefix: '^',
   override: {},
-  showInstalled: true,
   hideWorkspace: true,
 }))
 

@@ -113,7 +113,7 @@ const menu = computed(() => [refresh.value])
 
 .market-hint {
   width: 100%;
-  margin: 0.5rem 0 -0.5rem;
+  margin: 1rem 0 -0.5rem;
   text-align: center;
   display: inline-flex;
   align-items: center;
