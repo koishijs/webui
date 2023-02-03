@@ -25,6 +25,7 @@ export default class PackageProvider extends BasePackageProvider {
       result.shortname = data.name.replace(/(koishi-|^@koishijs\/)plugin-/, '')
       result.manifest = data.manifest
       result.peerDependencies = { ...data.versions[data.version].peerDependencies }
+      result.peerDependenciesMeta = { ...data.versions[data.version].peerDependenciesMeta }
       if (!result.portable) return
       const exports = await this.ctx.loader.resolvePlugin(data.shortname)
       result.schema = exports?.Config || exports?.schema
