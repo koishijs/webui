@@ -51,8 +51,7 @@ const browserEntries = {
 }
 
 router.get('/modules(/.+)+/index.js', async (ctx) => {
-  let name = ctx.params[0].slice(1)
-  if (name === 'koishi') name = '@koishijs/core'
+  const name = ctx.params[0].slice(1)
   try {
     const entry = resolve(require.resolve(name + '/package.json'), browserEntries[name] || '../src/index.ts')
     ctx.redirect(`/vite/@fs${entry}`)

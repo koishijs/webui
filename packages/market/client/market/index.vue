@@ -1,5 +1,9 @@
 <template>
   <k-layout main="darker" class="page-market" :menu="menu">
+    <template #left>
+      <market-filter v-model="words" :config="config" :data="all"></market-filter>
+    </template>
+
     <div v-if="!store.market">
       <div class="el-loading-spinner">
         <svg class="circular" viewBox="25 25 50 50">
@@ -11,20 +15,16 @@
 
     <el-scrollbar v-else-if="store.market.total">
       <market-search v-model="words"></market-search>
-        <!-- <div class="icon">
-          <k-icon name="search"></k-icon>
-        </div> -->
-      <div class="market-filter">
+      <div class="market-hint">
         共搜索到 {{ realWords.length ? packages.length + ' / ' : '' }}{{ all.length }} 个插件。
-        <el-checkbox v-if="store.packages" v-model="_config.showInstalled">
-          {{ global.static ? '只显示可用插件' : `显示已下载的插件 (共 ${installed} 个)` }}
-        </el-checkbox>
       </div>
       <div class="market-container">
-        <market-package v-for="data in objects" :key="data.name" :data="data" @query="onQuery">
+        <market-package
+          v-for="data in packages" :key="data.name" class="k-card"
+          :data="data" :config="config" :gravatar="store.market.gravatar" @query="onQuery">
           <template #action v-if="store.packages">
             <k-button v-if="store.packages[data.name]" type="success" solid @click="handleClick(data)">修改</k-button>
-            <k-button v-else :disabled="config.static" solid @click="handleClick(data)">添加</k-button>
+            <k-button v-else :disabled="global.static" solid @click="handleClick(data)">添加</k-button>
           </template>
         </market-package>
       </div>
@@ -42,18 +42,20 @@
 
 <script setup lang="ts">
 
-import { router, store, global, config } from '@koishijs/client'
+import { router, store, global } from '@koishijs/client'
 import { computed, watch } from 'vue'
 import { useRoute } from 'vue-router'
-import { config as _config, refresh, active } from '../utils'
-import { useMarket, MarketPackage, MarketSearch } from '@koishijs/client-market'
+import { refresh, active } from '../utils'
+import { useMarket, MarketFilter, MarketPackage, MarketSearch } from '@koishijs/client-market'
 import { AnalyzedPackage } from '@koishijs/registry'
 
 const route = useRoute()
 
 const { keyword } = route.query
 
-const { all, packages, words } = useMarket(() => Object.values(store.market.data))
+const { all, packages, words, config } = useMarket(() => Object.values(store.market.data), {
+  isInstalled: (data) => !!store.packages[data.name],
+})
 
 words.value.splice(0, words.value.length, ...Array.isArray(keyword) ? keyword : (keyword || '').split(' '))
 if (words.value[words.value.length - 1]) words.value.push('')
@@ -80,20 +82,6 @@ function handleClick(data: AnalyzedPackage) {
   active.value = data.name
 }
 
-const installed = computed(() => {
-  return all.value.filter(item => store.packages[item.name]).length
-})
-
-const objects = computed(() => {
-  return packages.value
-    .filter(item => global.static
-      ? !_config.showInstalled || store.packages[item.name]
-      : _config.showInstalled || !store.packages[item.name])
-    .sort((a, b) => 0
-      || (global.static ? +b.portable - +a.portable : 0)
-      || b.score.final - a.score.final)
-})
-
 const menu = computed(() => [refresh.value])
 
 </script>
@@ -104,13 +92,26 @@ const menu = computed(() => [refresh.value])
   padding: 0 var(--card-margin);
 }
 
+.page-market .layout-left {
+  .market-filter-group {
+    padding: 0 1.5rem;
+    margin: 2rem 0;
+  }
+
+  h2 {
+    margin: 0;
+    font-size: 14px;
+    padding: 8px 0;
+  }
+}
+
 .search-box {
   background-color: var(--card-bg);
   box-shadow: var(--card-shadow);
   transition: var(--color-transition);
 }
 
-.market-filter {
+.market-hint {
   width: 100%;
   margin: 0.5rem 0 -0.5rem;
   text-align: center;

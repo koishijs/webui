@@ -101,7 +101,7 @@ watch(showSelect, async (value, oldValue) => {
     height: 50vh;
 
     .tabs {
-      width: 8rem;
+      width: 7.5rem;
       border-right: 1px solid var(--border);
       font-size: 15px;
       flex: 0 0 auto;
@@ -110,21 +110,31 @@ watch(showSelect, async (value, oldValue) => {
         width: 3rem;
       }
 
+      .el-scrollbar__view {
+        padding: 0.5rem 0;
+      }
+
       .tab-item {
         display: flex;
         align-items: center;
-        height: 2.5rem;
+        height: 2rem;
         padding: 0 1rem;
         cursor: pointer;
+        font-size: 0.875rem;
+        justify-content: center;
+        transition: var(--color-transition);
+
+        &:hover {
+          background-color: var(--bg2);
+        }
 
         @media screen and (max-width: 768px) {
           padding: 0 0;
-          justify-content: center;
         }
 
         .market-icon {
-          width: 1.5rem;
-          height: 1.125rem;
+          width: 1.25rem;
+          height: 1rem;
         }
 
         &.active {
@@ -132,6 +142,7 @@ watch(showSelect, async (value, oldValue) => {
         }
 
         .title {
+          width: 3.5rem;
           margin-left: 0.5rem;
           @media screen and (max-width: 768px) {
             display: none;
