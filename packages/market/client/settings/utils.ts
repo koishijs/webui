@@ -45,7 +45,7 @@ function getEnvInfo(name: string) {
   const services = new Set<string>()
 
   // check peer dependencies
-  for (const name in Object.keys(local.peerDependencies ?? {})) {
+  for (const name in local.peerDependencies ?? {}) {
     if (!name.includes('@koishijs/plugin-') && !name.includes('koishi-plugin-')) continue
     if (builtinPeerDeps.includes(name)) continue
     const required = !local.peerDependenciesMeta?.[name]?.optional
