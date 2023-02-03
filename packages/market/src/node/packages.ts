@@ -112,6 +112,7 @@ class PackageProvider extends shared.PackageProvider {
     result.shortname = data.name.replace(/(koishi-|^@koishijs\/)plugin-/, '')
     result.manifest = conclude(data)
     result.peerDependencies = { ...data.peerDependencies }
+    result.peerDependenciesMeta = { ...data.peerDependenciesMeta }
 
     // check schema
     const exports = getExports(name)
