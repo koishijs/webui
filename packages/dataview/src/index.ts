@@ -1,12 +1,14 @@
-import { Context, Database, Dict, Driver, Field, Keys, Model, Schema } from 'koishi'
+import { Context, Dict, Driver, Field, makeArray, Model, Schema } from 'koishi'
 import { DataService } from '@koishijs/plugin-console'
 import { resolve } from 'path'
 import { deserialize, serialize } from './utils'
 
 export * from './utils'
 
+export type Methods = 'get' | 'set' | 'eval' | 'create' | 'remove' | 'upsert' | 'drop' | 'stats'
+
 export type DbEvents = {
-  [M in Keys<Database, Function> as `database/${M}`]: (...args: string[]) => Promise<string>
+  [M in Methods as `database/${M}`]: (...args: string[]) => Promise<string>
 }
 
 declare module '@koishijs/plugin-console' {
@@ -21,6 +23,7 @@ declare module '@koishijs/plugin-console' {
 
 export interface TableInfo extends Driver.TableStats, Model.Config<any> {
   fields: Field.Config
+  primary: string[]
 }
 
 export interface DatabaseInfo extends Driver.Stats {
@@ -32,7 +35,7 @@ class DatabaseProvider extends DataService<DatabaseInfo> {
 
   task: Promise<DatabaseInfo>
 
-  addListener<K extends Keys<Database, Function>>(name: K, refresh = false) {
+  addListener<K extends Methods>(name: K, refresh = false) {
     this.ctx.console.addListener(`database/${name}`, async (...args) => {
       const result = await (this.ctx.database[name] as any)(...args.map(deserialize))
       if (refresh) this.refresh()
@@ -75,6 +78,7 @@ class DatabaseProvider extends DataService<DatabaseInfo> {
         ...this.ctx.model.tables[name],
         ...tableStats[name],
       }
+      result.tables[name].primary = makeArray(result.tables[name].primary)
     }
     result.tables = Object.fromEntries(Object.entries(result.tables).sort(([a], [b]) => a.localeCompare(b)))
     return result

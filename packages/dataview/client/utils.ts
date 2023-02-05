@@ -1,5 +1,6 @@
-import { Database, Keys } from 'koishi'
+import { Database } from 'koishi'
 import { message, send } from '@koishijs/client'
+import { Methods } from '@koishijs/plugin-dataview'
 
 export function serialize(obj: unknown): string {
   if (obj instanceof Date) return `"d${obj.toJSON()}"`
@@ -35,7 +36,7 @@ export function deserialize(str: string): any {
   )
 }
 
-export async function sendQuery<K extends Keys<Database, Function>>(name: K, ...args: Parameters<Database[K]>): Promise<ReturnType<Database[K]>> {
+export async function sendQuery<K extends Methods>(name: K, ...args: Parameters<Database[K]>): Promise<ReturnType<Database[K]>> {
   return deserialize(await send(`database/${name}`, ...args.map(serialize) as any))
 }
 

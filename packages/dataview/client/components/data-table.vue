@@ -34,7 +34,7 @@
         :sortable="existChanges ? false : 'custom'"
         :prop="fName"
         :label="fName"
-        :fixed="[table.primary || []].flat().includes(fName)"
+        :fixed="table.primary.includes(fName)"
         :resizable="true"
       >
         <template #header="{ column }">
@@ -113,7 +113,7 @@
 
 import { Dict } from 'koishi'
 import { computed, ComputedRef, nextTick, reactive, ref, watch, watchEffect } from 'vue'
-import { store, message } from '@koishijs/client'
+import { store, message, pick } from '@koishijs/client'
 import { formatSize, handleError, sendQuery, timeStr } from '../utils'
 
 export interface TableStatus {
@@ -382,11 +382,11 @@ async function onSubmitChanges() {
         data[field] = fromModelValue(field, data[field])
       }
       console.log('Update row: ', data)
-      // await new Promise(res => setInterval(() => res(1), 1000))
-      await sendQuery('set', props.name as never, row, data)
+      await sendQuery('set', props.name, pick(row, table.value.primary), data)
 
-      for (const field in validChanges.value[idx])
+      for (const field in validChanges.value[idx]) {
         submitted.push({ idx, field })
+      }
     }
     catch (e) {
       handleError(e, '更新数据失败')
