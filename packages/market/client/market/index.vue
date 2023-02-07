@@ -16,7 +16,7 @@
     <el-scrollbar v-else-if="store.market.total">
       <market-search v-model="words"></market-search>
       <div class="market-hint">
-        共搜索到 {{ realWords.length ? packages.length + ' / ' : '' }}{{ all.length }} 个插件。
+        共搜索到 {{ hasFilter ? packages.length + ' / ' : '' }}{{ all.length }} 个插件。
       </div>
       <div class="market-container">
         <market-package
@@ -44,27 +44,24 @@
 
 import { router, store, global } from '@koishijs/client'
 import { computed, watch } from 'vue'
-import { useRoute } from 'vue-router'
 import { refresh, active } from '../utils'
 import { useMarket, MarketFilter, MarketPackage, MarketSearch } from '@koishijs/client-market'
 import { AnalyzedPackage } from '@koishijs/registry'
 
-const route = useRoute()
-
-const { keyword } = route.query
-
-const { all, packages, words, config } = useMarket(() => Object.values(store.market.data), {
+const { all, packages, words, config, hasFilter } = useMarket(() => Object.values(store.market.data), {
   isInstalled: (data) => !!store.packages[data.name],
 })
 
-words.value.splice(0, words.value.length, ...Array.isArray(keyword) ? keyword : (keyword || '').split(' '))
-if (words.value[words.value.length - 1]) words.value.push('')
+watch(router.currentRoute, (value) => {
+  if (value.path !== '/market') return
+  const { keyword } = value.query
+  words.value = Array.isArray(keyword) ? keyword : (keyword || '').split(' ')
+  if (words.value[words.value.length - 1]) words.value.push('')
+}, { immediate: true, deep: true })
 
-const realWords = computed(() => words.value.filter(w => w))
-
-watch(words, () => {
-  const { keyword: _, ...rest } = route.query
-  const keyword = realWords.value.join(' ')
+watch(() => words.value.filter(w => w), (value) => {
+  const { keyword: _, ...rest } = router.currentRoute.value.query
+  const keyword = value.join(' ')
   if (keyword) {
     router.replace({ query: { keyword, ...rest } })
   } else {
