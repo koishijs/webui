@@ -1,10 +1,10 @@
 import { App, Component, defineComponent, h } from 'vue'
 import { IconExternal, IconEye, IconEyeSlash } from 'schemastery-vue'
+import Default from './activity/default.vue'
 import Ellipsis from './activity/ellipsis.vue'
 import Home from './activity/home.vue'
 import Moon from './activity/moon.vue'
 import Sun from './activity/sun.vue'
-import Application from './svg/application.vue'
 import BoxOpen from './svg/box-open.vue'
 import CheckFull from './svg/check-full.vue'
 import ChevronDown from './svg/chevron-down.vue'
@@ -42,12 +42,12 @@ import './style.scss'
 
 const registry: Record<string, Component> = {}
 
+register('activity:default', Default)
 register('activity:ellipsis', Ellipsis)
 register('activity:home', Home)
 register('activity:moon', Moon)
 register('activity:sun', Sun)
 
-register('application', Application)
 register('box-open', BoxOpen)
 register('check-full', CheckFull)
 register('chevron-down', ChevronDown)

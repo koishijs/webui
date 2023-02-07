@@ -80,6 +80,7 @@ const route = useRoute()
     border-right: var(--border) 1px solid;
     transition: var(--color-transition);
     background-color: var(--bg2);
+    box-sizing: border-box;
   }
 
   .main-container {

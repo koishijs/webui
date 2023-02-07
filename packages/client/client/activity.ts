@@ -61,7 +61,7 @@ export class Activity {
   }
 
   get icon() {
-    return resolveUnref(this.options.icon ?? 'application')
+    return resolveUnref(this.options.icon ?? 'activity:default')
   }
 
   get name() {
