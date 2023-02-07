@@ -10,6 +10,7 @@ import notice from './notice'
 import Slot from './slot'
 
 import 'element-plus/dist/index.css'
+import './schema.scss'
 import './style.scss'
 
 export const loading = ElLoading.service

@@ -26,20 +26,6 @@
   @media screen and (max-width: 480px) {
     --content-padding: 1.5rem;
   }
-
-  @media screen and (max-width: 480px) {
-    .k-form {
-      margin: 0 -1.5rem;
-
-      h2 {
-        padding: 0 1.5rem;
-      }
-
-      .schema-item {
-        padding: 0.5rem 1.5rem;
-      }
-    }
-  }
 }
 
 </style>
