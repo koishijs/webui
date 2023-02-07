@@ -1,7 +1,7 @@
 {
   "name": "@koishijs/plugin-status",
   "description": "Status view for Koishi",
-  "version": "7.0.1",
+  "version": "7.1.0",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
   "files": [
@@ -25,20 +25,18 @@
     "koishi",
     "plugin",
     "status",
-    "server"
+    "environment",
+    "information"
   ],
   "koishi": {
     "category": "console",
     "description": {
-      "en": "Display running status in the console",
-      "zh": "在控制台中显示运行状态"
+      "en": "Display running status and environment information in the console",
+      "zh": "在控制台中显示运行状态和环境信息"
     },
     "service": {
       "required": [
         "console"
-      ],
-      "optional": [
-        "database"
       ]
     }
   },
@@ -48,8 +46,13 @@
   },
   "devDependencies": {
     "@koishijs/client": "^5.2.0",
+    "@types/envinfo": "^7.8.1",
     "echarts": "^5.4.1",
     "koishi": "^4.11.3",
     "vue-echarts": "^6.3.3"
+  },
+  "dependencies": {
+    "envinfo": "^7.8.1",
+    "which-pm-runs": "^1.1.0"
   }
 }
