@@ -38,8 +38,8 @@
       <plugin-settings v-else :current="current" v-model="config"></plugin-settings>
     </k-content>
 
-    <el-dialog v-model="showDialog" title="确认移除">
-      确定要移除{{ current.children ? `分组 ${current.alias} ` : `插件 ${current.label} ` }}吗？此操作不可撤销！
+    <el-dialog v-model="showDialog" title="确认移除" destroy-on-close>
+      确定要移除{{ current.children ? `分组 ${current.alias}` : `插件 ${current.label}` }} 吗？此操作不可撤销！
       <template #footer>
         <el-button @click="showDialog = false">取消</el-button>
         <el-button type="danger" @click="(showDialog = false, removeItem(current.path))">确定</el-button>
@@ -52,7 +52,7 @@
 
 import { computed, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { addItem, envMap, plugins, removeItem, splitPath, Tree } from './utils'
+import { addItem, envMap, plugins, removeItem, splitPath, Tree, coreDeps } from './utils'
 import GlobalSettings from './global.vue'
 import GroupSettings from './group.vue'
 import TreeView from './tree.vue'
@@ -118,7 +118,7 @@ const menu = computed(() => {
   return [{
     icon: isDisabled ? 'play' : 'stop',
     label: isDisabled ? '启用插件' : '停用插件',
-    disabled: isGroup || !name.value,
+    disabled: isGroup || !name.value || coreDeps.includes(name.value),
     action: async () => {
       await execute(isDisabled ? 'reload' : 'unload')
       message.success(isDisabled ? '插件已启用。' : '插件已停用。')

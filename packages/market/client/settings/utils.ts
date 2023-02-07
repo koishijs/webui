@@ -24,7 +24,7 @@ const getImplements = (name: string) => ({
   ...store.packages[name],
 }.manifest?.service.implements ?? [])
 
-const builtinPeerDeps = [
+export const coreDeps = [
   '@koishijs/plugin-console',
   '@koishijs/plugin-market',
 ]
@@ -47,7 +47,7 @@ function getEnvInfo(name: string) {
   // check peer dependencies
   for (const name in local.peerDependencies ?? {}) {
     if (!name.includes('@koishijs/plugin-') && !name.includes('koishi-plugin-')) continue
-    if (builtinPeerDeps.includes(name)) continue
+    if (coreDeps.includes(name)) continue
     const required = !local.peerDependenciesMeta?.[name]?.optional
     const active = !!store.packages[name]?.id
     result.peer[name] = { required, active }
