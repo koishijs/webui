@@ -43,8 +43,10 @@ class MarketProvider extends BaseMarketProvider {
 
   async collect() {
     const { timeout } = this.config
+    const registry = this.ctx.console.dependencies.http
+
     this.failed = []
-    this.scanner = new Scanner(this.ctx.console.dependencies.http.get)
+    this.scanner = new Scanner(registry.get)
     if (this.http) {
       const result = await this.http.get<SearchResult>('')
       this.scanner.objects = result.objects.filter(object => !object.ignored)
@@ -55,8 +57,13 @@ class MarketProvider extends BaseMarketProvider {
 
     this.scanner.analyze({
       version: '4',
-      onFailure: (name) => {
+      onFailure: (name, reason) => {
         this.failed.push(name)
+        if (registry.config.endpoint.startsWith('https://registry.npmmirror.com')) {
+          if (Quester.isAxiosError(reason) && reason.response?.status === 404) {
+            // ignore 404 error for npmmirror
+          }
+        }
       },
       onSuccess: (item) => {
         const { name, versions } = item

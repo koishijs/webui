@@ -43,7 +43,7 @@ export class UserProvider extends DataService<Dict<User>> {
   static using = ['database'] as const
   private task: Promise<Dict<User.Observed>>
 
-  constructor(ctx: Context) {
+  constructor(ctx: Context, public config: Config) {
     super(ctx, 'sandbox', { authority: 4 })
 
     ctx.console.addListener('sandbox/user', async (name, data) => {
