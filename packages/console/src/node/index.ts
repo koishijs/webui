@@ -200,7 +200,7 @@ namespace NodeConsole {
     apiPath: Schema.string().description('后端 API 服务的路径。').default('/status'),
     selfUrl: Schema.string().description('Koishi 服务暴露在公网的地址。').role('link').default(''),
     open: Schema.boolean().description('在应用启动后自动在浏览器中打开控制台。'),
-    devMode: Schema.boolean().description('启用调试模式（仅供开发者使用）。').default(process.env.NODE_ENV === 'development').hidden(),
+    devMode: Schema.boolean().description('启用调试模式 (仅供开发者使用)。').default(process.env.NODE_ENV === 'development').hidden(),
     cacheDir: Schema.string().description('调试服务器缓存目录。').default('.vite').hidden(),
   })
 }
