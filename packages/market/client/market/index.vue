@@ -23,8 +23,8 @@
           v-for="data in packages" :key="data.name" class="k-card"
           :data="data" :config="config" :gravatar="store.market.gravatar" @query="onQuery">
           <template #action v-if="store.packages">
-            <k-button v-if="store.packages[data.name]" type="success" solid @click="handleClick(data)">修改</k-button>
-            <k-button v-else :disabled="global.static" solid @click="handleClick(data)">添加</k-button>
+            <k-button v-if="store.packages[data.name]" type="success" solid @click.stop="handleClick(data)">修改</k-button>
+            <k-button v-else :disabled="global.static" solid @click.stop="handleClick(data)">添加</k-button>
           </template>
         </market-package>
       </div>
@@ -52,18 +52,20 @@ const { all, packages, words, config, hasFilter } = useMarket(() => Object.value
   isInstalled: (data) => !!store.packages[data.name],
 })
 
+const prompt = computed(() => words.value.filter(w => w).join(' '))
+
 watch(router.currentRoute, (value) => {
   if (value.path !== '/market') return
   const { keyword } = value.query
+  if (keyword === prompt.value) return
   words.value = Array.isArray(keyword) ? keyword : (keyword || '').split(' ')
   if (words.value[words.value.length - 1]) words.value.push('')
 }, { immediate: true, deep: true })
 
-watch(() => words.value.filter(w => w), (value) => {
+watch(prompt, (value) => {
   const { keyword: _, ...rest } = router.currentRoute.value.query
-  const keyword = value.join(' ')
-  if (keyword) {
-    router.replace({ query: { keyword, ...rest } })
+  if (value) {
+    router.replace({ query: { keyword: value, ...rest } })
   } else {
     router.replace({ query: rest })
   }
