@@ -30,6 +30,7 @@ export {
 export * from './meta'
 export * from './stats'
 
+export const filter = false
 export const name = 'status'
 export const using = ['console'] as const
 

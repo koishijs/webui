@@ -106,6 +106,8 @@ export class EntryProvider extends DataService<string[]> {
 }
 
 export abstract class Console extends Service {
+  static filter = false
+
   readonly entries: Dict<string[]> = Object.create(null)
   readonly listeners: Dict<Listener> = Object.create(null)
   readonly clients: Dict<Client> = Object.create(null)

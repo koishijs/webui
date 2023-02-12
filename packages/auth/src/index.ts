@@ -195,6 +195,8 @@ class AuthService extends DataService<UserAuth> {
 }
 
 namespace AuthService {
+  export const filter = false
+
   export interface Config {
     authTokenExpire?: number
     loginTokenExpire?: number

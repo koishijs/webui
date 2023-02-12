@@ -93,8 +93,8 @@ export class UserProvider extends DataService<Dict<User>> {
   }
 }
 
+export const filter = false
 export const name = 'sandbox'
-
 export const using = ['console']
 
 export interface Config {}

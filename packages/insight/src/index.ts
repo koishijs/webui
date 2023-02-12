@@ -154,6 +154,7 @@ namespace Insight {
     target: number
   }
 
+  export const filter = false
   export const using = ['console'] as const
 
   export interface Config {}

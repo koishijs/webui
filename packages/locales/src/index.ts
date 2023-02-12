@@ -47,6 +47,7 @@ export function apply(ctx: Context, config: Config) {
 }
 
 class LocaleProvider extends DataService<Dict<I18n.Store>> {
+  static filter = false
   static using = ['console'] as const
 
   update = debounce(0, () => this.refresh())
