@@ -1,4 +1,5 @@
 import { App } from 'vue'
+import Markdown from 'marked-vue'
 import Element, { ElLoading, ElMessage, ElMessageBox } from 'element-plus'
 
 import common from './common'
@@ -28,6 +29,7 @@ export { icons, ChatImage }
 
 export default function (app: App) {
   app.use(Element)
+  app.component('k-markdown', Markdown)
 
   app.use(common)
   app.use(form)

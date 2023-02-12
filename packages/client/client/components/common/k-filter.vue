@@ -2,8 +2,8 @@
   <p v-if="!conditions">无法解析过滤器。</p>
   <div class="k-filter" v-else>
     <div class="k-filter-item" v-for="(cond, key) in conditions" :key="key">
-      <el-button @click="remove(key)"><k-icon name="delete"></k-icon></el-button>
-      <k-filter-expr :modelValue="cond" @update:modelValue="update($event, key)"></k-filter-expr>
+      <el-button :disabled="disabled" @click="remove(key)"><k-icon name="delete"></k-icon></el-button>
+      <k-filter-expr :disabled="disabled" :modelValue="cond" @update:modelValue="update($event, key)"></k-filter-expr>
     </div>
     <div>
       <k-button @click="update({}, conditions.length)">添加条件</k-button>
@@ -13,11 +13,12 @@
 
 <script lang="ts" setup>
 
-import { computed, ref, watch } from 'vue'
+import { computed } from 'vue'
 import KFilterExpr from './k-filter-expr.vue'
 
 const props = defineProps<{
   modelValue: any
+  disabled?: boolean
 }>()
 
 const emit = defineEmits(['update:modelValue'])

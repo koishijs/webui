@@ -3,13 +3,13 @@
     无法解析的此处的表达式。
   </template>
   <div class="k-filter-expr" v-else>
-    <el-select class="entity" v-model="entity">
+    <el-select class="entity" :disabled="disabled" v-model="entity">
       <el-option v-for="(name, key) in entities" :key="key" :label="name" :value="key"></el-option>
     </el-select>
-    <el-select class="operator" v-model="operator">
+    <el-select class="operator" :disabled="disabled" v-model="operator">
       <el-option v-for="key in availableOps" :key="key" :label="operators[key]" :value="key"></el-option>
     </el-select>
-    <el-input :key="type" :type="type" class="value" v-model="value"></el-input>
+    <el-input :disabled="disabled" :key="type" :type="type" class="value" v-model="value"></el-input>
   </div>
 </template>
 
@@ -19,6 +19,7 @@ import { computed, ref, watch } from 'vue'
 
 const props = defineProps<{
   modelValue: any
+  disabled?: boolean
 }>()
 
 const emit = defineEmits(['update:modelValue'])
