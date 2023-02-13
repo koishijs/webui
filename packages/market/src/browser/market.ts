@@ -7,7 +7,7 @@ export default class MarketProvider extends BaseMarketProvider {
   }
 
   async collect() {
-    const response = await fetch('https://registry.koishi.chat/market.json')
+    const response = await fetch('https://registry.koishi.chat/play.json')
     return await response.json()
   }
 

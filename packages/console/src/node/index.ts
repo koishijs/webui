@@ -35,7 +35,8 @@ class NodeConsole extends Console {
     this.global.endpoint = selfUrl + apiPath
 
     this.layer = ctx.router.ws(config.apiPath, (socket) => {
-      this.accept(socket)
+      // @types/ws does not provide typings for `dispatchEvent`
+      this.accept(socket as any)
     })
 
     ctx.on('console/connection', () => {

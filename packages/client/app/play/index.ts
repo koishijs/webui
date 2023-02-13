@@ -1,21 +1,32 @@
 import type { AbstractWebSocket } from '@koishijs/plugin-console'
 import type { Context } from 'koishi'
-import { root } from '@koishijs/client'
+import { Dict, root } from '@koishijs/client'
 import { activate, data, getLoader } from './utils'
 import Instances from './index.vue'
 
 class StubWebSocket implements AbstractWebSocket {
   remote: StubWebSocket
-  onopen(event: any) {}
-  onmessage(event: any) {}
-  onclose(event: any) {}
-  onerror(event: any) {}
+  listeners: Dict<Set<AbstractWebSocket.EventListener>> = {}
+
+  addEventListener(type: any, listener: (event: any) => void) {
+    (this.listeners[type] ||= new Set()).add(listener)
+  }
+
+  removeEventListener(type: any, listener: (event: any) => void) {
+    this.listeners[type]?.delete(listener)
+  }
+
+  dispatchEvent(event: AbstractWebSocket.Event) {
+    this.listeners[event.type]?.forEach(fn => fn(event))
+    return true
+  }
+
   send(data: string) {
-    this.remote.onmessage({ data })
+    this.remote.dispatchEvent({ type: 'message', target: this, data } as AbstractWebSocket.MessageEvent)
   }
 }
 
-class BackWebSocket extends StubWebSocket {
+class ServerWebSocket extends StubWebSocket {
   app: Context
 
   constructor(public remote: StubWebSocket) {
@@ -30,12 +41,12 @@ class BackWebSocket extends StubWebSocket {
   }
 }
 
-export default class FrontWebSocket extends StubWebSocket {
-  remote = new BackWebSocket(this)
+export default class ClientWebSocket extends StubWebSocket {
+  remote = new ServerWebSocket(this)
 
   constructor() {
     super()
-    setTimeout(() => this.onopen({}), 0)
+    setTimeout(() => this.dispatchEvent({ type: 'open', target: this }), 0)
     root.slot({
       type: 'home',
       order: 900,

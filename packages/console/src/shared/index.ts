@@ -1,16 +1,10 @@
 import { Awaitable, coerce, Context, Dict, Logger, makeArray, Random, Service } from 'koishi'
 import { DataService } from './service'
+import { AbstractWebSocket } from './types'
 import NodeConsole from '../node'
 
 export * from './service'
-
-export interface AbstractWebSocket {
-  onopen(event: any): void
-  onerror(event: any): void
-  onmessage(event: any): void
-  onclose(event: any): void
-  send(data: string): void
-}
+export * from './types'
 
 type NestedServices = {
   [K in keyof Console.Services as `console.${K}`]: Console.Services[K]
@@ -39,7 +33,7 @@ export class Client {
   readonly id: string = Random.id()
 
   constructor(readonly ctx: Context, public socket: AbstractWebSocket) {
-    socket.onmessage = this.receive.bind(this)
+    socket.addEventListener('message', this.receive.bind(this))
     this.refresh()
   }
 
@@ -47,7 +41,7 @@ export class Client {
     this.socket.send(JSON.stringify(payload))
   }
 
-  async receive(data: any) {
+  async receive(data: AbstractWebSocket.MessageEvent) {
     const { type, args, id } = JSON.parse(data.data.toString())
     const listener = this.ctx.console.listeners[type]
     if (!listener) {
@@ -117,10 +111,10 @@ export abstract class Console extends Service {
 
   protected accept(socket: AbstractWebSocket) {
     const client = new Client(this.ctx, socket)
-    socket.onclose = () => {
+    socket.addEventListener('close', () => {
       delete this.clients[client.id]
       this.ctx.emit('console/connection', client)
-    }
+    })
     this.clients[client.id] = client
     this.ctx.emit('console/connection', client)
   }
