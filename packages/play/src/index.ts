@@ -13,9 +13,13 @@ function resolveName(name: string) {
   }
 }
 
-export default class BrowserLoader extends Loader {
-  public envData = {}
-  public config = { plugins: {} }
+declare const Filer: any
+
+class BrowserLoader extends Loader {
+  public fs: typeof import('node:fs') = new Filer.FileSystem({ name: 'play.koishi.chat' })
+  public path: typeof import('node:path') = Filer.path
+  public envData: any = {}
+  public config: any = { plugins: {} }
   private _initTask: Promise<void>
 
   private async prepare() {
@@ -56,3 +60,5 @@ export default class BrowserLoader extends Loader {
     console.info('trigger full reload')
   }
 }
+
+export default new BrowserLoader()

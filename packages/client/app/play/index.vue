@@ -5,9 +5,9 @@
       <k-button class="right" @click="create">添加</k-button>
     </template>
     <table>
-      <tr class="instance" v-for="(config, key) in data.instances" :key="key">
+      <tr class="instance" v-for="key in data.instances" :key="key">
         <td class="name">
-          {{ config.name || key }}
+          {{ key }}
           <template v-if="data.current === key">(运行中)</template>
         </td>
         <td class="actions">

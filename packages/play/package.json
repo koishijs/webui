@@ -2,13 +2,9 @@
   "name": "@koishijs/play",
   "description": "Koishi Play Loader",
   "version": "1.0.0",
-  "exports": {
-    ".": {
-      "import": "./lib/index.js"
-    },
-    "./src/*": "./src/*",
-    "./package.json": "./package.json"
-  },
+  "type": "module",
+  "main": "lib/index.js",
+  "typings": "lib/index.d.ts",
   "files": [
     "lib"
   ],
@@ -32,6 +28,7 @@
     "play"
   ],
   "dependencies": {
-    "@koishijs/loader": "^2.6.0"
+    "@koishijs/loader": "^2.6.1",
+    "filer": "^1.4.1"
   }
 }

@@ -7,7 +7,7 @@ import open from 'open'
 
 declare module 'koishi' {
   interface EnvData {
-    clientCount: number
+    clientCount?: number
   }
 }
 
