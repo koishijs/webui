@@ -49,7 +49,7 @@ import { useMarket, MarketFilter, MarketPackage, MarketSearch } from '@koishijs/
 import { AnalyzedPackage } from '@koishijs/registry'
 
 const { all, packages, words, config, hasFilter } = useMarket(() => Object.values(store.market.data), {
-  isInstalled: (data) => !!store.packages[data.name],
+  isInstalled: (data) => !!store.packages?.[data.name],
 })
 
 const prompt = computed(() => words.value.filter(w => w).join(' '))

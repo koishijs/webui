@@ -24,6 +24,7 @@ export async function build(root: string, config: vite.UserConfig = {}) {
       ...config.build,
       rollupOptions: {
         ...rollupOptions,
+        makeAbsoluteExternalsRelative: true,
         external: [
           root + '/vue.js',
           root + '/vue-router.js',

@@ -35,7 +35,7 @@
   "dependencies": {
     "@satorijs/components": "^0.5.6",
     "@satorijs/element": "^2.3.2",
-    "@vitejs/plugin-vue": "^3.2.0",
+    "@vitejs/plugin-vue": "^4.0.0",
     "@vueuse/core": "^8.9.4",
     "cac": "^6.7.14",
     "cordis": "^2.7.2",
@@ -46,7 +46,7 @@
     "sass": "^1.57.1",
     "schemastery": "^3.7.0",
     "schemastery-vue": "^2.0.0",
-    "vite": "^4.1.1",
+    "vite": "^4.0.0",
     "vue": "^3.2.45",
     "vue-router": "^4.1.6"
   },

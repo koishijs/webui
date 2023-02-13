@@ -1,13 +1,15 @@
-import { build, InlineConfig, mergeConfig, UserConfig } from 'vite'
+import { build, InlineConfig, mergeConfig, transformWithEsbuild, UserConfig } from 'vite'
+import { RollupOutput } from 'rollup'
 import { existsSync, promises as fsp } from 'fs'
 import vue from '@vitejs/plugin-vue'
 
 export async function buildExtension(root: string, config: UserConfig = {}) {
   if (!existsSync(root + '/client')) return
 
-  await build(mergeConfig({
+  const results = await build(mergeConfig({
     root,
     build: {
+      write: false,
       outDir: 'dist',
       assetsDir: '',
       minify: true,
@@ -21,6 +23,7 @@ export async function buildExtension(root: string, config: UserConfig = {}) {
         formats: ['es'],
       },
       rollupOptions: {
+        makeAbsoluteExternalsRelative: true,
         external: [
           root + '/vue.js',
           root + '/vue-router.js',
@@ -44,7 +47,18 @@ export async function buildExtension(root: string, config: UserConfig = {}) {
     define: {
       'process.env.NODE_ENV': '"production"',
     },
-  } as InlineConfig, config))
+  } as InlineConfig, config)) as RollupOutput[]
 
-  await fsp.rename(root + '/dist/index.mjs', root + '/dist/index.js')
+  for (const item of results[0].output) {
+    if (item.fileName === 'index.mjs') item.fileName = 'index.js'
+    const dest = root + '/dist/' + item.fileName
+    if (item.type === 'asset') {
+      await fsp.writeFile(dest, item.source)
+    } else {
+      const result = await transformWithEsbuild(item.code, dest, {
+        minifyWhitespace: true,
+      })
+      await fsp.writeFile(dest, result.code)
+    }
+  }
 }
