@@ -35,8 +35,7 @@ export default class FrontWebSocket extends StubWebSocket {
 
   constructor() {
     super()
-    this.onopen({})
-
+    setTimeout(() => this.onopen({}), 0)
     root.slot({
       type: 'home',
       order: 900,

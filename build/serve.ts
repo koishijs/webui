@@ -9,7 +9,7 @@ const router = new Router()
 app.use(router.routes())
 app.use(router.allowedMethods())
 
-const endpoint = 'https://registry.koishi.chat/modules'
+const endpoint = 'https://registry.koishi.chat'
 const filename = resolve(require.resolve('@koishijs/plugin-console/package.json'), '../dist/index.html')
 
 router.get('(/.+)*', async (ctx, next) => {
@@ -19,7 +19,7 @@ router.get('(/.+)*', async (ctx, next) => {
 })
 
 function transformHtml(template: string) {
-  template = template.replace(/(href|src)="(?=\/)/g, (_, $1) => `${$1}="${endpoint}/@koishijs/plugin-console/dist`)
+  template = template.replace(/(href|src)="(?=\/)/g, (_, $1) => `${$1}="${endpoint}/modules/@koishijs/plugin-console/dist`)
   const headInjection = `<script>KOISHI_CONFIG = ${JSON.stringify({
     static: true,
     uiPath: '/',

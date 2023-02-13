@@ -45,7 +45,6 @@ router.get(uiPath + '(/.+)*', async (ctx, next) => {
 })
 
 const browserEntries = {
-  '@koishijs/loader': '../src/browser.ts',
   '@koishijs/plugin-console': '../src/browser/index.ts',
   '@koishijs/plugin-market': '../src/browser/index.ts',
 }
@@ -86,13 +85,13 @@ async function createVite() {
         strict: false,
       },
     },
-    plugins: [vue(), yaml()],
+    plugins: [vue(), yaml() as any],
     resolve: {
       extensions: ['.ts', '.js', '.json', '.yml', '.yaml'],
-      dedupe: ['vue'],
+      dedupe: ['vue', 'vue-demi', 'vue-router', 'element-plus', '@vueuse/core', '@popperjs/core'],
       alias: {
-        'koishi': '@koishijs/core/src/index.ts',
-        '@koishijs/loader': '@koishijs/loader/src/browser.ts',
+        '@koishijs/core': '@koishijs/core/src/index.ts',
+        '@koishijs/play': '@koishijs/play/src/index.ts',
         '@koishijs/plugin-console': '@koishijs/plugin-console/src/browser/index.ts',
         'path': 'rollup-plugin-node-polyfills/polyfills/path',
       },
@@ -107,6 +106,8 @@ async function createVite() {
         'element-plus',
         'supports-color',
         'rollup-plugin-node-polyfills/polyfills/path',
+        'marked',
+        'xss',
       ],
     },
     build: {

@@ -56,7 +56,7 @@ if (!Object.keys(data.value.instances).length) {
 
 export async function getLoader() {
   if (loader) return loader
-  const url = config.endpoint + '/modules/@koishijs/loader/index.js'
-  const { default: Loader }: typeof import('@koishijs/loader') = await import(/* @vite-ignore */ url)
+  const url = config.endpoint + '/modules/@koishijs/play/index.js'
+  const { default: Loader }: typeof import('@koishijs/play') = await import(/* @vite-ignore */ url)
   return loader = new Loader()
 }

@@ -10,8 +10,6 @@ export interface AbstractWebSocket {
   onmessage(event: any): void
   onclose(event: any): void
   send(data: string): void
-  addEventListener(event: string, listener: (event: any) => void): void
-  removeEventListener(event: string, listener: (event: any) => void): void
 }
 
 type NestedServices = {
