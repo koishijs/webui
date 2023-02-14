@@ -1,6 +1,5 @@
 import Koa from 'koa'
 import Router from '@koa/router'
-import { readFile } from 'fs/promises'
 import { extname, resolve } from 'path'
 import { createReadStream, existsSync } from 'fs'
 
@@ -11,26 +10,15 @@ app.use(router.routes())
 app.use(router.allowedMethods())
 
 const root = resolve(require.resolve('@koishijs/play/package.json'), '../dist')
-const endpoint = 'https://registry.koishi.chat'
 
 router.get('(/.+)*', async (ctx, next) => {
-  if (ctx.path !== '/' && existsSync(root + ctx.path)) {
-    ctx.type = extname(ctx.path)
-    ctx.body = createReadStream(root + ctx.path)
-    return
+  let filename = root + ctx.path
+  if (ctx.path.endsWith('/') || !existsSync(root + ctx.path)) {
+    filename = root + '/index.html'
   }
-  const template = await readFile(root + '/index.html', 'utf8')
-  ctx.type = 'html'
-  ctx.body = transformHtml(template)
+  ctx.type = extname(filename)
+  ctx.body = createReadStream(filename)
+  return next()
 })
-
-function transformHtml(template: string) {
-  const headInjection = `<script>KOISHI_CONFIG = ${JSON.stringify({
-    static: true,
-    uiPath: '/',
-    endpoint,
-  })}</script>`
-  return template.replace('</title>', '</title>' + headInjection)
-}
 
 app.listen(3000)

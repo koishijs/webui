@@ -10,6 +10,18 @@ function findModulePath(id: string) {
   return path.slice(0, path.indexOf(keyword)) + keyword.slice(0, -1)
 }
 
+const configPlugin: vite.Plugin = {
+  name: 'config',
+  transformIndexHtml(template) {
+    const headInjection = `<script>KOISHI_CONFIG = ${JSON.stringify({
+      static: true,
+      uiPath: '/',
+      endpoint: 'https://registry.koishi.chat',
+    })}</script>`
+    return template.replace('</title>', '</title>\n    ' + headInjection)
+  },
+}
+
 const cwd = resolve(__dirname, '../../..')
 const dist = cwd + '/packages/play/dist'
 
@@ -61,7 +73,7 @@ export async function build(root: string, config: vite.UserConfig = {}) {
         },
       },
     },
-    plugins: [vue()],
+    plugins: [vue(), configPlugin],
     resolve: {
       alias: {
         'vue': root + '/vue.js',
