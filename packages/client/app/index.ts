@@ -3,7 +3,6 @@ import { useDark } from '@vueuse/core'
 import client, { config, connect, root, router } from '@koishijs/client'
 import App from './layouts/index.vue'
 import Home from './layouts/home.vue'
-import ClientWebSocket from './play'
 
 import './index.scss'
 
@@ -42,9 +41,7 @@ router.afterEach((route) => {
 
 app.mount('#app')
 
-if (config.static) {
-  connect(() => new ClientWebSocket())
-} else {
+if (!config.static) {
   const endpoint = new URL(config.endpoint, location.origin).toString()
   connect(() => new WebSocket(endpoint.replace(/^http/, 'ws')))
 }

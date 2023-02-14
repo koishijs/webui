@@ -1,6 +1,7 @@
 import { makeArray } from '@koishijs/core'
 import { MarketResult } from '@koishijs/registry'
 import { Loader, unwrapExports } from '@koishijs/loader'
+import { global } from '@koishijs/client'
 
 export * from '@koishijs/loader'
 
@@ -13,20 +14,16 @@ function resolveName(name: string) {
   }
 }
 
-declare const Filer: any
-
 class BrowserLoader extends Loader {
-  public fs: typeof import('node:fs') = new Filer.FileSystem({ name: 'play.koishi.chat' })
-  public path: typeof import('node:path') = Filer.path
   public envData: any = {}
   public config: any = { plugins: {} }
   private _initTask: Promise<void>
 
   private async prepare() {
-    if (!process.env.KOISHI_REGISTRY) return
-    const market: MarketResult = await fetch(process.env.KOISHI_REGISTRY + '/play.json').then(res => res.json())
+    if (process.env.NODE_ENV === 'development') return
+    const market: MarketResult = await fetch(global.endpoint + '/play.json').then(res => res.json())
     for (const object of market.objects) {
-      this.cache[object.shortname] = `${process.env.KOISHI_REGISTRY}/modules/${object.name}/index.js`
+      this.cache[object.shortname] = `${global.endpoint}/modules/${object.name}/index.js`
     }
   }
 
@@ -45,9 +42,9 @@ class BrowserLoader extends Loader {
 
   async resolvePlugin(name: string) {
     await (this._initTask ||= this.prepare())
-    const urls = process.env.KOISHI_REGISTRY
-      ? makeArray(this.cache[name])
-      : resolveName(name).map(name => `/modules/${name}/index.js`)
+    const urls = process.env.NODE_ENV === 'development'
+      ? resolveName(name).map(name => global.endpoint + `/modules/${name}/index.js`)
+      : makeArray(this.cache[name])
     for (const url of urls) {
       try {
         return unwrapExports(await import(/* @vite-ignore */ url))

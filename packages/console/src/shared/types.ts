@@ -27,7 +27,7 @@ export namespace AbstractWebSocket {
 
 export interface AbstractWebSocket {
   send(data: string): void
-  dispatchEvent(event: AbstractWebSocket.Event): boolean
+  dispatchEvent(event: any): boolean
   addEventListener<K extends keyof AbstractWebSocket.EventMap>(type: K, listener: (event: AbstractWebSocket.EventMap[K]) => void): void
   removeEventListener<K extends keyof AbstractWebSocket.EventMap>(type: K, listener: (event: AbstractWebSocket.EventMap[K]) => void): void
 }

@@ -1,8 +1,8 @@
 import type { AbstractWebSocket } from '@koishijs/plugin-console'
 import type { Context } from 'koishi'
-import { Dict, root } from '@koishijs/client'
-import { activate, data, getLoader } from './utils'
-import Instances from './index.vue'
+import { Dict } from '@koishijs/client'
+import { initialize } from './utils'
+import loader from './loader'
 
 class StubWebSocket implements AbstractWebSocket {
   remote: StubWebSocket
@@ -16,13 +16,13 @@ class StubWebSocket implements AbstractWebSocket {
     this.listeners[type]?.delete(listener)
   }
 
-  dispatchEvent(event: AbstractWebSocket.Event) {
+  dispatchEvent(event: any) {
     this.listeners[event.type]?.forEach(fn => fn(event))
     return true
   }
 
   send(data: string) {
-    this.remote.dispatchEvent({ type: 'message', target: this, data } as AbstractWebSocket.MessageEvent)
+    this.remote.dispatchEvent({ type: 'message', target: this, data })
   }
 }
 
@@ -35,9 +35,8 @@ class ServerWebSocket extends StubWebSocket {
   }
 
   private async start() {
-    const loader = await getLoader()
     loader[Symbol.for('koishi.socket')] = this
-    await activate(data.value.current)
+    await initialize()
   }
 }
 
@@ -47,10 +46,5 @@ export default class ClientWebSocket extends StubWebSocket {
   constructor() {
     super()
     setTimeout(() => this.dispatchEvent({ type: 'open', target: this }), 0)
-    root.slot({
-      type: 'home',
-      order: 900,
-      component: Instances,
-    })
   }
 }

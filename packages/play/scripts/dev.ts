@@ -14,7 +14,7 @@ app.use(router.routes())
 app.use(router.allowedMethods())
 
 const uiPath = ''
-const root = resolve(require.resolve('@koishijs/client/package.json'), '../app')
+const root = resolve(require.resolve('@koishijs/play/package.json'), '../app')
 
 let vite: ViteDevServer
 
@@ -91,12 +91,13 @@ async function createVite() {
       dedupe: ['vue', 'vue-demi', 'vue-router', 'element-plus', '@vueuse/core', '@popperjs/core'],
       alias: {
         '@koishijs/core': '@koishijs/core/src/index.ts',
-        '@koishijs/play': '@koishijs/play/src/index.ts',
         '@koishijs/plugin-console': '@koishijs/plugin-console/src/browser/index.ts',
         'path': 'rollup-plugin-node-polyfills/polyfills/path',
+        'fs': 'fsa-browserify/src/index.ts',
       },
     },
     define: {
+      'process.env.NODE_ENV': JSON.stringify('development'),
       'process.env.KOISHI_BASE': 'null',
       'process.env.KOISHI_ENV': JSON.stringify('browser'),
     },

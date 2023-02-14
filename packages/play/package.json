@@ -2,11 +2,8 @@
   "name": "@koishijs/play",
   "description": "Koishi Play Loader",
   "version": "1.0.0",
-  "type": "module",
-  "main": "lib/index.js",
-  "typings": "lib/index.d.ts",
   "files": [
-    "lib"
+    "dist"
   ],
   "author": "Shigma <shigma10826@gmail.com>",
   "license": "MIT",
@@ -30,5 +27,8 @@
   "dependencies": {
     "@koishijs/loader": "^2.6.1",
     "filer": "^1.4.1"
+  },
+  "yakumo": {
+    "client": "./scripts/build"
   }
 }
