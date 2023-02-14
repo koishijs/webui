@@ -1,5 +1,5 @@
 <template>
-  <el-dialog v-model="showDialog" class="install-panel" @closed="active = ''">
+  <el-dialog v-if="store.dependencies" v-model="showDialog" class="install-panel" @closed="active = ''">
     <template v-if="active" #header="{ titleId, titleClass }">
       <span :id="titleId" :class="[titleClass, '']">
         {{ active.replace(/(koishi-|^@koishijs\/)plugin-/, '') + (workspace ? ' (工作区)' : '') }}

@@ -24,7 +24,8 @@
     "config",
     "play"
   ],
-  "dependencies": {
+  "devDependencies": {
+    "@koishijs/client": "^5.4.0",
     "@koishijs/loader": "^2.6.1",
     "filer": "^1.4.1"
   },

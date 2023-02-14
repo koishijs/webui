@@ -1,0 +1,8 @@
+{
+  "buildCommand": "yarn build play",
+  "outputDirectory": "packages/play/dist",
+  "rewrites": [{
+    "source": "/(.*)",
+    "destination": "/index.html"
+  }]
+}

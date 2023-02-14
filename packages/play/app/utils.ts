@@ -57,10 +57,8 @@ export async function activate(id?: string) {
     await fs.writeFile(filename, dump(loader.config))
     instances.value = await fs.readdir(root)
   }
-  console.log('config', loader.config)
   const app = await loader.createApp()
   await app.start()
-  console.log(app)
 }
 
 export async function initialize() {

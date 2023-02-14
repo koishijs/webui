@@ -1,5 +1,5 @@
 <template>
-  <el-dialog v-model="showSelect" class="plugin-select">
+  <el-dialog v-if="store.packages" v-model="showSelect" class="plugin-select">
     <template #header>
       <span class="title">{{ extended[active] }} ({{ packages.length }})</span>
       <el-input ref="input" v-model="keyword" #suffix>
