@@ -1,12 +1,19 @@
 <template>
-  <p v-if="!conditions">无法解析过滤器。</p>
+  <p v-if="invalid">无法解析过滤器。</p>
   <div class="k-filter" v-else>
-    <div class="k-filter-item" v-for="(cond, key) in conditions" :key="key">
-      <el-button :disabled="disabled" @click="remove(key)"><k-icon name="delete"></k-icon></el-button>
-      <k-filter-expr :disabled="disabled" :modelValue="cond" @update:modelValue="update($event, key)"></k-filter-expr>
+    <div v-for="(layer, outer) in extract(modelValue, '$or')" :key="outer">
+      <div class="k-filter-item" v-for="(expr, inner) in extract(layer, '$and')" :key="inner">
+        <el-button :disabled="disabled" @click="remove(inner, outer)"><k-icon name="delete"></k-icon></el-button>
+        <k-filter-expr :disabled="disabled" :modelValue="expr" @update:modelValue="update($event, inner, outer)"></k-filter-expr>
+      </div>
+      <div>
+        <k-button @click="update({}, extract(layer, '$and').length, outer)">添加「与」条件</k-button>
+      </div>
     </div>
     <div>
-      <k-button @click="update({}, conditions.length)">添加条件</k-button>
+      <k-button @click="update({}, 0, extract(modelValue, '$or').length)">
+        {{ extract(modelValue, '$or').length ? '添加「或」条件' : '添加条件' }}
+      </k-button>
     </div>
   </div>
 </template>
@@ -23,36 +30,50 @@ const props = defineProps<{
 
 const emit = defineEmits(['update:modelValue'])
 
-const conditions = computed(() => {
-  if (!props.modelValue) {
-    return []
-  } else if (Array.isArray(props.modelValue.$and)) {
-    return props.modelValue.$and
-  } else {
-    return [props.modelValue]
+const invalid = computed(() => {
+  const outer = extract(props.modelValue, '$or')
+  if (!outer) return true
+  for (const layer of outer) {
+    const inner = extract(layer, '$and')
+    if (!inner) return true
   }
 })
 
-function update(expr: any, key: string | number) {
-  const values = conditions.value.slice()
-  values[key] = expr
-  if (values.length === 1) {
-    emit('update:modelValue', values[0])
+function extract(value: any, type: string) {
+  if (!value) {
+    return []
+  } else if (Array.isArray(value[type])) {
+    return value[type]
   } else {
-    emit('update:modelValue', { $and: values })
+    return [value]
   }
 }
 
-function remove(key: string | number) {
-  const values = conditions.value.slice()
-  values.splice(key, 1)
-  if (values.length === 0) {
-    emit('update:modelValue', undefined)
+function format(values: any, type: string) {
+  values = values.filter(Boolean)
+  if (!values.length) {
+    return
   } else if (values.length === 1) {
-    emit('update:modelValue', values[0])
+    return values[0]
   } else {
-    emit('update:modelValue', { $and: values })
+    return { [type]: values }
   }
+}
+
+function update(expr: any, innerKey: string | number, outerKey: string | number) {
+  const outer = extract(props.modelValue, '$or').slice()
+  const inner = extract(outer[outerKey], '$and').slice()
+  inner[innerKey] = expr
+  outer[outerKey] = format(inner, '$and')
+  emit('update:modelValue', format(outer, '$or'))
+}
+
+function remove(innerKey: string | number, outerKey: string | number) {
+  const outer = extract(props.modelValue, '$or').slice()
+  const inner = extract(outer[outerKey], '$and').slice()
+  inner[innerKey] = undefined
+  outer[outerKey] = format(inner, '$and')
+  emit('update:modelValue', format(outer, '$or'))
 }
 
 </script>

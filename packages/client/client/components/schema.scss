@@ -1,3 +1,7 @@
+.k-form {
+  --el-fill-color-light: var(--bg2);
+}
+
 @media screen and (max-width: 480px) {
   .k-form {
     margin: 0 -1.5rem;
