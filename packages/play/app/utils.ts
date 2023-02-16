@@ -1,6 +1,6 @@
 import { ref } from 'vue'
 import { useLocalStorage } from '@vueuse/core'
-import { dump, load } from 'js-yaml'
+import { dump } from 'js-yaml'
 import { promises as fs } from 'fs'
 import loader from './loader'
 
@@ -42,8 +42,8 @@ export async function activate(id?: string) {
   data.value.current = id
   const filename = `${root}/${id}/koishi.yml`
   try {
-    loader.config = load(await fs.readFile(filename, 'utf8'))
-    if (!loader.config?.plugins) throw new Error()
+    await loader.init(`${root}/${id}`)
+    await loader.readConfig()
   } catch {
     loader.config = {
       plugins: {
@@ -56,6 +56,7 @@ export async function activate(id?: string) {
     await fs.mkdir(`${root}/${id}`, { recursive: true })
     await fs.writeFile(filename, dump(loader.config))
     instances.value = await fs.readdir(root)
+    await loader.init(`${root}/${id}`)
   }
   const app = await loader.createApp()
   await app.start()

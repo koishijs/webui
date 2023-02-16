@@ -14,6 +14,8 @@ function resolveName(name: string) {
   }
 }
 
+process.cwd = () => '/'
+
 class BrowserLoader extends Loader {
   public envData: any = {}
   public config: any = { plugins: {} }
@@ -25,14 +27,6 @@ class BrowserLoader extends Loader {
     for (const object of market.objects) {
       this.cache[object.shortname] = `${global.endpoint}/modules/${object.name}/index.js`
     }
-  }
-
-  readConfig() {
-    return {}
-  }
-
-  writeConfig() {
-    this.app.emit('config')
   }
 
   async resolve(name: string) {

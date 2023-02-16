@@ -33,7 +33,10 @@ export class Client {
   readonly id: string = Random.id()
 
   constructor(readonly ctx: Context, public socket: AbstractWebSocket) {
-    socket.addEventListener('message', this.receive.bind(this))
+    socket.addEventListener('message', this.receive)
+    ctx.on('dispose', () => {
+      socket.removeEventListener('message', this.receive)
+    })
     this.refresh()
   }
 
@@ -41,7 +44,7 @@ export class Client {
     this.socket.send(JSON.stringify(payload))
   }
 
-  async receive(data: AbstractWebSocket.MessageEvent) {
+  receive = async (data: AbstractWebSocket.MessageEvent) => {
     const { type, args, id } = JSON.parse(data.data.toString())
     const listener = this.ctx.console.listeners[type]
     if (!listener) {
