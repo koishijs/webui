@@ -90,6 +90,7 @@
 
 import { send, store, router } from '@koishijs/client'
 import { computed, provide } from 'vue'
+import { gt } from 'semver'
 import { envMap, Tree } from './utils'
 import KDepLink from './dep-link.vue'
 import KModifier from './modifier.vue'
@@ -137,7 +138,7 @@ const hint = computed(() => local.value.workspace ? '，请检查源代码' : '�
 
 const hasUpdate = computed(() => {
   if (!remote.value?.versions || local.value.workspace) return
-  return remote.value.version !== local.value.version
+  return gt(remote.value.version, local.value.version)
 })
 
 function gotoMarket() {

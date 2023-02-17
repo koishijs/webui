@@ -7,7 +7,7 @@
       <template v-else>
         {{ local.resolved }}
         <template v-if="!local.invalid">
-          ({{ local.resolved === local.latest ? '最新' : '可更新' }})
+          ({{ gt(local.latest, local.resolved) ? '可更新' : '最新' }})
         </template>
       </template>
     </td>
@@ -37,6 +37,7 @@ import { computed } from 'vue'
 import { store } from '@koishijs/client'
 import { active, config } from '../utils'
 import { analyzeVersions } from './utils'
+import { gt } from 'semver'
 
 const props = defineProps({
   name: String,
