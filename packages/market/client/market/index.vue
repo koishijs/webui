@@ -1,7 +1,9 @@
 <template>
   <k-layout main="darker" class="page-market" :menu="menu">
     <template #left>
-      <market-filter v-model="words" :config="config" :data="all"></market-filter>
+      <el-scrollbar>
+        <market-filter v-model="words" :config="config" :data="all"></market-filter>
+      </el-scrollbar>
     </template>
 
     <div v-if="!store.market">
