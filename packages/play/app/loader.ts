@@ -2,6 +2,7 @@ import { makeArray } from '@koishijs/core'
 import { MarketResult } from '@koishijs/registry'
 import { Loader, unwrapExports } from '@koishijs/loader'
 import { global } from '@koishijs/client'
+import process from 'process'
 
 export * from '@koishijs/loader'
 
@@ -14,7 +15,7 @@ function resolveName(name: string) {
   }
 }
 
-process.cwd = () => '/'
+globalThis.process = process
 
 class BrowserLoader extends Loader {
   public envData: any = {}

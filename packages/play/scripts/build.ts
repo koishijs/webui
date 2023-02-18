@@ -35,6 +35,7 @@ const builtins = [
   'koishi',
   'reggol',
   'schemastery',
+  'process',
 ]
 
 const shims = {

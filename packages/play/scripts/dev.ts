@@ -97,6 +97,7 @@ async function createVite() {
       },
     },
     define: {
+      'process.cwd': '() => "/"',
       'process.env.NODE_ENV': JSON.stringify('development'),
       'process.env.KOISHI_BASE': 'null',
       'process.env.KOISHI_ENV': JSON.stringify('browser'),

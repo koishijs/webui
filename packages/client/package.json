@@ -1,7 +1,7 @@
 {
   "name": "@koishijs/client",
   "description": "Koishi Console Client",
-  "version": "5.4.0",
+  "version": "5.4.2",
   "main": "client/index.ts",
   "files": [
     "app",
@@ -45,7 +45,7 @@
     "ns-require": "^1.1.4",
     "sass": "^1.57.1",
     "schemastery": "^3.7.0",
-    "schemastery-vue": "^2.0.0",
+    "schemastery-vue": "^2.0.2",
     "vite": "^4.0.0",
     "vue": "^3.2.45",
     "vue-router": "^4.1.6"

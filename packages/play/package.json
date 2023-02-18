@@ -25,7 +25,7 @@
     "play"
   ],
   "devDependencies": {
-    "@koishijs/client": "^5.4.0",
+    "@koishijs/client": "^5.4.2",
     "@koishijs/loader": "^3.0.0",
     "fsa-browserify": "^1.2.0"
   },
