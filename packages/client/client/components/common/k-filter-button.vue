@@ -4,7 +4,7 @@
   </span>
   <el-dialog v-model="showDialog" destroy-on-close>
     <template #header>条件设置</template>
-    <k-filter v-model="config" :disabled="disabled"></k-filter>
+    <k-filter v-model="config" :options="options" :disabled="disabled"></k-filter>
   </el-dialog>
 </template>
 
@@ -16,6 +16,7 @@ import KFilter from './k-filter.vue'
 const props = defineProps<{
   modelValue: any
   disabled?: boolean
+  options?: any
 }>()
 
 const emit = defineEmits(['update:modelValue'])

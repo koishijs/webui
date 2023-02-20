@@ -4,7 +4,7 @@
     <div v-for="(layer, outer) in extract(modelValue, '$or')" :key="outer">
       <div class="k-filter-item" v-for="(expr, inner) in extract(layer, '$and')" :key="inner">
         <el-button :disabled="disabled" @click="remove(inner, outer)"><k-icon name="delete"></k-icon></el-button>
-        <k-filter-expr :disabled="disabled" :modelValue="expr" @update:modelValue="update($event, inner, outer)"></k-filter-expr>
+        <k-filter-expr :disabled="disabled" :options="options" :modelValue="expr" @update:modelValue="update($event, inner, outer)"></k-filter-expr>
       </div>
       <div>
         <k-button @click="update({}, extract(layer, '$and').length, outer)">添加「与」条件</k-button>
@@ -26,6 +26,7 @@ import KFilterExpr from './k-filter-expr.vue'
 const props = defineProps<{
   modelValue: any
   disabled?: boolean
+  options?: any
 }>()
 
 const emit = defineEmits(['update:modelValue'])

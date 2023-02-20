@@ -36,10 +36,12 @@ const builtins = [
   'reggol',
   'schemastery',
   'process',
+  'path',
 ]
 
 const shims = {
   fs: 'fsa-browserify',
+  path: 'path-browserify',
 }
 
 function toExternal(name: string) {

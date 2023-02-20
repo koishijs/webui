@@ -44,8 +44,7 @@
     "marked-vue": "^1.2.2",
     "ns-require": "^1.1.4",
     "sass": "^1.57.1",
-    "schemastery": "^3.7.0",
-    "schemastery-vue": "^2.0.2",
+    "schemastery-vue": "^2.0.3",
     "vite": "^4.0.0",
     "vue": "^3.2.45",
     "vue-router": "^4.1.6"

@@ -4,7 +4,9 @@
   </template>
   <div class="k-filter-expr" v-else>
     <el-select class="entity" :disabled="disabled" v-model="entity">
-      <el-option v-for="(name, key) in entities" :key="key" :label="name" :value="key"></el-option>
+      <template v-for="(name, key) in entities" :key="key">
+        <el-option v-if="isValid(key)" :label="name" :value="key"></el-option>
+      </template>
     </el-select>
     <el-select class="operator" :disabled="disabled" v-model="operator">
       <el-option v-for="key in availableOps" :key="key" :label="operators[key]" :value="key"></el-option>
@@ -20,6 +22,7 @@ import { computed, ref, watch } from 'vue'
 const props = defineProps<{
   modelValue: any
   disabled?: boolean
+  options?: any
 }>()
 
 const emit = defineEmits(['update:modelValue'])
@@ -27,6 +30,14 @@ const emit = defineEmits(['update:modelValue'])
 const entity = ref<string>()
 const operator = ref<string>()
 const value = ref<any>()
+
+function isValid(key: string) {
+  if (key.startsWith('user.')) {
+    return props.options?.userFields?.includes(key.slice(5))
+  } else {
+    return true
+  }
+}
 
 const entities = {
   'userId': '用户 ID',
