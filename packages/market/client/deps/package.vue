@@ -49,7 +49,7 @@ const local = computed(() => {
 
 const version = computed({
   get() {
-    const value = config.override[props.name]
+    const value = config.value.override[props.name]
     if (local.value.resolved === value) {
       return
     } else {
@@ -58,11 +58,10 @@ const version = computed({
   },
   set(value) {
     if (local.value.resolved === value) {
-      delete config.override[props.name]
+      delete config.value.override[props.name]
     } else {
-      config.override[props.name] = value
+      config.value.override[props.name] = value
     }
-    console.log(config.override)
   },
 })
 

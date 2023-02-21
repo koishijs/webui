@@ -1,5 +1,5 @@
 import { defineComponent, h } from 'vue'
-import { Context, receive, router, store } from '@koishijs/client'
+import { Context, global, receive, router, store } from '@koishijs/client'
 import type {} from '@koishijs/plugin-market'
 import Install from './deps/install.vue'
 import Dependencies from './deps/index.vue'
@@ -42,12 +42,6 @@ export default (ctx: Context) => {
     component: Select,
   })
 
-  ctx.slot({
-    type: 'status-right',
-    component: Progress,
-    order: 10,
-  })
-
   ctx.page({
     path: '/plugins/:name*',
     name: '插件配置',
@@ -68,13 +62,21 @@ export default (ctx: Context) => {
     component: Market,
   })
 
-  ctx.page({
-    path: '/dependencies',
-    name: '依赖管理',
-    icon: 'activity:deps',
-    order: 700,
-    authority: 4,
-    fields: ['dependencies'],
-    component: Dependencies,
-  })
+  if (!global.static) {
+    ctx.slot({
+      type: 'status-right',
+      component: Progress,
+      order: 10,
+    })
+
+    ctx.page({
+      path: '/dependencies',
+      name: '依赖管理',
+      icon: 'activity:deps',
+      order: 700,
+      authority: 4,
+      fields: ['dependencies'],
+      component: Dependencies,
+    })
+  }
 }

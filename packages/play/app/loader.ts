@@ -44,12 +44,8 @@ class BrowserLoader extends Loader {
       : makeArray(this.cache[name])
     for (const url of urls) {
       try {
-        const mod = await import(/* @vite-ignore */ url)
-        console.log(url, mod)
-        return unwrapExports(mod)
-      } catch (err) {
-        console.log(err)
-      }
+        return unwrapExports(await import(/* @vite-ignore */ url))
+      } catch (err) {}
     }
     console.warn(`cannot resolve plugin ${name}`)
   }

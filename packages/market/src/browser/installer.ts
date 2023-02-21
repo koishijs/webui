@@ -1,4 +1,4 @@
-import { Context, Dict } from 'koishi'
+import { Context, Dict, version } from 'koishi'
 import { DataService } from '@koishijs/plugin-console'
 import { PackageJson } from '@koishijs/registry'
 import {} from '@koishijs/loader'
@@ -38,6 +38,13 @@ class Installer extends DataService<Dict<Dependency>> {
   async get(force = false) {
     const market = await this.ctx.console.market.prepare()
     const objects = market.objects.filter(o => o.portable)
+    objects.push({
+      name: 'koishi',
+      version,
+      versions: {
+        [version]: {},
+      },
+    } as any)
     return Object.fromEntries(objects.map((object) => [object.name, {
       request: object.version,
       resolved: object.version,

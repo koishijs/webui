@@ -54,7 +54,7 @@
       <span class="link" @click.stop="configure(true)">你尚未配置此插件，点击立即配置。</span>
     </div>
 
-    <template v-if="active" #footer>
+    <template v-if="active && !global.static" #footer>
       <div class="left"></div>
       <div class="right">
         <el-button @click="showDialog = false">取消</el-button>
@@ -76,7 +76,7 @@
 <script lang="ts" setup>
 
 import { computed, ref, watch } from 'vue'
-import { router, send, store } from '@koishijs/client'
+import { global, router, send, store } from '@koishijs/client'
 import { analyzeVersions, showDialog, install } from './utils'
 import { active, config } from '../utils'
 import { parse } from 'semver'
@@ -152,7 +152,7 @@ const result = computed(() => {
 watch(() => active.value, (value) => {
   showDialog.value = !!value
   if (!value) return
-  version.value = config.override[active.value]
+  version.value = config.value.override[active.value]
     || store.dependencies[active.value]?.request
     || store.market.data[value].version
 }, { immediate: true })
@@ -238,6 +238,10 @@ function configure(path: string | true) {
 
     > div {
       margin: 1rem 0;
+    }
+
+    &:last-child {
+      padding-bottom: 1rem;
     }
   }
 

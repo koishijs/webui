@@ -50,9 +50,9 @@ const names = computed(() => {
 const menu = computed(() => [{
   icon: 'check',
   label: '应用更改',
-  disabled: !Object.keys(config.override).length,
+  disabled: !Object.keys(config.value.override).length,
   async action() {
-    return install(config.override)
+    return install(config.value.override)
   },
 }, refresh.value])
 

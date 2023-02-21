@@ -25,8 +25,9 @@
           v-for="data in packages" :key="data.name" class="k-card"
           :data="data" :config="config" :gravatar="store.market.gravatar" @query="onQuery">
           <template #action v-if="store.packages">
-            <k-button v-if="store.packages[data.name]" type="success" solid @click.stop="handleClick(data)">修改</k-button>
-            <k-button v-else :disabled="global.static" solid @click.stop="handleClick(data)">添加</k-button>
+            <k-button v-if="global.static" solid @click.stop="handleClick(data)">配置</k-button>
+            <k-button v-else-if="store.packages[data.name]" type="success" solid @click.stop="handleClick(data)">修改</k-button>
+            <k-button v-else solid @click.stop="handleClick(data)">添加</k-button>
           </template>
         </market-package>
       </div>

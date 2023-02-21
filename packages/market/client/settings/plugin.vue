@@ -13,7 +13,7 @@
     </k-comment>
 
     <!-- latest -->
-    <k-comment v-if="hasUpdate">
+    <k-comment v-if="hasUpdate && !global.static">
       <p>当前的插件版本 ({{ local.version }}) 不是最新，<router-link to="/dependencies">点击前往依赖管理</router-link>。</p>
     </k-comment>
 
@@ -88,7 +88,7 @@
 
 <script lang="ts" setup>
 
-import { send, store, router } from '@koishijs/client'
+import { global, send, store, router } from '@koishijs/client'
 import { computed, provide } from 'vue'
 import { gt } from 'semver'
 import { envMap, Tree } from './utils'
