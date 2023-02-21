@@ -34,6 +34,7 @@ declare module '@koishijs/plugin-console' {
 }
 
 export interface Message {
+  id: string
   user: string
   channel: string
   content: string

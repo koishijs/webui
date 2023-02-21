@@ -1,4 +1,4 @@
-import { createStorage, receive } from '@koishijs/client'
+import { receive, useStorage } from '@koishijs/client'
 import { Message } from '@koishijs/plugin-sandbox/src'
 import { Dict } from 'koishi'
 import { computed } from 'vue'
@@ -16,7 +16,7 @@ interface SandboxConfig {
   panelType: keyof typeof panelTypes
 }
 
-export const config = createStorage<SandboxConfig>('sandbox', 1, () => ({
+export const config = useStorage<SandboxConfig>('sandbox', 1, () => ({
   user: '',
   index: 0,
   messages: {},
@@ -24,22 +24,22 @@ export const config = createStorage<SandboxConfig>('sandbox', 1, () => ({
 }))
 
 export const channel = computed(() => {
-  if (config.panelType === 'guild') return '#'
-  return '@' + config.user
+  if (config.value.panelType === 'guild') return '#'
+  return '@' + config.value.user
 })
 
 receive('sandbox', (message: Message) => {
-  (config.messages[message.channel] ||= []).push(message)
+  (config.value.messages[message.channel] ||= []).push(message)
 })
 
 receive('sandbox/delete', ({ id, channel }) => {
-  const messages = config.messages[channel]
+  const messages = config.value.messages[channel]
   if (!messages) return
-  config.messages[channel] = messages.filter(msg => msg.id !== id)
+  config.value.messages[channel] = messages.filter(msg => msg.id !== id)
 })
 
 receive('sandbox/clear', () => {
-  config.messages[channel.value] = []
+  config.value.messages[channel.value] = []
 })
 
 export const words = [

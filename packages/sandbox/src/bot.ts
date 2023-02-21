@@ -4,7 +4,7 @@ import {} from '@koishijs/assets'
 class SandboxMessenger extends Messenger<SandboxBot> {
   private buffer = ''
 
-  private rules: Dict<h.AsyncTransformer> = Object.fromEntries(['image', 'audio', 'video', 'file'].map((type) => {
+  private rules: Dict<h.Transformer> = Object.fromEntries(['image', 'audio', 'video', 'file'].map((type) => {
     return [type, async (data) => {
       if (data.url.startsWith('file:') && this.bot.ctx.assets) {
         return h(type, { ...data, url: await this.bot.ctx.assets.upload(data.url, data.url) })

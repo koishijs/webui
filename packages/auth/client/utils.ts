@@ -1,5 +1,5 @@
 import { ref, watch } from 'vue'
-import { createStorage, message, router, store } from '@koishijs/client'
+import { message, router, store, useStorage } from '@koishijs/client'
 import { UserAuth } from '@koishijs/plugin-auth'
 
 interface AuthConfig extends Partial<UserAuth> {
@@ -10,7 +10,7 @@ interface AuthConfig extends Partial<UserAuth> {
   password?: string
 }
 
-export const config = createStorage<AuthConfig>('auth', 1, () => ({
+export const config = useStorage<AuthConfig>('auth', 1, () => ({
   authType: 0,
 }))
 
@@ -24,7 +24,7 @@ watch(() => store.user, (value, oldValue) => {
 
   if (oldValue) return
   message.success(`欢迎回来，${value.name || 'Koishi 用户'}！`)
-  Object.assign(config, value)
+  Object.assign(config.value, value)
   const from = router.currentRoute.value.redirectedFrom
   if (from && !from.path.startsWith('/login')) {
     router.push(from)

@@ -19,6 +19,20 @@ export function createStorage<T extends object>(key: string, version: number, fa
   return reactive<T>(storage.value['data'])
 }
 
+export let useStorage = <T extends object>(key: string, version: number, fallback?: () => T) => {
+  const initial = fallback ? fallback() : {} as T
+  initial['__version__'] = version
+  const storage = useLocalStorage('koishi.console.' + key, initial)
+  if (storage.value['__version__'] !== version) {
+    storage.value = initial
+  }
+  return storage
+}
+
+export function provideStorage(factory: typeof useStorage) {
+  useStorage = factory
+}
+
 export type Store = {
   [K in keyof Console.Services]?: Console.Services[K] extends DataService<infer T> ? T : never
 }

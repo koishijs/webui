@@ -38,19 +38,23 @@
 
 <script lang="ts" setup>
 
-import { config, receive, send, ChatInput, VirtualList, createStorage } from '@koishijs/client'
+import { config, receive, send, ChatInput, VirtualList, useStorage } from '@koishijs/client'
 import { computed, ref } from 'vue'
 import type { Dict } from 'cosmokit'
 import type { Message } from '@koishijs/plugin-chat/src'
 import ChatMessage from './message.vue'
 
 const index = ref<string>()
-const messages = createStorage<Message[]>('chat', 1, () => [])
+const data = useStorage<{
+  messages: Message[]
+}>('chat', 2, () => ({
+  messages: [],
+}))
 const current = ref<string>('')
 
 receive('chat', (body) => {
-  messages.push(body)
-  messages.splice(0, messages.length - config.maxMessages)
+  data.value.messages.push(body)
+  data.value.messages.splice(0, data.value.messages.length - config.maxMessages)
 })
 
 const guilds = computed(() => {
@@ -61,7 +65,7 @@ const guilds = computed(() => {
       selfId: string
     }>
   }> = {}
-  for (const message of messages) {
+  for (const message of data.value.messages) {
     const outerId = message.guildId || message.selfId + '$'
     const guild = guilds[message.platform + '/' + outerId] ||= {
       name: message.guildId
@@ -90,7 +94,7 @@ const header = computed(() => {
 const filtered = computed(() => {
   if (!current.value) return []
   const [platform, guildId, channelId] = current.value.split('/')
-  return messages.filter((data) => {
+  return data.value.messages.filter((data) => {
     if (data.platform !== platform || data.channelId !== channelId) return
     if (guildId.endsWith('$') && data.selfId + '$' !== guildId) return
     return true

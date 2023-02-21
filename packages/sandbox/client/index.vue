@@ -54,7 +54,7 @@ const schema = Schema.object({
 
 const users = computed(() => {
   return Object
-    .keys(config.messages)
+    .keys(config.value.messages)
     .filter(key => key.startsWith('@'))
     .map((key) => key.slice(1))
 })
@@ -71,20 +71,20 @@ function createUser() {
   }
   let name: string
   do {
-    name = words[config.index++]
-    config.index %= length
+    name = words[config.value.index++]
+    config.value.index %= length
   } while (users.value.includes(name))
-  config.user = name
-  config.messages['@' + name] = []
-  send('sandbox/user', config.user, {})
+  config.value.user = name
+  config.value.messages['@' + name] = []
+  send('sandbox/user', config.value.user, {})
 }
 
 function removeUser(name: string) {
   const index = users.value.indexOf(name)
-  delete config.messages['@' + name]
-  send('sandbox/user', config.user, null)
-  if (config.user === name) {
-    config.user = users.value[index] || ''
+  delete config.value.messages['@' + name]
+  send('sandbox/user', config.value.user, null)
+  if (config.value.user === name) {
+    config.value.user = users.value[index] || ''
   }
 }
 
@@ -93,14 +93,14 @@ const offset = ref(0)
 
 function onKeydown(event: KeyboardEvent) {
   if (event.key === 'ArrowUp') {
-    const list = config.messages[channel.value].filter(item => item.user === config.user)
+    const list = config.value.messages[channel.value].filter(item => item.user === config.value.user)
     let index = list.length - offset.value
     if (list[index - 1]) {
       offset.value++
       input.value = list[index - 1].content
     }
   } else if (event.key === 'ArrowDown') {
-    const list = config.messages[channel.value].filter(item => item.user === config.user)
+    const list = config.value.messages[channel.value].filter(item => item.user === config.value.user)
     let index = list.length - offset.value
     if (list[index + 1]) {
       offset.value--
@@ -114,18 +114,18 @@ function onKeydown(event: KeyboardEvent) {
 
 const model = ref()
 
-watch(() => store.sandbox?.[config.user], (value) => {
+watch(() => store.sandbox?.[config.value.user], (value) => {
   model.value = clone(value)
 }, { immediate: true })
 
 watch(model, (value) => {
-  if (deepEqual(value, store.sandbox?.[config.user])) return
-  send('sandbox/user', config.user, value)
+  if (deepEqual(value, store.sandbox?.[config.value.user])) return
+  send('sandbox/user', config.value.user, value)
 }, { deep: true })
 
 function sendMessage(content: string) {
   offset.value = 0
-  send('sandbox/message', config.user, channel.value, content)
+  send('sandbox/message', config.value.user, channel.value, content)
 }
 
 </script>

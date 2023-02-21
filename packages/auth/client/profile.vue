@@ -32,16 +32,16 @@ const diff = ref<UserUpdate>({})
 
 const schema = computed(() => {
   const result: Schema<UserUpdate> = Schema.object({
-    name: Schema.string().description('用户名').default(config.name),
+    name: Schema.string().description('用户名').default(config.value.name),
   }).description('基本资料')
-  result.dict.password = Schema.string().role('secret').description('密码').default(config.password)
+  result.dict.password = Schema.string().role('secret').description('密码').default(config.value.password)
   return result
 })
 
 async function logout() {
-  delete config.id
-  delete config.token
-  delete config.expire
+  delete config.value.id
+  delete config.value.token
+  delete config.value.expire
   return send('user/logout')
 }
 
@@ -49,7 +49,7 @@ async function update() {
   try {
     await send('user/update', diff.value)
     message.success('修改成功！')
-    Object.assign(config, diff)
+    Object.assign(config.value, diff)
     Object.assign(store.user, diff.value)
     diff.value = {}
   } catch (e) {

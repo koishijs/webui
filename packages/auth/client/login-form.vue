@@ -67,7 +67,7 @@ let timestamp = 0
 async function loginWithAccount() {
   const now = Date.now()
   if (now < timestamp) return
-  const { platform, userId } = config
+  const { platform, userId } = config.value
   if (!platform || !userId) return
   timestamp = now + 1000
   try {
@@ -78,7 +78,7 @@ async function loginWithAccount() {
 }
 
 async function loginWithPassword() {
-  const { name, password } = config
+  const { name, password } = config.value
   try {
     await send('login/password', name, password)
   } catch (e) {

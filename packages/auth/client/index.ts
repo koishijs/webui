@@ -18,8 +18,8 @@ icons.register('sign-out', SignOut)
 icons.register('user-full', UserFull)
 
 export default (ctx: Context) => {
-  if (config.token && config.expire > Date.now()) {
-    send('login/token', config.id, config.token).catch(e => message.error(e.message))
+  if (config.value.token && config.value.expire > Date.now()) {
+    send('login/token', config.value.id, config.value.token).catch(e => message.error(e.message))
   }
 
   ctx.on('activity', (data) => {

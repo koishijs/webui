@@ -1,5 +1,5 @@
 import { computed, ref, watch } from 'vue'
-import { createStorage, Dict, send, store } from '@koishijs/client'
+import { Dict, send, store, useStorage } from '@koishijs/client'
 
 interface ManagerConfig {
   prefix: string
@@ -7,23 +7,23 @@ interface ManagerConfig {
   hideWorkspace?: boolean
 }
 
-export const config = createStorage<ManagerConfig>('manager', 2, () => ({
+export const config = useStorage<ManagerConfig>('manager', 2, () => ({
   prefix: '^',
   override: {},
   hideWorkspace: true,
 }))
 
 export const overrideCount = computed(() => {
-  return Object.values(config.override).filter(value => value !== undefined).length
+  return Object.values(config.value.override).filter(value => value !== undefined).length
 })
 
 watch(() => store.dependencies, (value) => {
   if (!value) return
-  for (const key in config.override) {
-    if (!config.override[key]) {
-      if (!value[key]) delete config.override[key]
-    } else if (value[key]?.request === config.override[key]) {
-      delete config.override[key]
+  for (const key in config.value.override) {
+    if (!config.value.override[key]) {
+      if (!value[key]) delete config.value.override[key]
+    } else if (value[key]?.request === config.value.override[key]) {
+      delete config.value.override[key]
     }
   }
 }, { immediate: true })
