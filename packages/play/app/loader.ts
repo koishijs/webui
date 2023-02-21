@@ -15,7 +15,9 @@ function resolveName(name: string) {
   }
 }
 
-globalThis.process = process
+if (process.env.NODE_ENV !== 'development') {
+  globalThis.process = process
+}
 
 class BrowserLoader extends Loader {
   public envData: any = {}
@@ -42,8 +44,12 @@ class BrowserLoader extends Loader {
       : makeArray(this.cache[name])
     for (const url of urls) {
       try {
-        return unwrapExports(await import(/* @vite-ignore */ url))
-      } catch (err) {}
+        const mod = await import(/* @vite-ignore */ url)
+        console.log(url, mod)
+        return unwrapExports(mod)
+      } catch (err) {
+        console.log(err)
+      }
     }
     console.warn(`cannot resolve plugin ${name}`)
   }

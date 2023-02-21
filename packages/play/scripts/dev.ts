@@ -92,6 +92,8 @@ async function createVite() {
       alias: {
         '@koishijs/core': '@koishijs/core/src/index.ts',
         '@koishijs/plugin-console': '@koishijs/plugin-console/src/browser/index.ts',
+        '@minatojs/driver-sqlite': '@minatojs/driver-sqlite/src/index.ts',
+        '@minatojs/sql-utils': '@minatojs/sql-utils/src/index.ts',
         'path': 'rollup-plugin-node-polyfills/polyfills/path',
         'fs': 'fsa-browserify/src/index.ts',
       },
