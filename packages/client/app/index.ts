@@ -1,6 +1,6 @@
 import { createApp } from 'vue'
 import { useDark } from '@vueuse/core'
-import client, { config, connect, root, router } from '@koishijs/client'
+import client, { connect, global, root, router } from '@koishijs/client'
 import App from './layouts/index.vue'
 import Home from './layouts/home.vue'
 
@@ -35,13 +35,13 @@ app.use(router)
 
 router.afterEach((route) => {
   if (route.meta.activity) {
-    document.title = `${route.meta.activity.name} | Koishi 控制台`
+    document.title = `${route.meta.activity.name} | ${global.title || 'Koishi 控制台'}`
   }
 })
 
 app.mount('#app')
 
-if (!config.static) {
-  const endpoint = new URL(config.endpoint, location.origin).toString()
+if (!global.static) {
+  const endpoint = new URL(global.endpoint, location.origin).toString()
   connect(() => new WebSocket(endpoint.replace(/^http/, 'ws')))
 }

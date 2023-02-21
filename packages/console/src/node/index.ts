@@ -18,6 +18,7 @@ interface ClientConfig {
   uiPath: string
   endpoint: string
   static?: boolean
+  title?: string
 }
 
 class NodeConsole extends Console {
