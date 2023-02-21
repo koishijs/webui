@@ -49,6 +49,12 @@ const browserEntries = {
   '@koishijs/plugin-market': '../src/browser/index.ts',
 }
 
+router.get('(/.+)*/sql-wasm.wasm', async (ctx) => {
+  const filename = require.resolve('@minatojs/sql.js/dist/sql-wasm.wasm')
+  ctx.body = createReadStream(filename)
+  ctx.type = 'application/octet-stream'
+})
+
 router.get('/modules(/.+)+/index.js', async (ctx) => {
   const name = ctx.params[0].slice(1)
   try {
