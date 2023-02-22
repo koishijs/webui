@@ -74,6 +74,7 @@ export async function activate(id?: string) {
       plugins: {
         'console': {},
         'help': {},
+        'insight': {},
         'sandbox': {},
         'market': {},
         'dataview': {},

@@ -17,7 +17,7 @@ const configPlugin: vite.Plugin = {
       static: true,
       uiPath: '/',
       endpoint: 'https://registry.koishi.chat',
-      title: 'Koishi Play',
+      title: 'Koishi Online',
     })}</script>`
     return template.replace('</title>', '</title>\n    ' + headInjection)
   },

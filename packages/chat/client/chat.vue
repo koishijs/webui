@@ -38,18 +38,13 @@
 
 <script lang="ts" setup>
 
-import { config, receive, send, ChatInput, VirtualList, useStorage } from '@koishijs/client'
+import { config, Dict, receive, send, ChatInput, VirtualList } from '@koishijs/client'
 import { computed, ref } from 'vue'
-import type { Dict } from 'cosmokit'
-import type { Message } from '@koishijs/plugin-chat/src'
+import type { Message } from '../src'
+import { data } from './utils'
 import ChatMessage from './message.vue'
 
 const index = ref<string>()
-const data = useStorage<{
-  messages: Message[]
-}>('chat', 2, () => ({
-  messages: [],
-}))
 const current = ref<string>('')
 
 receive('chat', (body) => {
