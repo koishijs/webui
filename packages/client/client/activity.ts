@@ -53,11 +53,22 @@ export class Activity {
       const { path, id = path, component } = options
       this._disposables.push(router.addRoute({ path, name: id, component, meta: { activity: this } }))
       this.id ??= path
+      this.handleUpdate()
     }
     this.order ??= 0
     this.authority ??= 0
     this.fields ??= []
     activities[this.id] = this
+  }
+
+  handleUpdate() {
+    const { redirect } = router.currentRoute.value.query
+    if (typeof redirect === 'string') {
+      const location = router.resolve(redirect)
+      if (location.matched.length) {
+        router.replace(location)
+      }
+    }
   }
 
   get icon() {

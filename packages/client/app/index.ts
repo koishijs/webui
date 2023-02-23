@@ -3,6 +3,7 @@ import { useDark } from '@vueuse/core'
 import client, { connect, Dict, global, root, router } from '@koishijs/client'
 import App from './layouts/index.vue'
 import Home from './layouts/home.vue'
+import Progress from './layouts/status-loading.vue'
 
 import './index.scss'
 
@@ -25,6 +26,11 @@ root.page({
   icon: 'activity:home',
   order: 1000,
   component: Home,
+})
+
+root.slot({
+  type: 'status-right',
+  component: Progress,
 })
 
 const isDark = useDark()

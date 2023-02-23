@@ -133,12 +133,12 @@ export class ConfigWriter extends DataService<Context.Config> {
     const [parent, name] = this.resolve(path)
     const target = path ? parent.config[name] : parent.config
     for (const key of Object.keys(config)) {
+      delete target[key]
       if (config[key] === null) {
-        delete target[key]
-      } else {
-        target[key] = config[key]
+        delete config[key]
       }
     }
+    insertKey(target, config, Object.keys(target))
     this.loader.writeConfig()
   }
 

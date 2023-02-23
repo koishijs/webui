@@ -24,14 +24,17 @@
   font-size: 0.875rem;
   line-height: var(--footer-height);
 
+  @media screen and (max-width: 768px) {
+    display: none;
+  }
+
   > * {
     display: inline-flex;
   }
-}
 
-@media screen and (max-width: 768px) {
-  .layout-status {
-    display: none;
+  .el-progress-bar {
+    width: 120px;
+    margin-right: 2px;
   }
 }
 
