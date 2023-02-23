@@ -13,13 +13,16 @@ function findModulePath(id: string) {
 const configPlugin: vite.Plugin = {
   name: 'config',
   transformIndexHtml(template) {
-    const headInjection = `<script>KOISHI_CONFIG = ${JSON.stringify({
-      static: true,
-      uiPath: '/',
-      endpoint: 'https://registry.koishi.chat',
-      title: 'Koishi Online',
-    })}</script>`
-    return template.replace('</title>', '</title>\n    ' + headInjection)
+    const headInjection = [
+      '<link rel="manifest" href="/manifest.json">',
+      `<script>KOISHI_CONFIG = ${JSON.stringify({
+        static: true,
+        uiPath: '/',
+        endpoint: 'https://registry.koishi.chat',
+        title: 'Koishi Online',
+      })}</script>`,
+    ].map(line => '\n    ' + line)
+    return template.replace('</title>', '</title>' + headInjection)
   },
 }
 

@@ -1,0 +1,17 @@
+{
+  "lang": "zh-cn",
+  "name": "Koishi",
+  "short_name": "Koishi",
+  "description": "现代、高效的跨平台机器人框架",
+  "start_url": "/",
+  "background_color": "#202225",
+  "theme_color": "#202225",
+  "orientation": "any",
+  "display": "standalone",
+  "icons": [
+    {
+      "src": "/koishi.png",
+      "sizes": "384x384"
+    }
+  ]
+}
