@@ -52,7 +52,7 @@ const browserEntries = {
 router.get('(/.+)*/sql-wasm.wasm', async (ctx) => {
   const filename = require.resolve('@minatojs/sql.js/dist/sql-wasm.wasm')
   ctx.body = createReadStream(filename)
-  ctx.type = 'application/octet-stream'
+  ctx.type = 'application/wasm'
 })
 
 router.get('/modules(/.+)+/index.js', async (ctx) => {
@@ -118,6 +118,8 @@ async function createVite() {
         'rollup-plugin-node-polyfills/polyfills/path',
         'marked',
         'xss',
+        'semver',
+        'spark-md5',
       ],
     },
     build: {

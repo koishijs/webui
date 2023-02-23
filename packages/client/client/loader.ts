@@ -41,7 +41,6 @@ export const progress = ref(0)
 
 function notify() {
   const results = Object.values(extensions)
-  console.log(results.filter(({ done }) => done).length, results.length)
   progress.value = results.filter(({ done }) => done).length / results.length
 }
 
@@ -54,7 +53,6 @@ export function queue(key: string, callback: (key: string) => Promise<any>, isEx
   })
   if (!extensions[key]) {
     extensions[key] = result
-    console.log(key)
     notify()
   }
   return task

@@ -27,7 +27,7 @@
   "devDependencies": {
     "@koishijs/client": "^5.5.0",
     "@koishijs/loader": "^3.0.1",
-    "fsa-browserify": "^1.2.2"
+    "fsa-browserify": "^1.2.3"
   },
   "yakumo": {
     "client": "./scripts/build"

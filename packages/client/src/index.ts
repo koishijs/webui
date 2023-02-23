@@ -6,6 +6,12 @@ import vue from '@vitejs/plugin-vue'
 export async function buildExtension(root: string, config: UserConfig = {}) {
   if (!existsSync(root + '/client')) return
 
+  const outDir = root + '/dist'
+  if (existsSync(outDir)) {
+    await fsp.rm(outDir, { recursive: true })
+  }
+  await fsp.mkdir(root + '/dist', { recursive: true })
+
   const results = await build(mergeConfig({
     root,
     build: {
