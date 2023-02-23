@@ -1,13 +1,16 @@
 <template>
   <k-layout :main="`darker page-home${socket ? '' : ' loading'}`">
-    <el-scrollbar v-if="socket">
+    <k-card v-if="global.unsupported">
+      <p v-for="(line, index) in global.unsupported" :key="index">{{ line }}</p>
+    </k-card>
+    <el-scrollbar v-else-if="socket">
       <welcome></welcome>
       <k-slot name="home"></k-slot>
       <k-slot name="numeric" class="card-grid profile-grid"></k-slot>
       <k-slot name="chart" class="card-grid chart-grid"></k-slot>
     </el-scrollbar>
     <div v-else>
-      <k-card class="connect">{{ global.messages?.unsupported || global.messages?.connecting || '正在连接到 Koishi 服务器……' }}</k-card>
+      <k-card class="connect">{{ global.messages?.connecting || '正在连接到 Koishi 服务器……' }}</k-card>
     </div>
   </k-layout>
 </template>
@@ -42,6 +45,11 @@ import Welcome from './welcome.vue'
     width: 400px;
     max-width: 400px;
     text-align: center;
+    line-height: 2;
+
+    p {
+      margin: 0;
+    }
   }
 }
 

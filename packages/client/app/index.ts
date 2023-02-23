@@ -9,6 +9,7 @@ import './index.scss'
 declare module '@koishijs/plugin-console' {
   export interface ClientConfig {
     messages?: Dict<string>
+    unsupported?: string[]
   }
 }
 
@@ -38,12 +39,6 @@ root.page({
 })
 
 app.use(router)
-
-router.afterEach((route) => {
-  if (route.meta.activity) {
-    document.title = `${route.meta.activity.name} | ${global.messages?.title || 'Koishi 控制台'}`
-  }
-})
 
 app.mount('#app')
 

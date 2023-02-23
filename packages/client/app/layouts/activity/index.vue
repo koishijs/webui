@@ -14,8 +14,8 @@
 import { computed } from 'vue'
 import { useWindowSize } from '@vueuse/core'
 import { activities, Activity } from '@koishijs/client'
-import ActivityItem from './activity-item.vue'
-import ActivityGroup from './activity-group.vue'
+import ActivityItem from './item.vue'
+import ActivityGroup from './group.vue'
 
 const { height, width } = useWindowSize()
 

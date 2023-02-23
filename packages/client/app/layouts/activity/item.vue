@@ -16,11 +16,12 @@
 <script lang="ts" setup>
 
 import { computed } from 'vue'
-import { Activity, routeCache } from './utils'
+import { Activity, routeCache } from '../utils'
+import { Placement } from 'element-plus'
 
 const props = defineProps<{
   data: Activity,
-  placement: string,
+  placement: Placement,
 }>()
 
 const target = computed(() => {
