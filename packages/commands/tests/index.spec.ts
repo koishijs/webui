@@ -12,6 +12,7 @@ app.plugin(mock)
 const client = app.mock.client('123')
 
 before(() => app.start())
+after(() => app.stop())
 
 describe('@koishijs/plugin-commands', () => {
   describe('basic usage', () => {
