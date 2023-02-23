@@ -7,14 +7,14 @@
       <k-slot name="chart" class="card-grid chart-grid"></k-slot>
     </el-scrollbar>
     <div v-else>
-      <k-card class="connect">正在连接到 Koishi 服务器……</k-card>
+      <k-card class="connect">{{ global.messages?.unsupported || global.messages?.connecting || '正在连接到 Koishi 服务器……' }}</k-card>
     </div>
   </k-layout>
 </template>
 
 <script lang="ts" setup>
 
-import { socket } from '@koishijs/client'
+import { global, socket } from '@koishijs/client'
 import Welcome from './welcome.vue'
 
 </script>

@@ -1,10 +1,16 @@
 import { createApp } from 'vue'
 import { useDark } from '@vueuse/core'
-import client, { connect, global, root, router } from '@koishijs/client'
+import client, { connect, Dict, global, root, router } from '@koishijs/client'
 import App from './layouts/index.vue'
 import Home from './layouts/home.vue'
 
 import './index.scss'
+
+declare module '@koishijs/plugin-console' {
+  export interface ClientConfig {
+    messages?: Dict<string>
+  }
+}
 
 const app = createApp(App)
 
@@ -35,7 +41,7 @@ app.use(router)
 
 router.afterEach((route) => {
   if (route.meta.activity) {
-    document.title = `${route.meta.activity.name} | ${global.title || 'Koishi 控制台'}`
+    document.title = `${route.meta.activity.name} | ${global.messages?.title || 'Koishi 控制台'}`
   }
 })
 

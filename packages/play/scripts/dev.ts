@@ -73,7 +73,6 @@ async function transformHtml(template: string) {
     devMode: true,
     uiPath,
     endpoint: '',
-    title: 'Koishi Online',
   })}</script>`
   return template.replace('</title>', '</title>' + headInjection)
 }
