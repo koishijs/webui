@@ -1,6 +1,5 @@
 import { Context, Dict, Schema, version } from 'koishi'
 import { DataService } from '@koishijs/plugin-console'
-import { resolve } from 'path'
 import { helpers } from 'envinfo'
 import which from 'which-pm-runs'
 
@@ -11,11 +10,6 @@ class EnvInfoProvider extends DataService<Dict<Dict<string>>> {
 
   constructor(ctx: Context, public config: EnvInfoProvider.Config) {
     super(ctx, 'envinfo', { authority: 4 })
-
-    ctx.console.addEntry({
-      dev: resolve(__dirname, '../client/index.ts'),
-      prod: resolve(__dirname, '../dist'),
-    })
   }
 
   async _get(): Promise<Dict<Dict<string>>> {
