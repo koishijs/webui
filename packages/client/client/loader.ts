@@ -24,9 +24,7 @@ const loaders: Dict<(path: string) => Promise<Disposable>> = {
   },
   async [``](path) {
     const exports = await import(/* @vite-ignore */ path)
-    const fork = root.plugin((ctx) => {
-      exports.default(ctx)
-    })
+    const fork = root.plugin(exports.default)
     return fork.dispose
   },
 }
