@@ -6,8 +6,8 @@
       <template v-if="local.workspace">工作区</template>
       <template v-else>
         {{ local.resolved }}
-        <template v-if="!local.invalid">
-          ({{ gt(local.latest, local.resolved) ? '可更新' : '最新' }})
+        <template v-if="compare">
+          ({{ compare }})
         </template>
       </template>
     </td>
@@ -45,6 +45,13 @@ const props = defineProps({
 
 const local = computed(() => {
   return store.dependencies[props.name]
+})
+
+const compare = computed(() => {
+  if (local.value.invalid) return
+  try {
+    return gt(local.value.latest, local.value.resolved) ? '可更新' : '最新'
+  } catch {}
 })
 
 const version = computed({

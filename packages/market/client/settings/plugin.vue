@@ -138,7 +138,9 @@ const hint = computed(() => local.value.workspace ? '，请检查源代码' : '�
 
 const hasUpdate = computed(() => {
   if (!remote.value?.versions || local.value.workspace) return
-  return gt(remote.value.version, local.value.version)
+  try {
+    return gt(remote.value.version, local.value.version)
+  } catch {}
 })
 
 function gotoMarket() {
