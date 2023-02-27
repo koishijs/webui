@@ -58,7 +58,7 @@ export class ConfigWriter extends DataService<Context.Config> {
     this.plugins = ctx.loader.config.plugins
 
     ctx.console.addListener('manager/app-reload', (config) => {
-      this.reloadApp(config)
+      return this.reloadApp(config)
     }, { authority: 4 })
 
     for (const key of ['teleport', 'reload', 'unload', 'remove', 'group', 'meta', 'alias'] as const) {
@@ -77,7 +77,7 @@ export class ConfigWriter extends DataService<Context.Config> {
 
       // handle plugin groups
       if (name === 'group') {
-        const fork = ctx.state[Loader.kRecord][key]
+        const fork = ctx.scope[Loader.kRecord][key]
         result[key] = this.getGroup(value, fork.ctx)
       }
     }
@@ -90,10 +90,10 @@ export class ConfigWriter extends DataService<Context.Config> {
     return result
   }
 
-  reloadApp(config: any) {
+  async reloadApp(config: any) {
     this.loader.config = config
     this.loader.config.plugins = this.plugins
-    this.loader.writeConfig()
+    await this.loader.writeConfig()
     this.loader.fullReload()
   }
 
@@ -103,13 +103,13 @@ export class ConfigWriter extends DataService<Context.Config> {
     let ctx = this.loader.entry
     let name = segments.shift()
     while (segments.length) {
-      ctx = ctx.state[Loader.kRecord][name].ctx
+      ctx = ctx.scope[Loader.kRecord][name].ctx
       name = segments.shift()
     }
-    return [ctx.state, name] as const
+    return [ctx.scope, name] as const
   }
 
-  alias(path: string, alias: string) {
+  async alias(path: string, alias: string) {
     const [parent, oldKey] = this.resolve(path)
     let config: any
     let newKey = oldKey.split(':', 1)[0] + (alias ? ':' : '') + alias
@@ -126,10 +126,10 @@ export class ConfigWriter extends DataService<Context.Config> {
       config = parent.config['~' + oldKey]
     }
     rename(parent.config, oldKey, newKey, config)
-    this.loader.writeConfig()
+    await this.loader.writeConfig()
   }
 
-  meta(path: string, config: any) {
+  async meta(path: string, config: any) {
     const [parent, name] = this.resolve(path)
     const target = path ? parent.config[name] : parent.config
     for (const key of Object.keys(config)) {
@@ -139,7 +139,7 @@ export class ConfigWriter extends DataService<Context.Config> {
       }
     }
     insertKey(target, config, Object.keys(target))
-    this.loader.writeConfig()
+    await this.loader.writeConfig()
   }
 
   async reload(path: string, config: any, newKey?: string) {
@@ -149,36 +149,32 @@ export class ConfigWriter extends DataService<Context.Config> {
     }
     await this.loader.reloadPlugin(parent.ctx, newKey || oldKey, config)
     rename(parent.config, oldKey, newKey || oldKey, config)
-    this.loader.writeConfig()
-    this.refresh()
+    await this.loader.writeConfig()
   }
 
-  unload(path: string, config = {}, newKey?: string) {
+  async unload(path: string, config = {}, newKey?: string) {
     const [parent, oldKey] = this.resolve(path)
     this.loader.unloadPlugin(parent.ctx, oldKey)
     rename(parent.config, oldKey, '~' + (newKey || oldKey), config)
-    this.loader.writeConfig()
-    this.refresh()
+    await this.loader.writeConfig()
   }
 
-  remove(path: string) {
+  async remove(path: string) {
     const [parent, key] = this.resolve(path)
     this.loader.unloadPlugin(parent.ctx, key)
     delete parent.config[key]
     delete parent.config['~' + key]
-    this.loader.writeConfig()
-    this.refresh()
+    await this.loader.writeConfig()
   }
 
   async group(path: string) {
     const [parent, oldKey] = this.resolve(path)
     const config = parent.config[oldKey] = {}
     await this.loader.reloadPlugin(parent.ctx, oldKey, config)
-    this.loader.writeConfig()
-    this.refresh()
+    await this.loader.writeConfig()
   }
 
-  teleport(source: string, target: string, index: number) {
+  async teleport(source: string, target: string, index: number) {
     const [parentS, oldKey] = this.resolve(source)
     const [parentT] = this.resolve(target ? target + '/' : '')
 
@@ -201,6 +197,6 @@ export class ConfigWriter extends DataService<Context.Config> {
     const temp = dropKey(parentS.config, oldKey)
     const rest = Object.keys(parentT.config).slice(index)
     insertKey(parentT.config, temp, rest)
-    this.loader.writeConfig()
+    await this.loader.writeConfig()
   }
 }
