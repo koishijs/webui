@@ -9,7 +9,7 @@ icons.register('globe', Globe)
 
 export default (ctx: Context) => {
   ctx.page({
-    path: '/locales',
+    path: '/locales/:path*',
     name: '本地化',
     icon: 'activity:locales',
     order: 500,

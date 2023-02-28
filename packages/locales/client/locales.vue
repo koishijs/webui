@@ -30,7 +30,7 @@
         </div>
         <el-tree
           ref="tree"
-          :data="data"
+          :data="data.data"
           :props="{ class: getClass }"
           :filter-node-method="filterNode"
           :default-expand-all="true"
@@ -40,8 +40,8 @@
       </el-scrollbar>
     </template>
 
-    <k-content>
-      <template v-for="path in activePaths" :key="path">
+    <k-content v-if="active">
+      <template v-for="path in data.map[active]" :key="path">
         <h3>{{ path }}</h3>
         <div class="translation" v-for="locale in displayLocales" :key="locale">
           <span class="locale">{{ locale }}</span>
@@ -55,22 +55,39 @@
         </div>
       </template>
     </k-content>
+    <k-empty v-else>
+      <div>请在左侧选择类别</div>
+    </k-empty>
   </k-layout>
 </template>
 
 <script lang="ts" setup>
 
-import { send, store } from '@koishijs/client'
+import { useRoute, useRouter } from 'vue-router'
+import { Dict, send, store } from '@koishijs/client'
 import { computed, ref, watch } from 'vue'
 import { debounce } from 'throttle-debounce'
 
+const route = useRoute()
+const router = useRouter()
+
 const displayLocales = ref(['zh', 'en'])
 const tree = ref(null)
-const active = ref('')
 const keyword = ref('')
 
 watch(keyword, (val) => {
   tree.value.filter(val)
+})
+
+const active = computed<string>({
+  get() {
+    const name = route.path.slice(9).replace(/\//, '.')
+    return name in data.value.map ? name : ''
+  },
+  set(name) {
+    if (!(name in data.value.map)) name = ''
+    router.replace('/locales/' + name.replace(/\./, '/'))
+  },
 })
 
 function filterNode(value: string, data: Tree) {
@@ -96,13 +113,6 @@ const paths = computed(() => {
   return Object.keys(result).filter(path => !path.includes('._') && !path.includes('@'))
 })
 
-const activePaths = computed(() => {
-  return paths.value
-    .filter(path => path.startsWith(active.value + '.'))
-    .map(path => path.slice(active.value.length + 1))
-    .filter(path => active.value.split('.').length >= 2 || !path.includes('.'))
-})
-
 interface Tree {
   id: string
   label: string
@@ -110,23 +120,27 @@ interface Tree {
 }
 
 const data = computed(() => {
-  const result: Tree[] = []
+  const data: Tree[] = []
+  const map: Dict<string[]> = {}
   for (const path of paths.value) {
     const parts = path.split('.')
-    let node = result
-    for (let i = 0; i < Math.min(parts.length - 1, 2); i++) {
+    let children = data
+    const depth = Math.min(parts.length - 1, 2)
+    for (let i = 0; i < depth; i++) {
       const label = parts[i]
       if (!label) break
       const id = parts.slice(0, i + 1).join('.')
-      let child = node.find(item => item.id === id)
+      let child = children.find(item => item.id === id)
       if (!child) {
         child = { id, label }
-        node.push(child)
+        children.push(child)
+        map[id] = []
       }
-      node = child.children ??= []
+      children = child.children ??= []
     }
+    map[parts.slice(0, depth).join('.')].push(parts.slice(depth).join('.'))
   }
-  return result
+  return { data, map }
 })
 
 const update = debounce(1000, () => {
