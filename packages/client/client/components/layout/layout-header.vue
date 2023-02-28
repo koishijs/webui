@@ -24,8 +24,6 @@ import { isLeftAsideOpen } from './utils'
 
 <style lang="scss">
 
-@import '../style.scss';
-
 .toggle-sidebar-button {
   position: absolute;
   top: 0;

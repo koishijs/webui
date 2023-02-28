@@ -126,7 +126,6 @@ onActivated(async () => {
 .plugin-tree {
   width: 100%;
   height: 100%;
-  border-right: 1px solid var(--border);
   overflow: auto;
 
   .el-scrollbar__view {
@@ -146,39 +145,13 @@ onActivated(async () => {
     color: var(--fg3t);
   }
 
-  .el-tree {
-    margin-top: 0.5rem;
-    user-select: none;
-  }
-
-  .el-tree-node__expand-icon {
-    margin-left: 8px;
-  }
-
   .el-tree-node {
     &.is-group > .el-tree-node__content {
       font-weight: bold;
     }
-
-    &:focus:not(:hover) > .el-tree-node__content {
-      background-color: unset;
-    }
-
-    &.is-disabled > .el-tree-node__content .label {
-      color: var(--fg3t);
-    }
-
-    &.is-active > .el-tree-node__content {
-      background-color: var(--hover-bg);
-      color: var(--active);
-    }
   }
 
   .el-tree-node__content {
-    line-height: 2.25rem;
-    height: 2.25rem;
-    transition: var(--color-transition);
-
     .item {
       flex: 1;
       height: 100%;
@@ -214,17 +187,6 @@ onActivated(async () => {
         }
       }
     }
-
-    &:hover {
-      background-color: var(--hover-bg);
-      .right > .button {
-        opacity: 0.75;
-      }
-    }
-  }
-
-  .el-tree-node__label {
-    font-size: 16px;
   }
 }
 

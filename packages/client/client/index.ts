@@ -7,6 +7,8 @@ import Overlay from './components/chat/overlay.vue'
 import { initTask } from './loader'
 import { Context } from './context'
 
+import './styles/index.scss'
+
 export * from './activity'
 export * from './components'
 export * from './context'
