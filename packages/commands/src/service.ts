@@ -1,6 +1,6 @@
 import { DataService } from '@koishijs/plugin-console'
 import { debounce } from 'throttle-debounce'
-import { Command, Context } from 'koishi'
+import { Command, Context, EffectScope } from 'koishi'
 import { resolve } from 'path'
 
 declare module '@koishijs/plugin-console' {
@@ -13,12 +13,33 @@ declare module '@koishijs/plugin-console' {
 
 export interface CommandData extends Command.Config {
   name: string
+  paths: string[]
   aliases: string[]
   children: CommandData[]
 }
 
+function findAncestors(scope: EffectScope): string[] {
+  if (scope.runtime === scope) {
+    return [].concat(...scope.runtime.children.map(findAncestors))
+  }
+  const segments: string[] = []
+  while (true) {
+    const child = scope
+    scope = scope.parent.scope
+    if (scope === child) break
+    const record = scope[Symbol.for('koishi.loader.record')]
+    if (!record) continue
+    const entry = Object.entries(record).find(([, value]) => value === child)
+    if (!entry) return []
+    segments.unshift(entry[0])
+  }
+  // slice leading group entry
+  return [segments.slice(1).join('/')]
+}
+
 function traverse(command: Command): CommandData {
   return {
+    paths: findAncestors(command.ctx.scope),
     name: command.name,
     aliases: command._aliases,
     children: command.children.map(traverse),
