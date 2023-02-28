@@ -1,10 +1,6 @@
 import { computed } from 'vue'
-import { Dict, Schema, store } from '@koishijs/client'
+import { Dict, store } from '@koishijs/client'
 import { CommandData } from '@koishijs/plugin-commands'
-
-export const commandSchema = computed(() => {
-  return new Schema(store.schema['command'])
-})
 
 function getCommands(data: CommandData[]) {
   const result: CommandData[] = []

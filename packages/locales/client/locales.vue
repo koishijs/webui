@@ -41,6 +41,8 @@
     </template>
 
     <k-content v-if="active">
+      <k-slot name="locale-main" :data="{ active }"></k-slot>
+
       <template v-for="path in data.map[active]" :key="path">
         <h3>{{ path }}</h3>
         <div class="translation" v-for="locale in displayLocales" :key="locale">

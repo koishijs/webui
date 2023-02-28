@@ -1,6 +1,6 @@
 import { DataService } from '@koishijs/plugin-console'
 import { debounce } from 'throttle-debounce'
-import { Command, Context, EffectScope } from 'koishi'
+import { Argv, Command, Context, EffectScope } from 'koishi'
 import { resolve } from 'path'
 
 declare module '@koishijs/plugin-console' {
@@ -16,6 +16,7 @@ export interface CommandData extends Command.Config {
   paths: string[]
   aliases: string[]
   children: CommandData[]
+  options: Argv.OptionDeclarationMap
 }
 
 function findAncestors(scope: EffectScope): string[] {
@@ -43,6 +44,7 @@ function traverse(command: Command): CommandData {
     name: command.name,
     aliases: command._aliases,
     children: command.children.map(traverse),
+    options: command._options,
     ...command.config,
   }
 }
