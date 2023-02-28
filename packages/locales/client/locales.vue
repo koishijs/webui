@@ -151,36 +151,10 @@ function handleUpdate(locale: string, path: string, value: string) {
 .page-locales {
   .layout-left .el-scrollbar__view {
     padding: 1rem 0;
-    line-height: 2.25rem;
   }
 
   .search {
     padding: 0 1.5rem;
-  }
-
-  .el-tree-node__expand-icon {
-    margin-left: 8px;
-  }
-
-  .el-tree-node {
-    &.is-active > .el-tree-node__content {
-      background-color: var(--hover-bg);
-      color: var(--active);
-    }
-  }
-
-  .el-tree-node__content {
-    line-height: 2.25rem;
-    height: 2.25rem;
-    transition: var(--color-transition);
-
-    &:hover {
-      background-color: var(--hover-bg);
-    }
-  }
-
-  .el-tree-node__label {
-    font-size: 16px;
   }
 
   .translation {
