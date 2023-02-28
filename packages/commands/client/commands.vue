@@ -1,5 +1,9 @@
 <template>
   <k-layout>
+    <template #header>
+      指令管理{{ active ? ' - ' + active : '' }}
+    </template>
+
     <template #left>
       <el-scrollbar class="command-tree">
         <div class="search">
@@ -19,24 +23,42 @@
       </el-scrollbar>
     </template>
 
-    <k-content>
+    <k-content v-if="active">
       <p>{{ active }}</p>
     </k-content>
+    <k-empty v-else>
+      <div>请在左侧选择指令</div>
+    </k-empty>
   </k-layout>
 </template>
 
 <script lang="ts" setup>
 
 import { store } from '@koishijs/client'
-import { ref, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import { computed, ref, watch } from 'vue'
 import { CommandData } from '@koishijs/plugin-commands'
+import { commands } from './utils'
+
+const route = useRoute()
+const router = useRouter()
 
 const tree = ref(null)
-const active = ref('')
 const keyword = ref('')
 
 watch(keyword, (val) => {
   tree.value.filter(val)
+})
+
+const active = computed<string>({
+  get() {
+    const name = route.path.slice(10).replace(/\//, '.')
+    return name in commands.value ? name : ''
+  },
+  set(name) {
+    if (!(name in commands.value)) name = ''
+    router.replace('/commands/' + name.replace(/\./, '/'))
+  },
 })
 
 function filterNode(value: string, data: CommandData) {

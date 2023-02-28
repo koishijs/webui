@@ -1,7 +1,7 @@
 <template>
   <k-layout class="page-locales">
     <template #header>
-      本地化 - {{ active }}
+      本地化{{ active ? ' - ' + active : '' }}
     </template>
 
     <template #menu>

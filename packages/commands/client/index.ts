@@ -8,7 +8,7 @@ icons.register('activity:commands', Activity)
 
 export default (ctx: Context) => {
   ctx.page({
-    path: '/commands',
+    path: '/commands/:name*',
     name: '指令管理',
     icon: 'activity:commands',
     order: 500,
