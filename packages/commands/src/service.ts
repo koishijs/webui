@@ -1,8 +1,8 @@
 import { DataService } from '@koishijs/plugin-console'
 import { debounce } from 'throttle-debounce'
-import { Argv, Command, Context, Dict, EffectScope } from 'koishi'
+import { Command, Context, EffectScope } from 'koishi'
 import { resolve } from 'path'
-import { Snapshot } from '.'
+import { CommandManager, CommandState } from '.'
 
 declare module '@koishijs/plugin-console' {
   namespace Console {
@@ -12,7 +12,7 @@ declare module '@koishijs/plugin-console' {
   }
 
   interface Events {
-    'command/config'(name: string, config: Command.Config): void
+    'command/update'(name: string, config: CommandState): void
   }
 }
 
@@ -21,9 +21,8 @@ export interface CommandData {
   paths: string[]
   aliases: string[]
   children: CommandData[]
-  options: Argv.OptionDeclarationMap
-  config: Command.Config
-  initial: Command.Config
+  initial: CommandState
+  override: CommandState
 }
 
 function findAncestors(scope: EffectScope): string[] {
@@ -51,7 +50,7 @@ export default class CommandProvider extends DataService<CommandData[]> {
   cached: CommandData[]
   update = debounce(0, () => this.refresh())
 
-  constructor(ctx: Context, private snapshots: Dict<Snapshot>) {
+  constructor(ctx: Context, private manager: CommandManager) {
     super(ctx, 'commands', { authority: 4 })
 
     ctx.on('command-added', this.update)
@@ -63,8 +62,9 @@ export default class CommandProvider extends DataService<CommandData[]> {
       prod: resolve(__dirname, '../dist'),
     })
 
-    ctx.console.addListener('command/config', (name: string, config: Command.Config) => {
-      console.log('update', name, config)
+    ctx.console.addListener('command/update', (name: string, config: CommandState) => {
+      manager.update(name, config, true)
+      this.refresh()
     })
   }
 
@@ -80,9 +80,8 @@ export default class CommandProvider extends DataService<CommandData[]> {
       name: command.name,
       aliases: command._aliases,
       children: this.traverse(command.children),
-      options: command._options,
-      config: command.config,
-      initial: this.snapshots[command.name]?.config,
+      initial: this.manager.snapshots[command.name]?.initial || { config: command.config, options: command._options },
+      override: this.manager.snapshots[command.name]?.override || { config: null, options: {} },
     }))
   }
 }

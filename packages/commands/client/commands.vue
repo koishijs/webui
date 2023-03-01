@@ -5,7 +5,7 @@
     </template>
 
     <template #menu>
-      <span class="menu-item" @click.stop.prevent="send('command/config', current.name, current.config)">
+      <span class="menu-item" @click.stop.prevent="send('command/update', command.name, current)">
         <k-icon class="menu-icon" name="check"></k-icon>
       </span>
     </template>
@@ -33,8 +33,8 @@
       <div class="navigation">
         <router-link
           class="k-button"
-          v-if="store.config && store.packages && initial.paths.length"
-          :to="'/plugins/' + initial.paths[0].replace(/\./, '/')"
+          v-if="store.config && store.packages && command.paths.length"
+          :to="'/plugins/' + command.paths[0].replace(/\./, '/')"
         >前往插件</router-link>
         <router-link
           class="k-button"
@@ -43,24 +43,25 @@
         >前往本地化</router-link>
       </div>
 
-      {{ initial }}
+      {{ current }}
 
       <k-form
-        :schema="commandSchema"
-        :initial="initial.config"
+        :schema="schema.config"
+        :initial="command.override.config"
         v-model="current.config"
       ></k-form>
 
-      <template v-for="(option, key) in initial.options" :key="key">
+      <template v-for="(option, key) in command.initial.options" :key="key">
         <k-form
-          :schema="store.schema['command-option']"
-          :initial="option"
+          :schema="schema.options[key]"
+          :initial="command.override.options[key]"
           v-model="current.options[key]"
         >
           <template #title>{{ option.syntax }}</template>
         </k-form>
       </template>
     </k-content>
+
     <k-empty v-else>
       <div>请在左侧选择指令</div>
     </k-empty>
@@ -69,10 +70,10 @@
 
 <script lang="ts" setup>
 
-import { clone, send, store } from '@koishijs/client'
+import { clone, Dict, Schema, send, store, valueMap } from '@koishijs/client'
 import { useRoute, useRouter } from 'vue-router'
 import { computed, ref, watch } from 'vue'
-import { CommandData } from '@koishijs/plugin-commands'
+import { CommandData, CommandState } from '@koishijs/plugin-commands'
 import {} from '@koishijs/plugin-locales'
 import {} from '@koishijs/plugin-market'
 import { commands, createSchema } from './utils'
@@ -82,7 +83,11 @@ const router = useRouter()
 
 const tree = ref(null)
 const keyword = ref('')
-const current = ref<CommandData>()
+const current = ref<CommandState>()
+const schema = ref<{
+  config: Schema
+  options: Dict<Schema>
+}>()
 
 watch(keyword, (val) => {
   tree.value.filter(val)
@@ -99,11 +104,16 @@ const active = computed<string>({
   },
 })
 
-const initial = computed(() => commands.value[active.value])
-const commandSchema = computed(() => createSchema('command', initial.value.initial))
+const command = computed(() => commands.value[active.value])
 
-watch(initial, (value) => {
-  current.value = clone(value)
+watch(command, (value) => {
+  if (!value) return
+  const { initial, override } = value
+  schema.value = {
+    config: createSchema('command', initial.config),
+    options: valueMap(initial.options, (_, key) => createSchema('command-option', initial.options[key])),
+  }
+  current.value = clone(override)
 }, { immediate: true })
 
 function filterNode(value: string, data: CommandData) {
