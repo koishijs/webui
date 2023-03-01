@@ -1,11 +1,13 @@
 import { Context, icons } from '@koishijs/client'
 import {} from '@koishijs/plugin-commands'
 import Activity from './icons/activity.vue'
+import Check from './icons/check.vue'
 import Commands from './commands.vue'
 import Locales from './locales.vue'
 import Settings from './settings.vue'
 
 icons.register('activity:commands', Activity)
+icons.register('check', Check)
 
 export default (ctx: Context) => {
   ctx.page({

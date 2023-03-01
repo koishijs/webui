@@ -1,7 +1,8 @@
 import { DataService } from '@koishijs/plugin-console'
 import { debounce } from 'throttle-debounce'
-import { Argv, Command, Context, EffectScope } from 'koishi'
+import { Argv, Command, Context, Dict, EffectScope } from 'koishi'
 import { resolve } from 'path'
+import { Snapshot } from '.'
 
 declare module '@koishijs/plugin-console' {
   namespace Console {
@@ -9,14 +10,20 @@ declare module '@koishijs/plugin-console' {
       commands: CommandProvider
     }
   }
+
+  interface Events {
+    'command/config'(name: string, config: Command.Config): void
+  }
 }
 
-export interface CommandData extends Command.Config {
+export interface CommandData {
   name: string
   paths: string[]
   aliases: string[]
   children: CommandData[]
   options: Argv.OptionDeclarationMap
+  config: Command.Config
+  initial: Command.Config
 }
 
 function findAncestors(scope: EffectScope): string[] {
@@ -38,24 +45,13 @@ function findAncestors(scope: EffectScope): string[] {
   return [segments.slice(1).join('/')]
 }
 
-function traverse(command: Command): CommandData {
-  return {
-    paths: findAncestors(command.ctx.scope),
-    name: command.name,
-    aliases: command._aliases,
-    children: command.children.map(traverse),
-    options: command._options,
-    ...command.config,
-  }
-}
-
 export default class CommandProvider extends DataService<CommandData[]> {
   static using = ['console'] as const
 
   cached: CommandData[]
   update = debounce(0, () => this.refresh())
 
-  constructor(ctx: Context) {
+  constructor(ctx: Context, private snapshots: Dict<Snapshot>) {
     super(ctx, 'commands', { authority: 4 })
 
     ctx.on('command-added', this.update)
@@ -66,11 +62,27 @@ export default class CommandProvider extends DataService<CommandData[]> {
       dev: resolve(__dirname, '../client/index.ts'),
       prod: resolve(__dirname, '../dist'),
     })
+
+    ctx.console.addListener('command/config', (name: string, config: Command.Config) => {
+      console.log('update', name, config)
+    })
   }
 
   async get(forced = false) {
     if (this.cached && !forced) return this.cached
-    this.cached = this.ctx.$commander._commandList.filter(cmd => !cmd.parent).map(traverse)
+    this.cached = this.traverse(this.ctx.$commander._commandList.filter(cmd => !cmd.parent))
     return this.cached
+  }
+
+  traverse(commands: Command[]): CommandData[] {
+    return commands.map((command) => ({
+      paths: findAncestors(command.ctx.scope),
+      name: command.name,
+      aliases: command._aliases,
+      children: this.traverse(command.children),
+      options: command._options,
+      config: command.config,
+      initial: this.snapshots[command.name]?.config,
+    }))
   }
 }
