@@ -12,15 +12,15 @@ declare module '@koishijs/plugin-console' {
   }
 
   interface Events {
-    'command/update'(name: string, config: CommandState): void
-    'command/rename'(name: string, value: string): void
+    'command/update'(name: string, config: Pick<CommandState, 'config' | 'options'>): void
+    'command/teleport'(name: string, parent: string): void
+    'command/aliases'(name: string, aliases: string[]): void
   }
 }
 
 export interface CommandData {
   name: string
   paths: string[]
-  aliases: string[]
   children: CommandData[]
   initial: CommandState
   override: CommandState
@@ -64,13 +64,20 @@ export default class CommandProvider extends DataService<CommandData[]> {
     })
 
     ctx.console.addListener('command/update', (name: string, config: CommandState) => {
-      manager.update(name, config, true)
+      const { command } = manager.ensure(name)
+      manager.update(command, config, true)
       this.refresh()
     })
 
-    ctx.console.addListener('command/rename', (name: string, value: string) => {
-      const command = ctx.$commander.resolve(name)
-      manager.locate(command, value, true)
+    ctx.console.addListener('command/teleport', (name: string, parent: string) => {
+      const { command } = manager.ensure(name)
+      manager.teleport(command, parent, true)
+      this.refresh()
+    })
+
+    ctx.console.addListener('command/aliases', (name: string, aliases: string[]) => {
+      const { command } = manager.ensure(name)
+      manager.alias(command, aliases, true)
       this.refresh()
     })
   }
@@ -85,10 +92,9 @@ export default class CommandProvider extends DataService<CommandData[]> {
     return commands.map((command) => ({
       paths: findAncestors(command.ctx.scope),
       name: command.name,
-      aliases: command._aliases,
       children: this.traverse(command.children),
-      initial: this.manager.snapshots[command.name]?.initial || { config: command.config, options: command._options },
-      override: this.manager.snapshots[command.name]?.override || { config: null, options: {} },
+      initial: this.manager.snapshots[command.name]?.initial || { aliases: command._aliases, config: command.config, options: command._options },
+      override: this.manager.snapshots[command.name]?.override || { aliases: command._aliases, config: null, options: {} },
     })).sort((a, b) => a.name.localeCompare(b.name))
   }
 }
