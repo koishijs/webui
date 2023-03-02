@@ -23,7 +23,7 @@ export default (ctx: Context) => {
   ctx.slot({
     type: 'market-settings',
     component: Settings,
-    order: 2000,
+    order: 500,
   })
 
   ctx.slot({

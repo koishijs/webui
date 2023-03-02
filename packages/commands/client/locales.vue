@@ -1,8 +1,8 @@
 <template>
-  <div v-if="active.startsWith('commands.') && store.commands" class="navigation">
+  <div v-if="data.active.startsWith('commands.') && store.commands" class="navigation">
     <router-link
       class="k-button"
-      :to="'/commands/' + active.slice(9).replace(/\./, '/')"
+      :to="'/commands/' + data.active.slice(9).replace(/\./, '/')"
     >前往指令</router-link>
   </div>
 </template>
@@ -12,7 +12,7 @@
 import { store } from '@koishijs/client'
 
 defineProps<{
-  active: string
+  data: { active: string }
 }>()
 
 </script>

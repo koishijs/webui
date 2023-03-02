@@ -12,7 +12,7 @@ export default defineComponent({
   setup: ({ name, data, tag }, { slots }) => () => {
     return h(tag, [
       ...slots.default?.() || [],
-      ...(views[name] || []).map(view => h(view.component, data)),
+      ...(views[name] || []).map(view => h(view.component, { data })),
     ])
   },
 })

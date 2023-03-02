@@ -1,8 +1,8 @@
 <template>
   <k-comment type="success" v-if="data.length">
-    <p>此插件提供了下列指令：</p>
-    <ul v-for="item in data" :key="item.name">
-      <li>
+    <p>此插件提供了下列指令 (点击前往指令详情页)：</p>
+    <ul>
+      <li v-for="item in data" :key="item.name">
         <router-link :to="'/commands/' + item.name.replace(/\./g, '/')">{{ item.name }}</router-link>
       </li>
     </ul>

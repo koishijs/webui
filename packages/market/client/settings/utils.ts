@@ -1,6 +1,16 @@
 import { Dict } from 'koishi'
 import { computed } from 'vue'
 import { router, send, store } from '@koishijs/client'
+import { PackageProvider } from '@koishijs/plugin-market'
+import { AnalyzedPackage } from '@koishijs/registry'
+
+export interface SettingsData {
+  name: string
+  local: PackageProvider.Data
+  remote: AnalyzedPackage
+  config: any
+  current: Tree
+}
 
 interface DepInfo {
   required: boolean

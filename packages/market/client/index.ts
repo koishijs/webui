@@ -4,6 +4,9 @@ import type {} from '@koishijs/plugin-market'
 import Install from './deps/install.vue'
 import Dependencies from './deps/index.vue'
 import Settings from './settings/index.vue'
+import SettingsInfo from './settings/slots/info.vue'
+import SettingsModifier from './settings/slots/modifier.vue'
+import SettingsUsage from './settings/slots/usage.vue'
 import Market from './market/index.vue'
 import Select from './market/select.vue'
 import Progress from './market/progress.vue'
@@ -60,6 +63,24 @@ export default (ctx: Context) => {
     order: 750,
     authority: 4,
     component: Market,
+  })
+
+  ctx.slot({
+    type: 'market-settings',
+    component: SettingsInfo,
+    order: 1000,
+  })
+
+  ctx.slot({
+    type: 'market-settings',
+    component: SettingsUsage,
+    order: -500,
+  })
+
+  ctx.slot({
+    type: 'market-settings',
+    component: SettingsModifier,
+    order: -1000,
   })
 
   if (!global.static) {
