@@ -5,18 +5,22 @@ export * from './service'
 
 interface Override {
   name?: string
-  alias?: string[]
+  aliases?: string[]
   create?: boolean
   options?: Dict<Argv.OptionDeclaration>
+  config?: Command.Config
 }
 
 const Override: Schema<Override> = Schema.object({
   name: Schema.string(),
-  alias: Schema.array(String),
+  aliases: Schema.array(String),
   create: Schema.boolean(),
+  options: Schema.dict(null),
+  config: Schema.any(),
 })
 
 export interface CommandState {
+  aliases: string[]
   config: Command.Config
   options: Dict<Argv.OptionDeclaration>
 }
@@ -28,7 +32,7 @@ export interface Snapshot {
   override: CommandState
 }
 
-interface Config extends Override, Command.Config {}
+interface Config extends Override {}
 
 const Config: Schema<string | Config, Config> = Schema.union([
   Override,
@@ -39,7 +43,7 @@ const logger = new Logger('commands')
 
 export class CommandManager {
   static filter = false
-  static chema: Schema<Dict<string | Config>, Dict<Config>> = Schema.dict(Config).hidden()
+  static schema: Schema<Dict<string | Config>, Dict<Config>> = Schema.dict(Config).hidden()
 
   public snapshots: Dict<Snapshot> = {}
 
@@ -67,10 +71,15 @@ export class CommandManager {
 
     ctx.on('dispose', () => {
       for (const key in this.snapshots) {
-        const { name, parent, initial } = this.snapshots[key]
+        const { name, parent, initial, override } = this.snapshots[key]
         const cmd = ctx.$commander.resolve(name)
         cmd.config = initial.config
+        cmd._aliases = initial.aliases
         Object.assign(cmd._options, initial.options)
+        for (const alias of override.aliases) {
+          if (cmd._aliases.includes(alias)) continue
+          ctx.$commander._commands.delete(alias)
+        }
         this.teleport(cmd, parent)
       }
     }, true)
@@ -87,21 +96,69 @@ export class CommandManager {
     parent?.children.push(command)
   }
 
-  locate(command: Command, name: string) {
-    const capture = name.match(/.*(?=[./])/)
-    if (!capture) return name
-    const parent = this.ctx.$commander.resolve(capture[0])
-    if (capture[0] && !parent) {
-      logger.warn('cannot find parent command', capture[0])
-      return
-    }
-    this.teleport(command, parent)
-    const rest = name.slice(capture[0].length)
-    return rest[0] === '.' ? name : rest.slice(1)
+  ensure(command: Command) {
+    return this.snapshots[command.name] ||= {
+      name: command.name,
+      parent: command.parent,
+      initial: {
+        aliases: command._aliases,
+        options: command._options,
+        config: command.config,
+      },
+    } as Snapshot
   }
 
-  update(name: string, override: CommandState, write?: boolean) {
+  locate(command: Command, path: string, write = false) {
+    const capture = path.match(/.*(?=[./])/)
+    let name = path
+    if (capture) {
+      const parent = this.ctx.$commander.resolve(capture[0])
+      if (capture[0] && !parent) {
+        logger.warn('cannot find parent command', capture[0])
+        return
+      }
+      this.teleport(command, parent)
+      const rest = path.slice(capture[0].length)
+      name = rest[0] === '.' ? path : rest.slice(1)
+    }
+    command.displayName = name
+    if (write) {
+      this.config[command.name] ||= {}
+      this.config[command.name].name = path
+      this.write(command)
+    }
+  }
+
+  write(command: Command) {
+    const snapshot = this.ensure(command)
+    const override = this.config[command.name]
+    if (override.config && !Object.keys(override.config).length) {
+      delete override.config
+    }
+    if (override.options && !Object.keys(override.options).length) {
+      delete override.options
+    }
+    if (override.aliases && !override.aliases.length) {
+      delete override.aliases
+    }
+    if (override.name) {
+      const initial = (snapshot.parent?.name || '') + '/' + command.name
+      if (override.name === initial || override.name === command.name) {
+        delete this.config[command.name].name
+      }
+    }
+    if (!Object.keys(override).length) {
+      delete this.config[command.name]
+    }
+    this.ctx.scope.update(this.config, false)
+  }
+
+  update(name: string, override: CommandState, write = false) {
+    // create snapshot for restoration
     const command = this.ctx.$commander.resolve(name)
+    this.ensure(command)
+
+    // override command config
     const { initial } = this.snapshots[name]
     this.snapshots[name].override = override
     command.config = Object.assign({ ...initial.config }, override.config)
@@ -110,49 +167,26 @@ export class CommandManager {
       if (!option) continue
       command._options[key] = Object.assign({ ...initial.options[key] }, override.options[key])
     }
+
+    // update config
     if (write) {
-      const { alias } = this.config[name] || {}
-      this.config[name] = {
-        alias,
-        options: override.options,
-        ...override.config,
-      }
-      this.ctx.scope.update(this.config, false)
+      this.config[command.name] ||= {}
+      this.config[command.name].config = override.config
+      this.config[command.name].options = override.options
+      this.write(command)
     }
   }
 
-  accept(target: Command, config: Config) {
-    const { name, alias = [], options = {}, ...rest } = config
+  accept(target: Command, override: Override) {
+    const { name, aliases = [], options = {}, config = {} } = override
 
-    // create snapshot for restoration
-    this.snapshots[target.name] = {
-      name: target.name,
-      parent: target.parent,
-      initial: {
-        options: target._options,
-        config: target.config,
-      },
-    } as Snapshot
-
-    // override command config
     this.update(target.name, {
       options,
-      config: rest,
+      config,
+      aliases,
     })
 
-    if (name) {
-      const _name = this.locate(target, name)
-      if (!_name) return
-      // directly modify name of prototype
-      target.displayName = _name
-    }
-
-    // cmd.alias() is self-disposable
-    target = Object.create(target)
-    target._disposables = this.ctx.scope.disposables
-    for (const name of alias) {
-      target.alias(name)
-    }
+    if (name) this.locate(target, name)
   }
 }
 

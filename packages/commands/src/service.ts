@@ -13,6 +13,7 @@ declare module '@koishijs/plugin-console' {
 
   interface Events {
     'command/update'(name: string, config: CommandState): void
+    'command/rename'(name: string, value: string): void
   }
 }
 
@@ -66,6 +67,12 @@ export default class CommandProvider extends DataService<CommandData[]> {
       manager.update(name, config, true)
       this.refresh()
     })
+
+    ctx.console.addListener('command/rename', (name: string, value: string) => {
+      const command = ctx.$commander.resolve(name)
+      manager.locate(command, value, true)
+      this.refresh()
+    })
   }
 
   async get(forced = false) {
@@ -82,6 +89,6 @@ export default class CommandProvider extends DataService<CommandData[]> {
       children: this.traverse(command.children),
       initial: this.manager.snapshots[command.name]?.initial || { config: command.config, options: command._options },
       override: this.manager.snapshots[command.name]?.override || { config: null, options: {} },
-    }))
+    })).sort((a, b) => a.name.localeCompare(b.name))
   }
 }

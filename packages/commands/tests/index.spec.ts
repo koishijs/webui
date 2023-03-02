@@ -1,7 +1,7 @@
 import { App } from 'koishi'
 import mock from '@koishijs/plugin-mock'
 import * as help from '@koishijs/plugin-help'
-import * as commands from '@koishijs/plugin-commands'
+import commands from '@koishijs/plugin-commands'
 import { expect } from 'chai'
 
 const app = new App()

@@ -19,12 +19,16 @@
         </div>
         <el-tree
           ref="tree"
+          :draggable="true"
           :data="store.commands"
           :props="{ label: 'name' }"
           :filter-node-method="filterNode"
           :default-expand-all="true"
           :expand-on-click-node="false"
+          :allow-drag="allowDrag"
+          :allow-drop="allowDrop"
           @node-click="handleClick"
+          @node-drop="handleDrop"
         ></el-tree>
       </el-scrollbar>
     </template>
@@ -42,8 +46,6 @@
           :to="'/locales/commands/' + active.replace(/\./, '/')"
         >前往本地化</router-link>
       </div>
-
-      {{ current }}
 
       <k-form
         :schema="schema.config"
@@ -116,12 +118,34 @@ watch(command, (value) => {
   current.value = clone(override)
 }, { immediate: true })
 
+interface Node {
+  label: string
+  data: CommandData
+  parent: Node
+  expanded: boolean
+  isLeaf: boolean
+  childNodes: Node[]
+}
+
 function filterNode(value: string, data: CommandData) {
   return data.name.includes(keyword.value)
 }
 
+function allowDrag(node: Node) {
+  return !node.data.name.includes('.')
+}
+
+function allowDrop(source: Node, target: Node, type: 'inner' | 'prev' | 'next') {
+  return source.parent !== (type === 'inner' ? target : target.parent)
+}
+
 function handleClick(data: CommandData) {
   active.value = data.name
+}
+
+function handleDrop(source: Node, target: Node, position: 'before' | 'after' | 'inner', event: DragEvent) {
+  const parent = position === 'inner' ? target : target.parent
+  send('command/rename', source.data.name, (parent.data.name || '') + '/' + source.data.name)
 }
 
 </script>
