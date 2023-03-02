@@ -41,15 +41,13 @@
     }
   },
   "peerDependencies": {
-    "@koishijs/plugin-console": "^5.5.1",
-    "koishi": "^4.11.7"
+    "@koishijs/plugin-console": "^5.5.3",
+    "koishi": "^4.11.8"
   },
   "devDependencies": {
-    "@koishijs/client": "^5.5.1",
+    "@koishijs/client": "^5.5.3",
     "@types/envinfo": "^7.8.1",
-    "echarts": "^5.4.1",
-    "koishi": "^4.11.7",
-    "vue-echarts": "^6.3.3"
+    "koishi": "^4.11.8"
   },
   "dependencies": {
     "envinfo": "^7.8.1",
