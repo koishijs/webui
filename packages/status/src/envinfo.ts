@@ -9,7 +9,7 @@ class EnvInfoProvider extends DataService<Dict<Dict<string>>> {
   private task: Promise<Dict<Dict<string>>>
 
   constructor(ctx: Context, public config: EnvInfoProvider.Config) {
-    super(ctx, 'envinfo', { authority: 4 })
+    super(ctx, 'envinfo')
   }
 
   async _get(): Promise<Dict<Dict<string>>> {

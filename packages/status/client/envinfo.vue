@@ -1,5 +1,5 @@
 <template>
-  <k-status class="version" @click="copyInfo">
+  <k-status v-if="store.envinfo" class="version" @click="copyInfo">
     Koishi v{{ store.envinfo.koishi.Core }}
     <template #tooltip>
       <div class="section" v-for="(data, key) in store.envinfo">
