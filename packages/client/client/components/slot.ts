@@ -9,10 +9,10 @@ export default defineComponent({
       default: 'div',
     },
   },
-  setup: ({ name, data, tag }, { slots }) => () => {
-    return h(tag, [
+  setup: (props, { slots }) => () => {
+    return h(props.tag, [
       ...slots.default?.() || [],
-      ...(views[name] || []).map(view => h(view.component, { data })),
+      ...(views[props.name] || []).map(view => h(view.component, { data: props.data })),
     ])
   },
 })
