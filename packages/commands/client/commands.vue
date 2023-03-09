@@ -127,12 +127,12 @@ watch(keyword, (val) => {
 
 const active = computed<string>({
   get() {
-    const name = route.path.slice(10).replace(/\//, '.')
+    const name = route.path.slice(10).replace(/\//g, '.')
     return name in commands.value ? name : ''
   },
   set(name) {
     if (!(name in commands.value)) name = ''
-    router.replace('/commands/' + name.replace(/\./, '/'))
+    router.replace('/commands/' + name.replace(/\./g, '/'))
   },
 })
 

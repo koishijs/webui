@@ -17,7 +17,10 @@ import { commands } from './utils'
 const current: any = inject('manager.settings.current')
 
 const data = computed(() => {
-  return Object.values(commands.value).filter(item => item.paths.includes(current.value.path))
+  return Object
+    .values(commands.value)
+    .filter(item => item.paths.includes(current.value.path))
+    .sort((a, b) => a.name.localeCompare(b.name))
 })
 
 </script>

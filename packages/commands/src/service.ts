@@ -26,23 +26,24 @@ export interface CommandData {
   override: CommandState
 }
 
-function findAncestors(scope: EffectScope): string[] {
+function findAncestors(scope: EffectScope, suffix: string[] = []): string[] {
+  // root scope
+  if (scope === scope.parent.scope) {
+    return [suffix.slice(1).join('/')]
+  }
+
+  // runtime scope
   if (scope.runtime === scope) {
-    return [].concat(...scope.runtime.children.map(findAncestors))
+    return [].concat(...scope.runtime.children.map(child => findAncestors(child, suffix)))
   }
-  const segments: string[] = []
-  while (true) {
-    const child = scope
-    scope = scope.parent.scope
-    if (scope === child) break
-    const record = scope[Symbol.for('koishi.loader.record')]
-    if (!record) continue
-    const entry = Object.entries(record).find(([, value]) => value === child)
-    if (!entry) return []
-    segments.unshift(entry[0])
-  }
-  // slice leading group entry
-  return [segments.slice(1).join('/')]
+
+  const child = scope
+  scope = scope.parent.scope
+  const record = scope[Symbol.for('koishi.loader.record')]
+  if (!record) return findAncestors(scope, suffix)
+  const entry = Object.entries(record).find(([, value]) => value === child)
+  if (!entry) return []
+  return findAncestors(scope, [entry[0], ...suffix])
 }
 
 export default class CommandProvider extends DataService<CommandData[]> {
