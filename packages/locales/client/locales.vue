@@ -51,7 +51,7 @@
             autosize
             type="textarea"
             :modelValue="store.locales['$' + locale]?.[`${active}.${path}`]"
-            :placeholder="store.locales[locale][`${active}.${path}`]"
+            :placeholder="store.locales[locale][`${active}.${path}`] || store.locales[''][`${active}.${path}`]"
             @update:modelValue="handleUpdate(locale, path, $event)"
           ></el-input>
         </div>
@@ -83,12 +83,12 @@ watch(keyword, (val) => {
 
 const active = computed<string>({
   get() {
-    const name = route.path.slice(9).replace(/\//, '.')
+    const name = route.path.slice(9).replace(/\//g, '.')
     return name in data.value.map ? name : ''
   },
   set(name) {
     if (!(name in data.value.map)) name = ''
-    router.replace('/locales/' + name.replace(/\./, '/'))
+    router.replace('/locales/' + name.replace(/\./g, '/'))
   },
 })
 
@@ -109,7 +109,6 @@ function handleClick(tree: Tree) {
 const paths = computed(() => {
   const result = {}
   for (const locale in store.locales) {
-    if (!locale) continue
     Object.assign(result, store.locales[locale])
   }
   return Object.keys(result).filter(path => !path.includes('._') && !path.includes('@'))
@@ -121,16 +120,29 @@ interface Tree {
   children?: Tree[]
 }
 
+function sortTree(trees: Tree[]) {
+  trees.sort((a, b) => a.label.localeCompare(b.label))
+  for (const tree of trees) {
+    if (tree.children) sortTree(tree.children)
+  }
+}
+
 const data = computed(() => {
   const data: Tree[] = []
   const map: Dict<string[]> = {}
   for (const path of paths.value) {
     const parts = path.split('.')
+    if (parts.length < 2 || path.includes('$')) continue
     let children = data
-    const depth = Math.min(parts.length - 1, 2)
+    let depth = Math.min(parts.length - 1, 2)
+    for (let i = parts.length - 1; i >= depth; i--) {
+      if (paths.value.includes(parts.slice(0, i).join('.') + '.$')) {
+        depth = i
+        break
+      }
+    }
     for (let i = 0; i < depth; i++) {
       const label = parts[i]
-      if (!label) break
       const id = parts.slice(0, i + 1).join('.')
       let child = children.find(item => item.id === id)
       if (!child) {
@@ -142,6 +154,7 @@ const data = computed(() => {
     }
     map[parts.slice(0, depth).join('.')].push(parts.slice(depth).join('.'))
   }
+  sortTree(data)
   return { data, map }
 })
 
