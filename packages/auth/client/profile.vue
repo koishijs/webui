@@ -6,12 +6,14 @@
           平台账户绑定
           <el-button solid @click="showDialog = true">添加</el-button>
         </h2>
-        <div class="schema-item" v-for="({ platform, id }) in store.user['accounts']">
+        <div class="schema-item" v-for="({ platform, pid, bid }) in store.user.bindings">
           <div class="header">
-            <div class="left">{{ platform }} ({{ id }})</div>
+            <div class="left">{{ platform }} ({{ pid }})</div>
             <div class="right">
-              <!-- temporarily disable this feature for security reasons -->
-              <!-- <el-button>解绑</el-button> -->
+              <el-button
+                v-if="original.length > 1 || bid !== store.user.id"
+                @click.stop.prevent="send('user/unbind', platform, pid)"
+              >解绑</el-button>
             </div>
           </div>
         </div>
@@ -56,6 +58,10 @@ async function update() {
     message.error(e.message)
   }
 }
+
+const original = computed(() => {
+  return store.user?.bindings.filter(item => store.user.id === item.bid)
+})
 
 const menu = computed(() => [{
   icon: 'check',

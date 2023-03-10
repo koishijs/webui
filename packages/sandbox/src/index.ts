@@ -1,7 +1,7 @@
 import { Context, Dict, observe, Schema, User } from 'koishi'
 import { Client, DataService } from '@koishijs/plugin-console'
 import { resolve } from 'path'
-import { SandboxBot, words } from './bot'
+import { SandboxBot } from './bot'
 import zh from './locales/zh.yml'
 
 declare module 'koishi' {
@@ -76,9 +76,10 @@ export class UserProvider extends DataService<Dict<User>> {
   }
 
   async prepare() {
-    const data = await this.ctx.database.getUser('sandbox', words)
+    const data = await this.ctx.database.get('binding', { platform: 'sandbox' }, ['aid'])
+    const users = await this.ctx.database.get('user', data.map(({ aid }) => aid))
     const result: Dict<User.Observed> = {}
-    for (const user of data) {
+    for (const user of users) {
       this.observe(user, result)
     }
     return result
@@ -119,7 +120,8 @@ export function apply(ctx: Context, config: Config) {
 
   ctx.i18n.define('zh', zh)
 
-  ctx.platform('sandbox').command('clear')
+  ctx.platform('sandbox')
+    .command('clear')
     .action(({ session }) => {
       session.client.send({
         type: 'sandbox/clear',

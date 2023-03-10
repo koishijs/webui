@@ -1,4 +1,4 @@
-import { $, Awaitable, Context, isNullable, omit, pick, Schema, Time, User } from 'koishi'
+import { $, Awaitable, Binding, Context, isNullable, omit, pick, Schema, Time, User } from 'koishi'
 import { Client, DataService } from '@koishijs/plugin-console'
 import { createHash } from 'crypto'
 import { resolve } from 'path'
@@ -24,35 +24,24 @@ declare module '@koishijs/plugin-console' {
   }
 
   interface Events {
-    'login/platform'(this: Client, platform: string, userId: string, id?: number): Awaitable<UserLogin>
+    'login/platform'(this: Client, platform: string, pid: string, aid?: number): Awaitable<UserLogin>
     'login/password'(this: Client, name: string, password: string): void
     'login/token'(this: Client, id: number, token: string): void
+    'user/unbind'(this: Client, platform: string, pid: string): void
     'user/update'(this: Client, data: UserUpdate): void
     'user/logout'(this: Client): void
   }
 }
 
-export type UserAuth = Pick<User, AuthFields>
+export interface UserAuth extends Pick<User, AuthFields> {
+  bindings?: Omit<Binding, 'aid'>[]
+}
+
 export type UserLogin = Pick<User, 'id' | 'name' | 'token' | 'expire'>
 export type UserUpdate = Partial<Pick<User, 'name' | 'password'>>
 
 type AuthFields = typeof authFields[number]
 const authFields = ['name', 'authority', 'id', 'expire', 'token'] as const
-
-function setAuthUser(client: Client, value: UserAuth, platforms: Set<any>) {
-  if (value) {
-    value = {
-      ...omit(value, ['password', ...platforms]),
-      accounts: Object.entries(pick(value, platforms))
-        .filter(([, value]) => value)
-        .map(([platform, id]) => ({ platform, id })),
-    } as any
-  }
-  client.user = value
-  client.ctx.emit('console/connection', client)
-  client.send({ type: 'data', body: { key: 'user', value } })
-  client.refresh()
-}
 
 function toHash(password: string) {
   return createHash('sha256').update(password).digest('hex')
@@ -88,40 +77,42 @@ class AuthService extends DataService<UserAuth> {
     await this.ctx.database.create('user', { id: 0, name: 'admin', authority: 5, password })
   }
 
+  async setAuthUser(client: Client, value: UserAuth) {
+    if (value) {
+      const bindings = await this.ctx.database.get('binding', { aid: value.id })
+      value = {
+        ...omit(value, ['password' as never]),
+        bindings: bindings.map(binding => omit(binding, ['aid'])),
+      }
+    }
+    client.user = value
+    client.ctx.emit('console/connection', client)
+    client.send({ type: 'data', body: { key: 'user', value } })
+    client.refresh()
+  }
+
   initLogin() {
+    const self = this
     const { ctx, config } = this
     const states: Record<string, [string, number, Client, number]> = {}
 
-    let platforms: Set<never> = getPlatforms()
-    function getPlatforms() {
-      return new Set(ctx.bots.filter(bot => !bot.hidden).map(bot => bot.platform as never))
-    }
-
-    ctx.on('bot-added', () => {
-      platforms = getPlatforms()
-    })
-
-    ctx.on('bot-removed', () => {
-      platforms = getPlatforms()
-    })
-
     ctx.console.addListener('login/password', async function (name, password) {
       password = toHash(password)
-      const user = await ctx.database.getUser('name', name, ['password', ...platforms, ...authFields])
+      const [user] = await ctx.database.get('user', { name }, ['password', ...authFields])
       if (!user || user.password !== password) throw new Error('用户名或密码错误。')
       if (!user.expire || user.expire < Date.now()) {
         user.token = v4()
         user.expire = Date.now() + config.authTokenExpire
-        await ctx.database.setUser('name', name, pick(user, ['token', 'expire']))
+        await ctx.database.set('user', { name }, pick(user, ['token', 'expire']))
       }
-      setAuthUser(this, user, platforms)
+      await self.setAuthUser(this, user)
     })
 
     ctx.console.addListener('login/token', async function (id, token) {
-      const [user] = await ctx.database.get('user', { id }, ['name', ...platforms, ...authFields])
+      const [user] = await ctx.database.get('user', { id }, [...authFields])
       if (!user) throw new Error('用户不存在。')
       if (user.token !== token || user.expire <= Date.now()) throw new Error('令牌已失效。')
-      setAuthUser(this, user, platforms)
+      await self.setAuthUser(this, user)
     })
 
     ctx.console.addListener('login/platform', async function (platform, userId, id) {
@@ -153,24 +144,21 @@ class AuthService extends DataService<UserAuth> {
         return next()
       }
 
-      if (!isNullable(state[3])) {
-        const old = await session.observeUser()
-        await ctx.database.remove('user', { [session.platform]: session.userId })
-        await ctx.database.set('user', { id: state[3] }, {
-          [session.platform]: session.userId,
-          ...omit(old, ['id', 'name', ...authFields, ...platforms] as any),
-        })
-        const [user] = await ctx.database.get('user', { id: state[3] }, ['name', ...platforms, ...authFields])
-        return setAuthUser(state[2], user, platforms)
+      const aid = state[3]
+      const { platform, userId: pid } = session
+      if (!isNullable(aid)) {
+        await ctx.database.set('binding', { platform, pid }, { aid })
+        const [user] = await ctx.database.get('user', { id: state[3] }, [...authFields])
+        return self.setAuthUser(state[2], user)
       }
 
-      const user = await session.observeUser(['name', ...platforms, ...authFields])
+      const user = await session.observeUser([...authFields])
       if (!user.expire || user.expire < Date.now()) {
         user.token = v4()
         user.expire = Date.now() + config.authTokenExpire
         await user.$update()
       }
-      return setAuthUser(state[2], user, platforms)
+      return self.setAuthUser(state[2], user)
     }, true)
 
     ctx.on('console/intercept', (client, listener) => {
@@ -181,7 +169,7 @@ class AuthService extends DataService<UserAuth> {
     })
 
     ctx.console.addListener('user/logout', async function () {
-      setAuthUser(this, null, platforms)
+      await self.setAuthUser(this, null)
     })
 
     ctx.console.addListener('user/update', async function (data) {
@@ -189,7 +177,21 @@ class AuthService extends DataService<UserAuth> {
       if (data.password) data.password = toHash(data.password)
       await ctx.database.set('user', { id: this.user.id }, data)
       Object.assign(this.user, data)
-      setAuthUser(this, this.user, platforms)
+      await self.setAuthUser(this, this.user)
+    })
+
+    ctx.console.addListener('user/unbind', async function (platform, pid) {
+      if (!this.user) throw new Error('请先登录。')
+      const bindings = await ctx.database.get('binding', { aid: this.user.id })
+      const binding = bindings.find(item => item.platform === platform && item.pid === pid)
+      if (binding.aid !== binding.bid) {
+        await ctx.database.set('binding', { platform, pid }, { aid: binding.bid })
+      } else if (bindings.filter(item => item.aid === item.bid).length === 1) {
+        throw new Error('无法解除绑定。')
+      } else {
+        await ctx.database.remove('binding', { platform, pid })
+      }
+      await self.setAuthUser(this, this.user)
     })
   }
 }
