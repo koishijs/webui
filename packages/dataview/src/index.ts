@@ -80,6 +80,9 @@ class DatabaseProvider extends DataService<DatabaseInfo> {
         ...tableStats[name],
       }
       result.tables[name].primary = makeArray(result.tables[name].primary)
+      for (const [key, field] of Object.entries(result.tables[name].fields)) {
+        if (field.deprecated) delete result.tables[name].fields[key]
+      }
     }
     result.tables = Object.fromEntries(Object.entries(result.tables).sort(([a], [b]) => a.localeCompare(b)))
     return result
