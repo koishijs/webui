@@ -1,4 +1,4 @@
-import { $, Awaitable, Binding, Context, isNullable, omit, pick, Schema, Time, User } from 'koishi'
+import { Awaitable, Binding, Context, isNullable, omit, pick, Schema, Time, User } from 'koishi'
 import { Client, DataService } from '@koishijs/plugin-console'
 import { createHash } from 'crypto'
 import { resolve } from 'path'
@@ -68,13 +68,14 @@ class AuthService extends DataService<UserAuth> {
   }
 
   async start() {
-    // check if there is an authoized user
-    const count = await this.ctx.database.select('user', {
-      authority: { $gte: 4 },
-    }).execute(_ => $.count(_.id))
-    if (count) return
-    const password = toHash('123456')
-    await this.ctx.database.create('user', { id: 0, name: 'admin', authority: 5, password })
+    const { enabled, username, password } = this.config.admin
+    if (!enabled) return
+    await this.ctx.database.create('user', {
+      id: 0,
+      name: username,
+      authority: 5,
+      password: toHash(password),
+    })
   }
 
   async setAuthUser(client: Client, value: UserAuth) {
@@ -199,15 +200,41 @@ class AuthService extends DataService<UserAuth> {
 namespace AuthService {
   export const filter = false
 
+  export interface Admin {
+    enabled?: boolean
+    username?: string
+    password?: string
+  }
+
+  export const Admin: Schema<Admin> = Schema.intersect([
+    Schema.object({
+      enabled: Schema.boolean().default(true).description('启用管理员账号。'),
+    }),
+    Schema.union([
+      Schema.object({
+        enabled: Schema.const(true),
+        username: Schema.string().default('admin').description('管理员用户名。'),
+        password: Schema.string().role('secret').required().description('管理员密码。'),
+      }),
+      Schema.object({}),
+    ]),
+  ])
+
   export interface Config {
+    admin?: Admin
     authTokenExpire?: number
     loginTokenExpire?: number
   }
 
-  export const Config: Schema<Config> = Schema.object({
-    authTokenExpire: Schema.natural().role('ms').default(Time.week).description('用户令牌有效期。'),
-    loginTokenExpire: Schema.natural().role('ms').default(Time.minute * 10).description('登录令牌有效期。'),
-  })
+  export const Config: Schema<Config> = Schema.intersect([
+    Schema.object({
+      admin: Admin,
+    }).description('管理员设置'),
+    Schema.object({
+      authTokenExpire: Schema.natural().role('ms').default(Time.week).description('用户令牌有效期。'),
+      loginTokenExpire: Schema.natural().role('ms').default(Time.minute * 10).description('登录令牌有效期。'),
+    }).description('高级设置'),
+  ])
 }
 
 export default AuthService
