@@ -70,12 +70,12 @@ class AuthService extends DataService<UserAuth> {
   async start() {
     const { enabled, username, password } = this.config.admin
     if (!enabled) return
-    await this.ctx.database.create('user', {
+    await this.ctx.database.upsert('user', [{
       id: 0,
       name: username,
       authority: 5,
       password: toHash(password),
-    })
+    }])
   }
 
   async setAuthUser(client: Client, value: UserAuth) {
