@@ -169,7 +169,11 @@ const update = debounce(1000, () => {
 
 function handleUpdate(locale: string, path: string, value: string) {
   const root = store.locales['$' + locale] ??= {}
-  root[`${active.value}.${path}`] = value
+  if (value) {
+    root[`${active.value}.${path}`] = value
+  } else {
+    delete root[`${active.value}.${path}`]
+  }
   update()
 }
 
