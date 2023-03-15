@@ -231,8 +231,8 @@ namespace AuthService {
       admin: Admin,
     }).description('管理员设置'),
     Schema.object({
-      authTokenExpire: Schema.natural().role('ms').default(Time.week).description('用户令牌有效期。'),
-      loginTokenExpire: Schema.natural().role('ms').default(Time.minute * 10).description('登录令牌有效期。'),
+      authTokenExpire: Schema.natural().role('ms').default(Time.week).min(Time.hour).description('用户令牌有效期。'),
+      loginTokenExpire: Schema.natural().role('ms').default(Time.minute * 10).min(Time.minute).description('登录令牌有效期。'),
     }).description('高级设置'),
   ])
 }
