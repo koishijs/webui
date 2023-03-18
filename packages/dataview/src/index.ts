@@ -1,4 +1,4 @@
-import { Context, Dict, Driver, Field, makeArray, Model, Schema } from 'koishi'
+import { clone, Context, Dict, Driver, Field, makeArray, Model, Schema } from 'koishi'
 import { DataService } from '@koishijs/plugin-console'
 import { resolve } from 'path'
 import { deserialize, serialize } from './utils'
@@ -76,7 +76,7 @@ class DatabaseProvider extends DataService<DatabaseInfo> {
     result.tables = {}
     for (const name in this.ctx.model.tables) {
       result.tables[name] = {
-        ...this.ctx.model.tables[name],
+        ...clone(this.ctx.model.tables[name]),
         ...tableStats[name],
       }
       result.tables[name].primary = makeArray(result.tables[name].primary)
