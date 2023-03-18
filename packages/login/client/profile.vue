@@ -3,7 +3,7 @@
     <k-content>
       <k-form :schema="schema" v-model="diff" #epilog>
         <h2 class="k-schema-header">
-          平台账户绑定
+          平台用户绑定
           <el-button solid @click="showDialog = true">添加</el-button>
         </h2>
         <div class="schema-item" v-for="({ platform, pid, bid }) in store.user.bindings">
@@ -28,7 +28,7 @@ import { send, store } from '@koishijs/client'
 import { config, showDialog } from './utils'
 import { computed, ref } from 'vue'
 import { message, Schema } from '@koishijs/client'
-import { UserUpdate } from '@koishijs/plugin-auth'
+import { UserUpdate } from '@koishijs/plugin-login'
 
 const diff = ref<UserUpdate>({})
 

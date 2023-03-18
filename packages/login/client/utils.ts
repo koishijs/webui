@@ -1,6 +1,6 @@
 import { ref, watch } from 'vue'
 import { message, router, store, useStorage } from '@koishijs/client'
-import { UserAuth } from '@koishijs/plugin-auth'
+import { UserAuth } from '@koishijs/plugin-login'
 
 interface AuthConfig extends Partial<UserAuth> {
   authType: 0 | 1
