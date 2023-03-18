@@ -33,7 +33,7 @@ interface Config extends Override {}
 
 const Config: Schema<string | Config, Config> = Schema.union([
   Override,
-  Schema.transform(String, (name) => ({ name, aliases: [] })),
+  Schema.transform(String, (name) => ({ name, aliases: [], config: {}, options: {} })),
 ])
 
 const logger = new Logger('commands')
