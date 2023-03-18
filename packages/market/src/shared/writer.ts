@@ -78,6 +78,7 @@ export class ConfigWriter extends DataService<Context.Config> {
       // handle plugin groups
       if (name === 'group') {
         const fork = ctx.scope[Loader.kRecord][key]
+        if (!fork) continue
         result[key] = this.getGroup(value, fork.ctx)
       }
     }
