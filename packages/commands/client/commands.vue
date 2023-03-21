@@ -94,11 +94,11 @@
       <div>请在左侧选择指令</div>
     </k-empty>
 
-    <el-dialog destroy-on-close v-model="dialog" :title="title">
-      <el-input v-model="alias" @keydown.enter.stop.prevent="onEnter" placeholder="请输入名称"></el-input>
+    <el-dialog class="command-dialog" destroy-on-close v-model="dialog" :title="title">
+      <el-input :class="{ invalid }" v-model="alias" @keydown.enter.stop.prevent="onEnter" placeholder="请输入名称"></el-input>
       <template #footer>
         <el-button @click="title = ''">取消</el-button>
-        <el-button type="primary" :disabled="!alias" @click="onEnter">确定</el-button>
+        <el-button type="primary" :disabled="invalid" @click="onEnter">确定</el-button>
       </template>
     </el-dialog>
   </k-layout>
@@ -127,6 +127,14 @@ const schema = ref<{
   config: Schema
   options: Dict<Schema>
 }>()
+
+const aliases = computed(() => {
+  return Object.values(commands.value).flatMap(command => command.override.aliases)
+})
+
+const invalid = computed(() => {
+  return !alias.value || aliases.value.includes(alias.value)
+})
 
 const dialog = computed({
   get: () => !!title.value,
@@ -278,6 +286,12 @@ onActivated(async () => {
       cursor: pointer;
       text-decoration: underline;
     }
+  }
+}
+
+.command-dialog {
+  .el-input.invalid .el-input__wrapper {
+    box-shadow: 0 0 0 1px var(--el-color-danger) inset;
   }
 }
 
