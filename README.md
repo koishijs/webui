@@ -1,4 +1,8 @@
-# Koishi Console
+# Koishi WebUI
+
+## Documentation
+
+- [Get to know the console](https://koishi.chat/manual/console/)
 
 ## Packages
 
@@ -20,3 +24,7 @@
 - @koishijs/plugin-market
 - @koishijs/plugin-sandbox
 - @koishijs/plugin-status
+
+## License
+
+[AGPL-3.0](./LICENSE)

@@ -15,11 +15,11 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/koishijs/console.git",
+    "url": "git+https://github.com/koishijs/webui.git",
     "directory": "packages/login"
   },
   "bugs": {
-    "url": "https://github.com/koishijs/console/issues"
+    "url": "https://github.com/koishijs/webui/issues"
   },
   "homepage": "https://koishi.chat/plugins/console/login.html",
   "keywords": [

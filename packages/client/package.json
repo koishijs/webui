@@ -16,11 +16,11 @@
   "license": "AGPL-3.0",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/koishijs/console.git",
+    "url": "git+https://github.com/koishijs/webui.git",
     "directory": "packages/client"
   },
   "bugs": {
-    "url": "https://github.com/koishijs/console/issues"
+    "url": "https://github.com/koishijs/webui/issues"
   },
   "homepage": "https://koishi.chat",
   "keywords": [
@@ -35,7 +35,7 @@
   "dependencies": {
     "@satorijs/components": "^0.5.6",
     "@satorijs/element": "^2.3.5",
-    "@vitejs/plugin-vue": "^4.0.0",
+    "@vitejs/plugin-vue": "^4.1.0",
     "@vueuse/core": "^8.9.4",
     "cac": "^6.7.14",
     "cordis": "^2.7.4",
@@ -43,9 +43,9 @@
     "element-plus": "2.2.17",
     "marked-vue": "^1.2.2",
     "ns-require": "^1.1.4",
-    "sass": "^1.58.3",
+    "sass": "^1.59.3",
     "schemastery-vue": "^2.0.4",
-    "vite": "^4.1.4",
+    "vite": "^4.2.0",
     "vue": "^3.2.47",
     "vue-router": "^4.1.6"
   },
