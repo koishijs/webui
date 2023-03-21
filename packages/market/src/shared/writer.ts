@@ -140,7 +140,7 @@ export class ConfigWriter extends DataService<Context.Config> {
       }
     }
     insertKey(target, config, Object.keys(target))
-    await this.loader.writeConfig()
+    await this.loader.writeConfig(true)
   }
 
   async reload(path: string, config: any, newKey?: string) {

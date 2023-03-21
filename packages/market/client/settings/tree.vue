@@ -114,7 +114,7 @@ watch(keyword, (val) => {
 onActivated(async () => {
   const container = root.value.$el
   await nextTick()
-  const element = container.querySelector('.k-tab-item.active') as HTMLElement
+  const element = container.querySelector('.el-tree-node.is-active') as HTMLElement
   if (!element) return
   root.value['setScrollTop'](element.offsetTop - (container.offsetHeight - element.offsetHeight) / 2)
 })
