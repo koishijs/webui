@@ -1,4 +1,4 @@
-import { Argv, Command, Context, Dict, Logger, remove, Schema } from 'koishi'
+import { Argv, Command, Context, Dict, remove, Schema } from 'koishi'
 import CommandProvider from './service'
 
 export * from './service'
@@ -24,6 +24,7 @@ export interface CommandState {
 
 export interface Snapshot {
   create?: boolean
+  pending?: string
   command: Command
   parent: Command
   initial: CommandState
@@ -36,8 +37,6 @@ const Config: Schema<string | Config, Config> = Schema.union([
   Override,
   Schema.transform(String, (name) => ({ name, aliases: [], config: {}, options: {} })),
 ])
-
-const logger = new Logger('commands')
 
 export class CommandManager {
   static filter = false
@@ -60,6 +59,12 @@ export class CommandManager {
       for (const key in config) {
         if (cmd !== ctx.$commander.resolve(key)) continue
         return this.accept(cmd, config[key])
+      }
+      for (const { command, pending } of Object.values(this.snapshots)) {
+        const parent = this.ctx.$commander.resolve(pending)
+        if (!parent || !pending) continue
+        this.snapshots[command.name].pending = null
+        this._teleport(command, parent)
       }
     })
 
@@ -113,16 +118,17 @@ export class CommandManager {
   }
 
   teleport(command: Command, name: string, write = false) {
+    this.snapshots[command.name].pending = null
     const parent = this.ctx.$commander.resolve(name)
     if (name && !parent) {
-      logger.warn('cannot find parent command', name)
-      return
+      this.snapshots[command.name].pending = name
+    } else {
+      this._teleport(command, parent)
     }
-    this._teleport(command, parent)
 
     if (write) {
       this.config[command.name] ||= {}
-      this.config[command.name].name = `${command.parent?.name || ''}/${command.displayName}`
+      this.config[command.name].name = `${name || ''}/${command.displayName}`
       this.write(command)
     }
   }
@@ -225,7 +231,6 @@ export class CommandManager {
       }
       if (override.name) {
         const initial = (snapshot.parent?.name || '') + '/' + command.name
-        console.log(command, override, initial)
         if (override.name === initial || override.name === command.name) {
           delete this.config[command.name].name
         }
