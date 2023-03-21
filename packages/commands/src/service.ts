@@ -12,6 +12,8 @@ declare module '@koishijs/plugin-console' {
   }
 
   interface Events {
+    'command/create'(name: string): void
+    'command/remove'(name: string): void
     'command/update'(name: string, config: Pick<CommandState, 'config' | 'options'>): void
     'command/teleport'(name: string, parent: string): void
     'command/aliases'(name: string, aliases: string[]): void
@@ -19,6 +21,7 @@ declare module '@koishijs/plugin-console' {
 }
 
 export interface CommandData {
+  create: boolean
   name: string
   paths: string[]
   children: CommandData[]
@@ -81,6 +84,16 @@ export default class CommandProvider extends DataService<CommandData[]> {
       manager.alias(command, aliases, true)
       this.refresh()
     })
+
+    ctx.console.addListener('command/create', (name: string) => {
+      manager.create(name)
+      this.refresh()
+    })
+
+    ctx.console.addListener('command/remove', (name: string) => {
+      manager.remove(name)
+      this.refresh()
+    })
   }
 
   async get(forced = false) {
@@ -93,7 +106,8 @@ export default class CommandProvider extends DataService<CommandData[]> {
     return commands.map((command) => ({
       paths: findAncestors(command.ctx.scope),
       name: command.name,
-      children: this.traverse(command.children),
+      children: (command.name === 'test' ? console.log(command.children) : 0, this.traverse(command.children)),
+      create: this.manager.snapshots[command.name]?.create,
       initial: this.manager.snapshots[command.name]?.initial || { aliases: command._aliases, config: command.config, options: command._options },
       override: this.manager.snapshots[command.name]?.override || { aliases: command._aliases, config: null, options: {} },
     })).sort((a, b) => a.name.localeCompare(b.name))

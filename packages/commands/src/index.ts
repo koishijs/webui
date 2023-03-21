@@ -23,6 +23,7 @@ export interface CommandState {
 }
 
 export interface Snapshot {
+  create?: boolean
   command: Command
   parent: Command
   initial: CommandState
@@ -83,9 +84,10 @@ export class CommandManager {
     ctx.plugin(CommandProvider, this)
   }
 
-  ensure(name: string) {
+  ensure(name: string, create?: boolean) {
     const command = this.ctx.$commander.resolve(name)
     return this.snapshots[command.name] ||= {
+      create,
       command,
       parent: command.parent,
       initial: {
@@ -161,11 +163,32 @@ export class CommandManager {
     }
   }
 
+  create(name: string) {
+    this.ctx.command(name)
+    this.ensure(name, true)
+    this.config[name] = { create: true }
+    this.write()
+  }
+
+  remove(name: string) {
+    const snapshot = this.snapshots[name]
+    const commands = snapshot.command.children.slice()
+    delete this.snapshots[name]
+    delete this.config[name]
+    for (const child of commands) {
+      const { parent } = this.snapshots[child.name]
+      this._teleport(child, parent)
+      this.config[child.name].name = `${parent?.name || ''}/${child.displayName}`
+    }
+    snapshot.command.dispose()
+    this.write(...commands)
+  }
+
   accept(target: Command, override: Override) {
-    const { options = {}, config = {} } = override
+    const { create, options = {}, config = {} } = override
 
     // create snapshot for restoration
-    this.ensure(target.name)
+    this.ensure(target.name, create)
 
     // override config and options
     this.update(target, { options, config })
@@ -187,26 +210,29 @@ export class CommandManager {
     this.alias(target, aliases)
   }
 
-  write(command: Command) {
-    const snapshot = this.ensure(command.name)
-    const override = this.config[command.name]
-    if (override.config && !Object.keys(override.config).length) {
-      delete override.config
-    }
-    if (override.options && !Object.keys(override.options).length) {
-      delete override.options
-    }
-    if (override.aliases && !override.aliases.length) {
-      delete override.aliases
-    }
-    if (override.name) {
-      const initial = (snapshot.parent?.name || '') + '/' + command.name
-      if (override.name === initial || override.name === command.name) {
-        delete this.config[command.name].name
+  write(...commands: Command[]) {
+    for (const command of commands) {
+      const snapshot = this.ensure(command.name)
+      const override = this.config[command.name]
+      if (override.config && !Object.keys(override.config).length) {
+        delete override.config
       }
-    }
-    if (!Object.keys(override).length) {
-      delete this.config[command.name]
+      if (override.options && !Object.keys(override.options).length) {
+        delete override.options
+      }
+      if (override.aliases && !override.aliases.length) {
+        delete override.aliases
+      }
+      if (override.name) {
+        const initial = (snapshot.parent?.name || '') + '/' + command.name
+        console.log(command, override, initial)
+        if (override.name === initial || override.name === command.name) {
+          delete this.config[command.name].name
+        }
+      }
+      if (!Object.keys(override).length) {
+        delete this.config[command.name]
+      }
     }
     this.ctx.scope.update(this.config, false)
   }

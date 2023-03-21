@@ -5,13 +5,19 @@
     </template>
 
     <template #menu>
-      <span class="menu-item" @click.stop.prevent="updateConfig">
+      <span class="menu-item" :class="{ disabled: !command }" @click.stop.prevent="updateConfig">
         <k-icon class="menu-icon" name="check"></k-icon>
+      </span>
+      <span class="menu-item" :class="{ disabled: !command?.create }" @click.stop.prevent="removeCommand">
+        <k-icon class="menu-icon" name="trash-can"></k-icon>
+      </span>
+      <span class="menu-item" @click.stop.prevent="title = '添加指令'">
+        <k-icon class="menu-icon" name="plus"></k-icon>
       </span>
     </template>
 
     <template #left>
-      <el-scrollbar class="command-tree">
+      <el-scrollbar class="command-tree" ref="root">
         <div class="search">
           <el-input v-model="keyword" #suffix>
             <k-icon name="search"></k-icon>
@@ -21,7 +27,7 @@
           ref="tree"
           :draggable="true"
           :data="store.commands"
-          :props="{ label: 'name' }"
+          :props="{ label: 'name', class: getClass }"
           :filter-node-method="filterNode"
           :default-expand-all="true"
           :expand-on-click-node="false"
@@ -62,18 +68,10 @@
             >删除别名</span>
           </li>
           <li>
-            <span class="button" @click.stop.prevent="dialog = true">添加别名</span>
+            <span class="button" @click.stop.prevent="title = '编辑别名'">添加别名</span>
           </li>
         </ul>
       </div>
-
-      <el-dialog destroy-on-close v-model="dialog" title="编辑别名">
-        <el-input v-model="alias" @keydown.enter.stop.prevent="addAlias"></el-input>
-        <template #footer>
-          <el-button @click="dialog = false">取消</el-button>
-          <el-button type="primary" @click="addAlias">确定</el-button>
-        </template>
-      </el-dialog>
 
       <k-form
         :schema="schema.config"
@@ -95,6 +93,14 @@
     <k-empty v-else>
       <div>请在左侧选择指令</div>
     </k-empty>
+
+    <el-dialog destroy-on-close v-model="dialog" :title="title">
+      <el-input v-model="alias" @keydown.enter.stop.prevent="onEnter" placeholder="请输入名称"></el-input>
+      <template #footer>
+        <el-button @click="title = ''">取消</el-button>
+        <el-button type="primary" :disabled="!alias" @click="onEnter">确定</el-button>
+      </template>
+    </el-dialog>
   </k-layout>
 </template>
 
@@ -102,7 +108,7 @@
 
 import { clone, Dict, pick, Schema, send, store, valueMap } from '@koishijs/client'
 import { useRoute, useRouter } from 'vue-router'
-import { computed, ref, watch } from 'vue'
+import { computed, nextTick, onActivated, ref, watch } from 'vue'
 import { CommandData, CommandState } from '@koishijs/plugin-commands'
 import {} from '@koishijs/plugin-locales'
 import {} from '@koishijs/plugin-market'
@@ -111,15 +117,23 @@ import { commands, createSchema } from './utils'
 const route = useRoute()
 const router = useRouter()
 
-const dialog = ref(false)
+const title = ref('')
 const alias = ref('')
 const tree = ref(null)
 const keyword = ref('')
 const current = ref<CommandState>()
+const root = ref<{ $el: HTMLElement }>(null)
 const schema = ref<{
   config: Schema
   options: Dict<Schema>
 }>()
+
+const dialog = computed({
+  get: () => !!title.value,
+  set: (value) => {
+    if (!value) title.value = ''
+  },
+})
 
 watch(keyword, (val) => {
   tree.value.filter(val)
@@ -157,6 +171,12 @@ interface Node {
   childNodes: Node[]
 }
 
+function getClass(data: CommandData) {
+  const words: string[] = []
+  if (data.name === active.value) words.push('is-active')
+  return words.join(' ')
+}
+
 function filterNode(value: string, data: CommandData) {
   return data.name.includes(keyword.value)
 }
@@ -178,17 +198,23 @@ function handleDrop(source: Node, target: Node, position: 'before' | 'after' | '
   send('command/teleport', source.data.name, parent.data.name)
 }
 
-function addAlias() {
-  if (alias.value && !current.value.aliases.includes(alias.value)) {
+async function onEnter() {
+  if (title.value === '添加指令') {
+    await send('command/create', alias.value)
+  } else if (alias.value && !current.value.aliases.includes(alias.value)) {
     current.value.aliases.push(alias.value)
+    await send('command/aliases', command.value.name, current.value.aliases)
   }
   alias.value = ''
-  dialog.value = false
-  send('command/aliases', command.value.name, current.value.aliases)
+  title.value = ''
 }
 
 function updateConfig() {
   send('command/update', command.value.name, pick(current.value, ['config', 'options']))
+}
+
+function removeCommand() {
+  send('command/remove', command.value.name)
 }
 
 function setDefault(index: number) {
@@ -202,6 +228,14 @@ function deleteAlias(index: number) {
   current.value.aliases.splice(index, 1)
   send('command/aliases', command.value.name, current.value.aliases)
 }
+
+onActivated(async () => {
+  const container = root.value.$el
+  await nextTick()
+  const element = container.querySelector('.el-tree-node.is-active') as HTMLElement
+  if (!element) return
+  root.value['setScrollTop'](element.offsetTop - (container.offsetHeight - element.offsetHeight) / 2)
+})
 
 </script>
 
