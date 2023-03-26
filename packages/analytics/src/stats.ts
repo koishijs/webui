@@ -91,6 +91,7 @@ class StatisticsProvider extends DataService<StatisticsProvider.Payload> {
       ...Object.fromEntries(StatisticsProvider.longtermFields.map((key) => [key, { type: 'integer', initial: 0 }])),
     }, { primary: 'time' })
 
+    // @ts-ignore
     ctx.on('exit', () => this.upload(true))
 
     ctx.on('dispose', async () => {
