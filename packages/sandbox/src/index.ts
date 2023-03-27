@@ -5,10 +5,6 @@ import { SandboxBot } from './bot'
 import zh from './locales/zh.yml'
 
 declare module 'koishi' {
-  interface User {
-    sandbox: string
-  }
-
   namespace Session {
     interface Payload {
       client: Client
@@ -55,32 +51,34 @@ export class UserProvider extends DataService<Dict<User>> {
           authority: 1,
           ...data,
         })
-        return this.observe(user, users)
+        this.observe(name, user, users)
       } else if (!data) {
+        await this.ctx.database.remove('user', users[name].id)
+        await this.ctx.database.remove('binding', { platform: 'sandbox', pid: name })
         delete users[name]
         this.ctx.$internal._userCache.set('sandbox', 'sandbox:' + name, null)
-        return this.ctx.database.remove('user', { sandbox: name })
+      } else {
+        Object.assign(users[name], data)
+        return users[name].$update()
       }
-      Object.assign(users[name], data)
-      return users[name].$update()
     }, { authority: 4 })
   }
 
-  observe(user: User, users: Dict<User.Observed>) {
-    const uid = 'sandbox:' + user.sandbox
-    users[user.sandbox] = observe(user, async (diff) => {
-      await this.ctx.database.setUser('sandbox', user.sandbox, diff)
+  observe(name: string, user: User, users: Dict<User.Observed>) {
+    users[name] = observe(user, async (diff) => {
+      await this.ctx.database.setUser('sandbox', name, diff)
       this.refresh()
     })
-    this.ctx.$internal._userCache.set('sandbox', uid, users[user.sandbox])
+    this.ctx.$internal._userCache.set('sandbox', 'sandbox:' + name, users[name])
   }
 
   async prepare() {
-    const data = await this.ctx.database.get('binding', { platform: 'sandbox' }, ['aid'])
+    const data = await this.ctx.database.get('binding', { platform: 'sandbox' }, ['pid', 'aid'])
     const users = await this.ctx.database.get('user', data.map(({ aid }) => aid))
     const result: Dict<User.Observed> = {}
-    for (const user of users) {
-      this.observe(user, result)
+    for (const { aid, pid } of data) {
+      const user = users.find(u => u.id === aid)
+      if (user) this.observe(pid, user, result)
     }
     return result
   }

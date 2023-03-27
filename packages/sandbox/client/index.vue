@@ -22,6 +22,7 @@
           @click="config.panelType = key">{{ name }}</span>
       </template>
     </div>
+
     <keep-alive>
       <k-empty key="empty" v-if="!users.length">
         <div>点击「添加用户」开始体验</div>
