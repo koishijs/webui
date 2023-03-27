@@ -62,19 +62,19 @@ describe('@koishijs/plugin-commands', () => {
   describe('subcommand', () => {
     it('leaf to root', async () => {
       const foo = app.command('foo')
-      const bar = app.command('foo.bar').action(() => 'test')
+      const bar = app.command('foo/bar').action(() => 'test')
       expect(foo.children).to.have.length(1)
 
       app.plugin(commands, {
-        'foo.bar': '/baz',
+        'bar': '/baz',
       })
 
       expect(foo.children).to.have.length(0)
-      await client.shouldReply('foo.bar', 'test')
+      await client.shouldReply('bar', 'test')
       await client.shouldReply('baz', 'test')
 
       app.dispose(commands)
-      await client.shouldReply('foo.bar', 'test')
+      await client.shouldReply('bar', 'test')
       await client.shouldNotReply('baz')
       expect(foo.children).to.have.length(1)
 
@@ -106,18 +106,21 @@ describe('@koishijs/plugin-commands', () => {
 
     it('leaf to leaf', async () => {
       const bar = app.command('bar')
-      const baz = app.command('baz')
       const foo = app.command('bar/foo').action(() => 'test')
       expect(bar.children).to.have.length(1)
-      expect(baz.children).to.have.length(0)
 
       app.plugin(commands, {
         foo: 'baz/foo',
       })
 
+      expect(bar.children).to.have.length(1)
+      const baz = app.command('baz')
       expect(bar.children).to.have.length(0)
       expect(baz.children).to.have.length(1)
       await client.shouldReply('foo', 'test')
+
+      baz.dispose()
+      expect(bar.children).to.have.length(1)
 
       app.dispose(commands)
       await client.shouldReply('foo', 'test')
@@ -126,7 +129,6 @@ describe('@koishijs/plugin-commands', () => {
 
       foo.dispose()
       bar.dispose()
-      baz.dispose()
     })
   })
 

@@ -69,6 +69,14 @@ export class CommandManager {
     })
 
     ctx.on('command-removed', (cmd) => {
+      for (const command of cmd.children) {
+        const parent = this.snapshots[command.name]?.parent
+        if (!parent || parent === cmd) continue
+        this._teleport(command, parent)
+      }
+    })
+
+    ctx.on('command-removed', (cmd) => {
       delete this.snapshots[cmd.name]
     })
 
