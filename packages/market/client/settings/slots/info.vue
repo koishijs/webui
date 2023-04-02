@@ -23,7 +23,7 @@
 
   <!-- external -->
   <k-comment type="warning" v-if="!data.local.workspace && store.dependencies && !store.dependencies[data.name]">
-    <p>尚未将当前插件列入依赖，<a @click="send('market/install', { [data.name]: data.local.version })">点击添加</a>。</p>
+    <p>尚未将当前插件列入依赖，<span class="link" @click="send('market/install', { [data.name]: data.local.version })">点击添加</span>。</p>
   </k-comment>
 
   <!-- impl -->
