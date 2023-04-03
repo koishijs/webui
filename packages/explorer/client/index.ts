@@ -1,6 +1,7 @@
 import { Context } from '@koishijs/client'
 import {} from '@koishijs/plugin-explorer/src'
 import Layout from './index.vue'
+import Status from './status.vue'
 import './icons'
 import './editor'
 
@@ -12,5 +13,10 @@ export default (ctx: Context) => {
     order: 600,
     fields: ['explorer'],
     component: Layout,
+  })
+
+  ctx.slot({
+    type: 'status-right',
+    component: Status,
   })
 }

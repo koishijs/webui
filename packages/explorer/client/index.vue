@@ -32,11 +32,12 @@
 
 <script lang="ts" setup>
 
-import { ref, computed, watch, onActivated, nextTick, onMounted } from 'vue'
+import { ref, computed, watch, onActivated, nextTick } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useDark, useElementSize } from '@vueuse/core'
 import { Dict, send, store } from '@koishijs/client'
 import { Entry } from '@koishijs/plugin-explorer/src'
+import { model } from './editor'
 import * as monaco from 'monaco-editor'
 
 const route = useRoute()
@@ -46,8 +47,7 @@ const tree = ref(null)
 const root = ref<{ $el: HTMLElement }>(null)
 const editor = ref(null)
 
-let instance: monaco.editor.IStandaloneCodeEditor
-let content: string
+let instance: monaco.editor.IStandaloneCodeEditor = null
 
 watch(keyword, (val) => {
   tree.value.filter(val)
@@ -58,21 +58,19 @@ const isDark = useDark()
 watch(editor, () => {
   if (!editor.value) return instance = null
   instance = monaco.editor.create(editor.value, {
-    value: content,
-    language: 'typescript',
+    model,
     theme: isDark.value ? 'vs-dark' : 'vs-light',
+    tabSize: 2,
   })
 })
 
 const { width, height } = useElementSize(editor)
 
 watch([width, height], () => {
-  if (instance) instance.layout()
+  instance?.layout()
 })
 
-console.log(isDark.value)
 watch(isDark, () => {
-  console.log(isDark.value)
   monaco.editor.setTheme(isDark.value ? 'vs-dark' : 'vs-light')
 })
 
@@ -128,9 +126,19 @@ function allowDrop(source: Node, target: Node, type: 'inner' | 'prev' | 'next') 
   return false
 }
 
+function getLanguage(filename: string) {
+  const index = filename.lastIndexOf('.')
+  const extension = index === -1 ? '' : filename.slice(index)
+  for (const language of monaco.languages.getLanguages()) {
+    if (language.extensions?.includes(extension)) return language.id
+  }
+  return 'plaintext'
+}
+
 async function updateContent(filename: string) {
-  content = await send('explorer/file', filename)
-  instance?.setValue(content)
+  const content = await send('explorer/file', filename)
+  model.setValue(content)
+  monaco.editor.setModelLanguage(instance.getModel(), getLanguage(filename))
 }
 
 watch(active, async (filename) => {
