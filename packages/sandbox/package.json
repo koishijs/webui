@@ -33,7 +33,6 @@
     "mock"
   ],
   "koishi": {
-    "category": "console",
     "browser": true,
     "public": [
       "dist"
@@ -52,12 +51,12 @@
     }
   },
   "peerDependencies": {
-    "@koishijs/plugin-console": "^5.5.6",
-    "koishi": "^4.12.2"
+    "@koishijs/plugin-console": "^5.5.7",
+    "koishi": "^4.12.3"
   },
   "devDependencies": {
     "@koishijs/assets": "^1.0.2",
-    "@koishijs/client": "^5.5.6",
-    "@koishijs/plugin-console": "^5.5.6"
+    "@koishijs/client": "^5.5.7",
+    "@koishijs/plugin-console": "^5.5.7"
   }
 }
