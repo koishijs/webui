@@ -1,7 +1,7 @@
 import { Context, Schema } from 'koishi'
 import { DataService } from '@koishijs/plugin-console'
 import { relative, resolve } from 'path'
-import { readdir } from 'fs/promises'
+import { readdir, readFile } from 'fs/promises'
 import { FSWatcher, watch } from 'chokidar'
 import anymatch, { Tester } from 'anymatch'
 
@@ -10,6 +10,10 @@ declare module '@koishijs/plugin-console' {
     interface Services {
       explorer: Explorer
     }
+  }
+
+  interface Events {
+    'explorer/file'(filename: string): Promise<string>
   }
 }
 
@@ -39,12 +43,15 @@ class Explorer extends DataService<Entry[]> {
       prod: resolve(__dirname, '../dist'),
     })
 
-    console.log(config.ignored)
     this.globFilter = anymatch(config.ignored)
 
     this.watcher = watch(ctx.baseDir, {
       cwd: ctx.baseDir,
       ignored: config.ignored,
+    })
+
+    ctx.console.addListener('explorer/file', (filename) => {
+      return readFile(resolve(ctx.baseDir, filename), 'utf8')
     })
   }
 

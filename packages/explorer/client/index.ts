@@ -2,6 +2,7 @@ import { Context } from '@koishijs/client'
 import {} from '@koishijs/plugin-explorer/src'
 import Layout from './index.vue'
 import './icons'
+import './editor'
 
 export default (ctx: Context) => {
   ctx.page({

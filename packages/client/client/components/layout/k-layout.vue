@@ -5,7 +5,7 @@
     </aside>
 
     <div class="main-container">
-      <div class="mask" @click="isLeftAsideOpen = !isLeftAsideOpen"></div>
+      <div class="aside-mask" @click="isLeftAsideOpen = !isLeftAsideOpen"></div>
       <layout-header>
         <template #left>
           <slot name="header">{{ route.meta.activity?.name }}</slot>
@@ -75,6 +75,7 @@ const route = useRoute()
   .layout-left {
     top: 0;
     bottom: 0;
+    flex: 0 0 auto;
     position: relative;
     width: var(--aside-width);
     border-right: var(--border) 1px solid;
@@ -101,7 +102,7 @@ const route = useRoute()
       overflow: hidden;
     }
 
-    .mask {
+    .aside-mask {
       pointer-events: none;
       position: absolute;
       top: 0;

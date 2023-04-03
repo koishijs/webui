@@ -54,13 +54,17 @@
       ]
     }
   },
+  "yakumo": {
+    "client": "./build/client"
+  },
   "peerDependencies": {
     "@koishijs/plugin-console": "^5.5.7",
     "koishi": "^4.12.3"
   },
   "devDependencies": {
     "@koishijs/client": "^5.5.7",
-    "@types/throttle-debounce": "^2.1.0"
+    "@types/throttle-debounce": "^2.1.0",
+    "monaco-editor": "~0.36.1"
   },
   "dependencies": {
     "anymatch": "^3.1.3",

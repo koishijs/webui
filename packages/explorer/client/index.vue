@@ -1,5 +1,9 @@
 <template>
   <k-layout>
+    <template #header>
+      资源管理器 - {{ active }}
+    </template>
+
     <template #left>
       <el-scrollbar class="command-tree" ref="root">
         <div class="search">
@@ -21,25 +25,55 @@
       </el-scrollbar>
     </template>
 
-    {{ active }}
+    <div ref="editor" v-if="files[active]?.type === 'file'" class="editor"></div>
+    <k-empty v-else>在左侧栏选择要查看的文件</k-empty>
   </k-layout>
 </template>
 
 <script lang="ts" setup>
 
-import { ref, computed, watch, onActivated, nextTick } from 'vue'
+import { ref, computed, watch, onActivated, nextTick, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { Dict, store } from '@koishijs/client'
+import { useDark, useElementSize } from '@vueuse/core'
+import { Dict, send, store } from '@koishijs/client'
 import { Entry } from '@koishijs/plugin-explorer/src'
+import * as monaco from 'monaco-editor'
 
 const route = useRoute()
 const router = useRouter()
 const keyword = ref('')
 const tree = ref(null)
 const root = ref<{ $el: HTMLElement }>(null)
+const editor = ref(null)
+
+let instance: monaco.editor.IStandaloneCodeEditor
+let content: string
 
 watch(keyword, (val) => {
   tree.value.filter(val)
+})
+
+const isDark = useDark()
+
+watch(editor, () => {
+  if (!editor.value) return instance = null
+  instance = monaco.editor.create(editor.value, {
+    value: content,
+    language: 'typescript',
+    theme: isDark.value ? 'vs-dark' : 'vs-light',
+  })
+})
+
+const { width, height } = useElementSize(editor)
+
+watch([width, height], () => {
+  if (instance) instance.layout()
+})
+
+console.log(isDark.value)
+watch(isDark, () => {
+  console.log(isDark.value)
+  monaco.editor.setTheme(isDark.value ? 'vs-dark' : 'vs-light')
 })
 
 const files = computed<Dict<Entry>>(() => {
@@ -94,7 +128,18 @@ function allowDrop(source: Node, target: Node, type: 'inner' | 'prev' | 'next') 
   return false
 }
 
-function handleClick(data: Entry) {
+async function updateContent(filename: string) {
+  content = await send('explorer/file', filename)
+  instance?.setValue(content)
+}
+
+watch(active, async (filename) => {
+  if (files.value[filename]?.type !== 'file') return
+  await updateContent(filename)
+}, { immediate: true })
+
+async function handleClick(data: Entry) {
+  if (data.type !== 'file') return
   active.value = data.filename
 }
 
@@ -112,5 +157,11 @@ onActivated(async () => {
 </script>
 
 <style lang="scss" scoped>
+
+.editor {
+  height: 100%;
+  width: 100%;
+  position: absolute;
+}
 
 </style>
