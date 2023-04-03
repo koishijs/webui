@@ -16,6 +16,7 @@ declare module '@koishijs/plugin-console' {
 export interface Entry {
   type: 'file' | 'directory'
   name: string
+  filename?: string
   children?: Entry[]
 }
 
@@ -86,7 +87,7 @@ namespace Explorer {
     ignored: Schema
       .array(String)
       .role('table')
-      .default(['**/node_modules', '**/.*'])
+      .default(['**/node_modules', '**/.*', 'accounts/*/data'])
       .description('要忽略的文件或目录。支持 [Glob Patterns](https://github.com/micromatch/micromatch) 语法。'),
   })
 }

@@ -110,8 +110,8 @@ class NodeConsole extends Console {
       }
       const stats = await fsp.stat(filename).catch<Stats>(noop)
       if (stats?.isFile()) return sendFile(filename)
-      const ext = extname(filename)
-      if (ext && ext !== '.html') return ctx.status = 404
+      // const ext = extname(filename)
+      // if (ext && ext !== '.html') return ctx.status = 404
       const template = await fsp.readFile(resolve(this.root, 'index.html'), 'utf8')
       ctx.type = 'html'
       ctx.body = await this.transformHtml(template)

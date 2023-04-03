@@ -5,7 +5,7 @@ import './icons'
 
 export default (ctx: Context) => {
   ctx.page({
-    path: '/files',
+    path: '/files/:name*',
     name: '资源管理器',
     icon: 'activity:explorer',
     order: 600,
