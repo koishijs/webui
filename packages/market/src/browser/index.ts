@@ -15,6 +15,7 @@ export {
   PackageProvider,
 }
 
+export const filter = false
 export const name = 'manager'
 export const using = ['console'] as const
 

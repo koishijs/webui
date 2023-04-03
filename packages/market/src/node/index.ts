@@ -17,6 +17,7 @@ declare module '@koishijs/plugin-console' {
   }
 }
 
+export const filter = false
 export const name = 'manager'
 export const using = ['console', 'loader'] as const
 

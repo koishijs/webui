@@ -9,6 +9,8 @@ export namespace DataService {
 }
 
 export abstract class DataService<T = never> extends Service {
+  static filter = false
+
   static keys = new Set<string>()
 
   static define(name: keyof Console.Services) {
