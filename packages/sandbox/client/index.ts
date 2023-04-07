@@ -1,5 +1,5 @@
 import { Context } from '@koishijs/client'
-import Sandbox from './index.vue'
+import Sandbox from './layout.vue'
 import './icons'
 
 export default (ctx: Context) => {

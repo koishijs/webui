@@ -50,7 +50,7 @@ import { channel, config, words, panelTypes } from './utils'
 import ChatMessage from './message.vue'
 
 const schema = Schema.object({
-  authority: Schema.natural().description('权限等级').default(1),
+  authority: Schema.natural().description('权限等级'),
 })
 
 const users = computed(() => {
@@ -77,13 +77,13 @@ function createUser() {
   } while (users.value.includes(name))
   config.value.user = name
   config.value.messages['@' + name] = []
-  send('sandbox/user', config.value.user, {})
+  send('sandbox/set-user', config.value.platform, config.value.user, {})
 }
 
 function removeUser(name: string) {
   const index = users.value.indexOf(name)
   delete config.value.messages['@' + name]
-  send('sandbox/user', config.value.user, null)
+  send('sandbox/set-user', config.value.platform, config.value.user, null)
   if (config.value.user === name) {
     config.value.user = users.value[index] || ''
   }
@@ -121,12 +121,12 @@ watch(() => store.sandbox?.[config.value.user], (value) => {
 
 watch(model, (value) => {
   if (deepEqual(value, store.sandbox?.[config.value.user])) return
-  send('sandbox/user', config.value.user, value)
+  send('sandbox/set-user', config.value.platform, config.value.user, value)
 }, { deep: true })
 
 function sendMessage(content: string) {
   offset.value = 0
-  send('sandbox/message', config.value.user, channel.value, content)
+  send('sandbox/message', config.value.platform, config.value.user, channel.value, content)
 }
 
 </script>

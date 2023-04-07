@@ -1,6 +1,7 @@
 import { receive, useStorage } from '@koishijs/client'
-import { Message } from '@koishijs/plugin-sandbox/src'
-import { Dict } from 'koishi'
+import type { Message } from '@koishijs/plugin-sandbox/src'
+import type { RemovableRef } from '@vueuse/core'
+import type { Dict } from 'koishi'
 import { computed } from 'vue'
 
 export const panelTypes = {
@@ -10,13 +11,15 @@ export const panelTypes = {
 }
 
 interface SandboxConfig {
+  platform: string
   user: string
   index: number
   messages: Dict<Message[]>
   panelType: keyof typeof panelTypes
 }
 
-export const config = useStorage<SandboxConfig>('sandbox', 1, () => ({
+export const config: RemovableRef<SandboxConfig> = useStorage<SandboxConfig>('sandbox', 1.1, () => ({
+  platform: 'sandbox:' + Math.random().toString(36).slice(2),
   user: '',
   index: 0,
   messages: {},
@@ -28,7 +31,7 @@ export const channel = computed(() => {
   return '@' + config.value.user
 })
 
-receive('sandbox', (message: Message) => {
+receive('sandbox/message', (message: Message) => {
   (config.value.messages[message.channel] ||= []).push(message)
 })
 
