@@ -1,4 +1,4 @@
-import { Context, noop, Schema, WebSocketLayer } from 'koishi'
+import { Context, noop, Schema, Time, WebSocketLayer } from 'koishi'
 import { Console, Entry } from '../shared'
 import { ViteDevServer } from 'vite'
 import { extname, resolve } from 'path'
@@ -18,6 +18,12 @@ interface ClientConfig {
   uiPath: string
   endpoint: string
   static?: boolean
+  heartbeat?: HeartbeatConfig
+}
+
+interface HeartbeatConfig {
+  interval?: number
+  timeout?: number
 }
 
 class NodeConsole extends Console {
@@ -29,9 +35,10 @@ class NodeConsole extends Console {
   constructor(public ctx: Context, public config: NodeConsole.Config) {
     super(ctx)
 
-    const { devMode, uiPath, apiPath, selfUrl } = config
+    const { devMode, uiPath, apiPath, selfUrl, heartbeat } = config
     this.global.devMode = devMode
     this.global.uiPath = uiPath
+    this.global.heartbeat = heartbeat
     this.global.endpoint = selfUrl + apiPath
 
     this.layer = ctx.router.ws(config.apiPath, (socket) => {
@@ -193,6 +200,7 @@ namespace NodeConsole {
     open?: boolean
     selfUrl?: string
     apiPath?: string
+    heartbeat?: HeartbeatConfig
   }
 
   export const Config: Schema<Config> = Schema.object({
@@ -201,6 +209,10 @@ namespace NodeConsole {
     apiPath: Schema.string().description('后端 API 服务的路径。').default('/status'),
     selfUrl: Schema.string().description('Koishi 服务暴露在公网的地址。').role('link').default(''),
     open: Schema.boolean().description('在应用启动后自动在浏览器中打开控制台。'),
+    heartbeat: Schema.object({
+      interval: Schema.number().description('心跳发送间隔 (单位毫秒)。').default(Time.second * 30),
+      timeout: Schema.number().description('心跳超时时间 (单位毫秒)。').default(Time.minute),
+    }),
     devMode: Schema.boolean().description('启用调试模式 (仅供开发者使用)。').default(process.env.NODE_ENV === 'development').hidden(),
     cacheDir: Schema.string().description('调试服务器缓存目录。').default('.vite').hidden(),
   })

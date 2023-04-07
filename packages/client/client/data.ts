@@ -1,7 +1,7 @@
 import { AbstractWebSocket, ClientConfig, Console, DataService, Events } from '@koishijs/plugin-console'
 import { Promisify } from 'koishi'
 import { markRaw, reactive, ref } from 'vue'
-import { useLocalStorage } from '@vueuse/core'
+import { RemovableRef, useLocalStorage } from '@vueuse/core'
 
 interface StorageData<T> {
   version: number
@@ -19,7 +19,7 @@ export function createStorage<T extends object>(key: string, version: number, fa
   return reactive<T>(storage.value['data'])
 }
 
-export let useStorage = <T extends object>(key: string, version: number, fallback?: () => T) => {
+export let useStorage = <T extends object>(key: string, version: number, fallback?: () => T): RemovableRef<T> => {
   const initial = fallback ? fallback() : {} as T
   initial['__version__'] = version
   const storage = useLocalStorage('koishi.console.' + key, initial)
@@ -91,15 +91,17 @@ receive('response', ({ id, value, error }) => {
 export function connect(callback: () => AbstractWebSocket) {
   const value = callback()
 
-  value.addEventListener('message', (ev) => {
-    const data = JSON.parse(ev.data)
-    console.debug('%c', 'color:purple', data.type, data.body)
-    if (data.type in listeners) {
-      listeners[data.type](data.body)
-    }
-  })
+  let sendTimer: number
+  let closeTimer: number
+  const refresh = () => {
+    if (!config.heartbeat) return
+    clearTimeout(sendTimer)
+    clearTimeout(closeTimer)
+    sendTimer = +setTimeout(() => send('ping'), config.heartbeat.interval)
+    closeTimer = +setTimeout(() => value?.close(), config.heartbeat.timeout)
+  }
 
-  value.addEventListener('close', () => {
+  const reconnect = () => {
     socket.value = null
     for (const key in store) {
       store[key] = undefined
@@ -110,7 +112,18 @@ export function connect(callback: () => AbstractWebSocket) {
         console.log('[koishi] websocket disconnected, will retry in 1s...')
       })
     }, 1000)
+  }
+
+  value.addEventListener('message', (ev) => {
+    refresh()
+    const data = JSON.parse(ev.data)
+    console.debug('%c', 'color:purple', data.type, data.body)
+    if (data.type in listeners) {
+      listeners[data.type](data.body)
+    }
   })
+
+  value.addEventListener('close', reconnect)
 
   return new Promise<AbstractWebSocket.Event>((resolve, reject) => {
     value.addEventListener('open', (event) => {

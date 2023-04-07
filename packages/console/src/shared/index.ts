@@ -56,6 +56,7 @@ export abstract class Console extends Service {
     super(ctx, 'console', true)
     ctx.plugin(EntryProvider)
     ctx.plugin(SchemaProvider)
+    this.addListener('ping', () => 'pong')
   }
 
   protected accept(socket: AbstractWebSocket) {
@@ -100,7 +101,9 @@ export abstract class Console extends Service {
   }
 }
 
-export interface Events {}
+export interface Events {
+  'ping'(): string
+}
 
 export namespace Console {
   export interface Services {
