@@ -1,76 +1,13 @@
-import { Bot, Context, defineProperty, Dict, Fragment, h, Messenger, Random, SendOptions } from 'koishi'
-import {} from '@koishijs/assets'
-
-class SandboxMessenger extends Messenger<SandboxBot> {
-  private buffer = ''
-
-  private rules: Dict<h.Transformer> = Object.fromEntries(['image', 'audio', 'video', 'file'].map((type) => {
-    return [type, async (data) => {
-      if (data.url.startsWith('file:') && this.bot.ctx.assets) {
-        return h(type, { ...data, url: await this.bot.ctx.assets.upload(data.url, data.url) })
-      }
-      return h(type, data)
-    }]
-  }))
-
-  async flush() {
-    if (!this.buffer.trim()) return
-    const content = await h.transformAsync(this.buffer.trim(), this.rules)
-    const session = this.bot.session(this.session)
-    session.messageId = Random.id()
-    session.app.console.broadcast('sandbox', {
-      content,
-      user: 'Koishi',
-      channel: session.channelId,
-      id: session.messageId,
-    })
-    this.results.push(session)
-    this.buffer = ''
-  }
-
-  async visit(element: h) {
-    const { type, children } = element
-    if (type === 'message' || type === 'figure') {
-      await this.flush()
-      await this.render(children)
-      await this.flush()
-    } else {
-      this.buffer += element.toString()
-    }
-  }
-}
+import { Bot, Context, Fragment, SendOptions } from 'koishi'
+import { SandboxMessenger } from './message'
 
 export class SandboxBot extends Bot {
   username = 'koishi'
   hidden = true
   internal = {}
 
-  constructor(public ctx: Context) {
-    super(ctx, {
-      platform: 'sandbox',
-      selfId: 'koishi',
-    })
-
-    const self = this
-    ctx.console.addListener('sandbox/message', async function (user, channel, content) {
-      const id = Random.id()
-      ctx.console.broadcast('sandbox', { id, content, user, channel })
-      const session = self.session({
-        userId: user,
-        content,
-        messageId: id,
-        channelId: channel,
-        guildId: channel === '@' + user ? undefined : channel,
-        type: 'message',
-        subtype: channel === '@' + user ? 'private' : 'group',
-        author: {
-          userId: user,
-          username: user,
-        },
-      })
-      defineProperty(session, 'client', this)
-      self.dispatch(session)
-    }, { authority: 4 })
+  constructor(ctx: Context, config: Bot.Config) {
+    super(ctx, config)
   }
 
   async sendMessage(channelId: string, fragment: Fragment, guildId?: string, options?: SendOptions) {
