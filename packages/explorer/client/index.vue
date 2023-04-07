@@ -1,7 +1,16 @@
 <template>
   <k-layout>
     <template #header>
-      资源管理器 - {{ active }}
+      资源管理器{{ active ? ' - ' + active : '' }}
+    </template>
+
+    <template #menu>
+      <span class="menu-item" :class="{ disabled: files[active]?.newValue === files[active]?.oldValue }" @click.stop.prevent="send('explorer/save', active, files[active].newValue)">
+        <k-icon class="menu-icon" name="save"></k-icon>
+      </span>
+      <span class="menu-item" @click.stop.prevent="send('explorer/refresh')">
+        <k-icon class="menu-icon" name="refresh"></k-icon>
+      </span>
     </template>
 
     <template #left>
@@ -21,7 +30,14 @@
           :allow-drop="allowDrop"
           @node-click="handleClick"
           @node-drop="handleDrop"
-        ></el-tree>
+          #="{ node }">
+          <div class="item">
+            <div class="label">{{ node.data.name }}</div>
+            <div class="right">
+              <template v-if="node.data.oldValue !== node.data.newValue">M</template>
+            </div>
+          </div>
+        </el-tree>
       </el-scrollbar>
     </template>
 
@@ -35,8 +51,9 @@
 import { ref, computed, watch, onActivated, nextTick } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useDark, useElementSize } from '@vueuse/core'
-import { Dict, send, store } from '@koishijs/client'
+import { send, store } from '@koishijs/client'
 import { Entry } from '@koishijs/plugin-explorer/src'
+import { files } from './store'
 import { model } from './editor'
 import * as monaco from 'monaco-editor'
 
@@ -74,27 +91,13 @@ watch(isDark, () => {
   monaco.editor.setTheme(isDark.value ? 'vs-dark' : 'vs-light')
 })
 
-const files = computed<Dict<Entry>>(() => {
-  const results = {}
-  function traverse(entries: Entry[], prefix = '') {
-    if (!entries) return
-    for (const entry of entries) {
-      entry.filename = prefix + entry.name
-      results[entry.filename] = entry
-      traverse(entry.children, entry.filename + '/')
-    }
-  }
-  traverse(store.explorer)
-  return results
-})
-
 const active = computed<string>({
   get() {
     const name = route.path.slice(7)
-    return name in files.value ? name : ''
+    return name in files ? name : ''
   },
   set(name) {
-    if (!(name in files.value)) name = ''
+    if (!(name in files)) name = ''
     router.replace('/files/' + name)
   },
 })
@@ -135,16 +138,20 @@ function getLanguage(filename: string) {
   return 'plaintext'
 }
 
-async function updateContent(filename: string) {
-  const content = await send('explorer/file', filename)
-  model.setValue(content)
-  monaco.editor.setModelLanguage(instance.getModel(), getLanguage(filename))
-}
-
-watch(active, async (filename) => {
-  if (files.value[filename]?.type !== 'file') return
-  await updateContent(filename)
+watch(() => files[active.value], async (entry) => {
+  if (entry?.type !== 'file') return
+  if (typeof entry.oldValue !== 'string') {
+    entry.oldValue = entry.newValue = await send('explorer/file', entry.filename)
+  }
+  model.setValue(entry.newValue)
+  monaco.editor.setModelLanguage(instance.getModel(), getLanguage(entry.filename))
 }, { immediate: true })
+
+model.onDidChangeContent((e) => {
+  const entry = files[active.value]
+  if (!entry) return
+  entry.newValue = model.getValue()
+})
 
 async function handleClick(data: Entry) {
   if (data.type !== 'file') return
@@ -170,6 +177,26 @@ onActivated(async () => {
   height: 100%;
   width: 100%;
   position: absolute;
+}
+.item {
+  flex: 1;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  overflow: hidden;
+}
+
+.label {
+  flex: 1 1 auto;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: var(--color-transition);
+}
+
+.right {
+  height: 100%;
+  margin: 0 0.75rem;
 }
 
 </style>

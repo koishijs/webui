@@ -1,7 +1,7 @@
 import { Context, Schema } from 'koishi'
 import { DataService } from '@koishijs/plugin-console'
 import { relative, resolve } from 'path'
-import { readdir, readFile } from 'fs/promises'
+import { readdir, readFile, writeFile } from 'fs/promises'
 import { FSWatcher, watch } from 'chokidar'
 import anymatch, { Tester } from 'anymatch'
 
@@ -14,6 +14,8 @@ declare module '@koishijs/plugin-console' {
 
   interface Events {
     'explorer/file'(filename: string): Promise<string>
+    'explorer/save'(filename: string, content: string): Promise<void>
+    'explorer/refresh'(): void
   }
 }
 
@@ -22,6 +24,8 @@ export interface Entry {
   name: string
   filename?: string
   children?: Entry[]
+  oldValue?: string
+  newValue?: string
 }
 
 class Explorer extends DataService<Entry[]> {
@@ -30,7 +34,7 @@ class Explorer extends DataService<Entry[]> {
   globFilter: Tester
 
   constructor(ctx: Context, config: Explorer.Config) {
-    super(ctx, 'explorer')
+    super(ctx, 'explorer', { authority: 4 })
 
     ctx.console.addEntry(process.env.KOISHI_BASE ? [
       process.env.KOISHI_BASE + '/dist/index.js',
@@ -52,7 +56,16 @@ class Explorer extends DataService<Entry[]> {
 
     ctx.console.addListener('explorer/file', (filename) => {
       return readFile(resolve(ctx.baseDir, filename), 'utf8')
-    })
+    }, { authority: 4 })
+
+    ctx.console.addListener('explorer/save', async (filename, content) => {
+      await writeFile(resolve(ctx.baseDir, filename), content, 'utf8')
+      this.refresh()
+    }, { authority: 4 })
+
+    ctx.console.addListener('explorer/refresh', () => {
+      this.refresh()
+    }, { authority: 4 })
   }
 
   stop() {
