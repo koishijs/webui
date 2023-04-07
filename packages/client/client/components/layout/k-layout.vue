@@ -100,6 +100,7 @@ const route = useRoute()
     .layout-main {
       flex: 1 1 auto;
       overflow: hidden;
+      position: relative;
     }
 
     .aside-mask {
