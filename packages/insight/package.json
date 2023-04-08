@@ -37,7 +37,6 @@
     "insight"
   ],
   "koishi": {
-    "category": "console",
     "public": [
       "dist"
     ],
@@ -52,11 +51,11 @@
     }
   },
   "peerDependencies": {
-    "@koishijs/plugin-console": "^5.5.7",
-    "koishi": "^4.12.3"
+    "@koishijs/plugin-console": "^5.6.1",
+    "koishi": "^4.12.4"
   },
   "devDependencies": {
-    "@koishijs/client": "^5.5.7",
+    "@koishijs/client": "^5.6.1",
     "@types/d3-force": "^3.0.4",
     "@types/throttle-debounce": "^2.1.0",
     "d3-force": "^3.0.0"

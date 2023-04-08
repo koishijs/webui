@@ -172,7 +172,7 @@ function handleUpdate(locale: string, path: string, value: string) {
   if (value) {
     root[`${active.value}.${path}`] = value
   } else {
-    delete root[`${active.value}.${path}`]
+    root[`${active.value}.${path}`] = null
   }
   update()
 }

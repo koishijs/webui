@@ -29,7 +29,6 @@
     "information"
   ],
   "koishi": {
-    "category": "console",
     "description": {
       "en": "Display running status and environment information in the console",
       "zh": "在控制台中显示运行状态和环境信息"
@@ -41,13 +40,13 @@
     }
   },
   "peerDependencies": {
-    "@koishijs/plugin-console": "^5.5.7",
-    "koishi": "^4.12.3"
+    "@koishijs/plugin-console": "^5.6.1",
+    "koishi": "^4.12.4"
   },
   "devDependencies": {
-    "@koishijs/client": "^5.5.7",
+    "@koishijs/client": "^5.6.1",
     "@types/envinfo": "^7.8.1",
-    "koishi": "^4.12.3"
+    "koishi": "^4.12.4"
   },
   "dependencies": {
     "envinfo": "^7.8.1",

@@ -24,6 +24,8 @@ class StubWebSocket implements AbstractWebSocket {
   send(data: string) {
     this.remote.dispatchEvent({ type: 'message', target: this, data })
   }
+
+  close() {}
 }
 
 class ServerWebSocket extends StubWebSocket {
