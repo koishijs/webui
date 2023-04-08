@@ -1,4 +1,4 @@
-import { receive, useStorage } from '@koishijs/client'
+import { receive, send, useStorage } from '@koishijs/client'
 import type { Message } from '@koishijs/plugin-sandbox/src'
 import type { RemovableRef } from '@vueuse/core'
 import type { Dict } from 'koishi'
@@ -35,14 +35,48 @@ receive('sandbox/message', (message: Message) => {
   (config.value.messages[message.channel] ||= []).push(message)
 })
 
-receive('sandbox/delete', ({ id, channel }) => {
-  const messages = config.value.messages[channel]
-  if (!messages) return
-  config.value.messages[channel] = messages.filter(msg => msg.id !== id)
-})
-
 receive('sandbox/clear', () => {
   config.value.messages[channel.value] = []
+})
+
+const api = {
+  deleteMessage({ messageId, channelId }) {
+    const messages = config.value.messages[channelId]
+    if (!messages) return
+    config.value.messages[channelId] = messages.filter(msg => msg.id !== messageId)
+  },
+  getMessage({ messageId, channelId }) {
+    return config.value.messages[channelId]?.find(msg => msg.id === messageId)
+  },
+  getChannel({ channelId, guildId }) {
+    return { channelId: '#' }
+  },
+  getChannelList({ guildId }) {
+    return [{ channelId: '#' }]
+  },
+  getGuild({ guildId }) {
+    return { guildId: '#' }
+  },
+  getGuildList() {
+    return [{ guildId: '#' }]
+  },
+  getGuildMember({ guildId, userId }) {
+    return { userId, username: userId }
+  },
+  getGuildMemberList({ guildId }) {
+    return Object
+      .keys(config.value.messages)
+      .filter(id => id.startsWith('@'))
+      .map((key) => {
+        const userId = key.slice(1)
+        return { userId, username: userId }
+      })
+  },
+}
+
+receive('sandbox/request', ({ method, nonce, data }) => {
+  const result = api[method]?.(data)
+  send('sandbox/response', nonce, result)
 })
 
 export const words = [

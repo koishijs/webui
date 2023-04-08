@@ -10,6 +10,10 @@ declare module 'koishi' {
       client: Client
     }
   }
+
+  interface Events {
+    'sandbox/response'(nonce: string, data: any): void
+  }
 }
 
 declare module '@koishijs/plugin-console' {
@@ -20,6 +24,7 @@ declare module '@koishijs/plugin-console' {
   }
 
   interface Events {
+    'sandbox/response'(this: Client, nonce: string, data?: any): void
     'sandbox/message'(this: Client, platform: string, user: string, channel: string, content: string): void
     'sandbox/get-user'(this: Client, platform: string, pid: string): Promise<User>
     'sandbox/set-user'(this: Client, platform: string, pid: string, data: Partial<User>): Promise<void>
@@ -124,6 +129,10 @@ export function apply(ctx: Context, config: Config) {
         ...data,
       }])
     }
+  }, { authority: 4 })
+
+  ctx.console.addListener('sandbox/response', (nonce, data) => {
+    ctx.emit('sandbox/response', nonce, data)
   }, { authority: 4 })
 
   ctx.on('console/connection', async (client) => {

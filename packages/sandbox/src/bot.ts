@@ -1,5 +1,5 @@
 import { Client } from '@koishijs/plugin-console'
-import { Bot, Context, Fragment, SendOptions } from 'koishi'
+import { Bot, Context, Fragment, SendOptions, Time } from 'koishi'
 import { SandboxMessenger } from './message'
 
 export class SandboxBot extends Bot {
@@ -12,6 +12,28 @@ export class SandboxBot extends Bot {
     super(ctx, config)
   }
 
+  async request<T = any>(method: string, data = {}) {
+    const client = [...this.clients][0]
+    const nonce = Math.random().toString(36).slice(2)
+    return new Promise<T>((resolve, reject) => {
+      const dispose1 = this.ctx.on('sandbox/response', (nonce2, data) => {
+        if (nonce !== nonce2) return
+        dispose1()
+        dispose2()
+        resolve(data)
+      })
+      const dispose2 = this.ctx.setTimeout(() => {
+        dispose1()
+        dispose2()
+        reject(new Error('timeout'))
+      }, Time.second * 5)
+      client.send({
+        type: 'sandbox/request',
+        body: { method, data, nonce },
+      })
+    })
+  }
+
   async sendMessage(channelId: string, fragment: Fragment, guildId?: string, options?: SendOptions) {
     return new SandboxMessenger(this, channelId, guildId, options).send(fragment)
   }
@@ -21,14 +43,35 @@ export class SandboxBot extends Bot {
   }
 
   async deleteMessage(channelId: string, messageId: string) {
-    this.ctx.console.broadcast('sandbox/delete', { id: messageId, channel: channelId })
+    return this.request('deleteMessage', { channelId, messageId })
+  }
+
+  async getMessage(channelId: string, messageId: string) {
+    return this.request('getMessage', { channelId, messageId })
+  }
+
+  async getChannel(channelId: string, guildId?: string) {
+    return this.request('getChannel', { channelId, guildId })
+  }
+
+  async getChannelList(guildId: string) {
+    return this.request('getChannelList', { guildId })
+  }
+
+  async getGuild(guildId: string) {
+    return this.request('getGuild', { guildId })
+  }
+
+  async getGuildList() {
+    return this.request('getGuildList')
+  }
+
+  async getGuildMember(guildId: string, userId: string) {
+    return this.request('getGuildMember', { guildId, userId })
   }
 
   async getGuildMemberList(guildId: string) {
-    return words.map((word) => ({
-      nickname: word,
-      userId: word,
-    }))
+    return this.request('getGuildMemberList', { guildId })
   }
 }
 

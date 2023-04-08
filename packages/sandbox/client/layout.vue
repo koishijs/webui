@@ -35,7 +35,7 @@
           <chat-message :data="data"></chat-message>
         </virtual-list>
         <div class="card-footer">
-          <chat-input v-model="input" @send="sendMessage" @keydown="onKeydown"></chat-input>
+          <chat-input v-model="input" @send="sendMessage" @keydown="onKeydown" placeholder="发送消息到沙盒"></chat-input>
         </div>
       </template>
     </keep-alive>
