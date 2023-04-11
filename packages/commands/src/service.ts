@@ -106,7 +106,7 @@ export default class CommandProvider extends DataService<CommandData[]> {
     return commands.map((command) => ({
       paths: findAncestors(command.ctx.scope),
       name: command.name,
-      children: (command.name === 'test' ? console.log(command.children) : 0, this.traverse(command.children)),
+      children: this.traverse(command.children),
       create: this.manager.snapshots[command.name]?.create,
       initial: this.manager.snapshots[command.name]?.initial || { aliases: command._aliases, config: command.config, options: command._options },
       override: this.manager.snapshots[command.name]?.override || { aliases: command._aliases, config: null, options: {} },
