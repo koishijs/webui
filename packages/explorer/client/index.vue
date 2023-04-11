@@ -5,10 +5,10 @@
     </template>
 
     <template #menu>
-      <span class="menu-item" :class="{ disabled: files[active]?.newValue === files[active]?.oldValue }" @click.stop.prevent="send('explorer/save', active, files[active].newValue)">
+      <span class="menu-item" :class="{ disabled: files[active]?.newValue === files[active]?.oldValue }" @click.prevent="send('explorer/save', active, files[active].newValue)">
         <k-icon class="menu-icon" name="save"></k-icon>
       </span>
-      <span class="menu-item" @click.stop.prevent="send('explorer/refresh')">
+      <span class="menu-item" @click.prevent="send('explorer/refresh')">
         <k-icon class="menu-icon" name="refresh"></k-icon>
       </span>
     </template>
@@ -29,6 +29,7 @@
           :allow-drag="allowDrag"
           :allow-drop="allowDrop"
           @node-click="handleClick"
+          @node-contextmenu="handleContextMenu"
           @node-drop="handleDrop"
           #="{ node }">
           <div class="item">
@@ -44,13 +45,30 @@
     <div ref="editor" v-if="files[active]?.type === 'file'" class="editor"></div>
     <k-empty v-else>在左侧栏选择要查看的文件</k-empty>
   </k-layout>
+
+  <teleport to="body">
+    <div ref="menu" class="context-menu" v-if="menuTarget">
+      <div class="item" v-if="menuTarget.type === 'directory'">
+        新建文件
+      </div>
+      <div class="item" v-if="menuTarget.type === 'directory'">
+        新建文件夹
+      </div>
+      <div class="item" @click.prevent="send('explorer/remove', menuTarget.filename)">
+        删除
+      </div>
+      <div class="item">
+        重命名
+      </div>
+    </div>
+  </teleport>
 </template>
 
 <script lang="ts" setup>
 
 import { ref, computed, watch, onActivated, nextTick } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { useDark, useElementSize } from '@vueuse/core'
+import { useDark, useElementSize, useEventListener } from '@vueuse/core'
 import { send, store } from '@koishijs/client'
 import { Entry } from '@koishijs/plugin-explorer/src'
 import { files } from './store'
@@ -61,8 +79,18 @@ const route = useRoute()
 const router = useRouter()
 const keyword = ref('')
 const tree = ref(null)
+const menu = ref(null)
 const root = ref<{ $el: HTMLElement }>(null)
 const editor = ref(null)
+const menuTarget = ref<Entry>(null)
+
+useEventListener('click', () => {
+  menuTarget.value = null
+})
+
+useEventListener('contextmenu', () => {
+  menuTarget.value = null
+})
 
 let instance: monaco.editor.IStandaloneCodeEditor = null
 
@@ -144,7 +172,7 @@ watch(() => files[active.value], async (entry) => {
     entry.oldValue = entry.newValue = await send('explorer/file', entry.filename)
   }
   model.setValue(entry.newValue)
-  monaco.editor.setModelLanguage(instance.getModel(), getLanguage(entry.filename))
+  monaco.editor.setModelLanguage(model, getLanguage(entry.filename))
 }, { immediate: true })
 
 model.onDidChangeContent((e) => {
@@ -156,6 +184,15 @@ model.onDidChangeContent((e) => {
 async function handleClick(data: Entry) {
   if (data.type !== 'file') return
   active.value = data.filename
+}
+
+async function handleContextMenu(event: MouseEvent, data: Entry) {
+  event.preventDefault()
+  menuTarget.value = data
+  await nextTick()
+  const { clientX, clientY } = event
+  menu.value.style.left = clientX + 'px'
+  menu.value.style.top = clientY + 'px'
 }
 
 function handleDrop(source: Node, target: Node, position: 'before' | 'after' | 'inner', event: DragEvent) {
@@ -197,6 +234,29 @@ onActivated(async () => {
 .right {
   height: 100%;
   margin: 0 0.75rem;
+}
+
+.context-menu {
+  position: fixed;
+  z-index: 1000;
+  min-width: 12rem;
+  padding: 0.5rem 0;
+  border-radius: 4px;
+  background-color: var(--card-bg);
+  box-shadow: var(--card-shadow);
+  transition: var(--color-transition);
+  font-size: 14px;
+
+  .item {
+    user-select: none;
+    padding: 0.25rem 1.5rem;
+    cursor: pointer;
+    transition: var(--color-transition);
+
+    &:hover {
+      background-color: var(--hover-bg);
+    }
+  }
 }
 
 </style>
