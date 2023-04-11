@@ -1,7 +1,7 @@
 import { Context, Schema } from 'koishi'
 import { DataService } from '@koishijs/plugin-console'
 import { relative, resolve } from 'path'
-import { mkdir, readdir, readFile, rm, writeFile } from 'fs/promises'
+import { mkdir, readdir, readFile, rename, rm, writeFile } from 'fs/promises'
 import { FSWatcher, watch } from 'chokidar'
 import anymatch, { Tester } from 'anymatch'
 
@@ -17,6 +17,7 @@ declare module '@koishijs/plugin-console' {
     'explorer/write'(filename: string, content: string): Promise<void>
     'explorer/mkdir'(filename: string): Promise<void>
     'explorer/remove'(filename: string): Promise<void>
+    'explorer/rename'(oldValue: string, newValue: string): Promise<void>
     'explorer/refresh'(): void
   }
 }
@@ -76,6 +77,13 @@ class Explorer extends DataService<Entry[]> {
     ctx.console.addListener('explorer/remove', async (filename) => {
       filename = resolve(ctx.baseDir, filename)
       await rm(filename, { recursive: true })
+      this.refresh()
+    }, { authority: 4 })
+
+    ctx.console.addListener('explorer/rename', async (oldValue, newValue) => {
+      oldValue = resolve(ctx.baseDir, oldValue)
+      newValue = resolve(ctx.baseDir, newValue)
+      await rename(oldValue, newValue)
       this.refresh()
     }, { authority: 4 })
 

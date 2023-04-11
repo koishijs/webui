@@ -37,7 +37,15 @@
           @node-drop="handleDrop"
           #="{ node }">
           <div class="item">
-            <div class="label">{{ node.data.name }}</div>
+            <div class="label">
+              <input
+                v-if="node.data.filename === renaming"
+                v-model="node.data.name"
+                @keypress.enter.prevent="confirmRename(node.data)"
+                @keypress.esc.prevent="cancelRename(node.data)"
+              />
+              <template v-else>{{ node.data.name }}</template>
+            </div>
             <div class="right">
               <template v-if="node.data.oldValue !== node.data.newValue">M</template>
             </div>
@@ -52,16 +60,16 @@
 
   <teleport to="body">
     <div ref="menu" class="context-menu" v-if="menuTarget">
-      <div class="item" v-if="menuTarget.type === 'directory'">
+      <div class="item" v-if="menuTarget.type === 'directory'" @click.prevent="createEntry('file')">
         新建文件
       </div>
-      <div class="item" v-if="menuTarget.type === 'directory'">
+      <div class="item" v-if="menuTarget.type === 'directory'" @click.prevent="createEntry('directory')">
         新建文件夹
       </div>
       <div class="item" @click.prevent="send('explorer/remove', menuTarget.filename)">
         删除
       </div>
-      <div class="item">
+      <div class="item" @click.prevent="renaming = menuTarget.filename">
         重命名
       </div>
     </div>
@@ -90,7 +98,8 @@ const tree = ref(null)
 const menu = ref(null)
 const root = ref<{ $el: HTMLElement }>(null)
 const editor = ref(null)
-const menuTarget = ref<Entry>(null)
+const menuTarget = ref<TreeEntry>(null)
+const renaming = ref<string>(null)
 const data = ref<TreeEntry[]>([])
 
 function* getExpanded(tree: TreeEntry[]) {
@@ -163,19 +172,76 @@ const active = computed<string>({
   },
 })
 
-function getClass(data: Entry) {
+function getClass(data: TreeEntry) {
   const words: string[] = []
   if (data.name === active.value) words.push('is-active')
   return words.join(' ')
 }
 
-function filterNode(value: string, data: Entry) {
+function filterNode(value: string, data: TreeEntry) {
   return data.name.includes(keyword.value)
+}
+
+function createEntry(type: 'file' | 'directory') {
+  renaming.value = menuTarget.value.filename + '/'
+  files[renaming.value] = {
+    type,
+    name: '',
+    filename: renaming.value,
+    oldValue: '',
+    newValue: '',
+  }
+  menuTarget.value.expanded = true
+  menuTarget.value.children.push(files[renaming.value])
+}
+
+function confirmRename(entry: TreeEntry) {
+  const segments = entry.filename.split(/\//g)
+  const name = segments.pop()
+  segments.push(entry.name)
+  const filename = segments.join('/')
+  if (filename in files || !entry.name) {
+    if (name) {
+      entry.name = name
+    } else {
+      delete files[entry.filename]
+      const parent = files[segments.slice(0, -1).join('/')]?.children || data.value
+      parent.splice(parent.indexOf(entry), 1)
+    }
+  } else if (entry.filename !== filename) {
+    files[filename] = entry
+    delete files[entry.filename]
+    if (name) {
+      send('explorer/rename', entry.filename, filename)
+      active.value = filename
+    } else if (entry.type === 'file') {
+      send('explorer/write', filename, '')
+      active.value = filename
+    } else {
+      send('explorer/mkdir', filename)
+    }
+    entry.filename = filename
+  }
+  renaming.value = null
+}
+
+function cancelRename(entry: TreeEntry) {
+  const segments = entry.filename.split(/\//g)
+  const name = segments.pop()
+  segments.push(entry.name)
+  if (name) {
+    entry.name = name
+  } else {
+    delete files[entry.filename]
+    const parent = files[segments.slice(0, -1).join('/')]?.children || data.value
+    parent.splice(parent.indexOf(entry), 1)
+  }
+  renaming.value = null
 }
 
 interface Node {
   label: string
-  data: Entry
+  data: TreeEntry
   parent: Node
   expanded: boolean
   isLeaf: boolean
@@ -214,12 +280,12 @@ model.onDidChangeContent((e) => {
   entry.newValue = model.getValue()
 })
 
-async function handleClick(data: Entry) {
+async function handleClick(data: TreeEntry) {
   if (data.type !== 'file') return
   active.value = data.filename
 }
 
-async function handleContextMenu(event: MouseEvent, data: Entry) {
+async function handleContextMenu(event: MouseEvent, data: TreeEntry) {
   event.preventDefault()
   menuTarget.value = data
   await nextTick()
