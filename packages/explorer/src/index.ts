@@ -13,8 +13,8 @@ declare module '@koishijs/plugin-console' {
   }
 
   interface Events {
-    'explorer/file'(filename: string): Promise<string>
-    'explorer/save'(filename: string, content: string): Promise<void>
+    'explorer/read'(filename: string): Promise<string>
+    'explorer/write'(filename: string, content: string): Promise<void>
     'explorer/mkdir'(filename: string): Promise<void>
     'explorer/remove'(filename: string): Promise<void>
     'explorer/refresh'(): void
@@ -25,7 +25,7 @@ export interface Entry {
   type: 'file' | 'directory'
   name: string
   filename?: string
-  children?: Entry[]
+  children?: this[]
   oldValue?: string
   newValue?: string
 }
@@ -56,12 +56,12 @@ class Explorer extends DataService<Entry[]> {
       ignored: config.ignored,
     })
 
-    ctx.console.addListener('explorer/file', (filename) => {
+    ctx.console.addListener('explorer/read', (filename) => {
       filename = resolve(ctx.baseDir, filename)
       return readFile(filename, 'utf8')
     }, { authority: 4 })
 
-    ctx.console.addListener('explorer/save', async (filename, content) => {
+    ctx.console.addListener('explorer/write', async (filename, content) => {
       filename = resolve(ctx.baseDir, filename)
       await writeFile(filename, content, 'utf8')
       this.refresh()
@@ -98,7 +98,12 @@ class Explorer extends DataService<Entry[]> {
       } else if (dirent.isDirectory()) {
         return { type: 'directory', name: dirent.name, children: await this.traverse(filename) }
       }
-    })).then(entries => entries.filter(Boolean))
+    })).then((entries) => entries
+      .filter(Boolean)
+      .sort((a, b) => {
+        if (a.type !== b.type) return a.type === 'directory' ? -1 : 1
+        return a.name.localeCompare(b.name)
+      }))
   }
 
   private async _get() {

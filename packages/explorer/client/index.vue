@@ -5,7 +5,7 @@
     </template>
 
     <template #menu>
-      <span class="menu-item" :class="{ disabled: files[active]?.newValue === files[active]?.oldValue }" @click.prevent="send('explorer/save', active, files[active].newValue)">
+      <span class="menu-item" :class="{ disabled: files[active]?.newValue === files[active]?.oldValue }" @click.prevent="send('explorer/write', active, files[active].newValue)">
         <k-icon class="menu-icon" name="save"></k-icon>
       </span>
       <span class="menu-item" @click.prevent="send('explorer/refresh')">
@@ -22,14 +22,18 @@
         </div>
         <el-tree
           ref="tree"
+          node-key="filename"
           :draggable="true"
-          :data="store.explorer"
+          :data="data"
           :props="{ label: 'name', class: getClass }"
           :filter-node-method="filterNode"
           :allow-drag="allowDrag"
           :allow-drop="allowDrop"
+          :default-expanded-keys="expandedKeys"
           @node-click="handleClick"
           @node-contextmenu="handleContextMenu"
+          @node-expand="handleExpand"
+          @node-collapse="handleCollapse"
           @node-drop="handleDrop"
           #="{ node }">
           <div class="item">
@@ -75,6 +79,10 @@ import { files } from './store'
 import { model } from './editor'
 import * as monaco from 'monaco-editor'
 
+interface TreeEntry extends Entry {
+  expanded?: boolean
+}
+
 const route = useRoute()
 const router = useRouter()
 const keyword = ref('')
@@ -83,6 +91,31 @@ const menu = ref(null)
 const root = ref<{ $el: HTMLElement }>(null)
 const editor = ref(null)
 const menuTarget = ref<Entry>(null)
+const data = ref<TreeEntry[]>([])
+
+function* getExpanded(tree: TreeEntry[]) {
+  for (const item of tree) {
+    if (item.expanded) yield item.filename
+    if (item.children) yield* getExpanded(item.children)
+  }
+}
+
+const expandedKeys = computed(() => [...getExpanded(data.value)])
+
+function merge(base: TreeEntry[], head: Entry[]) {
+  return head?.map((entry) => {
+    const old = base.find(old => old.type === entry.type && old.name === entry.name)
+    if (old) {
+      return { ...old, ...entry, children: merge(old.children, entry.children) }
+    } else {
+      return entry
+    }
+  })
+}
+
+watch(() => store.explorer, (value) => {
+  data.value = merge(data.value, value) || []
+}, { immediate: true })
 
 useEventListener('click', () => {
   menuTarget.value = null
@@ -169,7 +202,7 @@ function getLanguage(filename: string) {
 watch(() => files[active.value], async (entry) => {
   if (entry?.type !== 'file') return
   if (typeof entry.oldValue !== 'string') {
-    entry.oldValue = entry.newValue = await send('explorer/file', entry.filename)
+    entry.oldValue = entry.newValue = await send('explorer/read', entry.filename)
   }
   model.setValue(entry.newValue)
   monaco.editor.setModelLanguage(model, getLanguage(entry.filename))
@@ -193,6 +226,14 @@ async function handleContextMenu(event: MouseEvent, data: Entry) {
   const { clientX, clientY } = event
   menu.value.style.left = clientX + 'px'
   menu.value.style.top = clientY + 'px'
+}
+
+function handleExpand(entry: TreeEntry) {
+  entry.expanded = true
+}
+
+function handleCollapse(entry: TreeEntry) {
+  entry.expanded = false
 }
 
 function handleDrop(source: Node, target: Node, position: 'before' | 'after' | 'inner', event: DragEvent) {
