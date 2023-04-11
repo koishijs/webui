@@ -39,10 +39,11 @@
           <div class="item">
             <div class="label">
               <input
+                v-focus
                 v-if="node.data.filename === renaming"
                 v-model="node.data.name"
-                @keypress.enter.prevent="confirmRename(node.data)"
-                @keypress.esc.prevent="cancelRename(node.data)"
+                @keypress.enter.prevent="confirmRename()"
+                @keypress.esc.prevent="cancelRename()"
               />
               <template v-else>{{ node.data.name }}</template>
             </div>
@@ -66,19 +67,31 @@
       <div class="item" v-if="menuTarget.type === 'directory'" @click.prevent="createEntry('directory')">
         新建文件夹
       </div>
-      <div class="item" @click.prevent="send('explorer/remove', menuTarget.filename)">
+      <div class="item" @click.prevent="cancelRename(), removing = menuTarget.filename">
         删除
       </div>
-      <div class="item" @click.prevent="renaming = menuTarget.filename">
+      <div class="item" @click.prevent="cancelRename(), renaming = menuTarget.filename">
         重命名
       </div>
     </div>
   </teleport>
+
+  <el-dialog v-model="showRemoving" destroy-on-close>
+    你真的要删除文件 {{ removing }} 吗？
+    <template #footer>
+      <span class="dialog-footer">
+        <el-button @click="removing = null">取消</el-button>
+        <el-button type="primary" @click="send('explorer/remove', removing), removing = null">
+          确认
+        </el-button>
+      </span>
+    </template>
+  </el-dialog>
 </template>
 
 <script lang="ts" setup>
 
-import { ref, computed, watch, onActivated, nextTick } from 'vue'
+import { Directive, ref, computed, watch, onActivated, nextTick } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useDark, useElementSize, useEventListener } from '@vueuse/core'
 import { send, store } from '@koishijs/client'
@@ -86,6 +99,10 @@ import { Entry } from '@koishijs/plugin-explorer/src'
 import { files } from './store'
 import { model } from './editor'
 import * as monaco from 'monaco-editor'
+
+const vFocus: Directive = {
+  mounted: (el) => el.focus()
+}
 
 interface TreeEntry extends Entry {
   expanded?: boolean
@@ -101,6 +118,12 @@ const editor = ref(null)
 const menuTarget = ref<TreeEntry>(null)
 const renaming = ref<string>(null)
 const data = ref<TreeEntry[]>([])
+const removing = ref<string>(null)
+
+const showRemoving = computed({
+  get: () => !!removing.value,
+  set: (v) => removing.value = null,
+})
 
 function* getExpanded(tree: TreeEntry[]) {
   for (const item of tree) {
@@ -183,6 +206,7 @@ function filterNode(value: string, data: TreeEntry) {
 }
 
 function createEntry(type: 'file' | 'directory') {
+  cancelRename()
   renaming.value = menuTarget.value.filename + '/'
   files[renaming.value] = {
     type,
@@ -195,7 +219,8 @@ function createEntry(type: 'file' | 'directory') {
   menuTarget.value.children.push(files[renaming.value])
 }
 
-function confirmRename(entry: TreeEntry) {
+function confirmRename() {
+  const entry = files[renaming.value]
   const segments = entry.filename.split(/\//g)
   const name = segments.pop()
   segments.push(entry.name)
@@ -225,7 +250,9 @@ function confirmRename(entry: TreeEntry) {
   renaming.value = null
 }
 
-function cancelRename(entry: TreeEntry) {
+function cancelRename() {
+  if (!renaming.value) return
+  const entry = files[renaming.value]
   const segments = entry.filename.split(/\//g)
   const name = segments.pop()
   segments.push(entry.name)
