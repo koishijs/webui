@@ -3,6 +3,9 @@
     <div class="avatar">{{ data.user[0] }}</div>
     <div class="nickname">{{ data.user }}</div>
     <div class="message-box" @contextmenu="$emit('message-contextmenu', $event)">
+      <blockquote class="quote" v-if="data.quote">
+        <span class="abstract">{{ data.quote.content }}</span>
+      </blockquote>
       <message-content :content="data.content"/>
     </div>
   </div>
@@ -67,6 +70,17 @@ defineEmits(['message-contextmenu'])
       border-radius: 0 0 0 32px;
       color: var(--page-bg);
       transition: color ease .3s;
+    }
+
+    .quote {
+      font-size: 0.9rem;
+      margin: 0 0 0.2rem;
+      background-color: #f3f6f9;
+      border: none;
+      border-radius: 0.5rem;
+      padding: 0.2rem 0.6rem;
+      background-color: var(--card-bg);
+      opacity: 0.5;
     }
   }
 }

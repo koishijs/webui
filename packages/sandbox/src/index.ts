@@ -19,7 +19,7 @@ declare module '@koishijs/plugin-console' {
 
   interface Events {
     'sandbox/response'(this: Client, nonce: string, data?: any): void
-    'sandbox/send-message'(this: Client, platform: string, user: string, channel: string, content: string): void
+    'sandbox/send-message'(this: Client, platform: string, user: string, channel: string, content: string, quote?: Message): void
     'sandbox/delete-message'(this: Client, platform: string, user: string, channel: string, messageId: string): void
     'sandbox/get-user'(this: Client, platform: string, pid: string): Promise<User>
     'sandbox/set-user'(this: Client, platform: string, pid: string, data: Partial<User>): Promise<void>
@@ -32,6 +32,7 @@ export interface Message {
   channel: string
   content: string
   platform: string
+  quote?: Message
 }
 
 export const filter = false
@@ -88,7 +89,7 @@ export function apply(ctx: Context, config: Config) {
     },
   })
 
-  ctx.console.addListener('sandbox/send-message', async function (platform, userId, channel, content) {
+  ctx.console.addListener('sandbox/send-message', async function (platform, userId, channel, content, quote) {
     const bot = bots[platform] ||= new SandboxBot(ctx, {
       platform,
       selfId: 'koishi',
@@ -97,13 +98,18 @@ export function apply(ctx: Context, config: Config) {
     const id = Random.id()
     this.send({
       type: 'sandbox/message',
-      body: { id, content, user: userId, channel, platform },
+      body: { id, content, user: userId, channel, platform, quote },
     })
     bot.dispatch(bot.session({
       ...templateSession(userId, channel),
       content,
       messageId: id,
       type: 'message',
+      quote: quote && {
+        ...templateSession(quote.user, quote.channel),
+        content: quote.content,
+        messageId: quote.id,
+      },
     }))
   }, { authority: 4 })
 

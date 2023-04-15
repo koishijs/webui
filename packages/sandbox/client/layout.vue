@@ -35,6 +35,10 @@
           <chat-message :data="data" @message-contextmenu="handleContextMenu($event, data)"></chat-message>
         </virtual-list>
         <div class="card-footer">
+          <div class="quote" v-if="quote">
+            <span class="left">正在回复 @{{ quote.user }}</span>
+            <k-icon name="times-full" @click="quote = null"></k-icon>
+          </div>
           <chat-input v-model="input" @send="sendMessage" @keydown="onKeydown" placeholder="发送消息到沙盒"></chat-input>
         </div>
       </template>
@@ -45,6 +49,9 @@
     <div ref="menu" class="message-context-menu" v-if="menuTarget">
       <div class="item" @click.prevent="deleteMessage(menuTarget)">
         删除消息
+      </div>
+      <div class="item" @click.prevent="quote = menuTarget, menuTarget = null">
+        引用回复
       </div>
     </div>
   </teleport>
@@ -103,6 +110,7 @@ function removeUser(name: string) {
 
 const input = ref('')
 const offset = ref(0)
+const quote = ref<Message>()
 
 function onKeydown(event: KeyboardEvent) {
   if (event.key === 'ArrowUp') {
@@ -138,7 +146,8 @@ watch(model, (value) => {
 
 function sendMessage(content: string) {
   offset.value = 0
-  send('sandbox/send-message', config.value.platform, config.value.user, channel.value, content)
+  send('sandbox/send-message', config.value.platform, config.value.user, channel.value, content, quote.value)
+  quote.value = null
 }
 
 async function handleContextMenu(event: MouseEvent, data: Message) {
@@ -194,6 +203,19 @@ async function deleteMessage(data: Message) {
   .card-footer {
     padding: 1rem 1.25rem;
     border-top: 1px solid var(--border);
+
+    .quote {
+      opacity: 0.5;
+      font-size: 14px;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+
+      .k-icon {
+        cursor: pointer;
+      }
+    }
   }
 
   .user-container {
