@@ -40,7 +40,7 @@ receive('sandbox/clear', () => {
   config.value.messages[channel.value] = []
 })
 
-const api = {
+export const api = {
   deleteMessage({ messageId, channelId }) {
     const messages = config.value.messages[channelId]
     if (!messages) return

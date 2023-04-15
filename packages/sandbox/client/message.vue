@@ -2,7 +2,7 @@
   <div class="chat-message">
     <div class="avatar">{{ data.user[0] }}</div>
     <div class="nickname">{{ data.user }}</div>
-    <div class="message-box">
+    <div class="message-box" @contextmenu="$emit('message-contextmenu', $event)">
       <message-content :content="data.content"/>
     </div>
   </div>
@@ -16,6 +16,8 @@ import { MessageContent } from '@koishijs/client'
 defineProps<{
   data: Message
 }>()
+
+defineEmits(['message-contextmenu'])
 
 </script>
 

@@ -1,4 +1,4 @@
-import { $, Context, defineProperty, Dict, Random, Schema, User } from 'koishi'
+import { $, Context, Dict, Random, Schema, User } from 'koishi'
 import { DataService } from '@koishijs/plugin-console'
 import { resolve } from 'path'
 import { SandboxBot } from './bot'
@@ -19,7 +19,8 @@ declare module '@koishijs/plugin-console' {
 
   interface Events {
     'sandbox/response'(this: Client, nonce: string, data?: any): void
-    'sandbox/message'(this: Client, platform: string, user: string, channel: string, content: string): void
+    'sandbox/send-message'(this: Client, platform: string, user: string, channel: string, content: string): void
+    'sandbox/delete-message'(this: Client, platform: string, user: string, channel: string, messageId: string): void
     'sandbox/get-user'(this: Client, platform: string, pid: string): Promise<User>
     'sandbox/set-user'(this: Client, platform: string, pid: string, data: Partial<User>): Promise<void>
   }
@@ -75,7 +76,19 @@ export function apply(ctx: Context, config: Config) {
 
   const bots: Dict<SandboxBot> = {}
 
-  ctx.console.addListener('sandbox/message', async function (platform, userId, channel, content) {
+  const templateSession = (userId: string, channelId: string) => ({
+    userId,
+    channelId,
+    guildId: channelId === '@' + userId ? undefined : channelId,
+    subtype: channelId === '@' + userId ? 'private' : 'group',
+    timestamp: Date.now(),
+    author: {
+      userId,
+      username: userId,
+    },
+  })
+
+  ctx.console.addListener('sandbox/send-message', async function (platform, userId, channel, content) {
     const bot = bots[platform] ||= new SandboxBot(ctx, {
       platform,
       selfId: 'koishi',
@@ -86,28 +99,31 @@ export function apply(ctx: Context, config: Config) {
       type: 'sandbox/message',
       body: { id, content, user: userId, channel, platform },
     })
-    const session = bot.session({
-      userId,
+    bot.dispatch(bot.session({
+      ...templateSession(userId, channel),
       content,
       messageId: id,
-      channelId: channel,
-      guildId: channel === '@' + userId ? undefined : channel,
       type: 'message',
-      subtype: channel === '@' + userId ? 'private' : 'group',
-      timestamp: Date.now(),
-      author: {
-        userId,
-        username: userId,
-      },
+    }))
+  }, { authority: 4 })
+
+  ctx.console.addListener('sandbox/delete-message', async function (platform, userId, channel, messageId) {
+    const bot = bots[platform] ||= new SandboxBot(ctx, {
+      platform,
+      selfId: 'koishi',
     })
-    defineProperty(session, 'client', this)
-    bot.dispatch(session)
+    bot.clients.add(this)
+    bot.dispatch(bot.session({
+      ...templateSession(userId, channel),
+      messageId,
+      type: 'message-deleted',
+    }))
   }, { authority: 4 })
 
   ctx.console.addListener('sandbox/get-user', async function (platform, pid) {
     if (!ctx.database) return
     return ctx.database.getUser(platform, pid)
-  })
+  }, { authority: 4 })
 
   ctx.console.addListener('sandbox/set-user', async function (platform, pid, data) {
     if (!ctx.database) return

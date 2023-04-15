@@ -32,7 +32,7 @@
       </k-content>
       <template v-else :key="channel">
         <virtual-list :data="config.messages[channel] || []" #="data" pinned>
-          <chat-message :data="data"></chat-message>
+          <chat-message :data="data" @message-contextmenu="handleContextMenu($event, data)"></chat-message>
         </virtual-list>
         <div class="card-footer">
           <chat-input v-model="input" @send="sendMessage" @keydown="onKeydown" placeholder="发送消息到沙盒"></chat-input>
@@ -40,14 +40,26 @@
       </template>
     </keep-alive>
   </k-layout>
+
+  <teleport to="body">
+    <div ref="menu" class="message-context-menu" v-if="menuTarget">
+      <div class="item" @click.prevent="deleteMessage(menuTarget)">
+        删除消息
+      </div>
+    </div>
+  </teleport>
 </template>
 
 <script lang="ts" setup>
 
 import { clone, message, send, Schema, store, ChatInput, VirtualList, deepEqual } from '@koishijs/client'
-import { computed, ref, watch } from 'vue'
-import { channel, config, words, panelTypes } from './utils'
+import { computed, nextTick, ref, watch } from 'vue'
+import { api, channel, config, words, panelTypes } from './utils'
 import ChatMessage from './message.vue'
+import { Message } from '../src'
+
+const menuTarget = ref<Message>()
+const menu = ref()
 
 const schema = Schema.object({
   authority: Schema.natural().description('权限等级'),
@@ -126,7 +138,22 @@ watch(model, (value) => {
 
 function sendMessage(content: string) {
   offset.value = 0
-  send('sandbox/message', config.value.platform, config.value.user, channel.value, content)
+  send('sandbox/send-message', config.value.platform, config.value.user, channel.value, content)
+}
+
+async function handleContextMenu(event: MouseEvent, data: Message) {
+  event.preventDefault()
+  menuTarget.value = data
+  await nextTick()
+  const { clientX, clientY } = event
+  menu.value.style.left = clientX + 'px'
+  menu.value.style.top = clientY + 'px'
+}
+
+async function deleteMessage(data: Message) {
+  await send('sandbox/delete-message', data.platform, data.user, data.channel, data.id)
+  menuTarget.value = null
+  api.deleteMessage({ messageId: data.id, channelId: data.channel })
 }
 
 </script>
@@ -198,6 +225,29 @@ function sendMessage(content: string) {
       &:hover {
         opacity: 1;
       }
+    }
+  }
+}
+
+.message-context-menu {
+  position: fixed;
+  z-index: 1000;
+  min-width: 12rem;
+  padding: 0.5rem 0;
+  border-radius: 4px;
+  background-color: var(--card-bg);
+  box-shadow: var(--card-shadow);
+  transition: var(--color-transition);
+  font-size: 14px;
+
+  .item {
+    user-select: none;
+    padding: 0.25rem 1.5rem;
+    cursor: pointer;
+    transition: var(--color-transition);
+
+    &:hover {
+      background-color: var(--hover-bg);
     }
   }
 }
