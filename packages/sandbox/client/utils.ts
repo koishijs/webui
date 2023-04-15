@@ -32,6 +32,7 @@ export const channel = computed(() => {
 })
 
 receive('sandbox/message', (message: Message) => {
+  if (message.platform !== config.value.platform) return
   (config.value.messages[message.channel] ||= []).push(message)
 })
 

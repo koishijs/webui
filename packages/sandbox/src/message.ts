@@ -23,12 +23,18 @@ export class SandboxMessenger extends Messenger<SandboxBot> {
     const content = await h.transformAsync(this.buffer.trim(), this.rules)
     const session = this.bot.session(this.session)
     session.messageId = Random.id()
-    session.app.console.broadcast('sandbox/message', {
-      content,
-      user: 'Koishi',
-      channel: session.channelId,
-      id: session.messageId,
-    })
+    for (const client of this.bot.clients) {
+      client.send({
+        type: 'sandbox/message',
+        body: {
+          content,
+          user: 'Koishi',
+          channel: session.channelId,
+          id: session.messageId,
+          platform: session.platform,
+        },
+      })
+    }
     this.results.push(session)
     this.buffer = ''
   }

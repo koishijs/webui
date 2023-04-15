@@ -1,16 +1,10 @@
 import { $, Context, defineProperty, Dict, Random, Schema, User } from 'koishi'
-import { Client, DataService } from '@koishijs/plugin-console'
+import { DataService } from '@koishijs/plugin-console'
 import { resolve } from 'path'
 import { SandboxBot } from './bot'
 import zh from './locales/zh.yml'
 
 declare module 'koishi' {
-  namespace Session {
-    interface Payload {
-      client: Client
-    }
-  }
-
   interface Events {
     'sandbox/response'(nonce: string, data: any): void
   }
@@ -36,6 +30,7 @@ export interface Message {
   user: string
   channel: string
   content: string
+  platform: string
 }
 
 export const filter = false
@@ -87,7 +82,10 @@ export function apply(ctx: Context, config: Config) {
     })
     bot.clients.add(this)
     const id = Random.id()
-    ctx.console.broadcast('sandbox', { id, content, user: userId, channel })
+    this.send({
+      type: 'sandbox/message',
+      body: { id, content, user: userId, channel, platform },
+    })
     const session = bot.session({
       userId,
       content,
@@ -149,11 +147,13 @@ export function apply(ctx: Context, config: Config) {
 
   ctx.i18n.define('zh', zh)
 
-  ctx.platform('sandbox')
+  ctx.intersect(session => session.platform.startsWith('sandbox:'))
     .command('clear')
     .action(({ session }) => {
-      session.client.send({
-        type: 'sandbox/clear',
-      })
+      for (const client of (session.bot as SandboxBot).clients) {
+        client.send({
+          type: 'sandbox/clear',
+        })
+      }
     })
 }
