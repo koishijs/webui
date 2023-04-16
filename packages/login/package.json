@@ -46,11 +46,15 @@
       ]
     }
   },
+  "dependencies": {
+    "uuid": "^9.0.0"
+  },
   "peerDependencies": {
     "@koishijs/plugin-console": "^5.6.1",
     "koishi": "^4.12.4"
   },
   "devDependencies": {
-    "@koishijs/client": "^5.6.1"
+    "@koishijs/client": "^5.6.1",
+    "@types/uuid": "^9.0.1"
   }
 }
