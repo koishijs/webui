@@ -3,25 +3,17 @@
     <h1>欢迎使用 Koishi！</h1>
     <p>你的机器人已经准备就绪。点击下面的任一选项，开启你的 Koishi 之旅吧。</p>
     <k-slot name="welcome-choice" class="choices">
-      <div class="choice" @click="openLink('https://koishi.chat')">
+      <a class="choice" href="https://koishi.chat" rel="noopener noreferer" target="_blank">
         <h2>阅读文档</h2>
         <p>开始阅读官方文档。官方文档里包含了你想要了解的全部内容。</p>
-      </div>
-      <div class="choice" @click="openLink('https://k.ilharp.cc')">
+      </a>
+      <a class="choice" href="https://k.ilharp.cc" rel="noopener noreferer" target="_blank">
         <h2>前往论坛</h2>
         <p>前往论坛与其他用户交流。如果你遇到了问题，可以在这里寻求帮助。</p>
-      </div>
+      </a>
     </k-slot>
   </div>
 </template>
-
-<script lang="ts" setup>
-
-function openLink(link: string) {
-  window.open(link, '_blank', 'noopener noreferrer')
-}
-
-</script>
 
 <style lang="scss">
 
