@@ -1,5 +1,3 @@
-#!/usr/bin/env node
-
 import CAC from 'cac'
 import { resolve } from 'path'
 import { buildExtension } from '.'

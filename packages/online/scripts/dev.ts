@@ -14,7 +14,7 @@ app.use(router.routes())
 app.use(router.allowedMethods())
 
 const uiPath = ''
-const root = resolve(require.resolve('@koishijs/play/package.json'), '../app')
+const root = resolve(require.resolve('@koishijs/online/package.json'), '../app')
 
 let vite: ViteDevServer
 

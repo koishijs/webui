@@ -26,7 +26,7 @@ const configPlugin: vite.Plugin = {
 }
 
 const cwd = resolve(__dirname, '../../..')
-const dist = cwd + '/packages/play/dist'
+const dist = cwd + '/packages/online/dist'
 
 const builtins = [
   '@koishijs/core',
@@ -56,7 +56,7 @@ export async function build(root: string, config: vite.UserConfig = {}) {
   return await vite.build({
     root,
     build: {
-      outDir: cwd + '/packages/play/dist',
+      outDir: cwd + '/packages/online/dist',
       emptyOutDir: true,
       cssCodeSplit: false,
       ...config.build,
@@ -98,7 +98,7 @@ export async function build(root: string, config: vite.UserConfig = {}) {
 
 export default async function () {
   // build for play main
-  const { output } = await build(cwd + '/packages/play/app')
+  const { output } = await build(cwd + '/packages/online/app')
 
   await Promise.all([
     copyFile(findModulePath('vue') + '/dist/vue.runtime.esm-browser.prod.js', dist + '/vue.js'),
