@@ -1,6 +1,7 @@
 {
   "name": "@koishijs/online",
   "description": "Koishi Online Loader",
+  "private": true,
   "version": "1.0.0",
   "files": [
     "dist"
@@ -10,7 +11,7 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/koishijs/webui.git",
-    "directory": "packages/online"
+    "directory": "client/online"
   },
   "bugs": {
     "url": "https://github.com/koishijs/webui/issues"

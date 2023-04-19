@@ -2,7 +2,7 @@
 
 ## Documentation
 
-- [Get to know the console](https://koishi.chat/manual/console/)
+- [About Koishi Console](https://koishi.chat/en-US/manual/console/)
 
 ## Packages
 
@@ -16,7 +16,7 @@
 - @koishijs/plugin-analytics
 - @koishijs/plugin-commands
 - @koishijs/plugin-dataview
-- @koishijs/plugin-explorer (WIP)
+- @koishijs/plugin-explorer
 - @koishijs/plugin-insight
 - @koishijs/plugin-locales
 - @koishijs/plugin-logger
