@@ -43,7 +43,7 @@ const builtins = [
 ]
 
 const shims = {
-  fs: 'fsa-browserify',
+  fs: '@koishijs/fs',
   path: 'path-browserify',
 }
 

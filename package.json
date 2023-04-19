@@ -15,15 +15,15 @@
     "dep": "yakumo upgrade",
     "pub": "yakumo publish",
     "lint": "eslint packages --ext=ts --cache",
-    "dev": "node -r esbuild-register packages/play/scripts/dev",
-    "serve": "node -r esbuild-register packages/play/scripts/serve",
+    "dev": "node -r esbuild-register packages/online/scripts/dev",
+    "serve": "node -r esbuild-register packages/online/scripts/serve",
     "test": "yakumo mocha -r esbuild-register -r yml-register",
     "test:text": "shx rm -rf coverage && c8 -r text yarn test",
     "test:json": "shx rm -rf coverage && c8 -r json yarn test",
     "test:html": "shx rm -rf coverage && c8 -r html yarn test"
   },
   "devDependencies": {
-    "@koishijs/eslint-config": "^1.0.1",
+    "@koishijs/eslint-config": "^1.0.2",
     "@koishijs/plugin-database-memory": "^2.3.4",
     "@koishijs/plugin-help": "^2.2.2",
     "@koishijs/plugin-mock": "^2.4.3",
@@ -42,12 +42,11 @@
     "eslint": "^8.36.0",
     "eslint-plugin-mocha": "^10.1.0",
     "jest-mock": "^28.1.3",
-    "koishi": "^4.12.4",
+    "koishi": "^4.12.5",
     "mocha": "^9.2.2",
     "rollup-plugin-node-polyfills": "^0.2.1",
     "shx": "^0.3.4",
     "typescript": "^4.9.5",
-    "yml-register": "^1.1.0",
     "yakumo": "^0.3.10",
     "yakumo-esbuild": "^0.3.22",
     "yakumo-esbuild-yaml": "^0.3.1",
@@ -56,6 +55,7 @@
     "yakumo-publish-sync": "^0.3.2",
     "yakumo-tsc": "^0.3.8",
     "yakumo-upgrade": "^0.3.3",
-    "yakumo-version": "^0.3.4"
+    "yakumo-version": "^0.3.4",
+    "yml-register": "^1.1.0"
   }
 }

@@ -53,7 +53,7 @@
     }
   },
   "peerDependencies": {
-    "koishi": "^4.12.4"
+    "koishi": "^4.12.5"
   },
   "devDependencies": {
     "@koishijs/client": "^5.6.1",

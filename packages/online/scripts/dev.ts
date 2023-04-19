@@ -101,7 +101,7 @@ async function createVite() {
         '@minatojs/driver-sqlite': '@minatojs/driver-sqlite/src/index.ts',
         '@minatojs/sql-utils': '@minatojs/sql-utils/src/index.ts',
         'path': 'rollup-plugin-node-polyfills/polyfills/path',
-        'fs': 'fsa-browserify/src/index.ts',
+        'fs': '@koishijs/fs/src/index.ts',
       },
     },
     define: {
