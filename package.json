@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "workspaces": [
+    "client/*",
     "packages/*"
   ],
   "packageManager": "yarn@1.22.19",

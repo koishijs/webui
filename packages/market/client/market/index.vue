@@ -48,7 +48,7 @@
 import { router, store, global } from '@koishijs/client'
 import { computed, watch } from 'vue'
 import { refresh, active } from '../utils'
-import { useMarket, MarketFilter, MarketPackage, MarketSearch } from '@koishijs/client-market'
+import { useMarket, MarketFilter, MarketPackage, MarketSearch } from '@koishijs/ui-market'
 import { AnalyzedPackage } from '@koishijs/registry'
 
 const { all, packages, words, config, hasFilter } = useMarket(() => Object.values(store.market.data), {

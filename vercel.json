@@ -1,6 +1,6 @@
 {
-  "buildCommand": "yarn build play",
-  "outputDirectory": "packages/play/dist",
+  "buildCommand": "yarn build online",
+  "outputDirectory": "packages/online/dist",
   "rewrites": [{
     "source": "/(.*)",
     "destination": "/index.html"

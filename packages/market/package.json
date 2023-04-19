@@ -59,7 +59,7 @@
   },
   "devDependencies": {
     "@koishijs/client": "^5.6.1",
-    "@koishijs/client-market": "^1.2.3",
+    "@koishijs/ui-market": "^1.2.3",
     "@types/semver": "^7.3.13",
     "@types/throttle-debounce": "^2.1.0",
     "@types/which-pm-runs": "^1.0.0"
