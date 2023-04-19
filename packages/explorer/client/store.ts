@@ -6,7 +6,7 @@ export const files = reactive<Dict<Entry>>({})
 
 watch(() => store.explorer, () => {
   const oldFiles = { ...files }
-  function traverse(entries: Entry[], prefix = '') {
+  function traverse(entries: Entry[], prefix = '/') {
     if (!entries) return
     for (const entry of entries) {
       entry.filename = prefix + entry.name

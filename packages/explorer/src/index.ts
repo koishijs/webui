@@ -1,6 +1,6 @@
 import { Context, Schema } from 'koishi'
 import { DataService } from '@koishijs/plugin-console'
-import { relative, resolve } from 'path'
+import { join, relative, resolve } from 'path'
 import { mkdir, readdir, readFile, rename, rm, writeFile } from 'fs/promises'
 import { FSWatcher, watch } from 'chokidar'
 import anymatch, { Tester } from 'anymatch'
@@ -58,31 +58,31 @@ class Explorer extends DataService<Entry[]> {
     })
 
     ctx.console.addListener('explorer/read', (filename) => {
-      filename = resolve(ctx.baseDir, filename)
+      filename = join(ctx.baseDir, filename)
       return readFile(filename, 'utf8')
     }, { authority: 4 })
 
     ctx.console.addListener('explorer/write', async (filename, content) => {
-      filename = resolve(ctx.baseDir, filename)
+      filename = join(ctx.baseDir, filename)
       await writeFile(filename, content, 'utf8')
       this.refresh()
     }, { authority: 4 })
 
     ctx.console.addListener('explorer/mkdir', async (filename) => {
-      filename = resolve(ctx.baseDir, filename)
+      filename = join(ctx.baseDir, filename)
       await mkdir(filename)
       this.refresh()
     }, { authority: 4 })
 
     ctx.console.addListener('explorer/remove', async (filename) => {
-      filename = resolve(ctx.baseDir, filename)
+      filename = join(ctx.baseDir, filename)
       await rm(filename, { recursive: true })
       this.refresh()
     }, { authority: 4 })
 
     ctx.console.addListener('explorer/rename', async (oldValue, newValue) => {
-      oldValue = resolve(ctx.baseDir, oldValue)
-      newValue = resolve(ctx.baseDir, newValue)
+      oldValue = join(ctx.baseDir, oldValue)
+      newValue = join(ctx.baseDir, newValue)
       await rename(oldValue, newValue)
       this.refresh()
     }, { authority: 4 })
@@ -99,7 +99,7 @@ class Explorer extends DataService<Entry[]> {
   private async traverse(root: string): Promise<Entry[]> {
     const dirents = await readdir(root, { withFileTypes: true })
     return Promise.all(dirents.map<Promise<Entry>>(async (dirent) => {
-      const filename = resolve(root, dirent.name)
+      const filename = join(root, dirent.name)
       if (this.globFilter(relative(this.ctx.baseDir, filename))) return
       if (dirent.isFile()) {
         return { type: 'file', name: dirent.name }

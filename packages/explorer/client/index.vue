@@ -14,7 +14,7 @@
     </template>
 
     <template #left>
-      <el-scrollbar class="command-tree" ref="root">
+      <el-scrollbar ref="root" @contextmenu.stop="handleContextMenu($event)">
         <div class="search">
           <el-input v-model="keyword" #suffix>
             <k-icon name="search"></k-icon>
@@ -42,8 +42,8 @@
                 v-focus
                 v-if="node.data.filename === renaming"
                 v-model="node.data.name"
-                @keypress.enter.prevent="confirmRename()"
-                @keypress.esc.prevent="cancelRename()"
+                @keypress.enter.prevent="confirmRename(node.data)"
+                @keydown.escape.prevent="cancelRename()"
               />
               <template v-else>{{ node.data.name }}</template>
             </div>
@@ -61,23 +61,27 @@
 
   <teleport to="body">
     <div ref="menu" class="context-menu" v-if="menuTarget">
-      <div class="item" v-if="menuTarget.type === 'directory'" @click.prevent="createEntry('file')">
-        新建文件
-      </div>
+      <template v-if="menuTarget.type === 'directory'">
+        <div class="item" @click.prevent="createEntry('file')">新建文件</div>
+        <div class="item" @click.prevent="createEntry('directory')">新建文件夹</div>
       <div class="item" v-if="menuTarget.type === 'directory'" @click.prevent="createEntry('directory')">
-        新建文件夹
+      </template>
       </div>
       <div class="item" @click.prevent="cancelRename(), removing = menuTarget.filename">
-        删除
-      </div>
-      <div class="item" @click.prevent="cancelRename(), renaming = menuTarget.filename">
-        重命名
-      </div>
+      </template>
+      <template v-if="menuTarget.filename">
+        <div class="item" @click.prevent="initRemove(menuTarget)">
+          删除
+        </div>
+        <div class="item" @click.prevent="cancelRename(), renaming = menuTarget.filename">
+          重命名
+        </div>
+      </template>
     </div>
   </teleport>
 
   <el-dialog v-model="showRemoving" destroy-on-close>
-    你真的要删除文件 {{ removing }} 吗？
+    你真的要删除文件{{ removing?.endsWith('/') ? '夹' : '' }} {{ removing }} 吗？
     <template #footer>
       <span class="dialog-footer">
         <el-button @click="removing = null">取消</el-button>
@@ -186,12 +190,12 @@ watch(isDark, () => {
 
 const active = computed<string>({
   get() {
-    const name = route.path.slice(7)
+    const name = route.path.slice(6)
     return name in files ? name : ''
   },
   set(name) {
     if (!(name in files)) name = ''
-    router.replace('/files/' + name)
+    router.replace('/files' + name)
   },
 })
 
@@ -219,8 +223,7 @@ function createEntry(type: 'file' | 'directory') {
   menuTarget.value.children.push(files[renaming.value])
 }
 
-function confirmRename() {
-  const entry = files[renaming.value]
+function confirmRename(entry: TreeEntry) {
   const segments = entry.filename.split(/\//g)
   const name = segments.pop()
   segments.push(entry.name)
@@ -312,9 +315,14 @@ async function handleClick(data: TreeEntry) {
   active.value = data.filename
 }
 
-async function handleContextMenu(event: MouseEvent, data: TreeEntry) {
+async function handleContextMenu(event: MouseEvent, entry?: TreeEntry) {
   event.preventDefault()
-  menuTarget.value = data
+  menuTarget.value = entry || {
+    name: '',
+    filename: '',
+    type: 'directory',
+    children: data.value,
+  }
   await nextTick()
   const { clientX, clientY } = event
   menu.value.style.left = clientX + 'px'
@@ -330,6 +338,11 @@ function handleCollapse(entry: TreeEntry) {
 }
 
 function handleDrop(source: Node, target: Node, position: 'before' | 'after' | 'inner', event: DragEvent) {
+}
+
+function initRemove(entry: TreeEntry) {
+  cancelRename()
+  removing.value = entry.filename + (entry.type === 'directory' ? '/' : '')
 }
 
 onActivated(async () => {
@@ -349,6 +362,16 @@ onActivated(async () => {
   width: 100%;
   position: absolute;
 }
+
+.search {
+  margin-top: 1rem;
+  padding: 0 1.5rem;
+}
+
+.el-tree {
+  margin-bottom: 1rem;
+}
+
 .item {
   flex: 1;
   height: 100%;
