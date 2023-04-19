@@ -13,8 +13,8 @@ declare module '@koishijs/plugin-console' {
   }
 
   interface Events {
-    'explorer/read'(filename: string): Promise<string>
-    'explorer/write'(filename: string, content: string): Promise<void>
+    'explorer/read'(filename: string, binary?: boolean): Promise<string>
+    'explorer/write'(filename: string, content: string, binary?: boolean): Promise<void>
     'explorer/mkdir'(filename: string): Promise<void>
     'explorer/remove'(filename: string): Promise<void>
     'explorer/rename'(oldValue: string, newValue: string): Promise<void>
@@ -57,14 +57,24 @@ class Explorer extends DataService<Entry[]> {
       ignored: config.ignored,
     })
 
-    ctx.console.addListener('explorer/read', (filename) => {
+    ctx.console.addListener('explorer/read', async (filename, binary) => {
       filename = join(ctx.baseDir, filename)
-      return readFile(filename, 'utf8')
+      if (binary) {
+        const buffer = await readFile(filename)
+        return buffer.toString('base64')
+      } else {
+        return readFile(filename, 'utf8')
+      }
     }, { authority: 4 })
 
-    ctx.console.addListener('explorer/write', async (filename, content) => {
+    ctx.console.addListener('explorer/write', async (filename, content, binary) => {
       filename = join(ctx.baseDir, filename)
-      await writeFile(filename, content, 'utf8')
+      if (binary) {
+        const buffer = Buffer.from(content, 'base64')
+        await writeFile(filename, buffer)
+      } else {
+        await writeFile(filename, content, 'utf8')
+      }
       this.refresh()
     }, { authority: 4 })
 

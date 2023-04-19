@@ -64,10 +64,10 @@
       <template v-if="menuTarget.type === 'directory'">
         <div class="item" @click.prevent="createEntry('file')">新建文件</div>
         <div class="item" @click.prevent="createEntry('directory')">新建文件夹</div>
-      <div class="item" v-if="menuTarget.type === 'directory'" @click.prevent="createEntry('directory')">
+        <div class="item" @click.prevent="uploading = menuTarget.filename + '/'">上传文件</div>
       </template>
-      </div>
-      <div class="item" @click.prevent="cancelRename(), removing = menuTarget.filename">
+      <template v-else>
+        <div class="item" @click.prevent="downloadFile(menuTarget.filename)">下载</div>
       </template>
       <template v-if="menuTarget.filename">
         <div class="item" @click.prevent="initRemove(menuTarget)">
@@ -91,6 +91,15 @@
       </span>
     </template>
   </el-dialog>
+
+  <el-dialog v-model="showUploading" destroy-on-close>
+    请将文件拖动到窗口内以上传。
+    <template #footer>
+      <span class="dialog-footer">
+        <el-button @click="uploading = null">取消</el-button>
+      </span>
+    </template>
+  </el-dialog>
 </template>
 
 <script lang="ts" setup>
@@ -98,7 +107,7 @@
 import { Directive, ref, computed, watch, onActivated, nextTick } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useDark, useElementSize, useEventListener } from '@vueuse/core'
-import { send, store } from '@koishijs/client'
+import { send, store, base64ToArrayBuffer, arrayBufferToBase64 } from '@koishijs/client'
 import { Entry } from '@koishijs/plugin-explorer/src'
 import { files } from './store'
 import { model } from './editor'
@@ -123,10 +132,16 @@ const menuTarget = ref<TreeEntry>(null)
 const renaming = ref<string>(null)
 const data = ref<TreeEntry[]>([])
 const removing = ref<string>(null)
+const uploading = ref<string>(null)
 
 const showRemoving = computed({
   get: () => !!removing.value,
   set: (v) => removing.value = null,
+})
+
+const showUploading = computed({
+  get: () => !!uploading.value,
+  set: (v) => uploading.value = null,
 })
 
 function* getExpanded(tree: TreeEntry[]) {
@@ -351,6 +366,47 @@ onActivated(async () => {
   const element = container.querySelector('.el-tree-node.is-active') as HTMLElement
   if (!element) return
   root.value['setScrollTop'](element.offsetTop - (container.offsetHeight - element.offsetHeight) / 2)
+})
+
+async function downloadFile(filename: string) {
+  const base64 = await send('explorer/read', filename, true)
+  const blob = new Blob([base64ToArrayBuffer(base64)])
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement("a")
+  a.href = url;
+  a.download = filename
+  a.click()
+  URL.revokeObjectURL(url)
+}
+
+function handleDataTransfer(event: Event, transfer: DataTransfer) {
+  const prefix = uploading.value
+  for (const item of transfer.items) {
+    if (item.kind !== 'file') continue
+    event.preventDefault()
+    const file = item.getAsFile()
+    const reader = new FileReader()
+    reader.addEventListener('load', function () {
+      send('explorer/write', prefix + file.name, arrayBufferToBase64(reader.result as ArrayBuffer), true)
+    }, false)
+    reader.readAsArrayBuffer(file)
+  }
+  uploading.value = null
+}
+
+useEventListener('drop', (event: DragEvent) => {
+  if (!uploading.value) return
+  handleDataTransfer(event, event.dataTransfer)
+})
+
+useEventListener('paste', (event: ClipboardEvent) => {
+  if (!uploading.value) return
+  handleDataTransfer(event, event.clipboardData)
+})
+
+useEventListener('dragover', (event: DragEvent) => {
+  if (!uploading.value) return
+  event.preventDefault()
 })
 
 </script>
