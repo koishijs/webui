@@ -10,7 +10,7 @@
 .layout-status {
   position: fixed;
   box-sizing: border-box;
-  z-index: 200;
+  z-index: 50;
   bottom: 0;
   height: var(--footer-height);
   left: var(--activity-width);
