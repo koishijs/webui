@@ -205,3 +205,14 @@ export function validate(data: AnalyzedPackage, word: string, config: ValidateCo
     ...Object.values(data.manifest.description),
   ].some(keyword => keyword.includes(word))
 }
+
+export function timeAgo(time: string) {
+  const now = new Date()
+  const input = new Date(time)
+  const diff = now.getTime() - input.getTime()
+  if (diff < 30000) return '刚刚'
+  if (diff < 3600000) return Math.floor(diff / 60000) + ' 分钟前'
+  if (diff < 86400000) return Math.floor(diff / 3600000) + ' 小时前'
+  if (diff < 604800000) return Math.floor(diff / 86400000) + ' 天前'
+  return input.toLocaleDateString()
+}

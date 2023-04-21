@@ -22,7 +22,10 @@
         </div>
       </div>
       <div class="right">
-        <slot name="action"></slot>
+        <div class="top">
+          <slot name="action"></slot>
+        </div>
+        <span class="bottom" :title="new Date(data.updatedAt).toLocaleString()">更新于 {{ timeAgo(data.updatedAt) }}</span>
       </div>
     </div>
     <k-markdown inline class="desc" :source="data.manifest.description.zh || data.manifest.description.en"></k-markdown>
@@ -66,6 +69,7 @@ import { computed } from 'vue'
 import { AnalyzedPackage } from '@koishijs/registry'
 import { MarketConfig, badges, getUsers, resolveCategory, validate } from '@koishijs/ui-market'
 import MarketIcon from '../icons'
+import { timeAgo } from '../utils'
 import md5 from 'spark-md5'
 
 defineEmits(['query'])
@@ -243,9 +247,16 @@ function formatSize(value: number) {
     }
 
     .right {
+      display: flex;
+      flex-flow: column;
+      justify-content: space-around;
       flex: 1 0 auto;
       text-align: right;
-      position: relative;
+
+      .bottom {
+        color: var(--fg3);
+        font-size: 12px;
+      }
     }
   }
 
