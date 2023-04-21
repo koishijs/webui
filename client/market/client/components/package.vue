@@ -66,7 +66,7 @@ import { computed } from 'vue'
 import { AnalyzedPackage } from '@koishijs/registry'
 import { MarketConfig, badges, getUsers, resolveCategory, validate } from '@koishijs/ui-market'
 import MarketIcon from '../icons'
-import md5 from 'spark-md5'
+import * as md5 from 'spark-md5'
 
 defineEmits(['query'])
 
