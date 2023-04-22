@@ -1,5 +1,5 @@
 <template>
-  <k-layout>
+  <k-layout :menu="menu">
     <el-scrollbar class="container">
       <div ref="root" class="logs">
         <div class="line" :class="{ start: line.includes(hint) }" v-for="line in store.logs">
@@ -12,7 +12,7 @@
 
 <script lang="ts" setup>
 
-import { watch, ref, nextTick, onActivated } from 'vue'
+import { watch, ref, Ref, nextTick, onActivated, computed } from 'vue'
 import { store } from '@koishijs/client'
 import ansi from 'ansi_up'
 
@@ -31,16 +31,25 @@ onActivated(() => {
   const wrapper = root.value.parentElement.parentElement
   wrapper.scrollTop = wrapper.scrollHeight
 })
-
+var isBottomAlways: Ref<Boolean> = ref(true);
 watch(() => store.logs.length, async () => {
-  const wrapper = root.value.parentElement.parentElement
-  const { scrollTop, clientHeight, scrollHeight } = wrapper
-  if (Math.abs(scrollTop + clientHeight - scrollHeight) < 1) {
-    await nextTick()
-    wrapper.scrollTop = scrollHeight
-  }
+    if(isBottomAlways.value) {
+      const wrapper = root.value.parentElement.parentElement
+      const { scrollHeight } = wrapper
+      wrapper.scrollTop = 21 * (store.logs.length+1);
+    }
 })
 
+const menu = computed(() => {
+  return [{
+    icon: isBottomAlways.value?'stop':'download',
+    label: `${isBottomAlways.value?"禁用":"启用"}自动滚动`,
+    disabled: false,
+    action: () => {
+      isBottomAlways.value = !isBottomAlways.value
+    },
+  }]
+})
 </script>
 
 <style lang="scss" scoped>
@@ -50,7 +59,9 @@ watch(() => store.logs.length, async () => {
   background-color: var(--terminal-bg);
 
   .logs {
-    padding: 1rem 1rem;
+    padding-top: 1rem;
+    padding-right: 1rem;
+    padding-left: 1rem;
   }
 
   .logs .line.start {
