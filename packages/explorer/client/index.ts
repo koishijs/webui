@@ -1,9 +1,12 @@
 import { Context } from '@koishijs/client'
 import {} from '@koishijs/plugin-explorer/src'
+import FilePicker from './file-picker.vue'
 import Layout from './index.vue'
 import Status from './status.vue'
 import './icons'
 import './editor'
+
+Context.app.component('k-file-picker', FilePicker)
 
 export default (ctx: Context) => {
   ctx.page({

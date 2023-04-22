@@ -67,9 +67,9 @@
 import { computed } from 'vue'
 import { AnalyzedPackage } from '@koishijs/registry'
 import { MarketConfig, badges, getUsers, resolveCategory, validate } from '@koishijs/ui-market'
-import MarketIcon from '../icons'
 import { timeAgo } from '../utils'
-import md5 from 'spark-md5'
+import MarketIcon from '../icons'
+import * as md5 from 'spark-md5'
 
 defineEmits(['query'])
 
@@ -91,7 +91,7 @@ const badge = computed(() => {
 function getAvatar(email: string) {
   return (props.gravatar || 'https://s.gravatar.com')
     + '/avatar/'
-    + (email ? md5.hash(email.toLowerCase()) : '')
+    + (email ? (md5 as unknown as typeof import('spark-md5')).hash(email.toLowerCase()) : '')
     + '.png?d=mp'
 }
 

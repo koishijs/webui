@@ -1,6 +1,6 @@
 import { createApp } from 'vue'
 import { useDark } from '@vueuse/core'
-import client, { connect, Dict, global, root, router } from '@koishijs/client'
+import client, { connect, Context, Dict, global, root, router } from '@koishijs/client'
 import App from './layouts/index.vue'
 import Home from './layouts/home.vue'
 import Progress from './layouts/status-loading.vue'
@@ -19,6 +19,8 @@ const app = createApp(App)
 app.use(client)
 
 app.provide('ecTheme', 'dark-blue')
+
+Context.app = app
 
 root.page({
   path: '/',
