@@ -22,17 +22,16 @@
         </div>
       </div>
       <div class="right">
-        <div class="top">
-          <slot name="action"></slot>
-        </div>
-        <span class="bottom" :title="new Date(data.updatedAt).toLocaleString()">更新于 {{ timeAgo(data.updatedAt) }}</span>
+        <slot name="action"></slot>
       </div>
     </div>
     <k-markdown inline class="desc" :source="data.manifest.description.zh || data.manifest.description.en"></k-markdown>
     <div class="footer">
-      <a class="shrink" target="_blank" :href="data.links.npm">
-        <market-icon name="tag"></market-icon>{{ data.version }}
-      </a>
+      <el-tooltip :content="timeAgo(data.updatedAt)">
+        <a class="shrink" target="_blank" :href="data.links.npm">
+          <market-icon name="tag"></market-icon>{{ data.version }}
+        </a>
+      </el-tooltip>
       <template v-if="data.installSize">
         <span class="spacer"></span>
         <a target="_blank" :href="data.links.size">
@@ -247,16 +246,9 @@ function formatSize(value: number) {
     }
 
     .right {
-      display: flex;
-      flex-flow: column;
-      justify-content: space-around;
       flex: 1 0 auto;
       text-align: right;
-
-      .bottom {
-        color: #7a7887;
-        font-size: 12px;
-      }
+      position: relative;
     }
   }
 
