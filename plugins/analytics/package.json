@@ -1,0 +1,61 @@
+{
+  "name": "@koishijs/plugin-analytics",
+  "description": "Show statistics for Koishi application",
+  "version": "1.0.3",
+  "main": "lib/index.js",
+  "typings": "lib/index.d.ts",
+  "files": [
+    "lib",
+    "dist"
+  ],
+  "author": "Shigma <shigma10826@gmail.com>",
+  "license": "AGPL-3.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/koishijs/webui.git",
+    "directory": "plugins/analytics"
+  },
+  "bugs": {
+    "url": "https://github.com/koishijs/webui/issues"
+  },
+  "homepage": "https://koishi.chat/plugins/console/analytics.html",
+  "keywords": [
+    "bot",
+    "chatbot",
+    "koishi",
+    "plugin",
+    "chart",
+    "console",
+    "statistics",
+    "analytics",
+    "status"
+  ],
+  "yakumo": {
+    "client": "./build/client"
+  },
+  "koishi": {
+    "description": {
+      "en": "Show statistics for Koishi application",
+      "zh": "在控制台中显示统计数据"
+    },
+    "service": {
+      "required": [
+        "console"
+      ],
+      "optional": [
+        "database"
+      ]
+    }
+  },
+  "peerDependencies": {
+    "@koishijs/plugin-console": "^5.6.2",
+    "koishi": "^4.12.6"
+  },
+  "devDependencies": {
+    "@koishijs/assets": "^1.0.2",
+    "@koishijs/client": "^5.6.2",
+    "echarts": "^5.4.1",
+    "koishi": "^4.12.6",
+    "vue-echarts": "^6.5.4"
+  }
+}

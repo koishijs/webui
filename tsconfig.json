@@ -7,7 +7,7 @@
         "packages/client/src/*",
       ],
       "@koishijs/plugin-*": [
-        "packages/*/src",
+        "plugins/*/src",
       ],
       "@koishijs/*": [
         "packages/*/src",

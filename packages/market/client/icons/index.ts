@@ -1,28 +1,22 @@
-import { icons } from '@koishijs/client'
+import { Component, defineComponent, h } from 'vue'
 
-import NavDeps from './activity/deps.vue'
-import NavMarket from './activity/market.vue'
-import NavPlugin from './activity/plugin.vue'
+import misc from './misc'
+import outline from './outline'
+import solid from './solid'
 
-import Refresh from './market/refresh.vue'
+const registry: Record<string, Component> = {
+  ...misc,
+  ...outline,
+  ...solid,
+}
 
-import AddGroup from './settings/add-group.vue'
-import AddPlugin from './settings/add-plugin.vue'
-import TrashCan from './settings/trash-can.vue'
-import Check from './settings/check.vue'
-import Play from './settings/play.vue'
-import Stop from './settings/stop.vue'
-import Save from './settings/save.vue'
-
-icons.register('activity:deps', NavDeps)
-icons.register('activity:market', NavMarket)
-icons.register('activity:plugin', NavPlugin)
-
-icons.register('refresh', Refresh)
-icons.register('add-plugin', AddPlugin)
-icons.register('add-group', AddGroup)
-icons.register('trash-can', TrashCan)
-icons.register('check', Check)
-icons.register('play', Play)
-icons.register('stop', Stop)
-icons.register('save', Save)
+export default defineComponent({
+  props: {
+    name: String,
+  },
+  render(props) {
+    return props.name ? h(registry[props.name], {
+      class: 'market-icon',
+    }) : []
+  },
+})

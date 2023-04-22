@@ -1,0 +1,37 @@
+{
+  "name": "@koishijs/online",
+  "description": "Koishi Online Loader",
+  "private": true,
+  "version": "1.0.0",
+  "files": [
+    "dist"
+  ],
+  "author": "Shigma <shigma10826@gmail.com>",
+  "license": "AGPL-3.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/koishijs/webui.git",
+    "directory": "packages/online"
+  },
+  "bugs": {
+    "url": "https://github.com/koishijs/webui/issues"
+  },
+  "homepage": "https://koishi.online",
+  "keywords": [
+    "bot",
+    "chatbot",
+    "koishi",
+    "loader",
+    "config",
+    "playground",
+    "online"
+  ],
+  "devDependencies": {
+    "@koishijs/client": "^5.6.2",
+    "@koishijs/fs": "^1.3.0",
+    "@koishijs/loader": "^3.1.6"
+  },
+  "yakumo": {
+    "client": "./scripts/build"
+  }
+}

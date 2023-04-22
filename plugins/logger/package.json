@@ -1,0 +1,55 @@
+{
+  "name": "@koishijs/plugin-logger",
+  "description": "Dump log files for Koishi",
+  "version": "2.2.3",
+  "main": "lib/index.js",
+  "typings": "lib/index.d.ts",
+  "files": [
+    "lib",
+    "dist"
+  ],
+  "author": "Shigma <shigma10826@gmail.com>",
+  "license": "AGPL-3.0",
+  "scripts": {
+    "lint": "eslint src --ext .ts"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/koishijs/webui.git",
+    "directory": "plugins/ogger"
+  },
+  "bugs": {
+    "url": "https://github.com/koishijs/webui/issues"
+  },
+  "homepage": "https://koishi.chat/plugins/console/logger.html",
+  "keywords": [
+    "bot",
+    "chatbot",
+    "koishi",
+    "plugin",
+    "logs"
+  ],
+  "koishi": {
+    "public": [
+      "dist"
+    ],
+    "description": {
+      "en": "Dump log files and show them in the console",
+      "zh": "保存日志文件并在控制台中显示"
+    },
+    "service": {
+      "optional": [
+        "console"
+      ]
+    }
+  },
+  "peerDependencies": {
+    "@koishijs/plugin-console": "^5.6.2",
+    "koishi": "^4.12.6"
+  },
+  "devDependencies": {
+    "@koishijs/client": "^5.6.2",
+    "ansi_up": "^5.1.0",
+    "koishi": "^4.12.6"
+  }
+}

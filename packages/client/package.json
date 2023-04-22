@@ -35,7 +35,7 @@
   ],
   "dependencies": {
     "@satorijs/components": "^0.5.7",
-    "@satorijs/element": "^2.3.6",
+    "@satorijs/element": "^2.4.0",
     "@vitejs/plugin-vue": "^4.1.0",
     "@vueuse/core": "^9.13.0",
     "cac": "^6.7.14",
