@@ -88,7 +88,7 @@ const badge = computed(() => {
 function getAvatar(email: string) {
   return (props.gravatar || 'https://s.gravatar.com')
     + '/avatar/'
-    + (email ? md5.hash(email.toLowerCase()) : '')
+    + (email ? (md5 as unknown as typeof import('spark-md5')).hash(email.toLowerCase()) : '')
     + '.png?d=mp'
 }
 
