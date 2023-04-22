@@ -60,6 +60,7 @@
 <script lang="ts" setup>
 
 import { clone, message, send, Schema, store, ChatInput, VirtualList, deepEqual } from '@koishijs/client'
+import { useEventListener } from '@vueuse/core'
 import { computed, nextTick, ref, watch } from 'vue'
 import { api, channel, config, words, panelTypes } from './utils'
 import ChatMessage from './message.vue'
@@ -158,6 +159,14 @@ async function handleContextMenu(event: MouseEvent, data: Message) {
   menu.value.style.left = clientX + 'px'
   menu.value.style.top = clientY + 'px'
 }
+
+useEventListener('click', () => {
+  menuTarget.value = null
+})
+
+useEventListener('contextmenu', () => {
+  menuTarget.value = null
+})
 
 async function deleteMessage(data: Message) {
   await send('sandbox/delete-message', data.platform, data.user, data.channel, data.id)
