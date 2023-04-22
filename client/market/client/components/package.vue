@@ -254,7 +254,7 @@ function formatSize(value: number) {
       text-align: right;
 
       .bottom {
-        color: var(--fg3);
+        color: #7a7887;
         font-size: 12px;
       }
     }
