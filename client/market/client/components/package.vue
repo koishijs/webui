@@ -27,7 +27,7 @@
     </div>
     <k-markdown inline class="desc" :source="data.manifest.description.zh || data.manifest.description.en"></k-markdown>
     <div class="footer">
-      <el-tooltip :content="timeAgo(data.updatedAt)">
+      <el-tooltip :content="timeAgo(data.updatedAt)" placement="top">
         <a class="shrink" target="_blank" :href="data.links.npm">
           <market-icon name="tag"></market-icon>{{ data.version }}
         </a>
@@ -52,7 +52,7 @@
       </template>
       <span class="spacer grow"></span>
       <div class="avatars">
-        <el-tooltip v-for="({ email, name }) in getUsers(data)" :key="name" :content="name">
+        <el-tooltip v-for="({ email, name }) in getUsers(data)" :key="name" :content="name" placement="top">
           <span class="avatar" @click.stop.prevent="$emit('query', 'email:' + email)">
             <img :src="getAvatar(email)">
           </span>
