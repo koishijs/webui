@@ -27,9 +27,11 @@
     </div>
     <k-markdown inline class="desc" :source="data.manifest.description.zh || data.manifest.description.en"></k-markdown>
     <div class="footer">
-      <a class="shrink" target="_blank" :href="data.links.npm">
-        <market-icon name="tag"></market-icon>{{ data.version }}
-      </a>
+      <el-tooltip :content="timeAgo(data.updatedAt)" placement="top">
+        <a class="shrink" target="_blank" :href="data.links.npm">
+          <market-icon name="tag"></market-icon>{{ data.version }}
+        </a>
+      </el-tooltip>
       <template v-if="data.installSize">
         <span class="spacer"></span>
         <a target="_blank" :href="data.links.size">
@@ -50,7 +52,7 @@
       </template>
       <span class="spacer grow"></span>
       <div class="avatars">
-        <el-tooltip v-for="({ email, name }) in getUsers(data)" :key="name" :content="name">
+        <el-tooltip v-for="({ email, name }) in getUsers(data)" :key="name" :content="name" placement="top">
           <span class="avatar" @click.stop.prevent="$emit('query', 'email:' + email)">
             <img :src="getAvatar(email)">
           </span>
@@ -65,6 +67,7 @@
 import { computed } from 'vue'
 import { AnalyzedPackage } from '@koishijs/registry'
 import { MarketConfig, badges, getUsers, resolveCategory, validate } from '@koishijs/ui-market'
+import { timeAgo } from '../utils'
 import MarketIcon from '../icons'
 import * as md5 from 'spark-md5'
 
