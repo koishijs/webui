@@ -34,6 +34,6 @@
   "dependencies": {
     "cosmokit": "^1.4.1",
     "p-map": "^4.0.0",
-    "semver": "^7.3.8"
+    "semver": "^7.5.0"
   }
 }

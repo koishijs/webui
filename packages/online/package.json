@@ -1,7 +1,6 @@
 {
   "name": "@koishijs/online",
   "description": "Koishi Online Loader",
-  "private": true,
   "version": "1.0.0",
   "files": [
     "dist"

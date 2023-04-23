@@ -69,7 +69,7 @@
     "execa": "^5.1.1",
     "get-registry": "^1.1.0",
     "ns-require": "^1.1.4",
-    "semver": "^7.3.8",
+    "semver": "^7.5.0",
     "throttle-debounce": "^3.0.1",
     "which-pm-runs": "^1.1.0"
   }
