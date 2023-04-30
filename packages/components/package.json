@@ -1,0 +1,30 @@
+{
+  "name": "@koishijs/components",
+  "description": "Client components for Koishi",
+  "version": "1.0.0",
+  "main": "client/index.ts",
+  "files": [
+    "client"
+  ],
+  "author": "Shigma <shigma10826@gmail.com>",
+  "license": "AGPL-3.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/koishijs/webui.git",
+    "directory": "packages/components"
+  },
+  "bugs": {
+    "url": "https://github.com/koishijs/webui/issues"
+  },
+  "homepage": "https://koishi.chat",
+  "keywords": [
+    "bot",
+    "chatbot",
+    "koishi",
+    "webui",
+    "component"
+  ],
+  "peerDependencies": {
+    "vue": "^3"
+  }
+}

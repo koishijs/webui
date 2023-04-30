@@ -7,7 +7,6 @@ import form from 'schemastery-vue'
 import ChatImage from './chat/image.vue'
 import * as icons from './icons'
 import layout from './layout'
-import notice from './notice'
 import Slot from './slot'
 
 import 'element-plus/dist/index.css'
@@ -18,7 +17,6 @@ export const messageBox = ElMessageBox
 
 export * from './common'
 export * from './layout'
-export * from './notice'
 
 export * from 'schemastery-vue'
 export * from '@satorijs/components'
@@ -33,7 +31,6 @@ export default function (app: App) {
   app.use(form)
   app.use(icons)
   app.use(layout)
-  app.use(notice)
 
   app.component('k-slot', Slot)
 }
