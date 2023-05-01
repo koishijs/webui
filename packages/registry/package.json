@@ -1,7 +1,7 @@
 {
   "name": "@koishijs/registry",
   "description": "Scan Package Manager for Koishi Plugins",
-  "version": "4.6.0",
+  "version": "4.6.1",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
   "files": [
@@ -32,7 +32,7 @@
     "@types/semver": "^7.3.13"
   },
   "dependencies": {
-    "cosmokit": "^1.4.1",
+    "cosmokit": "^1.4.2",
     "p-map": "^4.0.0",
     "semver": "^7.5.0"
   }

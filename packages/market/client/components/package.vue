@@ -277,7 +277,7 @@ function formatSize(value: number) {
     overflow: hidden;
 
     .spacer {
-      flex: 0 5 1.5rem;
+      flex: 0 2 1.5rem;
     }
 
     .grow {

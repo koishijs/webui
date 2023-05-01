@@ -269,7 +269,7 @@ export default class Scanner {
   }
 
   public async collect(config: CollectConfig = {}) {
-    const { step = 250, margin = 10, ignored = [] } = config
+    const { step = 250, margin = 25, ignored = [] } = config
     this.cache = {}
     this.time = new Date().toUTCString()
     const total = await this.search(0, config)
