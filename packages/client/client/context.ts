@@ -1,4 +1,5 @@
 import * as cordis from 'cordis'
+import components from '@koishijs/components'
 import { Dict, remove } from 'cosmokit'
 import { App, Component, markRaw, reactive } from 'vue'
 import { Activity } from './activity'
@@ -54,5 +55,10 @@ export class Context extends cordis.Context {
     return this.scope.collect('page', () => {
       return activity.dispose()
     })
+  }
+
+  schema(extension: components.Extension) {
+    components.extensions.add(extension)
+    return this.scope.collect('schema', () => components.extensions.delete(extension))
   }
 }

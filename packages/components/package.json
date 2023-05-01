@@ -1,7 +1,7 @@
 {
   "name": "@koishijs/components",
   "description": "Client components for Koishi",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "main": "client/index.ts",
   "files": [
     "client"
@@ -26,5 +26,8 @@
   ],
   "peerDependencies": {
     "vue": "^3"
+  },
+  "dependencies": {
+    "schemastery-vue": "^4.0.0"
   }
 }

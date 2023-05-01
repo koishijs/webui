@@ -13,9 +13,16 @@ form.extensions.add({
 
 export * from 'schemastery-vue'
 
-export default function (app: App) {
+function components(app: App) {
   app.use(form)
   app.component('k-comment', Comment)
   app.component('k-filter', Filter)
   app.component('k-form', Form)
 }
+
+namespace components {
+  export const extensions = form.extensions
+  export type Extension = form.Extension
+}
+
+export default components

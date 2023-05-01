@@ -9,6 +9,13 @@ import './editor'
 Context.app.component('k-file-picker', FilePicker)
 
 export default (ctx: Context) => {
+  ctx.schema({
+    type: 'string',
+    role: 'path',
+    component: FilePicker,
+    validate: value => typeof value === 'string',
+  })
+
   ctx.page({
     path: '/files/:name*',
     name: '资源管理器',

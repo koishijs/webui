@@ -7,13 +7,13 @@
         <k-filter-expr :disabled="disabled" :options="options" :modelValue="expr" @update:modelValue="update($event, inner, outer)"></k-filter-expr>
       </div>
       <div>
-        <k-button @click="update({}, extract(layer, '$and').length, outer)">添加「与」条件</k-button>
+        <el-button @click="update({}, extract(layer, '$and').length, outer)">添加「与」条件</el-button>
       </div>
     </div>
     <div>
-      <k-button @click="update({}, 0, extract(modelValue, '$or').length)">
+      <el-button @click="update({}, 0, extract(modelValue, '$or').length)">
         {{ extract(modelValue, '$or').length ? '添加「或」条件' : '添加条件' }}
-      </k-button>
+      </el-button>
     </div>
   </div>
 </template>

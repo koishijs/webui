@@ -1,5 +1,5 @@
 import { App, Component, defineComponent, h } from 'vue'
-import { IconExternal, IconEye, IconEyeSlash } from 'schemastery-vue'
+import { IconExternal, IconEye, IconEyeSlash } from '@koishijs/components'
 import Default from './activity/default.vue'
 import Ellipsis from './activity/ellipsis.vue'
 import Home from './activity/home.vue'

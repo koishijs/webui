@@ -1,29 +1,42 @@
 <template>
-  <el-button @click="showDialog = true">选择文件</el-button>
-  <el-dialog class="file-picker" destroy-on-close v-model="showDialog">
-    <template #header>
-      从 {{ current }} 选择文件
+  <schema-base>
+    <template #title><slot name="title"></slot></template>
+    <template #desc><slot name="desc"></slot></template>
+    <template #menu><slot name="menu"></slot></template>
+    <template #prefix><slot name="prefix"></slot></template>
+    <template #suffix><slot name="suffix"></slot></template>
+    <template #control>
+      <el-button @click="showDialog = true">{{ lastname || '选择文件' }}</el-button>
+      <el-dialog class="file-picker" destroy-on-close v-model="showDialog">
+        <template #header>
+          从 {{ current }} 选择文件
+        </template>
+        <div class="entry" v-for="entry in entries" :key="entry.name" @click="handleClick(entry)">
+          {{ entry.name }}
+        </div>
+        <template #footer>
+          <el-button @click="showDialog = false">取消</el-button>
+          <el-button type="primary" @click="showDialog = false">确定</el-button>
+        </template>
+      </el-dialog>
     </template>
-    <div class="entry" v-for="entry in entries" :key="entry.name" @click="handleClick(entry)">
-      {{ entry.name }}
-    </div>
-    <template #footer>
-      <el-button @click="showDialog = false">取消</el-button>
-      <el-button type="primary" @click="showDialog = false">确定</el-button>
-    </template>
-  </el-dialog>
+  </schema-base>
 </template>
 
-<script setup lang="ts">
+<script lang="ts" setup>
 
-import { computed, ref } from 'vue'
-import { store } from '@koishijs/client'
+import { computed, PropType, ref } from 'vue'
+import { Schema, SchemaBase, store } from '@koishijs/client'
 import { files } from './store'
 import { Entry } from '../src'
 
-defineProps<{
-  modelValue: string
-}>()
+const props = defineProps({
+  schema: {} as PropType<Schema>,
+  modelValue: {} as PropType<string>,
+  disabled: {} as PropType<boolean>,
+  prefix: {} as PropType<string>,
+  initial: {} as PropType<{}>,
+})
 
 const emit = defineEmits(['update:modelValue'])
 
@@ -42,6 +55,12 @@ function handleClick(entry: Entry) {
     showDialog.value = false
   }
 }
+
+const lastname = computed(() => {
+  if (!props.modelValue) return
+  const index = props.modelValue.lastIndexOf('/')
+  return index === -1 ? props.modelValue : props.modelValue.slice(index + 1)
+})
 
 </script>
 

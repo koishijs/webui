@@ -1,9 +1,9 @@
 import { App } from 'vue'
 import Markdown from 'marked-vue'
+import components from '@koishijs/components'
 import Element, { ElLoading, ElMessage, ElMessageBox } from 'element-plus'
 
 import common from './common'
-import form from 'schemastery-vue'
 import ChatImage from './chat/image.vue'
 import * as icons from './icons'
 import layout from './layout'
@@ -18,7 +18,7 @@ export const messageBox = ElMessageBox
 export * from './common'
 export * from './layout'
 
-export * from 'schemastery-vue'
+export * from '@koishijs/components'
 export * from '@satorijs/components'
 
 export { icons, ChatImage }
@@ -28,7 +28,7 @@ export default function (app: App) {
   app.component('k-markdown', Markdown)
 
   app.use(common)
-  app.use(form)
+  app.use(components)
   app.use(icons)
   app.use(layout)
 
