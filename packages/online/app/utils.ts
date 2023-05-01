@@ -97,6 +97,7 @@ export async function activate(id?: string) {
 }
 
 export async function initialize() {
+  await fs.mkdir(root, { recursive: true })
   instances.value = await fs.readdir(root)
   await activate(data.value.current)
 }
