@@ -149,7 +149,7 @@ html.dark {
 
 :root {
   --el-text-color-regular: var(--fg1);
-  --el-text-color-primary: var(--fg3);
+  --el-text-color-primary: var(--fg2);
   --el-input-text-color: var(--fg1);
   --el-border-color: var(--border);
   --el-border-color-base: var(--border);
@@ -166,6 +166,8 @@ html.dark {
   --el-bg-color: var(--bg0);
   --el-bg-color-overlay: var(--bg0);
   --el-fill-color-blank: transparent;
+  --el-disabled-bg-color: var(--card-bg);
+  --el-fill-color: var(--card-bg);
 }
 
 .el-input-number, .el-popper {

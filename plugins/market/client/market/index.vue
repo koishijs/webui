@@ -2,7 +2,7 @@
   <k-layout main="darker" class="page-market" :menu="menu">
     <template #left>
       <el-scrollbar>
-        <market-filter v-model="words" :config="config" :data="all"></market-filter>
+        <market-filter v-model="words" :data="getSorted(data, words)"></market-filter>
       </el-scrollbar>
     </template>
 
@@ -16,21 +16,22 @@
     </div>
 
     <el-scrollbar v-else-if="store.market.total">
-      <market-search v-model="words"></market-search>
-      <div class="market-hint">
-        共搜索到 {{ hasFilter ? packages.length + ' / ' : '' }}{{ all.length }} 个插件。
-      </div>
-      <div class="market-container">
-        <market-package
-          v-for="data in packages" :key="data.name" class="k-card"
-          :data="data" :config="config" :gravatar="store.market.gravatar" @query="onQuery">
-          <template #action v-if="store.packages">
-            <k-button v-if="global.static" solid @click.stop="handleClick(data)">配置</k-button>
-            <k-button v-else-if="store.packages[data.name]" type="success" solid @click.stop="handleClick(data)">修改</k-button>
-            <k-button v-else solid @click.stop="handleClick(data)">添加</k-button>
-          </template>
-        </market-package>
-      </div>
+      <market-list
+        v-model="words"
+        :data="data"
+        :gravatar="store.market.gravatar">
+        <template #header="{ hasFilter, all, packages }">
+          <market-search v-model="words"></market-search>
+          <div class="market-hint">
+            共搜索到 {{ hasFilter ? packages.length + ' / ' : '' }}{{ all.length }} 个插件。
+          </div>
+        </template>
+        <template #action="data" v-if="store.packages">
+          <k-button v-if="global.static" solid @click.stop="handleClick(data)">配置</k-button>
+          <k-button v-else-if="store.packages[data.name]" type="success" solid @click.stop="handleClick(data)">修改</k-button>
+          <k-button v-else solid @click.stop="handleClick(data)">添加</k-button>
+        </template>
+      </market-list>
     </el-scrollbar>
 
     <k-comment v-else type="error" class="market-error">
@@ -46,16 +47,20 @@
 <script setup lang="ts">
 
 import { router, store, global } from '@koishijs/client'
-import { computed, watch } from 'vue'
+import { computed, provide, ref, watch } from 'vue'
 import { refresh, active } from '../utils'
-import { useMarket, MarketFilter, MarketPackage, MarketSearch } from '@koishijs/market'
+import { getSorted, kConfig, MarketFilter, MarketList, MarketSearch } from '@koishijs/market'
 import { AnalyzedPackage } from '@koishijs/registry'
 
-const { all, packages, words, config, hasFilter } = useMarket(() => Object.values(store.market.data), {
-  isInstalled: (data) => !!store.packages?.[data.name],
+provide(kConfig, {
+  installed: (data) => !!store.packages?.[data.name],
 })
 
+const words = ref<string[]>([])
+
 const prompt = computed(() => words.value.filter(w => w).join(' '))
+
+const data = computed(() => Object.values(store.market?.data || {}))
 
 watch(router.currentRoute, (value) => {
   if (value.path !== '/market') return
@@ -73,12 +78,6 @@ watch(prompt, (value) => {
     router.replace({ query: rest })
   }
 }, { deep: true })
-
-function onQuery(word: string) {
-  if (!words.value[words.value.length - 1]) words.value.pop()
-  if (!words.value.includes(word)) words.value.push(word)
-  words.value.push('')
-}
 
 function handleClick(data: AnalyzedPackage) {
   active.value = data.name
@@ -131,12 +130,6 @@ const menu = computed(() => [refresh.value])
 }
 
 .market-container {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(336px, 1fr));
-  gap: var(--card-margin);
-  margin: var(--card-margin) 0;
-  justify-items: center;
-
   .k-button {
     padding: 0.35em 0.85em;
     transform: translateY(-1px);

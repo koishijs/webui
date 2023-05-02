@@ -64,10 +64,10 @@
 
 <script lang="ts" setup>
 
-import { computed } from 'vue'
+import { computed, inject } from 'vue'
 import { AnalyzedPackage } from '@koishijs/registry'
-import { MarketConfig, badges, getUsers, resolveCategory, validate } from '@koishijs/market'
-import { timeAgo } from '../utils'
+import { badges, getUsers, resolveCategory, validate } from '@koishijs/market'
+import { kConfig, timeAgo } from '../utils'
 import MarketIcon from '../icons'
 import * as md5 from 'spark-md5'
 
@@ -75,15 +75,16 @@ defineEmits(['query'])
 
 const props = defineProps<{
   data: AnalyzedPackage
-  config?: MarketConfig
   gravatar?: string
 }>()
+
+const config = inject(kConfig, {})
 
 const homepage = computed(() => props.data.links.homepage || props.data.links.repository)
 
 const badge = computed(() => {
   for (const type in badges) {
-    if (badges[type].hidden?.(props.config ?? {}, 'card')) continue
+    if (badges[type].hidden?.(config, 'card')) continue
     if (validate(props.data, badges[type].query)) return { type, ...badges[type] }
   }
 })

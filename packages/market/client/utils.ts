@@ -1,5 +1,5 @@
 import { AnalyzedPackage, User } from '@koishijs/registry'
-import { computed, ref } from 'vue'
+import { InjectionKey } from 'vue'
 import { Dict } from 'cosmokit'
 
 export function getUsers(data: AnalyzedPackage) {
@@ -29,7 +29,7 @@ export const badges: Dict<Badge> = {
     query: 'is:installed',
     negate: 'not:installed',
     hidden(config, type) {
-      return !config.isInstalled || type === 'card'
+      return !config.installed || type === 'card'
     },
   },
   verified: {
@@ -102,50 +102,46 @@ export const categories = {
 }
 
 export interface MarketConfig {
-  isInstalled?(data: AnalyzedPackage): boolean
+  installed?(data: AnalyzedPackage): boolean
 }
 
 interface ValidateConfig extends MarketConfig {
   users?: User[]
 }
 
-export function useMarket(market: () => AnalyzedPackage[], config: MarketConfig = {}) {
-  const words = ref([''])
+export const kConfig = Symbol('market.config') as InjectionKey<MarketConfig>
 
-  const all = computed(() => {
-    return market()?.slice().filter((data) => {
-      return !data.manifest.hidden || words.value.includes('show:hidden')
-    }).sort((a, b) => {
-      for (let word of words.value) {
-        if (!word.startsWith('sort:')) continue
-        let order = 1
-        if (word.endsWith('-asc')) {
-          order = -1
-          word = word.slice(0, -4)
-        } else if (word.endsWith('-desc')) {
-          word = word.slice(0, -5)
-        }
-        const comparator = comparators[word.slice(5)]
-        if (comparator) return comparator.compare(a, b) * order
+export function getSorted(market: AnalyzedPackage[], words: string[]) {
+  return market?.slice().filter((data) => {
+    return !data.manifest.hidden || words.includes('show:hidden')
+  }).sort((a, b) => {
+    for (let word of words) {
+      if (!word.startsWith('sort:')) continue
+      let order = 1
+      if (word.endsWith('-asc')) {
+        order = -1
+        word = word.slice(0, -4)
+      } else if (word.endsWith('-desc')) {
+        word = word.slice(0, -5)
       }
-      return comparators.rating.compare(a, b)
+      const comparator = comparators[word.slice(5)]
+      if (comparator) return comparator.compare(a, b) * order
+    }
+    return comparators.rating.compare(a, b)
+  })
+}
+
+export function getFiltered(market: AnalyzedPackage[], words: string[], config?: MarketConfig) {
+  return market.filter((data) => {
+    const users = getUsers(data)
+    return words.every((word) => {
+      return validate(data, word, { ...config, users })
     })
   })
+}
 
-  const packages = computed(() => {
-    return all.value.filter((data) => {
-      const users = getUsers(data)
-      return words.value.every((word) => {
-        return validate(data, word, { ...config, users })
-      })
-    })
-  })
-
-  const hasFilter = computed(() => {
-    return words.value.filter(w => w && !w.startsWith('show:') && !w.startsWith('sort:')).length > 0
-  })
-
-  return { words, hasFilter, packages, all, config }
+export function hasFilter(words: string[]) {
+  return words.filter(w => w && !w.startsWith('show:') && !w.startsWith('sort:')).length > 0
 }
 
 export function resolveCategory(name?: string) {
@@ -187,13 +183,13 @@ export function validate(data: AnalyzedPackage, word: string, config: ValidateCo
     if (word === 'is:verified') return data.verified
     if (word === 'is:insecure') return data.insecure
     if (word === 'is:preview') return !!data.manifest.preview
-    if (word === 'is:installed') return !!config.isInstalled?.(data)
+    if (word === 'is:installed') return !!config.installed?.(data)
     return false
   } else if (word.startsWith('not:')) {
     if (word === 'not:verified') return !data.verified
     if (word === 'not:insecure') return !data.insecure
     if (word === 'not:preview') return !data.manifest.preview
-    if (word === 'not:installed') return !config.isInstalled?.(data)
+    if (word === 'not:installed') return !config.installed?.(data)
     return true
   } else if (word.includes(':')) {
     return true

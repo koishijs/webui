@@ -55,18 +55,19 @@
 
 <script lang="ts" setup>
 
-import { computed, ref, watch } from 'vue'
-import { Badge, badges, validate, comparators, categories, resolveCategory, MarketConfig } from '../utils'
+import { computed, inject, ref, watch } from 'vue'
+import { Badge, badges, kConfig, validate, comparators, categories, resolveCategory, MarketConfig } from '../utils'
 import { AnalyzedPackage } from '@koishijs/registry'
 import MarketIcon from '../icons'
 
 const props = defineProps<{
   modelValue: string[]
-  config?: MarketConfig
   data?: AnalyzedPackage[]
 }>()
 
 const emit = defineEmits(['update:modelValue'])
+
+const config = inject(kConfig, {})
 
 const words = ref<string[]>()
 
