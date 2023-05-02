@@ -19,7 +19,6 @@ export * from './common'
 export * from './layout'
 
 export * from '@koishijs/components'
-export * from '@satorijs/components'
 
 export { icons, ChatImage }
 
