@@ -56,7 +56,7 @@ provide(kConfig, {
   installed: (data) => !!store.packages?.[data.name],
 })
 
-const words = ref<string[]>([])
+const words = ref<string[]>([''])
 
 const prompt = computed(() => words.value.filter(w => w).join(' '))
 

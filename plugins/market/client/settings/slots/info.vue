@@ -1,9 +1,21 @@
 <template>
   <div class="navigation" v-if="data.remote">
-    <a class="k-button" target="_blank" v-if="data.remote.links.homepage" :href="data.remote.links.homepage">插件主页</a>
-    <a class="k-button" target="_blank" v-if="data.remote.links.npm" :href="data.remote.links.npm">最新版：{{ data.remote.version }}</a>
-    <a class="k-button" target="_blank" v-if="data.remote.links.repository" :href="data.remote.links.repository">存储库</a>
-    <a class="k-button" target="_blank" v-if="data.remote.links.bugs" :href="data.remote.links.bugs">问题反馈</a>
+    <a class="k-button" target="_blank"
+      v-if="data.remote.links.homepage"
+      :href="data.remote.links.homepage"
+    >插件主页</a>
+    <a class="k-button" target="_blank"
+      v-if="data.remote.links.npm && data.local.version"
+      :href="data.remote.links.npm + '/v/' + data.local.version"
+    >当前版本：{{ data.local.version }}</a>
+    <a class="k-button" target="_blank"
+      v-if="data.remote.links.repository"
+      :href="data.remote.links.repository"
+    >存储库</a>
+    <a class="k-button" target="_blank"
+      v-if="data.remote.links.bugs"
+      :href="data.remote.links.bugs"
+    >问题反馈</a>
   </div>
 
   <!-- reusability -->
@@ -13,7 +25,7 @@
 
   <!-- latest -->
   <k-comment v-if="hasUpdate && !global.static">
-    <p>当前的插件版本 ({{ data.local.version }}) 不是最新，<router-link to="/dependencies">点击前往依赖管理</router-link>。</p>
+    <p>当前的插件版本不是最新，<router-link to="/dependencies">点击前往依赖管理</router-link>。</p>
   </k-comment>
 
   <!-- deprecated -->
