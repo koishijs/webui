@@ -26,9 +26,9 @@
     "online"
   ],
   "devDependencies": {
-    "@koishijs/client": "^5.7.1",
-    "@koishijs/fs": "^1.3.0",
-    "@koishijs/loader": "^3.1.7"
+    "@koishijs/client": "^5.7.5",
+    "@koishijs/fs": "^1.3.2",
+    "@koishijs/loader": "^3.1.8"
   },
   "yakumo": {
     "client": "./scripts/build"

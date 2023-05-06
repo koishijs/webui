@@ -77,16 +77,16 @@
         :schema="schema.config"
         :initial="command.override.config"
         v-model="current.config"
-      ></k-form>
+        #title
+      >指令设置</k-form>
 
       <template v-for="(option, key) in command.initial.options" :key="key">
         <k-form
           :schema="schema.options[key]"
           :initial="command.override.options[key]"
           v-model="current.options[key]"
-        >
-          <template #title>{{ option.syntax }}</template>
-        </k-form>
+          #title
+        >选项：{{ option.syntax }}</k-form>
       </template>
     </k-content>
 
