@@ -6,7 +6,7 @@
           平台用户绑定
           <el-button solid @click="showDialog = true">添加</el-button>
         </h2>
-        <div class="schema-item" v-for="({ platform, pid, bid }) in store.user.bindings">
+        <div class="k-schema-item" v-for="({ platform, pid, bid }) in store.user.bindings">
           <div class="header">
             <div class="left">{{ platform }} ({{ pid }})</div>
             <div class="right">

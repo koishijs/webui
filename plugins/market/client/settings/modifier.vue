@@ -29,10 +29,6 @@ const filter = computed({
 
 .modifier {
   margin-bottom: 2rem;
-
-  .k-schema-header {
-    font-size: 1.25rem;
-  }
 }
 
 </style>

@@ -4,6 +4,7 @@ import components from '@koishijs/components'
 import Element, { ElLoading, ElMessage, ElMessageBox } from 'element-plus'
 
 import common from './common'
+import Dynamic from './dynamic.vue'
 import ChatImage from './chat/image.vue'
 import * as icons from './icons'
 import layout from './layout'
@@ -21,6 +22,12 @@ export * from './layout'
 export * from '@koishijs/components'
 
 export { icons, ChatImage }
+
+components.extensions.add({
+  type: 'any',
+  role: 'dynamic',
+  component: Dynamic,
+})
 
 export default function (app: App) {
   app.use(Element)

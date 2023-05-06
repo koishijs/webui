@@ -1,11 +1,7 @@
 <template>
-  <k-comment v-if="!validate(resolved)" type="warning">
-    <p>部分配置项无法正常显示，这可能并非预期行为<slot name="hint"></slot>。</p>
-  </k-comment>
-
   <form class="k-form">
     <slot name="prolog"></slot>
-    <h2 class="k-schema-header" v-if="showHeader ?? !hasTitle(resolved, true)">
+    <h2 class="k-schema-header" v-if="showHeader ?? !hasTitle(resolved)">
       <slot name="title">基础设置</slot>
     </h2>
     <k-schema
@@ -22,7 +18,7 @@
 <script lang="ts" setup>
 
 import { computed, PropType } from 'vue'
-import { hasTitle, Schema, validate } from 'schemastery-vue'
+import { getChoices, Schema } from 'schemastery-vue'
 
 const props = defineProps({
   schema: {} as PropType<Schema>,
@@ -36,6 +32,23 @@ const props = defineProps({
 const resolved = computed(() => {
   return props.schema && new Schema(props.schema)
 })
+
+function hasTitle(schema: Schema): boolean {
+  if (!schema) return true
+  if (schema.type === 'object') {
+    if (schema.meta.description) return true
+    const keys = Object.keys(schema.dict)
+    if (!keys.length) return true
+    return hasTitle(schema.dict[keys[0]])
+  } else if (schema.type === 'intersect') {
+    return hasTitle(schema.list[0])
+  } else if (schema.type === 'union') {
+    const choices = getChoices(schema)
+    return choices.length === 1 ? hasTitle(choices[0]) : false
+  } else {
+    return false
+  }
+}
 
 const emit = defineEmits(['update:modelValue'])
 

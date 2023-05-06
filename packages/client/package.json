@@ -34,8 +34,7 @@
     "build"
   ],
   "dependencies": {
-    "@koishijs/components": "^1.0.3",
-    "@satorijs/element": "^2.4.1",
+    "@koishijs/components": "1.0.5",
     "@vitejs/plugin-vue": "^4.1.0",
     "@vueuse/core": "^9.13.0",
     "cac": "^6.7.14",
