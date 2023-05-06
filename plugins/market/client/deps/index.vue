@@ -47,7 +47,24 @@ const names = computed(() => {
     .sort((a, b) => a > b ? 1 : -1)
 })
 
+const updates = computed(() => {
+  return names.value.filter(name => {
+    const local = store.dependencies[name]
+    return local.latest && local.latest !== local.resolved
+  })
+})
+
 const menu = computed(() => [{
+  icon: 'rocket',
+  label: '全部更新',
+  disabled: !updates.value.length,
+  async action() {
+    for (const name of updates.value) {
+      const local = store.dependencies[name]
+      config.value.override[name] = local.latest
+    }
+  },
+}, {
   icon: 'check',
   label: '应用更改',
   disabled: !Object.keys(config.value.override).length,
