@@ -1,4 +1,5 @@
 import Asc from './asc.vue'
+import Award from './award.vue'
 import Balance from './balance.vue'
 import Close from './close.vue'
 import Desc from './desc.vue'
@@ -18,6 +19,7 @@ import Verified from './verified.vue'
 
 export default {
   'asc': Asc,
+  'award': Award,
   'balance': Balance,
   'close': Close,
   'desc': Desc,

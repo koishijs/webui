@@ -9,7 +9,10 @@ export function getUsers(data: AnalyzedPackage) {
     result[user.email] ||= user
   }
   if (!data.maintainers.some(user => result[user.email])) {
-    return data.maintainers
+    return data.maintainers.map(({ email, username }) => ({
+      email,
+      name: username,
+    }))
   }
   return Object.values(result)
 }
@@ -58,10 +61,37 @@ interface Comparator {
   text: string
   icon: string
   hidden?: boolean
-  compare(a: AnalyzedPackage, b: AnalyzedPackage): number
+  compare(a: AnalyzedPackage, b: AnalyzedPackage, words: string[]): number
+}
+
+function getSimilarity(data: AnalyzedPackage, word: string) {
+  word = word.replace('koishi-plugin-', '').replace('@koishijs/plugin-', '')
+  if (data.shortname === word) return 10
+  if (data.shortname.startsWith(word)) return 5
+  if (data.shortname.includes(word)) return 2
+  return [
+    ...data.keywords,
+    ...Object.values(data.manifest.description),
+  ].some(keyword => keyword.includes(word)) ? 1 : 0
+}
+
+function getSimRating(data: AnalyzedPackage, words: string[]) {
+  words = words.filter(w => w && !w.includes(':'))
+  let result = 0
+  for (const word of words) {
+    const similarity = getSimilarity(data, word)
+    if (!similarity) return 0
+    result = Math.max(result, similarity)
+  }
+  return data.rating + result
 }
 
 export const comparators: Dict<Comparator> = {
+  default: {
+    text: '默认排序',
+    icon: 'solid:all',
+    compare: (a, b, words) => getSimRating(b, words) - getSimRating(a, words),
+  },
   rating: {
     text: '按评分',
     icon: 'star-full',
@@ -125,9 +155,9 @@ export function getSorted(market: AnalyzedPackage[], words: string[]) {
         word = word.slice(0, -5)
       }
       const comparator = comparators[word.slice(5)]
-      if (comparator) return comparator.compare(a, b) * order
+      if (comparator) return comparator.compare(a, b, words) * order
     }
-    return comparators.rating.compare(a, b)
+    return comparators.default.compare(a, b, words)
   })
 }
 
@@ -195,11 +225,7 @@ export function validate(data: AnalyzedPackage, word: string, config: ValidateCo
     return true
   }
 
-  if (data.shortname.includes(word)) return true
-  return [
-    ...data.keywords,
-    ...Object.values(data.manifest.description),
-  ].some(keyword => keyword.includes(word))
+  return getSimilarity(data, word) > 0
 }
 
 export function timeAgo(time: string) {

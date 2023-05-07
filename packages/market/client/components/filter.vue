@@ -77,7 +77,7 @@ watch(() => props.modelValue, (value) => {
 
 const activeSort = computed<string[]>(() => {
   let word = words.value.find(w => w.startsWith('sort:'))
-  if (!word) return ['rating', 'desc']
+  if (!word) return ['default', 'desc']
   word = word.slice(5)
   if (word.endsWith('-desc')) {
     return [word.slice(0, -5), 'desc']
@@ -98,8 +98,8 @@ function addWord(word: string) {
 function toggleSort(word: string, event: MouseEvent) {
   const index = words.value.findIndex(x => x.startsWith('sort:'))
   if (index === -1) {
-    if (word === 'sort:rating') {
-      addWord('sort:rating-asc')
+    if (word === 'sort:default') {
+      addWord('sort:default-asc')
     } else {
       addWord(word)
     }
