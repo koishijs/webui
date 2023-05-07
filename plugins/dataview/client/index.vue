@@ -5,6 +5,12 @@
       <span v-if="store.database?.size">({{ formatSize(store.database.size) }})</span>
     </template>
 
+    <template #menu>
+      <span class="menu-item" @click="table?.updateData()">
+        <k-icon class="menu-icon" name="refresh"></k-icon>
+      </span>
+    </template>
+
     <template #left>
       <el-scrollbar>
         <k-tab-group :data="store.database.tables" v-model="current"></k-tab-group>
@@ -15,14 +21,14 @@
       <k-empty v-if="!current">
         <div>在左侧选择要访问的数据表</div>
       </k-empty>
-      <table-view v-else :key="current" :name="current"></table-view>
+      <table-view v-else :key="current" :name="current" ref="table"></table-view>
     </keep-alive>
   </k-layout>
 </template>
 
 <script lang="ts" setup>
 
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { router, store } from '@koishijs/client'
 import { formatSize } from './utils'
@@ -31,6 +37,8 @@ import TableView from './components/data-table.vue'
 function join(source: string | string[]) {
   return Array.isArray(source) ? source.join('/') : source || ''
 }
+
+const table = ref()
 
 const route = useRoute()
 

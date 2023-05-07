@@ -10,8 +10,8 @@
       </span>
       <div class="operations">
         <span v-if="existChanges">
-          <k-button solid :disabled="!existValidChanges" @click="onSubmitChanges">应用修改</k-button>
-          <k-button solid type="error" @click="onCancelChanges">取消修改</k-button>
+          <el-button type="primary" :disabled="!existValidChanges" @click="onSubmitChanges">应用修改</el-button>
+          <el-button type="danger" @click="onCancelChanges">取消修改</el-button>
         </span>
         <span v-else>双击单元格修改数据</span>
       </div>
@@ -186,6 +186,10 @@ async function updateData() {
   state.loading = false
 }
 watchEffect(updateData)
+
+defineExpose({
+  updateData,
+})
 
 const currPage = computed({
   get: () => Math.floor(state.offset / state.pageSize) + 1,
@@ -465,7 +469,7 @@ async function onInsertRow() {
   }
 }
 .operations {
-  .k-button:last-child {
+  .el-button:last-child {
     margin-right: 0;
   }
 }
@@ -492,7 +496,7 @@ async function onInsertRow() {
   }
   .cell-changed {
     &.el-table__cell {
-      padding: 2px;
+      padding: 0 2px;
     }
 
     .cell,

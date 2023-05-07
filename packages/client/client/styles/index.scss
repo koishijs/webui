@@ -314,6 +314,7 @@ html.dark .el-popper.is-dark {
 .el-table__header-wrapper {
   --el-table-tr-bg-color: var(--card-bg);
   --el-table-header-bg-color: var(--bg2);
+  --el-table-row-hover-bg-color: var(--bg1);
   tr {
     td,
     th {
