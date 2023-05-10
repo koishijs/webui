@@ -11,14 +11,14 @@ function findModulePath(id: string) {
 }
 
 const cwd = resolve(__dirname, '../../..')
-const dist = cwd + '/packages/console/dist'
+const dist = cwd + '/plugins/console/dist'
 
 export async function build(root: string, config: vite.UserConfig = {}) {
   const { rollupOptions = {} } = config.build || {}
   return await vite.build({
     root,
     build: {
-      outDir: cwd + '/packages/console/dist',
+      outDir: cwd + '/plugins/console/dist',
       emptyOutDir: true,
       cssCodeSplit: false,
       ...config.build,
