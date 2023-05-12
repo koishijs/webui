@@ -1,10 +1,11 @@
 {
   "name": "@koishijs/components",
   "description": "Client components for Koishi",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "main": "client/index.ts",
   "files": [
-    "client"
+    "client",
+    "tsconfig.client.json"
   ],
   "author": "Shigma <shigma10826@gmail.com>",
   "license": "AGPL-3.0",
