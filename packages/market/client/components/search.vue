@@ -8,7 +8,7 @@
         @click="onClickWord(index)"
       >{{ word }}</span>
       <input
-        :placeholder="placeholder || '输入想要查询的插件名'"
+        :placeholder="t('search.placeholder')"
         v-model="lastWord"
         @blur="onEnter"
         @keydown.escape="onEscape"
@@ -27,6 +27,8 @@
 
 import { computed, ref, watch } from 'vue'
 import { validateWord } from '../utils'
+import { useI18n } from 'vue-i18n'
+import zhCN from '../locales/zh-CN.yml'
 import MarketIcon from '../icons'
 
 const props = defineProps<{
@@ -81,6 +83,18 @@ function onBackspace(event: KeyboardEvent) {
 function onClear() {
   words.value = ['']
   emit('update:modelValue', words.value)
+}
+
+const { t, setLocaleMessage } = useI18n({
+  messages: {
+    'zh-CN': zhCN,
+  },
+})
+
+if (import.meta.hot) {
+  import.meta.hot.accept('../locales/zh-CN.yml', (module) => {
+    setLocaleMessage('zh-CN', module.default)
+  })
 }
 
 </script>

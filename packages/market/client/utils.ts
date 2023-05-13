@@ -88,7 +88,7 @@ function getSimRating(data: AnalyzedPackage, words: string[]) {
 
 export const comparators: Dict<Comparator> = {
   default: {
-    text: '默认排序',
+    text: '综合',
     icon: 'solid:all',
     compare: (a, b, words) => getSimRating(b, words) - getSimRating(a, words),
   },

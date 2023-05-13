@@ -7,7 +7,7 @@
       <div class="main">
         <h2 class="top">
           <span class="title">{{ data.shortname }}</span>
-          <el-tooltip v-if="badge" placement="right" :content="badge.text">
+          <el-tooltip v-if="badge" placement="right" :content="t(`badge.${badge.type}`)">
             <span :class="['icon', badge.type]" @click.stop.prevent="$emit('query', badge.query)">
               <market-icon :name="badge.type"></market-icon>
             </span>
@@ -68,6 +68,8 @@ import { computed, inject } from 'vue'
 import { AnalyzedPackage } from '@koishijs/registry'
 import { badges, getUsers, resolveCategory, validate } from '@koishijs/market'
 import { kConfig, timeAgo } from '../utils'
+import { useI18n } from 'vue-i18n'
+import zhCN from '../locales/zh-CN.yml'
 import MarketIcon from '../icons'
 import * as md5 from 'spark-md5'
 
@@ -108,6 +110,18 @@ function formatSize(value: number) {
   } else {
     return formatValue(value / (1 << 10)) + ' KB'
   }
+}
+
+const { t, setLocaleMessage } = useI18n({
+  messages: {
+    'zh-CN': zhCN,
+  },
+})
+
+if (import.meta.hot) {
+  import.meta.hot.accept('../locales/zh-CN.yml', (module) => {
+    setLocaleMessage('zh-CN', module.default)
+  })
 }
 
 </script>

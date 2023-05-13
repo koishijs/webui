@@ -1,7 +1,7 @@
 <template>
   <div class="market-filter-group">
     <div class="market-filter-title">
-      <h2 class="text">排序</h2>
+      <h2 class="text">{{ t('type.sort') }}</h2>
     </div>
     <template v-for="(item, key) in comparators" :key="key">
       <div
@@ -10,7 +10,7 @@
         :class="{ active: activeSort[0] === key }"
         @click="toggleSort('sort:' + key, $event)">
         <span class="icon"><market-icon :name="item.icon"></market-icon></span>
-        <span class="text">{{ item.text }}</span>
+        <span class="text">{{ t(`sort.${key}`) }}</span>
         <span class="spacer"></span>
         <span class="order"><market-icon :name="activeSort[1]"></market-icon></span>
       </div>
@@ -18,7 +18,7 @@
   </div>
   <div class="market-filter-group">
     <div class="market-filter-title">
-      <h2 class="text">筛选</h2>
+      <h2 class="text">{{ t('type.filter') }}</h2>
     </div>
     <template v-for="(item, key) in badges" :key="key">
       <div
@@ -27,7 +27,7 @@
         :class="{ [key]: true, active: words.includes(item.query), disabled: words.includes(item.negate) }"
         @click="toggleQuery(item, $event)">
         <span class="icon"><market-icon :name="key"></market-icon></span>
-        <span class="text">{{ item.text }}</span>
+        <span class="text">{{ t(`sort.${key}`) }}</span>
         <span class="spacer"></span>
         <span class="count" v-if="data">
           {{ data.filter(x => validate(x, item.query, config)).length }}
@@ -37,14 +37,14 @@
   </div>
   <div class="market-filter-group">
     <div class="market-filter-title">
-      <h2 class="text">分类</h2>
+      <h2 class="text">{{ t('type.category') }}</h2>
     </div>
     <div
       v-for="(title, key) in categories" :key="key" class="market-filter-item"
       :class="{ active: words.includes('category:' + key) }"
       @click="toggleCategory('category:' + key, $event)">
       <span class="icon"><market-icon :name="'solid:' + key"></market-icon></span>
-      <span class="text">{{ title }}</span>
+      <span class="text">{{ t(`category.${key}`) }}</span>
       <span class="spacer"></span>
       <span class="count" v-if="data">
         {{ data.filter(item => resolveCategory(item.category) === key).length }}
@@ -56,8 +56,10 @@
 <script lang="ts" setup>
 
 import { computed, inject, ref, watch } from 'vue'
-import { Badge, badges, kConfig, validate, comparators, categories, resolveCategory, MarketConfig } from '../utils'
+import { Badge, badges, kConfig, validate, comparators, categories, resolveCategory } from '../utils'
 import { AnalyzedPackage } from '@koishijs/registry'
+import { useI18n } from 'vue-i18n'
+import zhCN from '../locales/zh-CN.yml'
 import MarketIcon from '../icons'
 
 const props = defineProps<{
@@ -136,6 +138,18 @@ function toggleQuery(item: Badge, event: MouseEvent) {
     words.value.splice(index, 1)
   }
   emit('update:modelValue', words.value)
+}
+
+const { t, setLocaleMessage } = useI18n({
+  messages: {
+    'zh-CN': zhCN,
+  },
+})
+
+if (import.meta.hot) {
+  import.meta.hot.accept('../locales/zh-CN.yml', (module) => {
+    setLocaleMessage('zh-CN', module.default)
+  })
 }
 
 </script>

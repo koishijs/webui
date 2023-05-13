@@ -31,7 +31,8 @@
     "@types/spark-md5": "^3.0.2"
   },
   "peerDependencies": {
-    "vue": "^3"
+    "vue": "^3",
+    "vue-i18n": "^9"
   },
   "dependencies": {
     "cosmokit": "^1.4.2",
