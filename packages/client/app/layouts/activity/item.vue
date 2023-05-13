@@ -4,12 +4,9 @@
       <div class="title">{{ data.name }}</div>
       <div class="desc" v-if="data.desc">{{ data.desc }}</div>
     </template>
-    <router-link v-if="data.path" class="navbar-item" :to="target">
+    <router-link class="navbar-item" :to="target">
       <k-icon class="menu-icon" :name="data.icon"></k-icon>
     </router-link>
-    <div v-else class="navbar-item" @click.stop="data.action">
-      <k-icon class="menu-icon" :name="data.icon"></k-icon>
-    </div>
   </el-tooltip>
 </template>
 

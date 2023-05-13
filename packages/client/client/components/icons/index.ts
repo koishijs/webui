@@ -4,6 +4,7 @@ import Default from './activity/default.vue'
 import Ellipsis from './activity/ellipsis.vue'
 import Home from './activity/home.vue'
 import Moon from './activity/moon.vue'
+import Settings from './activity/settings.vue'
 import Sun from './activity/sun.vue'
 import BoxOpen from './svg/box-open.vue'
 import CheckFull from './svg/check-full.vue'
@@ -46,6 +47,7 @@ register('activity:default', Default)
 register('activity:ellipsis', Ellipsis)
 register('activity:home', Home)
 register('activity:moon', Moon)
+register('activity:settings', Settings)
 register('activity:sun', Sun)
 
 register('box-open', BoxOpen)
