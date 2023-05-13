@@ -141,6 +141,7 @@ class NodeConsole extends Console {
     const { createServer } = require('vite') as typeof import('vite')
     const { default: vue } = require('@vitejs/plugin-vue') as typeof import('@vitejs/plugin-vue')
     const { default: yaml } = require('@maikolib/vite-plugin-yaml') as typeof import('@maikolib/vite-plugin-yaml')
+    // const i18n = require('@intlify/vite-plugin-vue-i18n') as typeof import('@intlify/vite-plugin-vue-i18n').default
 
     this.vite = await createServer({
       root: this.root,
@@ -155,6 +156,10 @@ class NodeConsole extends Console {
       plugins: [
         vue(),
         yaml(),
+        // i18n({
+        //   include: '**',
+        //   defaultSFCLang: 'yaml',
+        // }),
       ],
       resolve: {
         dedupe: ['vue', 'vue-demi', 'vue-router', 'element-plus', '@vueuse/core', '@popperjs/core', 'marked', 'xss'],

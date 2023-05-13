@@ -55,6 +55,7 @@
     "koishi": "^4.12.8"
   },
   "devDependencies": {
+    "@intlify/vite-plugin-vue-i18n": "^7.0.0",
     "@koishijs/client": "^5.7.7",
     "@maikolib/vite-plugin-yaml": "^1.0.1",
     "@types/uuid": "^8.3.4",

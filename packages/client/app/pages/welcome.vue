@@ -98,3 +98,5 @@ if (import.meta.hot) {
 }
 
 </style>
+
+<!-- <i18n locale="zh-CN" src="./welcome.zh-CN.yml" /> -->
