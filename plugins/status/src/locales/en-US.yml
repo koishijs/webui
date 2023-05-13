@@ -1,0 +1,3 @@
+commands:
+  status:
+    description: Display the status
