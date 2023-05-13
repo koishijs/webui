@@ -1,5 +1,5 @@
 import { createApp } from 'vue'
-import client, { connect, Context, Dict, global, root, router } from '@koishijs/client'
+import client, { connect, Context, Dict, global, i18n, root, router } from '@koishijs/client'
 import App from './layouts/index.vue'
 import Home from './pages/home.vue'
 import Settings from './pages/settings.vue'
@@ -17,6 +17,8 @@ declare module '@koishijs/plugin-console' {
 const app = createApp(App)
 
 app.use(client)
+app.use(i18n)
+app.use(router)
 
 app.provide('ecTheme', 'dark-blue')
 
@@ -43,8 +45,6 @@ root.slot({
   type: 'status-right',
   component: Progress,
 })
-
-app.use(router)
 
 app.mount('#app')
 

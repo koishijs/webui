@@ -1,19 +1,43 @@
 <template>
   <div class="k-card welcome">
-    <h1>欢迎使用 Koishi！</h1>
-    <p>你的机器人已经准备就绪。点击下面的任一选项，开启你的 Koishi 之旅吧。</p>
+    <h1>{{ t('title') }}</h1>
+    <p>{{ t('description') }}</p>
     <k-slot name="welcome-choice" class="choices">
       <a class="choice" href="https://koishi.chat" rel="noopener noreferer" target="_blank">
-        <h2>阅读文档</h2>
-        <p>开始阅读官方文档。官方文档里包含了你想要了解的全部内容。</p>
+        <h2>{{ t('action.docs.title') }}</h2>
+        <p>{{ t('action.docs.description') }}</p>
       </a>
       <a class="choice" href="https://k.ilharp.cc" rel="noopener noreferer" target="_blank">
-        <h2>前往论坛</h2>
-        <p>前往论坛与其他用户交流。如果你遇到了问题，可以在这里寻求帮助。</p>
+        <h2>{{ t('action.forum.title') }}</h2>
+        <p>{{ t('action.forum.description') }}</p>
       </a>
     </k-slot>
   </div>
 </template>
+
+<script lang="ts" setup>
+
+import { useI18n } from 'vue-i18n'
+import zhCN from './welcome.zh-CN.yml'
+import enUS from './welcome.en-US.yml'
+
+const { t, setLocaleMessage } = useI18n({
+  messages: {
+    'zh-CN': zhCN,
+    'en-US': enUS,
+  },
+})
+
+if (import.meta.hot) {
+  import.meta.hot.accept('./welcome.zh-CN.yml', (module) => {
+    setLocaleMessage('zh-CN', module.default)
+  })
+  import.meta.hot.accept('./welcome.en-US.yml', (module) => {
+    setLocaleMessage('en-US', module.default)
+  })
+}
+
+</script>
 
 <style lang="scss">
 

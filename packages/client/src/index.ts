@@ -2,6 +2,7 @@ import { build, InlineConfig, mergeConfig, transformWithEsbuild, UserConfig } fr
 import { RollupOutput } from 'rollup'
 import { existsSync, promises as fsp } from 'fs'
 import vue from '@vitejs/plugin-vue'
+import yaml from '@maikolib/vite-plugin-yaml'
 
 export async function buildExtension(root: string, config: UserConfig = {}) {
   if (!existsSync(root + '/client')) return
@@ -41,7 +42,10 @@ export async function buildExtension(root: string, config: UserConfig = {}) {
         },
       },
     },
-    plugins: [vue()],
+    plugins: [
+      vue(),
+      yaml(),
+    ],
     resolve: {
       alias: {
         'vue': root + '/vue.js',

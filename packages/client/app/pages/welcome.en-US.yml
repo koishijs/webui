@@ -1,0 +1,9 @@
+title: Welcome to Koishi！
+description: Your chatbot is ready to go. 点击下面的任一选项，开启你的 Koishi 之旅吧。
+action:
+  docs:
+    title: Documentation
+    description: The official documentation contains everything you want to know.
+  forum:
+    title: Forum
+    description: If you run into problems, you can always ask for help on the forum.

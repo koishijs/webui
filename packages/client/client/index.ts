@@ -6,6 +6,7 @@ import install, { isNullable } from './components'
 import Overlay from './components/chat/overlay.vue'
 import { initTask } from './loader'
 import { Context } from './context'
+import { createI18n } from 'vue-i18n'
 
 import './styles/index.scss'
 
@@ -21,6 +22,12 @@ export const router = createRouter({
   history: createWebHistory(config.uiPath),
   linkActiveClass: 'active',
   routes: [],
+})
+
+export const i18n = createI18n({
+  legacy: false,
+  locale: 'zh-CN',
+  fallbackLocale: 'zh-CN',
 })
 
 export const root = new Context()

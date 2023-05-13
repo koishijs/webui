@@ -140,6 +140,7 @@ class NodeConsole extends Console {
     const { cacheDir } = this.config
     const { createServer } = require('vite') as typeof import('vite')
     const { default: vue } = require('@vitejs/plugin-vue') as typeof import('@vitejs/plugin-vue')
+    const { default: yaml } = require('@maikolib/vite-plugin-yaml') as typeof import('@maikolib/vite-plugin-yaml')
 
     this.vite = await createServer({
       root: this.root,
@@ -151,7 +152,10 @@ class NodeConsole extends Console {
           strict: false,
         },
       },
-      plugins: [vue()],
+      plugins: [
+        vue(),
+        yaml(),
+      ],
       resolve: {
         dedupe: ['vue', 'vue-demi', 'vue-router', 'element-plus', '@vueuse/core', '@popperjs/core', 'marked', 'xss'],
         alias: {
