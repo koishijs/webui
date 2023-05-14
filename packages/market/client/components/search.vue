@@ -64,7 +64,7 @@ function onEnter() {
     words.value.pop()
   }
   words.value.push('')
-  emit('update:modelValue', words.value)
+  emit('update:modelValue', words.value.toLowerCase())
 }
 
 function onEscape(event: KeyboardEvent) {
