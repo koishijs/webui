@@ -29,11 +29,11 @@
     "search"
   ],
   "devDependencies": {
-    "@types/semver": "^7.3.13"
+    "@types/semver": "^7.5.0"
   },
   "dependencies": {
     "cosmokit": "^1.4.2",
     "p-map": "^4.0.0",
-    "semver": "^7.5.0"
+    "semver": "^7.5.1"
   }
 }
