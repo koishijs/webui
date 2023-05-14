@@ -48,7 +48,7 @@ const lastWord = computed({
   get: () => words.value[words.value.length - 1],
   set: (value) => {
     words.value[words.value.length - 1] = value
-    emit('update:modelValue', words.value)
+    emit('update:modelValue', words.value.toLowerCase())
   },
 })
 
