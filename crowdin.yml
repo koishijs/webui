@@ -5,5 +5,7 @@ pull_request_labels:
 files:
   - source: /**/locales/zh-CN.yml
     translation: /**/locales/%locale%.yml
-  - source: /**/*.zh-CN.md
-    translation: /**/*.%locale%.md
+  - source: /**/*.zh-CN.yml
+    translation: /**/%original_file_name%.%locale%.yml
+    translation_replace:
+      .zh-CN.yml: ''

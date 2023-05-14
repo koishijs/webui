@@ -33,9 +33,11 @@ export async function buildExtension(root: string, config: UserConfig = {}) {
         makeAbsoluteExternalsRelative: true,
         external: [
           root + '/vue.js',
+          root + '/vue-i18n.js',
           root + '/vue-router.js',
           root + '/vueuse.js',
           root + '/client.js',
+          root + '/intlify.js',
         ],
         output: {
           format: 'iife',
@@ -49,9 +51,11 @@ export async function buildExtension(root: string, config: UserConfig = {}) {
     resolve: {
       alias: {
         'vue': root + '/vue.js',
+        'vue-i18n': root + '/vue-i18n.js',
         'vue-router': root + '/vue-router.js',
         '@vueuse/core': root + '/vueuse.js',
         '@koishijs/client': root + '/client.js',
+        '@intlify/core-base': root + '/intlify.js',
       },
     },
     define: {

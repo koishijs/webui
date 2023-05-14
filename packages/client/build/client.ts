@@ -3,6 +3,7 @@ import { appendFile, copyFile } from 'fs/promises'
 import { resolve } from 'path'
 import * as vite from 'vite'
 import vue from '@vitejs/plugin-vue'
+import yaml from '@maikolib/vite-plugin-yaml'
 
 function findModulePath(id: string) {
   const path = require.resolve(id).replace(/\\/g, '/')
@@ -13,7 +14,7 @@ function findModulePath(id: string) {
 const cwd = resolve(__dirname, '../../..')
 const dist = cwd + '/plugins/console/dist'
 
-export async function build(root: string, config: vite.UserConfig = {}) {
+export async function build(root: string, config: vite.UserConfig = {}, isClient = false) {
   const { rollupOptions = {} } = config.build || {}
   return await vite.build({
     root,
@@ -27,9 +28,11 @@ export async function build(root: string, config: vite.UserConfig = {}) {
         makeAbsoluteExternalsRelative: true,
         external: [
           root + '/vue.js',
+          root + '/vue-i18n.js',
           root + '/vue-router.js',
           root + '/client.js',
           root + '/vueuse.js',
+          root + '/intlify.js',
         ],
         output: {
           format: 'module',
@@ -40,13 +43,18 @@ export async function build(root: string, config: vite.UserConfig = {}) {
         },
       },
     },
-    plugins: [vue()],
+    plugins: [
+      vue(),
+      yaml(),
+    ],
     resolve: {
       alias: {
         'vue': root + '/vue.js',
+        'vue-i18n': root + '/vue-i18n.js',
         'vue-router': root + '/vue-router.js',
         '@vueuse/core': root + '/vueuse.js',
         '@koishijs/client': root + '/client.js',
+        '@intlify/core-base': root + '/intlify.js',
       },
     },
   }) as RollupOutput
@@ -58,6 +66,30 @@ export default async function () {
 
   await Promise.all([
     copyFile(findModulePath('vue') + '/dist/vue.runtime.esm-browser.prod.js', dist + '/vue.js'),
+    build(findModulePath('@intlify/core-base') + '/dist', {
+      build: {
+        outDir: dist,
+        emptyOutDir: false,
+        rollupOptions: {
+          input: {
+            'intlify': findModulePath('@intlify/core-base') + '/dist/core-base.esm-browser.js',
+          },
+          preserveEntrySignatures: 'strict',
+        },
+      },
+    }),
+    build(findModulePath('vue-i18n') + '/dist', {
+      build: {
+        outDir: dist,
+        emptyOutDir: false,
+        rollupOptions: {
+          input: {
+            'vue-i18n': findModulePath('vue-i18n') + '/dist/vue-i18n.esm-browser.js',
+          },
+          preserveEntrySignatures: 'strict',
+        },
+      },
+    }),
     build(findModulePath('vue-router') + '/dist', {
       build: {
         outDir: dist,
@@ -100,7 +132,7 @@ export default async function () {
         preserveEntrySignatures: 'strict',
       },
     },
-  })
+  }, true)
 
   for (const file of output) {
     if (file.type === 'asset' && file.name === 'style.css') {

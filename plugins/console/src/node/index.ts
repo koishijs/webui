@@ -161,8 +161,10 @@ class NodeConsole extends Console {
         alias: {
           '../client.js': '@koishijs/client',
           '../vue.js': 'vue',
+          '../vue-i18n.js': 'vue-i18n',
           '../vue-router.js': 'vue-router',
           '../vueuse.js': '@vueuse/core',
+          '../intlify.js': '@intlify/core-base',
         },
       },
       optimizeDeps: {
@@ -208,17 +210,19 @@ namespace NodeConsole {
   }
 
   export const Config: Schema<Config> = Schema.object({
-    root: Schema.string().description('前端页面的根目录。').hidden(),
-    uiPath: Schema.string().description('前端页面呈现的路径。').default(''),
-    apiPath: Schema.string().description('后端 API 服务的路径。').default('/status'),
-    selfUrl: Schema.string().description('Koishi 服务暴露在公网的地址。').role('link').default(''),
-    open: Schema.boolean().description('在应用启动后自动在浏览器中打开控制台。'),
+    root: Schema.string().hidden(),
+    uiPath: Schema.string().default(''),
+    apiPath: Schema.string().default('/status'),
+    selfUrl: Schema.string().role('link').default(''),
+    open: Schema.boolean(),
     heartbeat: Schema.object({
-      interval: Schema.number().description('心跳发送间隔 (单位毫秒)。').default(Time.second * 30),
-      timeout: Schema.number().description('心跳超时时间 (单位毫秒)。').default(Time.minute),
+      interval: Schema.number().default(Time.second * 30),
+      timeout: Schema.number().default(Time.minute),
     }),
-    devMode: Schema.boolean().description('启用调试模式 (仅供开发者使用)。').default(process.env.NODE_ENV === 'development').hidden(),
-    cacheDir: Schema.string().description('调试服务器缓存目录。').default('.vite').hidden(),
+    devMode: Schema.boolean().default(process.env.NODE_ENV === 'development').hidden(),
+    cacheDir: Schema.string().default('.vite').hidden(),
+  }).i18n({
+    'zh-CN': require('./locales/zh-CN'),
   })
 }
 
