@@ -27,7 +27,7 @@
         :class="{ [key]: true, active: words.includes(item.query), disabled: words.includes(item.negate) }"
         @click="toggleQuery(item, $event)">
         <span class="icon"><market-icon :name="key"></market-icon></span>
-        <span class="text">{{ t(`sort.${key}`) }}</span>
+        <span class="text">{{ t(`badge.${key}`) }}</span>
         <span class="spacer"></span>
         <span class="count" v-if="data">
           {{ data.filter(x => validate(x, item.query, config)).length }}

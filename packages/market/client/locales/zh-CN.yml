@@ -38,3 +38,6 @@ time:
   minutes-ago: '{0} 分钟前'
   hours-ago: '{0} 小时前'
   days-ago: '{0} 天前'
+
+search:
+  placeholder: 输入想要查询的插件名
