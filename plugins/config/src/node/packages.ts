@@ -38,8 +38,8 @@ export class PackageProvider extends shared.PackageProvider {
       const result = this.cache[entry]
       if (!result || result.runtime) return
       result.runtime = await this.parseExports(name, () => getExports(name))
-      this.refresh()
-    })
+      this.refresh(false)
+    }, { authority: 4 })
   }
 
   update(state: EffectScope) {
@@ -48,7 +48,7 @@ export class PackageProvider extends shared.PackageProvider {
     })
     if (!this.cache[entry]?.runtime) return
     this.parseRuntime(state, this.cache[entry].runtime)
-    this.refresh()
+    this.refresh(false)
   }
 
   async prepare() {
