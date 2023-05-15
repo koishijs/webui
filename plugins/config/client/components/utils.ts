@@ -1,5 +1,5 @@
 import { Dict } from 'koishi'
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { router, send, store } from '@koishijs/client'
 import { PackageProvider } from '@koishijs/plugin-market'
 import { AnalyzedPackage } from '@koishijs/registry'
@@ -28,6 +28,8 @@ export interface EnvInfo {
   peer: Dict<PeerInfo>
   warning?: boolean
 }
+
+export const showSelect = ref(false)
 
 const getImplements = (name: string) => ({
   ...store.market?.data[name],

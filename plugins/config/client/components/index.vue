@@ -59,7 +59,7 @@ import TreeView from './tree.vue'
 import PluginSettings from './plugin.vue'
 import KAlias from './alias.vue'
 import { clone, message, send, store } from '@koishijs/client'
-import { showSelect } from '../utils'
+import { showSelect } from './utils'
 
 const route = useRoute()
 const router = useRouter()

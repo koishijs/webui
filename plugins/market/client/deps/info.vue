@@ -84,7 +84,7 @@ import { global, send, store } from '@koishijs/client'
 import { computed } from 'vue'
 import { gt } from 'semver'
 import { envMap, SettingsData } from '../utils'
-import KDepLink from '../dep-link.vue'
+import KDepLink from './dep-link.vue'
 
 const props = defineProps<{
   data: SettingsData
