@@ -38,6 +38,7 @@ export async function buildExtension(root: string, config: UserConfig = {}) {
           root + '/i18n-base.js',
           root + '/vueuse.js',
           root + '/client.js',
+          root + '/intlify.js',
         ],
         output: {
           format: 'iife',
@@ -56,6 +57,7 @@ export async function buildExtension(root: string, config: UserConfig = {}) {
         '@intlify/core-base': root + '/i18n-base.js',
         '@vueuse/core': root + '/vueuse.js',
         '@koishijs/client': root + '/client.js',
+        '@intlify/core-base': root + '/intlify.js',
       },
     },
     define: {
