@@ -22,23 +22,26 @@ if (process.env.NODE_ENV !== 'development') {
 class BrowserLoader extends Loader {
   public envData: any = {}
   public config: any = { plugins: {} }
-  private _initTask: Promise<void>
+  public market: MarketResult
+
+  async init(filename?: string) {
+    await super.init(filename)
+    await this.prepare()
+  }
 
   private async prepare() {
     if (process.env.NODE_ENV === 'development') return
-    const market: MarketResult = await fetch(global.endpoint + '/play.json').then(res => res.json())
-    for (const object of market.objects) {
+    this.market = await fetch(global.endpoint + '/play.json').then(res => res.json())
+    for (const object of this.market.objects) {
       this.cache[object.shortname] = `${global.endpoint}/modules/${object.name}/index.js`
     }
   }
 
   async resolve(name: string) {
-    await (this._initTask ||= this.prepare())
     return this.cache[name]
   }
 
   async resolvePlugin(name: string) {
-    await (this._initTask ||= this.prepare())
     const urls = process.env.NODE_ENV === 'development'
       ? resolveName(name).map(name => global.endpoint + `/modules/${name}/index.js`)
       : makeArray(this.cache[name])

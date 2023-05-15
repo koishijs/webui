@@ -1,5 +1,5 @@
 import { Context } from '@koishijs/client'
-import type {} from '../src'
+import type {} from '@koishijs/plugin-config'
 import Settings from './components/index.vue'
 import SettingsModifier from './components/slots/modifier.vue'
 import SettingsUsage from './components/slots/usage.vue'

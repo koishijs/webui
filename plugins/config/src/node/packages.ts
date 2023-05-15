@@ -26,7 +26,7 @@ function getExports(id: string) {
   return unwrapExports(result.exports)
 }
 
-class PackageProvider extends shared.PackageProvider {
+export class PackageProvider extends shared.PackageProvider {
   cache: Dict<PackageProvider.Data> = {}
   task: Promise<void>
 
@@ -136,10 +136,8 @@ class PackageProvider extends shared.PackageProvider {
   }
 }
 
-namespace PackageProvider {
+export namespace PackageProvider {
   export interface Config {}
 
   export interface Data extends shared.PackageProvider.Data {}
 }
-
-export default PackageProvider

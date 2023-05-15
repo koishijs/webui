@@ -1,27 +1,29 @@
 import { Context, pick } from 'koishi'
-import { PackageProvider as BasePackageProvider } from '../shared'
+import { MarketResult } from '@koishijs/registry'
+import * as shared from '../shared'
 
-export default class PackageProvider extends BasePackageProvider {
-  static using = ['console.market']
+declare module '@koishijs/loader' {
+  interface Loader {
+    market: MarketResult
+  }
+}
 
+export class PackageProvider extends shared.PackageProvider {
   async getManifest(name: string) {
-    const market = await this.ctx.console.market.prepare()
-    return market.objects.find(item => {
+    return this.ctx.loader.market.objects.find(item => {
       return name === item.name.replace(/(koishi-|^@koishijs\/)plugin-/, '')
     })?.manifest
   }
 
   async get(forced = false) {
-    const market = await this.ctx.console.market.prepare()
-
-    const packages = await Promise.all(market.objects.map(async (data) => {
+    const packages = await Promise.all(this.ctx.loader.market.objects.map(async (data) => {
       const result = pick(data, [
         'name',
         'version',
         'description',
         'portable',
         'manifest',
-      ]) as BasePackageProvider.Data
+      ]) as shared.PackageProvider.Data
       result.shortname = data.name.replace(/(koishi-|^@koishijs\/)plugin-/, '')
       result.manifest = data.manifest
       result.peerDependencies = { ...data.versions[data.version].peerDependencies }

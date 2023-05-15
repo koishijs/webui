@@ -1,7 +1,7 @@
 {
   "name": "@koishijs/plugin-market",
   "description": "Manage your bots and plugins with console",
-  "version": "1.13.5",
+  "version": "2.0.0-alpha.0",
   "main": "lib/node/index.js",
   "typings": "lib/index.d.ts",
   "exports": {
@@ -44,8 +44,8 @@
       "dist"
     ],
     "description": {
-      "en": "Manage your bots and plugins with console",
-      "zh": "使用控制台安装、卸载、配置、查看你的插件"
+      "en": "Manage your plugins with console",
+      "zh": "使用控制台安装、卸载、更新你的插件"
     },
     "service": {
       "required": [

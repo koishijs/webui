@@ -49,7 +49,7 @@
     "@koishijs/client": "^5.8.0",
     "@koishijs/plugin-console": "^5.8.0",
     "@koishijs/plugin-locales": "^2.2.6",
-    "@koishijs/plugin-market": "^1.13.5",
+    "@koishijs/plugin-market": "^2.0.0-alpha.0",
     "@koishijs/plugin-mock": "^2.4.3",
     "@types/throttle-debounce": "^2.1.0"
   },
