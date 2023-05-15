@@ -4,6 +4,8 @@ import Settings from './components/index.vue'
 import Select from './components/select.vue'
 import './icons'
 
+export * from './components/utils'
+
 export default (ctx: Context) => {
   ctx.slot({
     type: 'global',
@@ -16,7 +18,7 @@ export default (ctx: Context) => {
     icon: 'activity:plugin',
     order: 800,
     authority: 4,
-    fields: ['config', 'packages'],
+    fields: ['config', 'packages', 'services'],
     component: Settings,
   })
 }

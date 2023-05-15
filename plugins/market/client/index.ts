@@ -1,12 +1,11 @@
 import { defineComponent, h } from 'vue'
 import { Context, global, receive, router, store } from '@koishijs/client'
 import type {} from '@koishijs/plugin-market'
-import Missing from './components/missing.vue'
-import Install from './deps/install.vue'
-import Dependencies from './deps/index.vue'
-import SettingsInfo from './deps/info.vue'
-import Market from './market/index.vue'
-import Progress from './market/progress.vue'
+import extensions from './extensions'
+import Dependencies from './components/dependencies.vue'
+import Install from './components/install.vue'
+import Market from './components/market.vue'
+import Progress from './components/progress.vue'
 import './icons'
 
 receive('market/patch', (data) => {
@@ -20,6 +19,8 @@ receive('market/patch', (data) => {
 })
 
 export default (ctx: Context) => {
+  ctx.plugin(extensions)
+
   ctx.slot({
     type: 'welcome-choice',
     component: defineComponent(() => () => h('div', {
@@ -44,17 +45,6 @@ export default (ctx: Context) => {
     order: 750,
     authority: 4,
     component: Market,
-  })
-
-  ctx.slot({
-    type: 'market-settings',
-    component: SettingsInfo,
-    order: 1000,
-  })
-
-  ctx.slot({
-    type: 'plugin-missing',
-    component: Missing,
   })
 
   if (!global.static) {

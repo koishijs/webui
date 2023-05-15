@@ -4,6 +4,7 @@ import { router, send, store } from '@koishijs/client'
 import { PackageProvider } from '@koishijs/plugin-config'
 
 export interface SettingsData {
+  env: EnvInfo
   name: string
   local: PackageProvider.Data
   config: any
@@ -12,7 +13,6 @@ export interface SettingsData {
 
 interface DepInfo {
   required: boolean
-  available: string[]
 }
 
 interface PeerInfo {
@@ -29,25 +29,16 @@ export interface EnvInfo {
 
 export const showSelect = ref(false)
 
-const getImplements = (name: string) => ({
-  ...store.market?.data[name],
-  ...store.packages[name],
-}.manifest?.service.implements ?? [])
-
 export const coreDeps = [
   '@koishijs/plugin-console',
-  '@koishijs/plugin-market',
+  '@koishijs/plugin-config',
 ]
 
 function getEnvInfo(name: string) {
   function setService(name: string, required: boolean) {
     if (services.has(name)) return
     if (name === 'console') return
-
-    const available = Object.values(store.market?.data ?? {})
-      .filter(data => getImplements(data.name).includes(name))
-      .map(data => data.name)
-    result.using[name] = { required, available }
+    result.using[name] = { required }
   }
 
   const local = store.packages[name]
@@ -61,7 +52,7 @@ function getEnvInfo(name: string) {
     const required = !local.peerDependenciesMeta?.[name]?.optional
     const active = !!store.packages[name]?.runtime?.id
     result.peer[name] = { required, active }
-    for (const service of getImplements(name)) {
+    for (const service of store.packages[name]?.manifest?.service.implements ?? []) {
       services.add(service)
     }
   }
@@ -86,7 +77,7 @@ function getEnvInfo(name: string) {
   }
 
   // check schema
-  if (!local.schema) {
+  if (!local.runtime?.schema) {
     result.warning = true
   }
 
