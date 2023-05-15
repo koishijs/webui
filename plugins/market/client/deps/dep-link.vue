@@ -16,4 +16,11 @@ defineProps<{
 
 <style scoped lang="scss">
 
+.link {
+  &:hover {
+    cursor: pointer;
+    text-decoration: underline;
+  }
+}
+
 </style>

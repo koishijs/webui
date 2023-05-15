@@ -16,7 +16,7 @@ declare module '@koishijs/plugin-console' {
 }
 
 export const filter = false
-export const name = 'manager'
+export const name = 'market'
 export const using = ['console', 'loader'] as const
 
 export interface Config {
@@ -30,10 +30,6 @@ export const Config: Schema<Config> = Schema.object({
 })
 
 export function apply(ctx: Context, config: Config) {
-  if (!ctx.loader.writable) {
-    return ctx.logger('manager').warn('manager is only available for json/yaml config file')
-  }
-
   ctx.plugin(Installer, config.registry)
   ctx.plugin(MarketProvider, config.search)
 

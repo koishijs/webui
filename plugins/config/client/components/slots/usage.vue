@@ -1,5 +1,5 @@
 <template>
-  <k-markdown unsafe class="usage" v-if="data.local.usage" :source="data.local.usage"></k-markdown>
+  <k-markdown unsafe class="usage" v-if="data.local.runtime?.usage" :source="data.local.runtime?.usage"></k-markdown>
 </template>
 
 <script lang="ts" setup>

@@ -1,5 +1,5 @@
 <template>
-  <k-modifier v-if="data.local.filter !== false" v-model="config"></k-modifier>
+  <k-modifier v-if="data.local.runtime.filter !== false" v-model="config"></k-modifier>
 </template>
 
 <script lang="ts" setup>

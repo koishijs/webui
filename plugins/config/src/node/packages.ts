@@ -6,7 +6,7 @@ import { unwrapExports } from '@koishijs/loader'
 import { loadManifest } from './utils'
 import * as shared from '../shared'
 
-const logger = new Logger('market')
+const logger = new Logger('config')
 
 /** require without affecting the dependency tree */
 function getExports(id: string) {
@@ -30,13 +30,24 @@ export class PackageProvider extends shared.PackageProvider {
   cache: Dict<PackageProvider.Data> = {}
   task: Promise<void>
 
+  constructor(ctx: Context) {
+    super(ctx)
+
+    ctx.console.addListener('config/request-runtime', async (name) => {
+      const entry = require.resolve(name)
+      const result = this.cache[entry]
+      if (!result || result.runtime) return
+      result.runtime = await this.parseExports(name, () => getExports(name))
+      this.refresh()
+    })
+  }
+
   update(state: EffectScope) {
     const entry = Object.keys(require.cache).find((key) => {
       return unwrapExports(require.cache[key].exports) === state.runtime.plugin
     })
-    if (!this.cache[entry]) return
-    const data = this.cache[entry]
-    this.parseRuntime(state.runtime, data)
+    if (!this.cache[entry]?.runtime) return
+    this.parseRuntime(state, this.cache[entry].runtime)
     this.refresh()
   }
 
@@ -62,7 +73,9 @@ export class PackageProvider extends shared.PackageProvider {
     packages.unshift({
       name: '',
       shortname: '',
-      schema: Context.Config,
+      runtime: {
+        schema: Context.Config,
+      },
     })
 
     return Object.fromEntries(packages.filter(x => x).map(data => [data.name, data]))
@@ -72,34 +85,33 @@ export class PackageProvider extends shared.PackageProvider {
     const base = baseDir + '/node_modules'
     const files = await fsp.readdir(base).catch(() => [])
     for (const name of files) {
-      const base2 = base + '/' + name
-      if (name.startsWith('@')) {
+      if (name.startsWith('koishi-plugin-')) {
+        this.loadPackage(name)
+      } else if (name.startsWith('@')) {
+        const base2 = base + '/' + name
         const files = await fsp.readdir(base2).catch(() => [])
         for (const name2 of files) {
           if (name === '@koishijs' && name2.startsWith('plugin-') || name2.startsWith('koishi-plugin-')) {
             this.loadPackage(name + '/' + name2)
           }
         }
-      } else {
-        if (name.startsWith('koishi-plugin-')) {
-          this.loadPackage(name)
-        }
       }
     }
   }
 
-  private loadPackage(name: string) {
+  private async loadPackage(name: string) {
     try {
       // require.resolve(name) may be different from require.resolve(path)
       // because tsconfig-paths may resolve the path differently
-      this.cache[require.resolve(name)] = this.parsePackage(name)
+      const entry = require.resolve(name)
+      this.cache[entry] = await this.parsePackage(name, entry)
     } catch (error) {
-      logger.warn('failed to parse %c', name)
+      logger.warn('failed to resolve %c', name)
       logger.warn(error)
     }
   }
 
-  private parsePackage(name: string) {
+  private async parsePackage(name: string, entry: string) {
     const data = loadManifest(name)
     const result = pick(data, [
       'name',
@@ -114,19 +126,9 @@ export class PackageProvider extends shared.PackageProvider {
     result.peerDependencies = { ...data.peerDependencies }
     result.peerDependenciesMeta = { ...data.peerDependenciesMeta }
 
-    // check schema
-    const exports = getExports(name)
-    result.schema = exports?.Config || exports?.schema
-    result.usage = exports?.usage
-    result.filter = exports?.filter
-
-    // check plugin state
-    const runtime = this.ctx.registry.get(exports)
-    if (runtime) this.parseRuntime(runtime, result)
-
-    // make sure that result can be serialized into json
-    JSON.stringify(result)
-
+    if (require.resolve[entry]) {
+      result.runtime = await this.parseExports(name, () => unwrapExports(require.cache[entry].exports))
+    }
     return result
   }
 

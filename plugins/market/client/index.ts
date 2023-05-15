@@ -1,13 +1,13 @@
 import { defineComponent, h } from 'vue'
 import { Context, global, receive, router, store } from '@koishijs/client'
 import type {} from '@koishijs/plugin-market'
+import Missing from './components/missing.vue'
 import Install from './deps/install.vue'
 import Dependencies from './deps/index.vue'
 import SettingsInfo from './deps/info.vue'
 import Market from './market/index.vue'
 import Progress from './market/progress.vue'
 import './icons'
-import './index.scss'
 
 receive('market/patch', (data) => {
   store.market = {
@@ -50,6 +50,11 @@ export default (ctx: Context) => {
     type: 'market-settings',
     component: SettingsInfo,
     order: 1000,
+  })
+
+  ctx.slot({
+    type: 'plugin-missing',
+    component: Missing,
   })
 
   if (!global.static) {

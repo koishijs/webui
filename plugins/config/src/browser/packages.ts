@@ -1,12 +1,5 @@
 import { Context, pick } from 'koishi'
-import { MarketResult } from '@koishijs/registry'
 import * as shared from '../shared'
-
-declare module '@koishijs/loader' {
-  interface Loader {
-    market: MarketResult
-  }
-}
 
 export class PackageProvider extends shared.PackageProvider {
   async getManifest(name: string) {
@@ -29,11 +22,9 @@ export class PackageProvider extends shared.PackageProvider {
       result.peerDependencies = { ...data.versions[data.version].peerDependencies }
       result.peerDependenciesMeta = { ...data.versions[data.version].peerDependenciesMeta }
       if (!result.portable) return
-      const exports = await this.ctx.loader.resolvePlugin(data.shortname)
-      result.schema = exports?.Config || exports?.schema
-      result.usage = exports?.usage
-      const runtime = this.ctx.registry.get(exports)
-      if (runtime) this.parseRuntime(runtime, result)
+      result.runtime = await this.parseExports(data.name, () => {
+        return this.ctx.loader.resolvePlugin(data.shortname)
+      })
       return result
     }))
 
@@ -41,7 +32,9 @@ export class PackageProvider extends shared.PackageProvider {
     packages.unshift({
       name: '',
       shortname: '',
-      schema: Context.Config,
+      runtime: {
+        schema: Context.Config,
+      },
     })
 
     return Object.fromEntries(packages.filter(x => x).map(data => [data.name, data]))

@@ -1,5 +1,5 @@
 <template>
-  <k-form :schema="store.packages[''].schema" :initial="current.config" v-model="config"></k-form>
+  <k-form :schema="store.packages[''].runtime.schema" :initial="current.config" v-model="config"></k-form>
 </template>
 
 <script lang="ts" setup>

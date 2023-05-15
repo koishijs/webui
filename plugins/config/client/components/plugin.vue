@@ -2,24 +2,26 @@
   <template v-if="name">
     <k-slot name="market-settings" :data="data"></k-slot>
 
-    <!-- schema -->
-    <k-comment v-if="!local.schema" type="warning">
+    <k-comment v-if="!local.runtime">
+      <p>正在加载插件配置……</p>
+    </k-comment>
+    <k-comment v-else-if="!local.runtime.schema" type="warning">
       <p>此插件未声明配置项，这可能并非预期行为{{ hint }}。</p>
     </k-comment>
-    <k-form :schema="local.schema" :initial="current.config" v-model="config">
+    <k-form v-else :schema="local.runtime.schema" :initial="current.config" v-model="config">
       <template #hint>{{ hint }}</template>
     </k-form>
   </template>
 
-  <k-comment v-else-if="current.label" type="error">
-    <p>此插件尚未安装，<span class="link" @click.stop="gotoMarket">点击前往插件市场</span>。</p>
-  </k-comment>
+  <template v-else-if="current.label">
+    <k-slot name="plugin-missing"></k-slot>
+  </template>
 </template>
 
 <script lang="ts" setup>
 
-import { store, router } from '@koishijs/client'
-import { computed, provide } from 'vue'
+import { store, send } from '@koishijs/client'
+import { computed, provide, watch } from 'vue'
 import { SettingsData, Tree } from './utils'
 
 const props = defineProps<{
@@ -48,12 +50,12 @@ const name = computed(() => {
 })
 
 const local = computed(() => store.packages[name.value])
-const remote = computed(() => store.market?.data[name.value])
 const hint = computed(() => local.value.workspace ? '，请检查源代码' : '，请联系插件作者')
 
-function gotoMarket() {
-  router.push('/market?keyword=' + props.current.label)
-}
+watch(local, (value) => {
+  if (!value || value.runtime) return
+  send('config/request-runtime', value.name)
+})
 
 provide('manager.settings.local', local)
 provide('manager.settings.config', config)
@@ -62,22 +64,8 @@ provide('manager.settings.current', computed(() => props.current))
 const data = computed<SettingsData>(() => ({
   name: name.value,
   local: local.value,
-  remote: remote.value,
   config: config.value,
   current: props.current,
 }))
 
 </script>
-
-<style lang="scss">
-
-.plugin-view {
-  span.link {
-    &:hover {
-      cursor: pointer;
-      text-decoration: underline;
-    }
-  }
-}
-
-</style>

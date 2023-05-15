@@ -1,4 +1,5 @@
 import { MarketProvider as BaseMarketProvider } from '../shared'
+import {} from '@koishijs/plugin-config'
 
 export default class MarketProvider extends BaseMarketProvider {
   start() {
@@ -7,8 +8,7 @@ export default class MarketProvider extends BaseMarketProvider {
   }
 
   async collect() {
-    const response = await fetch('https://registry.koishi.chat/play.json')
-    return await response.json()
+    return this.ctx.loader.market
   }
 
   async get() {

@@ -1,13 +1,11 @@
 import { Dict } from 'koishi'
 import { computed, ref } from 'vue'
 import { router, send, store } from '@koishijs/client'
-import { PackageProvider } from '@koishijs/plugin-market'
-import { AnalyzedPackage } from '@koishijs/registry'
+import { PackageProvider } from '@koishijs/plugin-config'
 
 export interface SettingsData {
   name: string
   local: PackageProvider.Data
-  remote: AnalyzedPackage
   config: any
   current: Tree
 }
@@ -61,7 +59,7 @@ function getEnvInfo(name: string) {
     if (!name.includes('@koishijs/plugin-') && !name.includes('koishi-plugin-')) continue
     if (coreDeps.includes(name)) continue
     const required = !local.peerDependenciesMeta?.[name]?.optional
-    const active = !!store.packages[name]?.id
+    const active = !!store.packages[name]?.runtime.id
     result.peer[name] = { required, active }
     for (const service of getImplements(name)) {
       services.add(service)
@@ -83,7 +81,7 @@ function getEnvInfo(name: string) {
   }
 
   // check reusability
-  if (local.id && !local.forkable) {
+  if (local.runtime?.id && !local.runtime?.forkable) {
     result.warning = true
   }
 
