@@ -8,25 +8,28 @@ export interface SlotItem {
 
 export interface SlotOptions extends SlotItem {
   type: string
+  when?: () => boolean
 }
 
 export const KSlot = defineComponent({
   props: {
     name: String,
     data: Object,
-    tag: {
-      default: 'div',
-    },
+    single: Boolean,
   },
   setup(props, { slots }) {
     return () => {
-      const internal = [...slots.default?.() || []]
+      const internal = props.single ? [] : [...slots.default?.() || []]
         .filter(node => node.type === KSlotItem)
         .map(node => ({ node, order: node.props?.order || 0 }))
       const external = [...views[props.name] || []]
-        .map(item => ({ node: h(item.component, { data: props.data }), order: item.order }))
+        .filter(item => !item.when || item.when())
+        .map(item => ({ node: h(item.component, { data: props.data }), order: item.order, layer: 1 }))
       const children = [...internal, ...external].sort((a, b) => b.order - a.order)
-      return h(props.tag, children.map(item => item.node))
+      if (props.single) {
+        return children[0]?.node || slots.default?.()
+      }
+      return children.map(item => item.node)
     }
   },
 })
@@ -36,7 +39,6 @@ const KSlotItem = defineComponent({
     order: Number,
   },
   setup(props, { slots }) {
-    console.log(111, props, slots)
     return () => slots.default?.()
   },
 })
