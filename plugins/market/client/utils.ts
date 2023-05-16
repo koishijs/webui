@@ -30,13 +30,6 @@ watch(() => store.dependencies, (value) => {
 
 export const active = ref('')
 
-export const getMixedMeta = (name: string) => ({
-  keywords: [],
-  peerDependencies: {},
-  ...store.market.data[name],
-  ...store.packages?.[name],
-})
-
 export const refresh = computed(() => ({
   icon: 'refresh',
   label: '刷新',

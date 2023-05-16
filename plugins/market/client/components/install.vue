@@ -45,7 +45,7 @@
           <span class="link" @click.stop="configure(path)">{{ path }}</span>
           ({{ active ? '运行中' : '闲置' }})
         </li>
-        <li v-if="!store.packages?.[active]?.runtime?.id">
+        <li v-if="!local.runtime?.id">
           <span class="link" @click.stop="configure(true)">添加新配置</span>
         </li>
       </ul>
@@ -84,7 +84,7 @@ import { parse } from 'semver'
 function installDep(version: string) {
   const target = shortname.value
   install({ [active.value]: version }, async () => {
-    if (!version || !target || getPaths(target).length) return
+    if (!version || !target || !store.config || getPaths(target).length) return
     const path = target + ':' + Math.random().toString(36).slice(2, 8)
     await send('manager/unload', path, {})
     await router.push('/plugins/' + path)
@@ -180,7 +180,7 @@ const shortname = computed(() => {
 const paths = computed(() => getPaths(shortname.value))
 
 function getPaths(target: string) {
-  if (!target) return []
+  if (!target || !store.config) return []
   return [...find(target, store.config.plugins, '')]
 }
 

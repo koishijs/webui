@@ -14,7 +14,7 @@ export const Config: Schema<Config> = Schema.object({})
 
 export function apply(ctx: Context, config: Config) {
   if (!ctx.loader.writable) {
-    return ctx.logger('config').warn('@koishijs/plugin-config is only available for json/yaml config file')
+    return ctx.logger('app').warn('@koishijs/plugin-config is only available for json/yaml config file')
   }
 
   ctx.plugin(PackageProvider)

@@ -30,6 +30,10 @@ export const Config: Schema<Config> = Schema.object({
 })
 
 export function apply(ctx: Context, config: Config) {
+  if (!ctx.loader.writable) {
+    return ctx.logger('app').warn('@koishijs/plugin-market is only available for json/yaml config file')
+  }
+
   ctx.plugin(Installer, config.registry)
   ctx.plugin(MarketProvider, config.search)
 

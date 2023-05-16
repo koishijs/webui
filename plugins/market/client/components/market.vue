@@ -26,9 +26,9 @@
             共搜索到 {{ hasFilter ? packages.length + ' / ' : '' }}{{ all.length }} 个插件。
           </div>
         </template>
-        <template #action="data" v-if="store.packages">
+        <template #action="data">
           <k-button v-if="global.static" solid @click.stop="handleClick(data)">配置</k-button>
-          <k-button v-else-if="store.packages[data.name]" type="success" solid @click.stop="handleClick(data)">修改</k-button>
+          <k-button v-else-if="installed(data)" type="success" solid @click.stop="handleClick(data)">修改</k-button>
           <k-button v-else solid @click.stop="handleClick(data)">添加</k-button>
         </template>
       </market-list>
@@ -52,9 +52,15 @@ import { refresh, active } from '../utils'
 import { getSorted, kConfig, MarketFilter, MarketList, MarketSearch } from '@koishijs/market'
 import { AnalyzedPackage } from '@koishijs/registry'
 
-provide(kConfig, {
-  installed: (data) => !!store.packages?.[data.name],
-})
+function installed(data: AnalyzedPackage) {
+  if (store.packages) {
+    return !!store.packages[data.name]
+  } else {
+    return !!store.dependencies?.[data.name]
+  }
+}
+
+provide(kConfig, { installed })
 
 const words = ref<string[]>([''])
 

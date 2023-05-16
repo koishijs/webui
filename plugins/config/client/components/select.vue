@@ -18,7 +18,7 @@
       <el-scrollbar>
         <div class="package" v-for="({ name, shortname, manifest }) in packages" :key="name" @click.stop="configure(shortname)">
           <h3>{{ shortname }}</h3>
-          <k-markdown inline class="desc" :source="manifest.description.zh || manifest.description.en"></k-markdown>
+          <k-markdown inline class="desc" :source="tt(manifest.description)"></k-markdown>
         </div>
       </el-scrollbar>
     </div>
@@ -27,11 +27,13 @@
 
 <script lang="ts" setup>
 
-import { router, send, store } from '@koishijs/client'
+import { router, send, store, useI18nText } from '@koishijs/client'
 import { computed, nextTick, ref, watch } from 'vue'
 import { showSelect } from './utils'
 import { categories, resolveCategory, MarketIcon } from '@koishijs/market'
 import { useRoute } from 'vue-router'
+
+const tt = useI18nText()
 
 const extended = {
   all: '所有插件',
