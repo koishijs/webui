@@ -14,7 +14,6 @@ declare module 'koishi' {
 
   interface Tables {
     token: LoginToken
-    login: LoginHistory
   }
 }
 
@@ -33,7 +32,7 @@ declare module '@koishijs/plugin-console' {
     'login/platform'(this: Client, platform: string, pid: string): Promise<UserLogin>
     'login/password'(this: Client, name: string, password: string): void
     'login/token'(this: Client, id: number, token: string): void
-    'login/history'(this: Client): Promise<LoginHistory[]>
+    'user/delete-token'(this: Client, inc: number): void
     'user/unbind'(this: Client, platform: string, pid: string): void
     'user/update'(this: Client, data: UserUpdate): void
     'user/logout'(this: Client): void
@@ -41,32 +40,27 @@ declare module '@koishijs/plugin-console' {
 }
 
 export interface LoginToken {
+  inc: number
   id: number
+  type: LoginType
   token: string
   expire: number
+  createdAt: Date
+  lastUsedAt: Date
+  userAgent: string
+  address: string
 }
 
-export interface Auth extends LoginToken {
-  name: string
-  authority: number
-}
+export type Auth =
+  & Pick<LoginToken, 'token' | 'expire'>
+  & Pick<User, 'id' | 'name' | 'authority'>
 
 interface AuthData extends Auth {
-  history: Omit<LoginHistory, 'token' | 'aid'>[]
+  tokens: Omit<LoginToken, 'token' | 'id'>[]
   bindings: Omit<Binding, 'aid'>[]
 }
 
 type LoginType = 'platform' | 'password' | 'token'
-
-export interface LoginHistory {
-  inc: number
-  aid: number
-  token: string
-  time: Date
-  agent: string
-  address: string
-  type: LoginType
-}
 
 const logger = new Logger('auth')
 
@@ -98,20 +92,20 @@ class AuthService extends Service {
     })
 
     ctx.model.extend('token', {
+      inc: 'unsigned',
       id: 'unsigned',
+      type: 'string(255)',
       token: 'string(255)',
       expire: 'unsigned(20)',
-    }, { primary: 'token' })
-
-    ctx.model.extend('login', {
-      inc: 'unsigned',
-      aid: 'unsigned',
-      token: 'string(255)',
-      time: 'timestamp',
-      agent: 'string(255)',
+      createdAt: 'timestamp',
+      lastUsedAt: 'timestamp',
+      userAgent: 'string(255)',
       address: 'string(255)',
-      type: 'string(255)',
-    }, { primary: 'inc', autoInc: true })
+    }, {
+      primary: 'inc',
+      autoInc: true,
+      unique: ['token'],
+    })
 
     ctx.console.addEntry({
       dev: resolve(__dirname, '../client/index.ts'),
@@ -133,13 +127,13 @@ class AuthService extends Service {
     }])
   }
 
-  async setAuth(client: Client, auth: Auth) {
+  async setAuth(client: Client, auth = client.auth) {
     if (auth) {
       const bindings = await this.ctx.database.get('binding', { aid: auth.id })
       bindings.forEach(binding => delete binding.aid)
-      const history = await this.ctx.database.get('login', { aid: auth.id, type: { $not: 'token' } })
-      history.reverse().forEach(login => (delete login.aid, delete login.token))
-      client.send({ type: 'data', body: { key: 'user', value: { ...auth, bindings, history } } })
+      const tokens = await this.ctx.database.get('token', { id: auth.id })
+      tokens.reverse().forEach(login => (delete login.id, delete login.token))
+      client.send({ type: 'data', body: { key: 'user', value: { ...auth, bindings, tokens } } })
     } else {
       client.send({ type: 'data', body: { key: 'user', value: null } })
     }
@@ -148,20 +142,15 @@ class AuthService extends Service {
     client.refresh()
   }
 
-  async createLogin(client: Client, type: LoginType, aid: number, token: string) {
-    const { headers, socket } = client.request
-    const time = new Date()
-    const agent = headers['user-agent']?.toString()
-    const address = headers['x-forwarded-for']?.toString() || socket.remoteAddress
-    logger.debug('login attempt (id: %s, type: %s, address: %s)', type, aid, address)
-    await this.ctx.database.create('login', { aid, token, type, time, agent, address })
-  }
-
   async createToken(client: Client, type: LoginType, user: Pick<User, 'id' | 'name' | 'authority'>) {
+    const { headers, socket } = client.request
+    const createdAt = new Date()
+    const lastUsedAt = new Date()
+    const userAgent = headers['user-agent']?.toString()
+    const address = headers['x-forwarded-for']?.toString() || socket.remoteAddress
     const expire = Date.now() + this.config.authTokenExpire
     const token = randomId()
-    await this.ctx.database.create('token', { id: user.id, expire, token })
-    await this.createLogin(client, type, user.id, token)
+    await this.ctx.database.create('token', { id: user.id, type, expire, token, createdAt, lastUsedAt, userAgent, address })
     await this.setAuth(client, { ...user, expire, token })
   }
 
@@ -182,7 +171,7 @@ class AuthService extends Service {
       if (!data || data.expire <= Date.now()) throw new Error('令牌已失效。')
       const [user] = await ctx.database.get('user', { id: aid }, ['id', 'name', 'authority'])
       if (!user) throw new Error('用户不存在。')
-      await self.createLogin(this, 'token', aid, token)
+      await ctx.database.set('token', { token }, { lastUsedAt: new Date() })
       await self.setAuth(this, { ...user, ...data, token })
     })
 
@@ -225,14 +214,26 @@ class AuthService extends Service {
       }
     }, true)
 
-    ctx.on('console/intercept', (client, listener) => {
+    ctx.on('console/intercept', async (client, listener) => {
       if (!listener.authority) return false
       if (!client.auth) return true
       if (client.auth.expire <= Date.now()) return true
-      return client.auth.authority < listener.authority
+      if (client.auth.authority < listener.authority) return true
+      await ctx.database.set('token', { token: client.auth.token }, { lastUsedAt: new Date() })
+    })
+
+    ctx.console.addListener('user/delete-token', async function (inc) {
+      if (!this.auth) throw new Error('请先登录。')
+      const [data] = await ctx.database.get('token', { id: this.auth.id, inc })
+      if (!data) throw new Error('令牌不存在。')
+      await ctx.database.remove('token', { inc })
+      await self.setAuth(this)
     })
 
     ctx.console.addListener('user/logout', async function () {
+      if (this.auth) {
+        await ctx.database.remove('token', { token: this.auth.token })
+      }
       await self.setAuth(this, null)
     })
 
@@ -241,7 +242,7 @@ class AuthService extends Service {
       if (data.password) data.password = toHash(data.password)
       await ctx.database.set('user', { id: this.auth.id }, data)
       Object.assign(this.auth, data)
-      await self.setAuth(this, this.auth)
+      await self.setAuth(this)
     })
 
     ctx.console.addListener('user/unbind', async function (platform, pid) {
@@ -255,7 +256,7 @@ class AuthService extends Service {
       } else {
         await ctx.database.remove('binding', { platform, pid })
       }
-      await self.setAuth(this, this.auth)
+      await self.setAuth(this)
     })
   }
 }

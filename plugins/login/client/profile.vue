@@ -5,7 +5,7 @@
 
       <h2 class="k-schema-header">
         平台绑定
-        <el-button solid @click="showDialog = true">添加</el-button>
+        <el-button solid class="right" @click="showDialog = true">添加</el-button>
       </h2>
       <div class="k-schema-item" v-for="({ platform, pid, bid }) in store.user.bindings">
         <div class="header">
@@ -20,20 +20,16 @@
       </div>
 
       <h2 class="k-schema-header">登录历史</h2>
-      <table>
-        <tr>
-          <th>时间</th>
-          <th>登录方式</th>
-          <th>IP 地址</th>
-          <th>客户端</th>
-        </tr>
-        <tr v-for="({ inc, time, type, address, agent }) in store.user.history" :key="inc">
-          <td>{{ time }}</td>
-          <td>{{ types[type] }}</td>
-          <td>{{ address }}</td>
-          <td>{{ agent }}</td>
-        </tr>
-      </table>
+      <ul>
+        <li v-for="({ inc, type, createdAt, lastUsedAt, address, userAgent }) in store.user.tokens" :key="inc">
+          <div>登录类型：{{ types[type] }}</div>
+          <div>登录时间：{{ createdAt }}</div>
+          <div>最后访问：{{ lastUsedAt }}</div>
+          <div>IP 地址：{{ address }}</div>
+          <div>客户端：{{ userAgent }}</div>
+          <div><el-button @click="send('user/delete-token', inc)">移除会话</el-button></div>
+        </li>
+      </ul>
     </k-content>
   </k-layout>
 </template>
@@ -106,6 +102,10 @@ const menu = computed(() => [{
     font-size: 1.375rem;
     margin: 1.5rem 0;
     line-height: 2rem;
+  }
+
+  .el-button.right {
+    float: right;
   }
 }
 
