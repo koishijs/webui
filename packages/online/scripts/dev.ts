@@ -3,7 +3,7 @@ import { readFile, stat } from 'fs/promises'
 import { extname, resolve } from 'path'
 import { ViteDevServer } from 'vite'
 import { noop } from '@koishijs/utils'
-import yaml from '@rollup/plugin-yaml'
+import yaml from '@maikolib/vite-plugin-yaml'
 import Koa from 'koa'
 import Router from '@koa/router'
 
@@ -91,7 +91,10 @@ async function createVite() {
         strict: false,
       },
     },
-    plugins: [vue(), yaml() as any],
+    plugins: [
+      vue(),
+      yaml() as any,
+    ],
     resolve: {
       extensions: ['.ts', '.js', '.json', '.yml', '.yaml'],
       dedupe: ['vue', 'vue-demi', 'vue-router', 'element-plus', '@vueuse/core', '@popperjs/core'],
@@ -101,7 +104,10 @@ async function createVite() {
         '@minatojs/driver-sqlite': '@minatojs/driver-sqlite/src/index.ts',
         '@minatojs/sql-utils': '@minatojs/sql-utils/src/index.ts',
         'path': 'rollup-plugin-node-polyfills/polyfills/path',
+        'fs/promises': '@koishijs/fs/src/promises/index.ts',
         'fs': '@koishijs/fs/src/index.ts',
+        'os': '@koishijs/os/src/index.ts',
+        'url': '@koishijs/url/src/index.ts',
       },
     },
     define: {

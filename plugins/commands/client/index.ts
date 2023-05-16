@@ -30,6 +30,13 @@ export default (ctx: Context) => {
     order: 200,
   })
 
+  // for backward compatibility
+  ctx.slot({
+    type: 'market-settings',
+    component: Settings,
+    order: 500,
+  })
+
   ctx.slot({
     type: 'locale-main',
     component: Locales,

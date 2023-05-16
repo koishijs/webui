@@ -1,7 +1,7 @@
 {
   "name": "@koishijs/plugin-commands",
   "description": "Override Command Config for Koishi",
-  "version": "3.1.3",
+  "version": "3.2.0",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
   "files": [
@@ -37,8 +37,8 @@
     }
   },
   "peerDependencies": {
-    "@koishijs/plugin-console": "^5.8.0",
-    "koishi": "^4.12.8"
+    "@koishijs/plugin-console": "^5.8.3",
+    "koishi": "^4.12.9"
   },
   "peerDependenciesMeta": {
     "@koishijs/plugin-console": {
@@ -46,10 +46,10 @@
     }
   },
   "devDependencies": {
-    "@koishijs/client": "^5.8.0",
-    "@koishijs/plugin-console": "^5.8.0",
+    "@koishijs/client": "^5.8.3",
+    "@koishijs/plugin-console": "^5.8.3",
     "@koishijs/plugin-locales": "^2.2.6",
-    "@koishijs/plugin-market": "^2.0.0-alpha.0",
+    "@koishijs/plugin-config": "^2.0.0-alpha.0",
     "@koishijs/plugin-mock": "^2.4.3",
     "@types/throttle-debounce": "^2.1.0"
   },

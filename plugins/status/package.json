@@ -40,13 +40,13 @@
     }
   },
   "peerDependencies": {
-    "@koishijs/plugin-console": "^5.8.0",
-    "koishi": "^4.12.8"
+    "@koishijs/plugin-console": "^5.8.3",
+    "koishi": "^4.12.9"
   },
   "devDependencies": {
-    "@koishijs/client": "^5.8.0",
+    "@koishijs/client": "^5.8.3",
     "@types/envinfo": "^7.8.1",
-    "koishi": "^4.12.8"
+    "koishi": "^4.12.9"
   },
   "dependencies": {
     "envinfo": "^7.8.1",

@@ -3,6 +3,7 @@ import { appendFile, copyFile } from 'fs/promises'
 import { resolve } from 'path'
 import * as vite from 'vite'
 import vue from '@vitejs/plugin-vue'
+import yaml from '@maikolib/vite-plugin-yaml'
 
 function findModulePath(id: string) {
   const path = require.resolve(id).replace(/\\/g, '/')
@@ -79,7 +80,11 @@ export async function build(root: string, config: vite.UserConfig = {}) {
         },
       },
     },
-    plugins: [vue(), configPlugin],
+    plugins: [
+      vue() as any,
+      yaml(),
+      configPlugin,
+    ],
     resolve: {
       alias: {
         'vue': root + '/vue.js',

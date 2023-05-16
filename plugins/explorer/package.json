@@ -57,11 +57,11 @@
     "client": "./build/client"
   },
   "peerDependencies": {
-    "@koishijs/plugin-console": "^5.8.0",
-    "koishi": "^4.12.8"
+    "@koishijs/plugin-console": "^5.8.3",
+    "koishi": "^4.12.9"
   },
   "devDependencies": {
-    "@koishijs/client": "^5.8.0",
+    "@koishijs/client": "^5.8.3",
     "@types/throttle-debounce": "^2.1.0",
     "monaco-editor": "~0.36.1"
   },
