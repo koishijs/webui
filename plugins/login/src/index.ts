@@ -1,4 +1,4 @@
-import { Awaitable, Binding, Context, isNullable, omit, pick, Schema, Service, Time, User } from 'koishi'
+import { Awaitable, Binding, Context, omit, Schema, Service, Time, User } from 'koishi'
 import { Client } from '@koishijs/plugin-console'
 import { createHash } from 'crypto'
 import { resolve } from 'path'
@@ -54,11 +54,12 @@ interface AuthData extends Auth {
 }
 
 export interface Login {
+  inc: number
   aid: number
-  time: Date
-  userAgent: string
-  ip: string
   token: string
+  time: Date
+  agent: string
+  address: string
 }
 
 const letters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
@@ -73,8 +74,6 @@ export interface UserLogin extends Pick<User, 'id' | 'name'> {
 }
 
 export type UserUpdate = Partial<Pick<User, 'name' | 'password'>>
-
-const authFields = ['name', 'authority', 'id'] as const
 
 function toHash(password: string) {
   return createHash('sha256').update(password).digest('hex')
@@ -115,53 +114,55 @@ class AuthService extends Service {
     }])
   }
 
-  async setAuthUser(client: Client, value: UserAuth) {
-    if (value) {
-      const bindings = await this.ctx.database.get('binding', { aid: value.id })
-      value = {
-        ...omit(value, ['password' as never]),
-        bindings: bindings.map(binding => omit(binding, ['aid'])),
-      }
+  async setAuth(client: Client, auth: Auth) {
+    if (auth) {
+      const bindings = await this.ctx.database.get('binding', { aid: auth.id })
+      bindings.forEach(binding => delete binding.aid)
+      client.send({ type: 'data', body: { key: 'user', value: { ...auth, bindings } } })
+    } else {
+      client.send({ type: 'data', body: { key: 'user', value: null } })
     }
-    client.user = value
+    client.auth = auth
     client.ctx.emit('console/connection', client)
-    client.send({ type: 'data', body: { key: 'user', value } })
     client.refresh()
+  }
+
+  async createToken(client: Client, user: Pick<User, 'id' | 'authority'>) {
+    const expire = Date.now() + this.config.authTokenExpire
+    const token = randomId()
+    await this.ctx.database.create('token', { id: user.id, expire, token })
+    await this.setAuth(client, { ...user, expire, token })
   }
 
   initLogin() {
     const self = this
     const { ctx, config } = this
-    const states: Record<string, [string, number, Client, number]> = {}
+    const states: Record<string, [string, number, Client]> = {}
 
     ctx.console.addListener('login/password', async function (name, password) {
       password = toHash(password)
-      const [user] = await ctx.database.get('user', { name }, ['password', ...authFields])
+      const [user] = await ctx.database.get('user', { name }, ['password', 'id', 'authority'])
       if (!user || user.password !== password) throw new Error('用户名或密码错误。')
-      if (!user.expire || user.expire < Date.now()) {
-        user.token = randomId()
-        user.expire = Date.now() + config.authTokenExpire
-        await ctx.database.set('user', { name }, pick(user, ['token', 'expire']))
-      }
-      await self.setAuthUser(this, user)
+      await self.createToken(this, omit(user, ['password']))
     })
 
-    ctx.console.addListener('login/token', async function (id, token) {
-      const [user] = await ctx.database.get('user', { id }, [...authFields])
+    ctx.console.addListener('login/token', async function (aid, token) {
+      const [data] = await ctx.database.get('token', { id: aid, token }, ['expire'])
+      if (!data || data.expire <= Date.now()) throw new Error('令牌已失效。')
+      const [user] = await ctx.database.get('user', { id: aid }, ['id', 'authority'])
       if (!user) throw new Error('用户不存在。')
-      if (user.token !== token || user.expire <= Date.now()) throw new Error('令牌已失效。')
-      await self.setAuthUser(this, user)
+      await self.setAuth(this, { ...user, ...data, token })
     })
 
-    ctx.console.addListener('login/platform', async function (platform, userId, id) {
+    ctx.console.addListener('login/platform', async function (platform, userId) {
       const user = await ctx.database.getUser(platform, userId, ['id', 'name'])
       if (!user) throw new Error('找不到此账户。')
-      if (id === user.id) throw new Error('你已经绑定了此账户。')
+      if (this.auth?.id === user.id) throw new Error('你已经绑定了此账户。')
 
       const key = `${platform}:${userId}`
-      const token = randomId()
+      const token = Math.random().toString(36).slice(2)
       const expire = Date.now() + config.loginTokenExpire
-      states[key] = [token, expire, this, id]
+      states[key] = [token, expire, this]
 
       const listener = () => {
         delete states[key]
@@ -182,45 +183,38 @@ class AuthService extends Service {
         return next()
       }
 
-      const aid = state[3]
       const { platform, userId: pid } = session
-      if (!isNullable(aid)) {
-        await ctx.database.set('binding', { platform, pid }, { aid })
-        const [user] = await ctx.database.get('user', { id: state[3] }, [...authFields])
-        return self.setAuthUser(state[2], user)
+      if (state[2].auth) {
+        await ctx.database.set('binding', { platform, pid }, { aid: state[2].auth.id })
+        return self.setAuth(state[2], state[2].auth)
+      } else {
+        const user = await session.observeUser(['id', 'authority'])
+        return self.createToken(state[2], user)
       }
-
-      const user = await session.observeUser([...authFields])
-      if (!user.expire || user.expire < Date.now()) {
-        user.token = randomId()
-        user.expire = Date.now() + config.authTokenExpire
-        await user.$update()
-      }
-      return self.setAuthUser(state[2], user)
     }, true)
 
     ctx.on('console/intercept', (client, listener) => {
       if (!listener.authority) return false
-      if (!client.user) return true
-      if (client.user.expire <= Date.now()) return true
-      return client.user.authority < listener.authority
+      if (!client.auth) return true
+      if (client.auth.expire <= Date.now()) return true
+      return client.auth.authority < listener.authority
     })
 
     ctx.console.addListener('user/logout', async function () {
-      await self.setAuthUser(this, null)
+      await self.setAuth(this, null)
     })
 
     ctx.console.addListener('user/update', async function (data) {
-      if (!this.user) throw new Error('请先登录。')
+      if (!this.auth) throw new Error('请先登录。')
       if (data.password) data.password = toHash(data.password)
-      await ctx.database.set('user', { id: this.user.id }, data)
-      Object.assign(this.user, data)
-      await self.setAuthUser(this, this.user)
+      await ctx.database.set('user', { id: this.auth.id }, data)
+      Object.assign(this.auth, data)
+      await self.setAuth(this, this.auth)
     })
 
     ctx.console.addListener('user/unbind', async function (platform, pid) {
-      if (!this.user) throw new Error('请先登录。')
-      const bindings = await ctx.database.get('binding', { aid: this.user.id })
+      if (!this.auth) throw new Error('请先登录。')
+      const bindings = await ctx.database.get('binding', { aid: this.auth.id })
       const binding = bindings.find(item => item.platform === platform && item.pid === pid)
       if (binding.aid !== binding.bid) {
         await ctx.database.set('binding', { platform, pid }, { aid: binding.bid })
@@ -229,7 +223,7 @@ class AuthService extends Service {
       } else {
         await ctx.database.remove('binding', { platform, pid })
       }
-      await self.setAuthUser(this, this.user)
+      await self.setAuth(this, this.auth)
     })
   }
 }
