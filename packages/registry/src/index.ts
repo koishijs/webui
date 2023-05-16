@@ -58,7 +58,7 @@ export interface Manifest {
   category?: string
   public?: string[]
   exports?: Dict<string>
-  description: Dict<string>
+  description: string | Dict<string>
   service: Manifest.Service
   locales: string[]
 }
@@ -210,9 +210,7 @@ export function conclude(meta: PackageJson) {
     browser: Ensure.boolean(meta.koishi?.browser),
     category: Ensure.string(meta.koishi?.category),
     public: Ensure.array(meta.koishi?.public),
-    description: Ensure.dict(meta.koishi?.description, {
-      en: Ensure.string(meta.description, ''),
-    }),
+    description: Ensure.dict(meta.koishi?.description) || Ensure.string(meta.description),
     locales: Ensure.array(meta.koishi?.locales, []),
     service: {
       required: Ensure.array(meta.koishi?.service?.required, []),
@@ -221,8 +219,12 @@ export function conclude(meta: PackageJson) {
     },
   }
 
-  for (const key in manifest.description) {
-    manifest.description[key] = manifest.description[key].slice(0, 1024)
+  if (typeof manifest.description === 'string') {
+    manifest.description = manifest.description.slice(0, 1024)
+  } else if (manifest.description) {
+    for (const key in manifest.description) {
+      manifest.description[key] = manifest.description[key].slice(0, 1024)
+    }
   }
 
   meta.keywords = Ensure.array(meta.keywords, []).filter((keyword) => {
