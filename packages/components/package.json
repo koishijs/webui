@@ -30,6 +30,6 @@
   },
   "dependencies": {
     "@satorijs/element": "^2.4.2",
-    "schemastery-vue": "5.0.0"
+    "schemastery-vue": "5.0.1"
   }
 }

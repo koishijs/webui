@@ -37,9 +37,9 @@ function hasTitle(schema: Schema): boolean {
   if (!schema) return true
   if (schema.type === 'object') {
     if (schema.meta.description) return true
-    const keys = Object.keys(schema.dict)
-    if (!keys.length) return true
-    return hasTitle(schema.dict[keys[0]])
+    const entries = Object.entries(schema.dict).filter(([, value]) => !value.meta.hidden)
+    if (!entries.length) return true
+    return hasTitle(schema.dict[entries[0][0]])
   } else if (schema.type === 'intersect') {
     return hasTitle(schema.list[0])
   } else if (schema.type === 'union') {
