@@ -25,7 +25,7 @@
         <slot name="action"></slot>
       </div>
     </div>
-    <k-markdown inline class="desc" :source="data.manifest.description.zh || data.manifest.description.en"></k-markdown>
+    <k-markdown inline class="desc" :source="tt(data.manifest.description)"></k-markdown>
     <div class="footer">
       <el-tooltip :content="timeAgo(data.updatedAt)" placement="top">
         <a class="shrink" target="_blank" :href="data.links.npm">
@@ -66,8 +66,9 @@
 
 import { computed, inject } from 'vue'
 import { AnalyzedPackage } from '@koishijs/registry'
+import { useI18nText } from '@koishijs/components'
 import { badges, getUsers, resolveCategory, validate } from '@koishijs/market'
-import { kConfig, timeAgo } from '../utils'
+import { kConfig } from '../utils'
 import { useI18n } from 'vue-i18n'
 import zhCN from '../locales/zh-CN.yml'
 import MarketIcon from '../icons'
@@ -81,6 +82,8 @@ const props = defineProps<{
 }>()
 
 const config = inject(kConfig, {})
+
+const tt = useI18nText()
 
 const homepage = computed(() => props.data.links.homepage || props.data.links.repository)
 
@@ -117,6 +120,17 @@ const { t, setLocaleMessage } = useI18n({
     'zh-CN': zhCN,
   },
 })
+
+function timeAgo(time: string) {
+  const now = new Date()
+  const input = new Date(time)
+  const diff = now.getTime() - input.getTime()
+  if (diff < 30000) return t('time.just-now')
+  if (diff < 3600000) return t('time.minutes-ago', [Math.floor(diff / 60000)])
+  if (diff < 86400000) return t('time.hours-ago', [Math.floor(diff / 3600000)])
+  if (diff < 604800000) return t('time.days-ago', [Math.floor(diff / 86400000)])
+  return input.toLocaleDateString()
+}
 
 if (import.meta.hot) {
   import.meta.hot.accept('../locales/zh-CN.yml', (module) => {

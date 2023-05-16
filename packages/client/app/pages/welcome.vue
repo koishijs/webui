@@ -2,7 +2,8 @@
   <div class="k-card welcome">
     <h1>{{ t('title') }}</h1>
     <p>{{ t('description') }}</p>
-    <k-slot name="welcome-choice" class="choices">
+    <div class="choices">
+      <k-slot name="welcome-choice">
       <a class="choice" href="https://koishi.chat" rel="noopener noreferer" target="_blank">
         <h2>{{ t('action.docs.title') }}</h2>
         <p>{{ t('action.docs.description') }}</p>
@@ -12,6 +13,7 @@
         <p>{{ t('action.forum.description') }}</p>
       </a>
     </k-slot>
+    </div>
   </div>
 </template>
 

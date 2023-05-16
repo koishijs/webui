@@ -47,8 +47,6 @@ function dropKey(plugins: {}, name: string) {
 }
 
 export class ConfigWriter extends DataService<Context.Config> {
-  static using = ['console.packages']
-
   protected loader: Loader
   protected plugins: {}
 

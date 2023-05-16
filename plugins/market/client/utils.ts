@@ -29,7 +29,6 @@ watch(() => store.dependencies, (value) => {
 }, { immediate: true })
 
 export const active = ref('')
-export const showSelect = ref(false)
 
 export const getMixedMeta = (name: string) => ({
   keywords: [],

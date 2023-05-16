@@ -1,8 +1,7 @@
-import { Awaitable, Binding, Context, isNullable, omit, pick, Schema, Time, User } from 'koishi'
+import { Awaitable, Binding, Context, isNullable, omit, pick, randomId, Schema, Time, User } from 'koishi'
 import { Client, DataService } from '@koishijs/plugin-console'
 import { createHash } from 'crypto'
 import { resolve } from 'path'
-import { v4 } from 'uuid'
 
 declare module 'koishi' {
   interface User {
@@ -102,7 +101,7 @@ class AuthService extends DataService<UserAuth> {
       const [user] = await ctx.database.get('user', { name }, ['password', ...authFields])
       if (!user || user.password !== password) throw new Error('用户名或密码错误。')
       if (!user.expire || user.expire < Date.now()) {
-        user.token = v4()
+        user.token = randomId()
         user.expire = Date.now() + config.authTokenExpire
         await ctx.database.set('user', { name }, pick(user, ['token', 'expire']))
       }
@@ -122,7 +121,7 @@ class AuthService extends DataService<UserAuth> {
       if (id === user.id) throw new Error('你已经绑定了此账户。')
 
       const key = `${platform}:${userId}`
-      const token = v4()
+      const token = randomId()
       const expire = Date.now() + config.loginTokenExpire
       states[key] = [token, expire, this, id]
 
@@ -155,7 +154,7 @@ class AuthService extends DataService<UserAuth> {
 
       const user = await session.observeUser([...authFields])
       if (!user.expire || user.expire < Date.now()) {
-        user.token = v4()
+        user.token = randomId()
         user.expire = Date.now() + config.authTokenExpire
         await user.$update()
       }

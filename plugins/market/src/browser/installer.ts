@@ -1,7 +1,7 @@
 import { Context, Dict, version } from 'koishi'
 import { DataService } from '@koishijs/plugin-console'
 import { PackageJson } from '@koishijs/registry'
-import {} from '@koishijs/loader'
+import {} from '@koishijs/plugin-config'
 
 declare module '@koishijs/plugin-console' {
   interface Events {
@@ -29,15 +29,12 @@ export interface Dependency {
 }
 
 class Installer extends DataService<Dict<Dependency>> {
-  static using = ['console.market']
-
   constructor(public ctx: Context) {
     super(ctx, 'dependencies', { authority: 4 })
   }
 
   async get(force = false) {
-    const market = await this.ctx.console.market.prepare()
-    const objects = market.objects.filter(o => o.portable)
+    const objects = this.ctx.loader.market.objects.filter(o => o.portable)
     objects.push({
       name: 'koishi',
       version,

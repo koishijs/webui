@@ -1,18 +1,13 @@
 import * as cordis from 'cordis'
 import components from '@koishijs/components'
 import { Dict, remove } from 'cosmokit'
-import { App, Component, markRaw, reactive } from 'vue'
+import { App, markRaw, reactive } from 'vue'
 import { Activity } from './activity'
+import { SlotOptions } from './components'
 
 // layout api
 
 export type Computed<T> = T | (() => T)
-
-export interface SlotOptions {
-  type: string
-  order?: number
-  component: Component
-}
 
 export const views = reactive<Dict<SlotOptions[]>>({})
 

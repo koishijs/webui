@@ -45,7 +45,7 @@
           <span class="link" @click.stop="configure(path)">{{ path }}</span>
           ({{ active ? '运行中' : '闲置' }})
         </li>
-        <li v-if="!store.packages?.[active]?.id">
+        <li v-if="!store.packages?.[active]?.runtime?.id">
           <span class="link" @click.stop="configure(true)">添加新配置</span>
         </li>
       </ul>

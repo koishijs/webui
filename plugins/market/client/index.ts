@@ -1,17 +1,12 @@
 import { defineComponent, h } from 'vue'
 import { Context, global, receive, router, store } from '@koishijs/client'
 import type {} from '@koishijs/plugin-market'
-import Install from './deps/install.vue'
-import Dependencies from './deps/index.vue'
-import Settings from './settings/index.vue'
-import SettingsInfo from './settings/slots/info.vue'
-import SettingsModifier from './settings/slots/modifier.vue'
-import SettingsUsage from './settings/slots/usage.vue'
-import Market from './market/index.vue'
-import Select from './market/select.vue'
-import Progress from './market/progress.vue'
+import extensions from './extensions'
+import Dependencies from './components/dependencies.vue'
+import Install from './components/install.vue'
+import Market from './components/market.vue'
+import Progress from './components/progress.vue'
 import './icons'
-import './index.scss'
 
 receive('market/patch', (data) => {
   store.market = {
@@ -24,6 +19,8 @@ receive('market/patch', (data) => {
 })
 
 export default (ctx: Context) => {
+  ctx.plugin(extensions)
+
   ctx.slot({
     type: 'welcome-choice',
     component: defineComponent(() => () => h('div', {
@@ -40,21 +37,6 @@ export default (ctx: Context) => {
     component: Install,
   })
 
-  ctx.slot({
-    type: 'global',
-    component: Select,
-  })
-
-  ctx.page({
-    path: '/plugins/:name*',
-    name: '插件配置',
-    icon: 'activity:plugin',
-    order: 800,
-    authority: 4,
-    fields: ['config', 'packages'],
-    component: Settings,
-  })
-
   ctx.page({
     id: 'market',
     path: '/market',
@@ -63,24 +45,6 @@ export default (ctx: Context) => {
     order: 750,
     authority: 4,
     component: Market,
-  })
-
-  ctx.slot({
-    type: 'market-settings',
-    component: SettingsInfo,
-    order: 1000,
-  })
-
-  ctx.slot({
-    type: 'market-settings',
-    component: SettingsUsage,
-    order: -500,
-  })
-
-  ctx.slot({
-    type: 'market-settings',
-    component: SettingsModifier,
-    order: -1000,
   })
 
   if (!global.static) {

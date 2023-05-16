@@ -25,9 +25,9 @@ export default (ctx: Context) => {
   })
 
   ctx.slot({
-    type: 'market-settings',
+    type: 'plugin-details',
     component: Settings,
-    order: 500,
+    order: 200,
   })
 
   ctx.slot({

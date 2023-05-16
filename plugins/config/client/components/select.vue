@@ -29,7 +29,7 @@
 
 import { router, send, store } from '@koishijs/client'
 import { computed, nextTick, ref, watch } from 'vue'
-import { showSelect } from '../utils'
+import { showSelect } from './utils'
 import { categories, resolveCategory, MarketIcon } from '@koishijs/market'
 import { useRoute } from 'vue-router'
 

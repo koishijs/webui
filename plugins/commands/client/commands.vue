@@ -111,7 +111,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { computed, nextTick, onActivated, ref, watch } from 'vue'
 import { CommandData, CommandState } from '@koishijs/plugin-commands'
 import {} from '@koishijs/plugin-locales'
-import {} from '@koishijs/plugin-market'
+import {} from '@koishijs/plugin-config'
 import { commands, createSchema } from './utils'
 
 const route = useRoute()

@@ -1,7 +1,7 @@
 <template>
   <footer class="layout-status">
-    <k-slot name="status-left"></k-slot>
-    <k-slot name="status-right"></k-slot>
+    <div><k-slot name="status-left"></k-slot></div>
+    <div><k-slot name="status-right"></k-slot></div>
   </footer>
 </template>
 

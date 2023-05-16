@@ -40,10 +40,10 @@ export abstract class DataService<T = never> extends Service {
     this.refresh()
   }
 
-  async refresh() {
+  async refresh(forced = true) {
     this.ctx.console?.broadcast('data', {
       key: this.key,
-      value: await this.get(true),
+      value: await this.get(forced),
     }, this.options)
   }
 

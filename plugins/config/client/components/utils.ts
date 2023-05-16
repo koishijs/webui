@@ -1,20 +1,18 @@
 import { Dict } from 'koishi'
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { router, send, store } from '@koishijs/client'
-import { PackageProvider } from '@koishijs/plugin-market'
-import { AnalyzedPackage } from '@koishijs/registry'
+import { PackageProvider } from '@koishijs/plugin-config'
 
 export interface SettingsData {
+  env: EnvInfo
   name: string
   local: PackageProvider.Data
-  remote: AnalyzedPackage
   config: any
   current: Tree
 }
 
 interface DepInfo {
   required: boolean
-  available: string[]
 }
 
 interface PeerInfo {
@@ -29,25 +27,18 @@ export interface EnvInfo {
   warning?: boolean
 }
 
-const getImplements = (name: string) => ({
-  ...store.market?.data[name],
-  ...store.packages[name],
-}.manifest?.service.implements ?? [])
+export const showSelect = ref(false)
 
 export const coreDeps = [
   '@koishijs/plugin-console',
-  '@koishijs/plugin-market',
+  '@koishijs/plugin-config',
 ]
 
 function getEnvInfo(name: string) {
   function setService(name: string, required: boolean) {
     if (services.has(name)) return
     if (name === 'console') return
-
-    const available = Object.values(store.market?.data ?? {})
-      .filter(data => getImplements(data.name).includes(name))
-      .map(data => data.name)
-    result.using[name] = { required, available }
+    result.using[name] = { required }
   }
 
   const local = store.packages[name]
@@ -59,9 +50,9 @@ function getEnvInfo(name: string) {
     if (!name.includes('@koishijs/plugin-') && !name.includes('koishi-plugin-')) continue
     if (coreDeps.includes(name)) continue
     const required = !local.peerDependenciesMeta?.[name]?.optional
-    const active = !!store.packages[name]?.id
+    const active = !!store.packages[name]?.runtime?.id
     result.peer[name] = { required, active }
-    for (const service of getImplements(name)) {
+    for (const service of store.packages[name]?.manifest?.service.implements ?? []) {
       services.add(service)
     }
   }
@@ -81,12 +72,12 @@ function getEnvInfo(name: string) {
   }
 
   // check reusability
-  if (local.id && !local.forkable) {
+  if (local.runtime?.id && !local.runtime?.forkable) {
     result.warning = true
   }
 
   // check schema
-  if (!local.schema) {
+  if (!local.runtime?.schema) {
     result.warning = true
   }
 

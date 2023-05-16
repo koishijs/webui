@@ -176,7 +176,7 @@ class Installer extends DataService<Dict<Dependency>> {
       if (!(require.resolve(name) in require.cache)) continue
       this.ctx.loader.fullReload()
     }
-    this.ctx.console.packages.refresh()
+    this.ctx.console.packages?.refresh()
     return 0
   }
 }
