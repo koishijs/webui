@@ -41,6 +41,7 @@ const schema = computed(() => {
 })
 
 async function logout() {
+  store.user = null
   delete config.value.id
   delete config.value.token
   delete config.value.expire

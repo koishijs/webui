@@ -1,24 +1,31 @@
-import { Awaitable, Binding, Context, isNullable, omit, pick, randomId, Schema, Time, User } from 'koishi'
-import { Client, DataService } from '@koishijs/plugin-console'
+import { Awaitable, Binding, Context, isNullable, omit, pick, Schema, Service, Time, User } from 'koishi'
+import { Client } from '@koishijs/plugin-console'
 import { createHash } from 'crypto'
 import { resolve } from 'path'
 
 declare module 'koishi' {
+  interface Context {
+    auth: AuthService
+  }
+
   interface User {
     password: string
-    token: string
-    expire: number
+  }
+
+  interface Tables {
+    token: Token
+    login: Login
   }
 }
 
 declare module '@koishijs/plugin-console' {
   interface Client {
-    user?: UserAuth
+    auth?: Auth
   }
 
   namespace Console {
     interface Services {
-      user: AuthService
+      user: DataService<AuthData>
     }
   }
 
@@ -32,31 +39,62 @@ declare module '@koishijs/plugin-console' {
   }
 }
 
-export interface UserAuth extends Pick<User, AuthFields> {
-  bindings?: Omit<Binding, 'aid'>[]
+export interface Token {
+  id: number
+  token: string
+  expire: number
 }
 
-export type UserLogin = Pick<User, 'id' | 'name' | 'token' | 'expire'>
+export interface Auth extends Token {
+  authority: number
+}
+
+interface AuthData extends Auth {
+  bindings: Omit<Binding, 'aid'>[]
+}
+
+export interface Login {
+  aid: number
+  time: Date
+  userAgent: string
+  ip: string
+  token: string
+}
+
+const letters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
+
+export function randomId(length = 40) {
+  return Array(length).fill(0).map(() => letters[Math.floor(Math.random() * letters.length)]).join('')
+}
+
+export interface UserLogin extends Pick<User, 'id' | 'name'> {
+  token: string
+  expire: number
+}
+
 export type UserUpdate = Partial<Pick<User, 'name' | 'password'>>
 
-type AuthFields = typeof authFields[number]
-const authFields = ['name', 'authority', 'id', 'expire', 'token'] as const
+const authFields = ['name', 'authority', 'id'] as const
 
 function toHash(password: string) {
   return createHash('sha256').update(password).digest('hex')
 }
 
-class AuthService extends DataService<UserAuth> {
+class AuthService extends Service {
   static using = ['console', 'database'] as const
 
   constructor(ctx: Context, private config: AuthService.Config) {
-    super(ctx, 'user')
+    super(ctx, 'auth')
 
     ctx.model.extend('user', {
       password: 'string(255)',
+    })
+
+    ctx.model.extend('token', {
+      id: 'unsigned',
       token: 'string(255)',
       expire: 'unsigned(20)',
-    })
+    }, { primary: 'token' })
 
     ctx.console.addEntry({
       dev: resolve(__dirname, '../client/index.ts'),

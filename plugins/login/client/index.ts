@@ -26,7 +26,7 @@ export default (ctx: Context) => {
     return data.authority > 0 && (!store.user || store.user.authority < data.authority)
   })
 
-  ctx.state.disposables.push(router.beforeEach((route) => {
+  ctx.scope.disposables.push(router.beforeEach((route) => {
     const { activity } = route.meta
     if (!activity) return
     if ((activity.authority || activity.fields.includes('user')) && !store.user) {
