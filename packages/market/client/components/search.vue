@@ -48,7 +48,7 @@ const lastWord = computed({
   get: () => words.value[words.value.length - 1],
   set: (value) => {
     words.value[words.value.length - 1] = value
-    emit('update:modelValue', words.value.toLowerCase())
+    emit('update:modelValue', words.value)
   },
 })
 
@@ -64,7 +64,7 @@ function onEnter() {
     words.value.pop()
   }
   words.value.push('')
-  emit('update:modelValue', words.value.toLowerCase())
+  emit('update:modelValue', words.value)
 }
 
 function onEscape(event: KeyboardEvent) {
