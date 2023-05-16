@@ -40,7 +40,7 @@ import { send, store } from '@koishijs/client'
 import { config, showDialog } from './utils'
 import { computed, ref } from 'vue'
 import { message, Schema } from '@koishijs/client'
-import { UserUpdate } from '@koishijs/plugin-login'
+import { UserUpdate } from '@koishijs/plugin-auth'
 
 const types = {
   platform: '平台账户',

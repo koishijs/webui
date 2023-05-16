@@ -58,7 +58,7 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { config, showDialog } from './utils'
 import { send, store } from '@koishijs/client'
-import { UserLogin } from '@koishijs/plugin-login'
+import { UserLogin } from '@koishijs/plugin-auth'
 
 const error = ref<string>()
 const user = ref<UserLogin>()

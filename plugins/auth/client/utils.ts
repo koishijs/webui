@@ -1,6 +1,6 @@
 import { ref, watch } from 'vue'
 import { message, pick, router, store, useStorage } from '@koishijs/client'
-import { LoginToken } from '@koishijs/plugin-login'
+import { LoginToken } from '@koishijs/plugin-auth'
 
 interface AuthConfig extends Partial<LoginToken> {
   name?: string

@@ -1,7 +1,7 @@
 {
-  "name": "@koishijs/plugin-login",
+  "name": "@koishijs/plugin-auth",
   "description": "Console User Authentication",
-  "version": "3.1.0",
+  "version": "4.0.0-alpha.0",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
   "files": [
@@ -21,7 +21,7 @@
   "bugs": {
     "url": "https://github.com/koishijs/webui/issues"
   },
-  "homepage": "https://koishi.chat/plugins/console/login.html",
+  "homepage": "https://koishi.chat/plugins/console/auth.html",
   "keywords": [
     "bot",
     "chatbot",
