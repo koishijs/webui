@@ -1,13 +1,14 @@
 import { coerce, Context, Logger, Random } from 'koishi'
 import { DataService } from './service'
 import { AbstractWebSocket } from './types'
+import { IncomingMessage } from 'http'
 
 const logger = new Logger('console')
 
 export class Client {
   readonly id: string = Random.id()
 
-  constructor(readonly ctx: Context, public socket: AbstractWebSocket) {
+  constructor(readonly ctx: Context, public socket: AbstractWebSocket, public request?: IncomingMessage) {
     socket.addEventListener('message', this.receive)
     ctx.on('dispose', () => {
       socket.removeEventListener('message', this.receive)

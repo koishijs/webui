@@ -6,7 +6,6 @@
 
 <script lang="ts" setup>
 
-import { computed, ref, watch } from 'vue'
 import { showDialog } from './utils'
 import LoginForm from './login-form.vue'
 

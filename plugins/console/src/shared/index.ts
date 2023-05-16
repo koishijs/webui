@@ -4,6 +4,7 @@ import { AbstractWebSocket } from './types'
 import { SchemaProvider } from './schema'
 import { Client } from './client'
 import NodeConsole from '../node'
+import { IncomingMessage } from 'http'
 
 export * from './client'
 export * from './service'
@@ -59,8 +60,8 @@ export abstract class Console extends Service {
     this.addListener('ping', () => 'pong')
   }
 
-  protected accept(socket: AbstractWebSocket) {
-    const client = new Client(this.ctx, socket)
+  protected accept(socket: AbstractWebSocket, request?: IncomingMessage) {
+    const client = new Client(this.ctx, socket, request)
     socket.addEventListener('close', () => {
       delete this.clients[client.id]
       this.ctx.emit('console/connection', client)

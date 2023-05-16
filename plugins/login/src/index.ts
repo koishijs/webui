@@ -1,4 +1,4 @@
-import { Awaitable, Binding, Context, omit, Schema, Service, Time, User } from 'koishi'
+import { Binding, Context, Logger, omit, Schema, Service, Time, User } from 'koishi'
 import { Client } from '@koishijs/plugin-console'
 import { createHash } from 'crypto'
 import { resolve } from 'path'
@@ -13,8 +13,8 @@ declare module 'koishi' {
   }
 
   interface Tables {
-    token: Token
-    login: Login
+    token: LoginToken
+    login: LoginHistory
   }
 }
 
@@ -30,37 +30,45 @@ declare module '@koishijs/plugin-console' {
   }
 
   interface Events {
-    'login/platform'(this: Client, platform: string, pid: string, aid?: number): Awaitable<UserLogin>
+    'login/platform'(this: Client, platform: string, pid: string): Promise<UserLogin>
     'login/password'(this: Client, name: string, password: string): void
     'login/token'(this: Client, id: number, token: string): void
+    'login/history'(this: Client): Promise<LoginHistory[]>
     'user/unbind'(this: Client, platform: string, pid: string): void
     'user/update'(this: Client, data: UserUpdate): void
     'user/logout'(this: Client): void
   }
 }
 
-export interface Token {
+export interface LoginToken {
   id: number
   token: string
   expire: number
 }
 
-export interface Auth extends Token {
+export interface Auth extends LoginToken {
+  name: string
   authority: number
 }
 
 interface AuthData extends Auth {
+  history: Omit<LoginHistory, 'token' | 'aid'>[]
   bindings: Omit<Binding, 'aid'>[]
 }
 
-export interface Login {
+type LoginType = 'platform' | 'password' | 'token'
+
+export interface LoginHistory {
   inc: number
   aid: number
   token: string
   time: Date
   agent: string
   address: string
+  type: LoginType
 }
+
+const logger = new Logger('auth')
 
 const letters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
 
@@ -95,6 +103,16 @@ class AuthService extends Service {
       expire: 'unsigned(20)',
     }, { primary: 'token' })
 
+    ctx.model.extend('login', {
+      inc: 'unsigned',
+      aid: 'unsigned',
+      token: 'string(255)',
+      time: 'timestamp',
+      agent: 'string(255)',
+      address: 'string(255)',
+      type: 'string(255)',
+    }, { primary: 'inc', autoInc: true })
+
     ctx.console.addEntry({
       dev: resolve(__dirname, '../client/index.ts'),
       prod: resolve(__dirname, '../dist'),
@@ -106,6 +124,7 @@ class AuthService extends Service {
   async start() {
     const { enabled, username, password } = this.config.admin
     if (!enabled) return
+    logger.debug('creating admin account')
     await this.ctx.database.upsert('user', [{
       id: 0,
       name: username,
@@ -118,7 +137,9 @@ class AuthService extends Service {
     if (auth) {
       const bindings = await this.ctx.database.get('binding', { aid: auth.id })
       bindings.forEach(binding => delete binding.aid)
-      client.send({ type: 'data', body: { key: 'user', value: { ...auth, bindings } } })
+      const history = await this.ctx.database.get('login', { aid: auth.id, type: { $not: 'token' } })
+      history.reverse().forEach(login => (delete login.aid, delete login.token))
+      client.send({ type: 'data', body: { key: 'user', value: { ...auth, bindings, history } } })
     } else {
       client.send({ type: 'data', body: { key: 'user', value: null } })
     }
@@ -127,10 +148,20 @@ class AuthService extends Service {
     client.refresh()
   }
 
-  async createToken(client: Client, user: Pick<User, 'id' | 'authority'>) {
+  async createLogin(client: Client, type: LoginType, aid: number, token: string) {
+    const { headers, socket } = client.request
+    const time = new Date()
+    const agent = headers['user-agent']?.toString()
+    const address = headers['x-forwarded-for']?.toString() || socket.remoteAddress
+    logger.debug('login attempt (id: %s, type: %s, address: %s)', type, aid, address)
+    await this.ctx.database.create('login', { aid, token, type, time, agent, address })
+  }
+
+  async createToken(client: Client, type: LoginType, user: Pick<User, 'id' | 'name' | 'authority'>) {
     const expire = Date.now() + this.config.authTokenExpire
     const token = randomId()
     await this.ctx.database.create('token', { id: user.id, expire, token })
+    await this.createLogin(client, type, user.id, token)
     await this.setAuth(client, { ...user, expire, token })
   }
 
@@ -141,16 +172,17 @@ class AuthService extends Service {
 
     ctx.console.addListener('login/password', async function (name, password) {
       password = toHash(password)
-      const [user] = await ctx.database.get('user', { name }, ['password', 'id', 'authority'])
+      const [user] = await ctx.database.get('user', { name }, ['password', 'name', 'id', 'authority'])
       if (!user || user.password !== password) throw new Error('用户名或密码错误。')
-      await self.createToken(this, omit(user, ['password']))
+      await self.createToken(this, 'password', omit(user, ['password']))
     })
 
     ctx.console.addListener('login/token', async function (aid, token) {
       const [data] = await ctx.database.get('token', { id: aid, token }, ['expire'])
       if (!data || data.expire <= Date.now()) throw new Error('令牌已失效。')
-      const [user] = await ctx.database.get('user', { id: aid }, ['id', 'authority'])
+      const [user] = await ctx.database.get('user', { id: aid }, ['id', 'name', 'authority'])
       if (!user) throw new Error('用户不存在。')
+      await self.createLogin(this, 'token', aid, token)
       await self.setAuth(this, { ...user, ...data, token })
     })
 
@@ -160,7 +192,7 @@ class AuthService extends Service {
       if (this.auth?.id === user.id) throw new Error('你已经绑定了此账户。')
 
       const key = `${platform}:${userId}`
-      const token = Math.random().toString(36).slice(2)
+      const token = Math.random().toString().slice(2, 8)
       const expire = Date.now() + config.loginTokenExpire
       states[key] = [token, expire, this]
 
@@ -188,8 +220,8 @@ class AuthService extends Service {
         await ctx.database.set('binding', { platform, pid }, { aid: state[2].auth.id })
         return self.setAuth(state[2], state[2].auth)
       } else {
-        const user = await session.observeUser(['id', 'authority'])
-        return self.createToken(state[2], user)
+        const user = await session.observeUser(['id', 'name', 'authority'])
+        return self.createToken(state[2], 'platform', user)
       }
     }, true)
 

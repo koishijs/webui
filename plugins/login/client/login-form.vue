@@ -14,7 +14,7 @@
     <template v-else>
       <h1 v-if="store.user"><span>平台账户绑定</span></h1>
       <h1 v-else>
-        <k-tab :data="['平台账户登录', '用户名密码登录']" v-model="config.authType"></k-tab>
+        <k-tab :data="['平台账户登录', '用户密码登录']" v-model="config.authType"></k-tab>
       </h1>
 
       <template v-if="store.user || config.authType === 0">
@@ -71,7 +71,7 @@ async function loginWithAccount() {
   if (!platform || !userId) return
   timestamp = now + 1000
   try {
-    user.value = await send('login/platform', platform, userId, store.user?.id)
+    user.value = await send('login/platform', platform, userId)
   } catch (e) {
     error.value = e.message
   }
