@@ -93,7 +93,7 @@ const active = computed<string>({
 })
 
 function filterNode(value: string, data: Tree) {
-  return data.label.includes(keyword.value)
+  return data.label.toLowerCase().includes(keyword.value.toLowerCase())
 }
 
 function getClass(tree: Tree) {

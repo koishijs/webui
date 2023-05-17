@@ -186,7 +186,7 @@ function getClass(data: CommandData) {
 }
 
 function filterNode(value: string, data: CommandData) {
-  return data.name.includes(keyword.value)
+  return data.name.toLowerCase().includes(keyword.value.toLowerCase())
 }
 
 function allowDrag(node: Node) {

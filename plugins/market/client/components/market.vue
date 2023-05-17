@@ -73,6 +73,7 @@ watch(router.currentRoute, (value) => {
   const { keyword } = value.query
   if (keyword === prompt.value) return
   words.value = Array.isArray(keyword) ? keyword : (keyword || '').split(' ')
+  words.value = words.value.map(w => w.toLowerCase())
   if (words.value[words.value.length - 1]) words.value.push('')
 }, { immediate: true, deep: true })
 

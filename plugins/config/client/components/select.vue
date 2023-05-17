@@ -50,7 +50,7 @@ const route = useRoute()
 const packages = computed(() => Object.values(store.packages).filter(({ name, shortname, manifest }) => {
   const category = store.market?.data[name]?.category || manifest?.category
   return name
-    && shortname.includes(keyword.value)
+    && shortname.includes(keyword.value.toLowerCase())
     && (active.value === 'all' || resolveCategory(category) === active.value)
 }))
 

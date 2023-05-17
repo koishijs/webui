@@ -221,7 +221,7 @@ function getClass(data: TreeEntry) {
 }
 
 function filterNode(value: string, data: TreeEntry) {
-  return data.name.includes(keyword.value)
+  return data.name.toLowerCase().includes(keyword.value.toLowerCase())
 }
 
 function createEntry(type: 'file' | 'directory') {
