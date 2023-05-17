@@ -68,7 +68,7 @@
 import { useRoute, useRouter } from 'vue-router'
 import { Dict, send, store } from '@koishijs/client'
 import { computed, ref, watch } from 'vue'
-import { debounce } from 'throttle-debounce'
+import { useDebounceFn } from '@vueuse/core'
 
 const route = useRoute()
 const router = useRouter()
@@ -158,14 +158,14 @@ const data = computed(() => {
   return { data, map }
 })
 
-const update = debounce(1000, () => {
+const update = useDebounceFn(() => {
   const result = {}
   for (const locale in store.locales) {
     if (!locale.startsWith('$')) continue
     result[locale.slice(1)] = store.locales[locale]
   }
   send('l10n', result)
-})
+}, 1000)
 
 function handleUpdate(locale: string, path: string, value: string) {
   const root = store.locales['$' + locale] ??= {}

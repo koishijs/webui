@@ -28,6 +28,7 @@
 import { computed, ref, watch } from 'vue'
 import { validateWord } from '../utils'
 import { useI18n } from 'vue-i18n'
+import { useDebounceFn } from '@vueuse/core'
 import zhCN from '../locales/zh-CN.yml'
 import MarketIcon from '../icons'
 
@@ -44,11 +45,15 @@ watch(() => props.modelValue, (value) => {
   words.value = value.slice()
 }, { immediate: true, deep: true })
 
+const update = useDebounceFn(() => {
+  emit('update:modelValue', words.value)
+}, 100)
+
 const lastWord = computed({
   get: () => words.value[words.value.length - 1],
   set: (value) => {
     words.value[words.value.length - 1] = value.toLowerCase()
-    emit('update:modelValue', words.value)
+    update()
   },
 })
 
