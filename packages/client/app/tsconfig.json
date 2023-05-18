@@ -2,6 +2,7 @@
   "extends": "../tsconfig.client",
   "compilerOptions": {
     "rootDir": ".",
+    "lib": ["ESNext", "DOM", "WebWorker"]
   },
   "include": [
     ".",
