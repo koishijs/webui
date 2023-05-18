@@ -8,11 +8,31 @@ badge:
   insecure: Insecure
   preview: Preview
   newborn: Newborn
+sort:
+  default: 综合
+  rating: 按评分
+  download: 按下载量
+  created: 按创建时间
+  updated: 按更新时间
 category:
+  core: 核心功能
   adapter: Adapter
+  storage: 存储服务
+  extension: 扩展功能
   console: Console
+  manage: 管理工具
+  preset: 行为预设
+  image: 图片服务
+  media: 资讯服务
+  tool: 实用工具
+  ai: 人工智能
+  meme: 趣味交互
+  game: 娱乐玩法
+  gametool: 游戏工具
 time:
   just-now: Just now
   minutes-ago: '{0} minute(s) ago'
   hours-ago: '{0} hour(s) ago'
   days-ago: '{0} day(s) ago'
+search:
+  placeholder: 输入想要查询的插件名
