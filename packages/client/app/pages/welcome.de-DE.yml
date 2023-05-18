@@ -1,0 +1,9 @@
+title: 欢迎使用 Koishi！
+description: 你的机器人已经准备就绪。点击下面的任一选项，开启你的 Koishi 之旅吧。
+action:
+  docs:
+    title: 阅读文档
+    description: 开始阅读官方文档。官方文档里包含了你想要了解的全部内容。
+  forum:
+    title: 前往论坛
+    description: 前往论坛与其他用户交流。如果你遇到了问题，可以在这里寻求帮助。
