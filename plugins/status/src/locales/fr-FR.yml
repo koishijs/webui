@@ -1,0 +1,15 @@
+commands:
+  status:
+    description: 查看运行状态
+    messages:
+      status:
+        online: 运行中
+        offline: 离线
+        connect: 正在连接
+        reconnect: 正在重连
+        disconnect: 正在断开
+      bot: <p>{username}：<i18n path={"commands.status.messages.status." + status}/></p>
+      epilog: |-
+        ==========
+        CPU 使用率：{ (cpu[0] * 100).toFixed() }% / { (cpu[1] * 100).toFixed() }%
+        内存使用率：{ (memory[0] * 100).toFixed() }% / { (memory[1] * 100).toFixed() }%
