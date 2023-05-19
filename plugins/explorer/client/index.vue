@@ -110,8 +110,10 @@ import { useDark, useElementSize, useEventListener } from '@vueuse/core'
 import { send, store, base64ToArrayBuffer, arrayBufferToBase64 } from '@koishijs/client'
 import { Entry } from '../src'
 import { files } from './store'
-import { model } from './editor'
-import * as monaco from 'monaco-editor'
+import useEditor from './editor'
+import type Monaco from 'monaco-editor'
+
+const { model, monaco } = await useEditor()
 
 const vFocus: Directive = {
   mounted: (el) => el.focus()
@@ -176,7 +178,7 @@ useEventListener('contextmenu', () => {
   menuTarget.value = null
 })
 
-let instance: monaco.editor.IStandaloneCodeEditor = null
+let instance: Monaco.editor.IStandaloneCodeEditor = null
 
 watch(keyword, (val) => {
   tree.value.filter(val)
