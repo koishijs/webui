@@ -112,9 +112,8 @@ import { Entry } from '../src'
 import { files } from './store'
 import useEditor from './editor'
 import type Monaco from 'monaco-editor'
-const monaco = await import('monaco-editor')
 
-const { model } = await useEditor()
+const { model, monaco } = await useEditor()
 
 const vFocus: Directive = {
   mounted: (el) => el.focus()

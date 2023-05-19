@@ -1,4 +1,4 @@
-import { shallowRef } from 'vue'
+import { shallowRef, ShallowRef } from 'vue'
 
 // import * as monaco from 'monaco-editor'
 import type TEditorWorker from 'monaco-editor/esm/vs/editor/editor.worker?worker'
@@ -13,12 +13,22 @@ declare global {
     monaco: typeof Monaco
   }
 }
+
+let state: {
+  monaco: typeof Monaco
+  model: Monaco.editor.ITextModel
+  language: ShallowRef<Monaco.languages.ILanguageExtensionPoint>
+}
 export default async function useMonacoEditor() {
+  if (state) {
+    return state
+  }
+
   const monaco = await import('monaco-editor')
   const EditorWorker = (await import('monaco-editor/esm/vs/editor/editor.worker?worker')).default as unknown as typeof TEditorWorker
 
+  // useMonacoEditor may be called multiple times
   window.monaco = monaco
-
   window.MonacoEnvironment = {
     getWorker(_: string, label: string) {
     // if (label === 'typescript' || label === 'javascript') return new TsWorker()
@@ -109,8 +119,10 @@ export default async function useMonacoEditor() {
     language.value = monaco.languages.getLanguages().find(x => x.id === e.newLanguage)
   })
 
-  return {
+  state = {
     model,
     language,
+    monaco,
   }
+  return state
 }
