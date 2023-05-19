@@ -4,6 +4,7 @@ import { resolve } from 'path'
 import * as vite from 'vite'
 import vue from '@vitejs/plugin-vue'
 import yaml from '@maikolib/vite-plugin-yaml'
+import { VitePWA as pwa } from 'vite-plugin-pwa'
 
 function findModulePath(id: string) {
   const path = require.resolve(id).replace(/\\/g, '/')
@@ -18,6 +19,7 @@ export async function build(root: string, config: vite.UserConfig = {}, isClient
   const { rollupOptions = {} } = config.build || {}
   return await vite.build({
     root,
+    publicDir: 'assets',
     build: {
       outDir: cwd + '/plugins/console/dist',
       emptyOutDir: true,
@@ -44,6 +46,7 @@ export async function build(root: string, config: vite.UserConfig = {}, isClient
     plugins: [
       vue(),
       yaml(),
+      config.plugins,
     ],
     resolve: {
       alias: {
@@ -64,7 +67,34 @@ export async function build(root: string, config: vite.UserConfig = {}, isClient
 
 export default async function () {
   // build for console main
-  const { output } = await build(cwd + '/packages/client/app')
+  const { output } = await build(cwd + '/packages/client/app', {
+    plugins: [
+      pwa({
+        strategies: 'injectManifest',
+        srcDir: '.',
+        filename: 'sw.ts',
+        injectRegister: 'inline',
+        manifest: {
+          name: 'Koishi',
+          short_name: 'Koishi',
+          description: 'Koishi 控制台',
+          theme_color: '#ffffff',
+          icons: [
+            {
+              src: 'koishi-192x192.png',
+              sizes: '192x192',
+              type: 'image/png',
+            },
+            {
+              src: 'koishi-512x512.png',
+              sizes: '512x512',
+              type: 'image/png',
+            },
+          ],
+        },
+      }),
+    ],
+  })
 
   await Promise.all([
     copyFile(findModulePath('vue') + '/dist/vue.runtime.esm-browser.prod.js', dist + '/vue.js'),
