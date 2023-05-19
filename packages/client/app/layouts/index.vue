@@ -1,12 +1,16 @@
 <template>
   <div :class="{ 'is-left-aside-open': isLeftAsideOpen }">
     <activity-bar></activity-bar>
-    <router-view v-if="loaded" #="{ Component }">
-      <keep-alive>
-        <component :is="Component"></component>
-      </keep-alive>
-    </router-view>
-    <div class="loading" v-else v-loading="true" element-loading-text="正在加载数据……"></div>
+    <suspense>
+      <router-view #="{ Component }">
+        <keep-alive>
+          <component :is="Component" />
+        </keep-alive>
+      </router-view>
+      <template #fallback>
+        <div class="loading">正在加载数据……</div>
+      </template>
+    </suspense>
     <status-bar></status-bar>
     <k-slot name="global"></k-slot>
   </div>
