@@ -20,7 +20,10 @@ export * from './common'
 export * from './layout'
 export * from './slot'
 
+export * from 'vue-i18n'
 export * from '@koishijs/components'
+
+export { fallbackWithLocaleChain } from '@intlify/core-base'
 
 export { icons, ChatImage }
 

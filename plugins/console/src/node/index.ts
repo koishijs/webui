@@ -161,10 +161,8 @@ class NodeConsole extends Console {
         alias: {
           '../client.js': '@koishijs/client',
           '../vue.js': 'vue',
-          '../vue-i18n.js': 'vue-i18n',
           '../vue-router.js': 'vue-router',
           '../vueuse.js': '@vueuse/core',
-          '../intlify.js': '@intlify/core-base',
         },
       },
       optimizeDeps: {

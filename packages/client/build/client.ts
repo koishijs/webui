@@ -28,11 +28,9 @@ export async function build(root: string, config: vite.UserConfig = {}, isClient
         makeAbsoluteExternalsRelative: true,
         external: [
           root + '/vue.js',
-          root + '/vue-i18n.js',
           root + '/vue-router.js',
           root + '/client.js',
           root + '/vueuse.js',
-          root + '/intlify.js',
         ],
         output: {
           format: 'module',
@@ -50,11 +48,15 @@ export async function build(root: string, config: vite.UserConfig = {}, isClient
     resolve: {
       alias: {
         'vue': root + '/vue.js',
-        'vue-i18n': root + '/vue-i18n.js',
         'vue-router': root + '/vue-router.js',
         '@vueuse/core': root + '/vueuse.js',
         '@koishijs/client': root + '/client.js',
-        '@intlify/core-base': root + '/intlify.js',
+        ...isClient ? {
+          'vue-i18n': findModulePath('vue-i18n') + '/dist/vue-i18n.esm-browser.prod.js',
+          '@intlify/core-base': findModulePath('@intlify/core-base') + '/dist/core-base.esm-browser.prod.js',
+        } : {
+          'vue-i18n': root + '/client.js',
+        },
       },
     },
   }) as RollupOutput
@@ -66,30 +68,6 @@ export default async function () {
 
   await Promise.all([
     copyFile(findModulePath('vue') + '/dist/vue.runtime.esm-browser.prod.js', dist + '/vue.js'),
-    build(findModulePath('@intlify/core-base') + '/dist', {
-      build: {
-        outDir: dist,
-        emptyOutDir: false,
-        rollupOptions: {
-          input: {
-            'intlify': findModulePath('@intlify/core-base') + '/dist/core-base.esm-browser.js',
-          },
-          preserveEntrySignatures: 'strict',
-        },
-      },
-    }),
-    build(findModulePath('vue-i18n') + '/dist', {
-      build: {
-        outDir: dist,
-        emptyOutDir: false,
-        rollupOptions: {
-          input: {
-            'vue-i18n': findModulePath('vue-i18n') + '/dist/vue-i18n.esm-browser.js',
-          },
-          preserveEntrySignatures: 'strict',
-        },
-      },
-    }),
     build(findModulePath('vue-router') + '/dist', {
       build: {
         outDir: dist,
