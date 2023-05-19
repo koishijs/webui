@@ -1,10 +1,13 @@
 import { Context } from '@koishijs/client'
 import {} from '@koishijs/plugin-explorer/src'
-import FilePicker from './file-picker.vue'
-import Layout from './index.vue'
-import Status from './status.vue'
 import './icons'
 import './editor'
+// import FilePicker from './file-picker.vue'
+// import Layout from './index.vue'
+// import Status from './status.vue'
+const FilePicker = () => import('./file-picker.vue')
+const Layout = () => import('./index.vue')
+const Status = () => import('./status.vue')
 
 Context.app.component('k-file-picker', FilePicker)
 

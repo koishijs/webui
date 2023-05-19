@@ -13,7 +13,7 @@ export namespace Activity {
     id?: string
     path: string
     strict?: boolean
-    component: Component
+    component: Component | (() => PromiseLike<Component>)
     name: MaybeRefOrGetter<string>
     desc?: MaybeRefOrGetter<string>
     icon?: MaybeRefOrGetter<string>

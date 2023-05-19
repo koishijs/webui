@@ -110,8 +110,10 @@ import { useDark, useElementSize, useEventListener } from '@vueuse/core'
 import { send, store, base64ToArrayBuffer, arrayBufferToBase64 } from '@koishijs/client'
 import { Entry } from '../src'
 import { files } from './store'
-import { model } from './editor'
+// import { model } from './editor'
 import type Monaco from 'monaco-editor'
+const Editor = await import ('./editor')
+const { model } = Editor
 const monaco = await import('monaco-editor')
 
 const vFocus: Directive = {
