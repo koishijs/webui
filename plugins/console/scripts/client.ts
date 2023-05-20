@@ -64,7 +64,7 @@ export async function build(root: string, config: vite.UserConfig = {}, isClient
 
 export default async function () {
   // build for console main
-  const { output } = await build(cwd + '/packages/client/app')
+  const { output } = await build(cwd + '/plugins/console/app')
 
   await Promise.all([
     copyFile(findModulePath('vue') + '/dist/vue.runtime.esm-browser.prod.js', dist + '/vue.js'),

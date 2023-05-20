@@ -4,12 +4,10 @@
   "version": "5.8.3",
   "main": "client/index.ts",
   "files": [
-    "app",
     "client",
     "lib",
     "bin.js",
-    "global.d.ts",
-    "tsconfig.client.json"
+    "global.d.ts"
   ],
   "bin": {
     "koishi-console": "bin.js"
@@ -50,8 +48,5 @@
     "vue": "^3.3.2",
     "vue-i18n": "^9.2.2",
     "vue-router": "^4.2.0"
-  },
-  "yakumo": {
-    "client": "./build/client"
   }
 }

@@ -50,9 +50,7 @@ class NodeConsole extends Console {
       ctx.envData.clientCount = this.layer.clients.size
     })
 
-    this.root = config.root || config.devMode
-      ? resolve(require.resolve('@koishijs/client/package.json'), '../app')
-      : resolve(__dirname, '../../dist')
+    this.root = config.root || (resolve(__dirname, config.devMode ? '../../app' : '../../dist'))
   }
 
   async start() {
