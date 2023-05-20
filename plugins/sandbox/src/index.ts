@@ -128,7 +128,11 @@ export function apply(ctx: Context, config: Config) {
 
   ctx.console.addListener('sandbox/get-user', async function (platform, pid) {
     if (!ctx.database) return
-    return ctx.database.getUser(platform, pid)
+    const [binding] = await ctx.database.get('binding', { platform, pid }, ['aid'])
+    if (binding) return ctx.database.getUser(platform, pid)
+    return ctx.database.createUser(platform, pid, {
+      authority: 1,
+    })
   }, { authority: 4 })
 
   ctx.console.addListener('sandbox/set-user', async function (platform, pid, data) {

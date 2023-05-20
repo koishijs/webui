@@ -28,7 +28,7 @@
         <div>点击「添加用户」开始体验</div>
       </k-empty>
       <k-content :key="'profile' + channel" v-else-if="config.panelType === 'profile'">
-        <k-form instant v-model="model" :schema="schema" :show-header="false"></k-form>
+        <k-form v-if="user" :initial="user" v-model="model" :schema="schema" :show-header="false"></k-form>
       </k-content>
       <template v-else :key="channel">
         <virtual-list :data="config.messages[channel] || []" #="data" pinned>
@@ -59,7 +59,7 @@
 
 <script lang="ts" setup>
 
-import { clone, message, send, Schema, store, ChatInput, VirtualList, deepEqual } from '@koishijs/client'
+import { clone, message, send, Schema, ChatInput, VirtualList, deepEqual } from '@koishijs/client'
 import { useEventListener } from '@vueuse/core'
 import { computed, nextTick, ref, watch } from 'vue'
 import { api, channel, config, words, panelTypes } from './utils'
@@ -134,15 +134,19 @@ function onKeydown(event: KeyboardEvent) {
   }
 }
 
+const user = ref()
 const model = ref()
 
-watch(() => store.sandbox?.[config.value.user], (value) => {
-  model.value = clone(value)
+watch(() => config.value.user, async (value) => {
+  if (!value) return
+  user.value = await send('sandbox/get-user', config.value.platform, config.value.user)
+  model.value = clone(user.value)
 }, { immediate: true })
 
-watch(model, (value) => {
-  if (deepEqual(value, store.sandbox?.[config.value.user])) return
-  send('sandbox/set-user', config.value.platform, config.value.user, value)
+watch(model, async (value) => {
+  if (deepEqual(value, user.value)) return
+  await send('sandbox/set-user', config.value.platform, config.value.user, value)
+  user.value = clone(value)
 }, { deep: true })
 
 function sendMessage(content: string) {

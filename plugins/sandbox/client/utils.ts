@@ -1,5 +1,5 @@
 import { receive, send, useStorage } from '@koishijs/client'
-import type { Message } from '@koishijs/plugin-sandbox/src'
+import type { Message } from '@koishijs/plugin-sandbox'
 import type { RemovableRef } from '@vueuse/core'
 import type { Dict } from 'koishi'
 import { computed } from 'vue'
