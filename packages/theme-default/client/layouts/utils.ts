@@ -1,8 +1,10 @@
-import { reactive } from 'vue'
+import { reactive, ref } from 'vue'
 import { RouteRecordName } from 'vue-router'
 import { global, router } from '@koishijs/client'
 
 export * from '@koishijs/client'
+
+export const isLeftAsideOpen = ref(false)
 
 export const routeCache = reactive<Record<RouteRecordName, string>>({})
 

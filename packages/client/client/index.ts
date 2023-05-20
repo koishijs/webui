@@ -1,9 +1,10 @@
 import { Console } from '@koishijs/plugin-console'
 import { defineComponent, h, resolveComponent } from 'vue'
 import { createRouter, createWebHistory, START_LOCATION } from 'vue-router'
-import { config, Store, store } from './data'
+import { global, Store, store } from './data'
 import install, { isNullable } from './components'
 import Overlay from './components/chat/overlay.vue'
+import Settings from './extensions/settings.vue'
 import { initTask } from './loader'
 import { Context } from './context'
 import { createI18n } from 'vue-i18n'
@@ -12,14 +13,17 @@ import './styles/index.scss'
 
 export * from './activity'
 export * from './components'
+export * from './config'
 export * from './context'
 export * from './loader'
 export * from './data'
 
 export default install
 
+export const root = new Context()
+
 export const router = createRouter({
-  history: createWebHistory(config.uiPath),
+  history: createWebHistory(global.uiPath),
   linkActiveClass: 'active',
   routes: [],
 })
@@ -30,11 +34,22 @@ export const i18n = createI18n({
   fallbackLocale: 'zh-CN',
 })
 
-export const root = new Context()
+root.app.use(install)
+root.app.use(i18n)
+root.app.use(router)
 
 root.slot({
   type: 'global',
   component: Overlay,
+})
+
+root.page({
+  path: '/settings',
+  name: '用户设置',
+  icon: 'activity:settings',
+  position: 'bottom',
+  order: -100,
+  component: Settings,
 })
 
 root.on('activity', data => !data)

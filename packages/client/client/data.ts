@@ -38,10 +38,8 @@ export type Store = {
 }
 
 declare const KOISHI_CONFIG: ClientConfig
-export const config = KOISHI_CONFIG
+export const global = KOISHI_CONFIG
 export const store = reactive<Store>({})
-
-export { config as global }
 
 export const socket = ref<AbstractWebSocket>(null)
 const listeners: Record<string, (data: any) => void> = {}
@@ -94,11 +92,11 @@ export function connect(callback: () => AbstractWebSocket) {
   let sendTimer: number
   let closeTimer: number
   const refresh = () => {
-    if (!config.heartbeat) return
+    if (!global.heartbeat) return
     clearTimeout(sendTimer)
     clearTimeout(closeTimer)
-    sendTimer = +setTimeout(() => send('ping'), config.heartbeat.interval)
-    closeTimer = +setTimeout(() => value?.close(), config.heartbeat.timeout)
+    sendTimer = +setTimeout(() => send('ping'), global.heartbeat.interval)
+    closeTimer = +setTimeout(() => value?.close(), global.heartbeat.timeout)
   }
 
   const reconnect = () => {

@@ -1,6 +1,4 @@
 import { App } from 'vue'
-import Layout from './k-layout.vue'
-import Status from './k-status.vue'
 import CardNumeric from './card-numeric.vue'
 import Card from './card.vue'
 import Content from './content.vue'
@@ -11,8 +9,6 @@ import TabItem from './tab-item.vue'
 export * from './utils'
 
 export default function (app: App) {
-  app.component('k-layout', Layout)
-  app.component('k-status', Status)
   app.component('k-numeric', CardNumeric)
   app.component('k-card', Card)
   app.component('k-content', Content)

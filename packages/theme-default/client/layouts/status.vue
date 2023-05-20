@@ -11,11 +11,11 @@
   </el-tooltip>
 </template>
 
-<script lang="ts">
+<script lang="ts" setup>
 
-export default {
+defineOptions({
   inheritAttrs: false,
-}
+})
 
 </script>
 

@@ -58,11 +58,3 @@ const config = computed({
 })
 
 </script>
-
-<style lang="scss">
-
-.k-form {
-  margin-bottom: 2rem;
-}
-
-</style>

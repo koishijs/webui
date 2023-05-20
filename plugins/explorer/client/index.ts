@@ -6,8 +6,6 @@ import Status from './status.vue'
 import './icons'
 import './editor'
 
-Context.app.component('k-file-picker', FilePicker)
-
 export default (ctx: Context) => {
   ctx.schema({
     type: 'string',

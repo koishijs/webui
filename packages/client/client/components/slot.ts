@@ -24,7 +24,11 @@ export const KSlot = defineComponent({
         .map(node => ({ node, order: node.props?.order || 0 }))
       const external = [...views[props.name] || []]
         .filter(item => !item.when || item.when())
-        .map(item => ({ node: h(item.component, { data: props.data }), order: item.order, layer: 1 }))
+        .map(item => ({
+          node: h(item.component, { data: props.data, ...props.data }, slots),
+          order: item.order,
+          layer: 1,
+        }))
       const children = [...internal, ...external].sort((a, b) => b.order - a.order)
       if (props.single) {
         return children[0]?.node || slots.default?.()
@@ -43,7 +47,15 @@ const KSlotItem = defineComponent({
   },
 })
 
+function defineSlotComponent(name: string) {
+  return defineComponent((_, { attrs, slots }) => {
+    return () => h(KSlot, { name, data: attrs, single: true }, slots)
+  })
+}
+
 export default (app: App) => {
   app.component('k-slot', KSlot)
   app.component('k-slot-item', KSlotItem)
+  app.component('k-layout', defineSlotComponent('layout'))
+  app.component('k-status', defineSlotComponent('status'))
 }

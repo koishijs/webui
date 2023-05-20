@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "rootDir": ".",
     "target": "es2020",
     "module": "esnext",
     "declaration": true,
@@ -15,4 +16,7 @@
       "@koishijs/client/global",
     ],
   },
+  "include": [
+    ".",
+  ],
 }

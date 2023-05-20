@@ -1,7 +1,7 @@
 import * as cordis from 'cordis'
 import components from '@koishijs/components'
 import { Dict, remove } from 'cosmokit'
-import { App, markRaw, reactive } from 'vue'
+import { App, createApp, defineComponent, h, inject, markRaw, reactive, resolveComponent } from 'vue'
 import { Activity } from './activity'
 import { SlotOptions } from './components'
 
@@ -19,8 +19,25 @@ export interface Context {
   [Context.events]: Events<this>
 }
 
+export function useContext() {
+  return inject('root') as Context
+}
+
 export class Context extends cordis.Context {
-  static app: App
+  app: App
+
+  constructor() {
+    super()
+    this.app = createApp(defineComponent({
+      setup() {
+        return () => [
+          h(resolveComponent('k-slot'), { name: 'root', single: true }),
+          h(resolveComponent('k-slot'), { name: 'global' }),
+        ]
+      },
+    }))
+    this.app.provide('root', this)
+  }
 
   /** @deprecated */
   addView(options: SlotOptions) {

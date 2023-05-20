@@ -17,7 +17,7 @@
 import { store } from './utils'
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
-import { isLeftAsideOpen } from '@koishijs/client'
+import { isLeftAsideOpen } from './utils'
 import ActivityBar from './activity/index.vue'
 import StatusBar from './status-bar.vue'
 
