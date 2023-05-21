@@ -15,6 +15,8 @@ sort:
   created: 按创建时间
   updated: 按更新时间
 category:
+  all: 所有插件
+  other: 未分类
   core: 核心功能
   adapter: Adapter
   storage: 存储服务
