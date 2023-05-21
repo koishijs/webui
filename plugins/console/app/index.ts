@@ -1,5 +1,5 @@
 import { connect, Dict, global, root } from '@koishijs/client'
-import themeDefault from '@koishijs/theme-default'
+import theme from './theme'
 
 import './index.scss'
 
@@ -10,7 +10,7 @@ declare module '@koishijs/plugin-console' {
   }
 }
 
-root.plugin(themeDefault)
+root.plugin(theme)
 
 root.app.provide('ecTheme', 'dark-blue')
 
