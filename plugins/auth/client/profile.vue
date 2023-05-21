@@ -61,7 +61,7 @@ async function logout() {
   store.user = null
   delete config.value.id
   delete config.value.token
-  delete config.value.expire
+  delete config.value.expiredAt
   return send('user/logout')
 }
 

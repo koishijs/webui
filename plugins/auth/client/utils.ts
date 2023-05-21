@@ -24,7 +24,7 @@ watch(() => store.user, (value, oldValue) => {
   }
 
   if (oldValue) return
-  Object.assign(config.value, pick(value, ['id', 'name', 'token', 'expire']))
+  Object.assign(config.value, pick(value, ['id', 'name', 'token', 'expiredAt']))
   message.success(`欢迎回来，${value.name || 'Koishi 用户'}！`)
   const from = router.currentRoute.value.redirectedFrom
   if (from && !from.path.startsWith('/login')) {

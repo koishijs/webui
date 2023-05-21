@@ -44,7 +44,7 @@ export interface LoginToken {
   id: number
   type: LoginType
   token: string
-  expire: number
+  expiredAt: number
   createdAt: Date
   lastUsedAt: Date
   userAgent: string
@@ -52,7 +52,7 @@ export interface LoginToken {
 }
 
 export type Auth =
-  & Pick<LoginToken, 'token' | 'expire'>
+  & Pick<LoginToken, 'token' | 'expiredAt'>
   & Pick<User, 'id' | 'name' | 'authority'>
 
 interface AuthData extends Auth {
@@ -72,7 +72,7 @@ export function randomId(length = 40) {
 
 export interface UserLogin extends Pick<User, 'id' | 'name'> {
   token: string
-  expire: number
+  expiredAt: number
 }
 
 export type UserUpdate = Partial<Pick<User, 'name' | 'password'>>
@@ -96,7 +96,7 @@ class AuthService extends Service {
       id: 'unsigned',
       type: 'string(255)',
       token: 'string(255)',
-      expire: 'unsigned(20)',
+      expiredAt: 'unsigned(20)',
       createdAt: 'timestamp',
       lastUsedAt: 'timestamp',
       userAgent: 'string(255)',
@@ -148,10 +148,10 @@ class AuthService extends Service {
     const lastUsedAt = new Date()
     const userAgent = headers['user-agent']?.toString()
     const address = headers['x-forwarded-for']?.toString() || socket.remoteAddress
-    const expire = Date.now() + this.config.authTokenExpire
+    const expiredAt = Date.now() + this.config.authTokenExpire
     const token = randomId()
-    await this.ctx.database.create('token', { id: user.id, type, expire, token, createdAt, lastUsedAt, userAgent, address })
-    await this.setAuth(client, { ...user, expire, token })
+    await this.ctx.database.create('token', { id: user.id, type, expiredAt, token, createdAt, lastUsedAt, userAgent, address })
+    await this.setAuth(client, { ...user, expiredAt, token })
   }
 
   initLogin() {
@@ -167,8 +167,8 @@ class AuthService extends Service {
     })
 
     ctx.console.addListener('login/token', async function (aid, token) {
-      const [data] = await ctx.database.get('token', { id: aid, token }, ['expire'])
-      if (!data || data.expire <= Date.now()) throw new Error('令牌已失效。')
+      const [data] = await ctx.database.get('token', { id: aid, token }, ['expiredAt'])
+      if (!data || data.expiredAt <= Date.now()) throw new Error('令牌已失效。')
       const [user] = await ctx.database.get('user', { id: aid }, ['id', 'name', 'authority'])
       if (!user) throw new Error('用户不存在。')
       await ctx.database.set('token', { token }, { lastUsedAt: new Date() })
@@ -182,8 +182,8 @@ class AuthService extends Service {
 
       const key = `${platform}:${userId}`
       const token = Math.random().toString().slice(2, 8)
-      const expire = Date.now() + config.loginTokenExpire
-      states[key] = [token, expire, this]
+      const expiredAt = Date.now() + config.loginTokenExpire
+      states[key] = [token, expiredAt, this]
 
       const listener = () => {
         delete states[key]
@@ -195,7 +195,7 @@ class AuthService extends Service {
       }, config.loginTokenExpire)
       this.socket.addEventListener('close', listener)
 
-      return { id: user.id, name: user.name, token, expire }
+      return { id: user.id, name: user.name, token, expiredAt }
     })
 
     ctx.middleware(async (session, next) => {
@@ -217,7 +217,7 @@ class AuthService extends Service {
     ctx.on('console/intercept', async (client, listener) => {
       if (!listener.authority) return false
       if (!client.auth) return true
-      if (client.auth.expire <= Date.now()) return true
+      if (client.auth.expiredAt <= Date.now()) return true
       if (client.auth.authority < listener.authority) return true
       await ctx.database.set('token', { token: client.auth.token }, { lastUsedAt: new Date() })
     })
