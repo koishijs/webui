@@ -6,7 +6,6 @@
     </h2>
     <k-schema
       v-model="config"
-      :instant="instant"
       :initial="initial"
       :schema="resolved"
       :disabled="disabled"
@@ -25,8 +24,7 @@ const props = defineProps({
   initial: {},
   modelValue: {},
   disabled: Boolean,
-  showHeader: {},
-  instant: Boolean,
+  showHeader: Boolean,
 })
 
 const resolved = computed(() => {

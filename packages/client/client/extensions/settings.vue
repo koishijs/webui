@@ -12,7 +12,7 @@ import { config, Schema } from '..'
 
 const schema = Schema.object({
   isDark: Schema.boolean().description('暗色模式。'),
-  locale: Schema.union(['zh-CN', 'en-US']).hidden().description('语言设置。'),
+  locale: Schema.union(['zh-CN', 'en-US']).description('语言设置。'),
 }).description('外观设置')
 
 </script>

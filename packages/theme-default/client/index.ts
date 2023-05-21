@@ -22,15 +22,18 @@ export default defineExtension((ctx) => {
   ctx.slot({
     type: 'root',
     component: App,
+    order: -1000,
   })
 
   ctx.slot({
     type: 'layout',
     component: Layout,
+    order: -1000,
   })
 
   ctx.slot({
     type: 'status',
     component: Status,
+    order: -1000,
   })
 })

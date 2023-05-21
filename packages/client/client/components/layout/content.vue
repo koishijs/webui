@@ -13,7 +13,7 @@
 
   margin: auto;
   max-width: 50rem;
-  padding: 3rem var(--content-padding) 1rem;
+  padding: 3rem var(--content-padding);
 
   > :first-child {
     margin-top: 0;
