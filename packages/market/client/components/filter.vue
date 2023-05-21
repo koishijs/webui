@@ -40,7 +40,7 @@
       <h2 class="text">{{ t('type.category') }}</h2>
     </div>
     <div
-      v-for="(title, key) in categories" :key="key" class="market-filter-item"
+      v-for="key in categories" :key="key" class="market-filter-item"
       :class="{ active: words.includes('category:' + key) }"
       @click="toggleCategory('category:' + key, $event)">
       <span class="icon"><market-icon :name="'solid:' + key"></market-icon></span>
@@ -56,10 +56,8 @@
 <script lang="ts" setup>
 
 import { computed, inject, ref, watch } from 'vue'
-import { Badge, badges, kConfig, validate, comparators, categories, resolveCategory } from '../utils'
+import { Badge, badges, kConfig, validate, comparators, categories, resolveCategory, useMarketI18n } from '../utils'
 import { AnalyzedPackage } from '@koishijs/registry'
-import { useI18n } from 'vue-i18n'
-import zhCN from '../locales/zh-CN.yml'
 import MarketIcon from '../icons'
 
 const props = defineProps<{
@@ -68,6 +66,8 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits(['update:modelValue'])
+
+const { t } = useMarketI18n()
 
 const config = inject(kConfig, {})
 
@@ -138,18 +138,6 @@ function toggleQuery(item: Badge, event: MouseEvent) {
     words.value.splice(index, 1)
   }
   emit('update:modelValue', words.value)
-}
-
-const { t, setLocaleMessage } = useI18n({
-  messages: {
-    'zh-CN': zhCN,
-  },
-})
-
-if (import.meta.hot) {
-  import.meta.hot.accept('../locales/zh-CN.yml', (module) => {
-    setLocaleMessage('zh-CN', module.default)
-  })
 }
 
 </script>

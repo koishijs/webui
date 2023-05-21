@@ -1,6 +1,7 @@
 import { Context, store } from '@koishijs/client'
 import Dependency from './dependency.vue'
 import Missing from './missing.vue'
+import Select from './select.vue'
 import Version from './version.vue'
 
 export default (ctx: Context) => {
@@ -21,5 +22,11 @@ export default (ctx: Context) => {
     type: 'plugin-missing',
     component: Missing,
     when: () => !!(store.market && store.dependencies),
+  })
+
+  ctx.slot({
+    type: 'plugin-select',
+    component: Select,
+    when: () => !!store.market,
   })
 }

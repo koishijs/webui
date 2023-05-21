@@ -1,6 +1,14 @@
 import { AnalyzedPackage, User } from '@koishijs/registry'
 import { InjectionKey } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { Dict } from 'cosmokit'
+import zhCN from './locales/zh-CN.yml'
+
+export const useMarketI18n = () => useI18n({
+  messages: {
+    'zh-CN': zhCN,
+  },
+})
 
 export function getUsers(data: AnalyzedPackage) {
   const result: Record<string, User> = {}
@@ -20,7 +28,6 @@ export function getUsers(data: AnalyzedPackage) {
 const aWeekAgo = new Date(Date.now() - 1000 * 3600 * 24 * 7).toISOString()
 
 export interface Badge {
-  text: string
   query: string
   negate: string
   hidden?(config: MarketConfig, type: 'card' | 'filter'): boolean
@@ -28,7 +35,6 @@ export interface Badge {
 
 export const badges: Dict<Badge> = {
   installed: {
-    text: '已下载',
     query: 'is:installed',
     negate: 'not:installed',
     hidden(config, type) {
@@ -36,29 +42,24 @@ export const badges: Dict<Badge> = {
     },
   },
   verified: {
-    text: '官方认证',
     query: 'is:verified',
     negate: 'not:verified',
   },
   insecure: {
-    text: '不安全',
     query: 'is:insecure',
     negate: 'not:insecure',
   },
   preview: {
-    text: '开发中',
     query: 'is:preview',
     negate: 'not:preview',
   },
   newborn: {
-    text: '近期新增',
     query: `created:>${aWeekAgo}`,
     negate: `created:<${aWeekAgo}`,
   },
 }
 
 interface Comparator {
-  text: string
   icon: string
   hidden?: boolean
   compare(a: AnalyzedPackage, b: AnalyzedPackage, words: string[]): number
@@ -88,48 +89,43 @@ function getSimRating(data: AnalyzedPackage, words: string[]) {
 
 export const comparators: Dict<Comparator> = {
   default: {
-    text: '综合',
     icon: 'solid:all',
     compare: (a, b, words) => getSimRating(b, words) - getSimRating(a, words),
   },
   rating: {
-    text: '按评分',
     icon: 'star-full',
     compare: (a, b) => b.rating - a.rating,
   },
   download: {
-    text: '按下载量',
     icon: 'download',
     compare: (a, b) => (b.downloads?.lastMonth ?? 0) - (a.downloads?.lastMonth ?? 0),
   },
   created: {
-    text: '按创建时间',
     icon: 'heart-pulse',
     compare: (a, b) => b.createdAt.localeCompare(a.createdAt),
   },
   updated: {
-    text: '按更新时间',
     icon: 'tag',
     compare: (a, b) => b.updatedAt.localeCompare(a.updatedAt),
   },
 }
 
-export const categories = {
-  core: '核心功能',
-  adapter: '适配器',
-  storage: '存储服务',
-  extension: '扩展功能',
-  console: '控制台',
-  manage: '管理工具',
-  preset: '行为预设',
-  image: '图片服务',
-  media: '资讯服务',
-  tool: '实用工具',
-  ai: '人工智能',
-  meme: '趣味交互',
-  game: '娱乐玩法',
-  gametool: '游戏工具',
-}
+export const categories = [
+  'core',
+  'adapter',
+  'storage',
+  'extension',
+  'console',
+  'manage',
+  'preset',
+  'image',
+  'media',
+  'tool',
+  'ai',
+  'meme',
+  'game',
+  'gametool',
+]
 
 export interface MarketConfig {
   installed?(data: AnalyzedPackage): boolean
@@ -175,7 +171,7 @@ export function hasFilter(words: string[]) {
 }
 
 export function resolveCategory(name?: string) {
-  if (categories[name]) return name
+  if (categories.includes(name)) return name
   return 'other'
 }
 
