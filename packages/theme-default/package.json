@@ -29,6 +29,6 @@
     "default"
   ],
   "dependencies": {
-    "@koishijs/client": "5.8.3"
+    "@koishijs/client": "5.8.4"
   }
 }
