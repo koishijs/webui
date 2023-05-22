@@ -1,10 +1,8 @@
-import { Console } from '@koishijs/plugin-console'
-import { defineComponent, h, resolveComponent } from 'vue'
 import { createRouter, createWebHistory, START_LOCATION } from 'vue-router'
-import { global, Store, store } from './data'
-import install, { isNullable } from './components'
+import { global } from './data'
+import install from './components'
 import Overlay from './components/chat/overlay.vue'
-import Settings from './extensions/settings.vue'
+import Settings from './settings/index.vue'
 import { initTask } from './loader'
 import { Context } from './context'
 import { createI18n } from 'vue-i18n'
@@ -17,6 +15,7 @@ export * from './config'
 export * from './context'
 export * from './loader'
 export * from './data'
+export * from './utils'
 
 export default install
 
@@ -44,7 +43,7 @@ root.slot({
 })
 
 root.page({
-  path: '/settings',
+  path: '/settings/:name*',
   name: '用户设置',
   icon: 'activity:settings',
   position: 'bottom',
@@ -68,48 +67,3 @@ router.beforeEach(async (to, from) => {
     query: { redirect: to.fullPath },
   }
 })
-
-// component helper
-
-export type Field = keyof Console.Services
-
-export namespace Card {
-  export function create(render: Function, fields: readonly Field[] = []) {
-    return defineComponent({
-      render: () => fields.every(key => store[key]) ? render() : null,
-    })
-  }
-
-  export interface NumericOptions {
-    icon: string
-    title: string
-    type?: string
-    fields?: Field[]
-    content: (store: Store) => any
-  }
-
-  export function numeric({ type, icon, fields, title, content }: NumericOptions) {
-    if (!type) {
-      return defineComponent(() => () => {
-        if (!fields.every(key => store[key])) return
-        return h(resolveComponent('k-numeric'), { icon, title }, () => content(store))
-      })
-    }
-
-    return defineComponent(() => () => {
-      if (!fields.every(key => store[key])) return
-      let value = content(store)
-      if (isNullable(value)) return
-      if (type === 'size') {
-        if (value >= (1 << 20) * 1000) {
-          value = (value / (1 << 30)).toFixed(1) + ' GB'
-        } else if (value >= (1 << 10) * 1000) {
-          value = (value / (1 << 20)).toFixed(1) + ' MB'
-        } else {
-          value = (value / (1 << 10)).toFixed(1) + ' KB'
-        }
-      }
-      return h(resolveComponent('k-numeric'), { icon, title }, () => [value])
-    })
-  }
-}

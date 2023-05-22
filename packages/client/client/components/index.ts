@@ -23,8 +23,6 @@ export * from './slot'
 export * from 'vue-i18n'
 export * from '@koishijs/components'
 
-export { fallbackWithLocaleChain } from '@intlify/core-base'
-
 export { icons, ChatImage }
 
 components.extensions.add({
