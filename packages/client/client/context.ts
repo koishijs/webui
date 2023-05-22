@@ -7,9 +7,15 @@ import { SlotOptions } from './components'
 
 // layout api
 
+export interface Theme {
+  id: string
+  name: string | Dict<string>
+}
+
 export type Computed<T> = T | (() => T)
 
 export const views = reactive<Dict<SlotOptions[]>>({})
+export const themes = reactive<Dict<Theme>>({})
 
 export interface Events<C extends Context> extends cordis.Events<C> {
   'activity'(activity: Activity): boolean
@@ -72,5 +78,11 @@ export class Context extends cordis.Context {
   schema(extension: components.Extension) {
     components.extensions.add(extension)
     return this.scope.collect('schema', () => components.extensions.delete(extension))
+  }
+
+  theme(options: Theme) {
+    markRaw(options)
+    themes[options.id] = options
+    return this.scope.collect('view', () => delete themes[options.id])
   }
 }

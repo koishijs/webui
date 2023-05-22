@@ -1,11 +1,12 @@
 @use 'sass:color';
 @import './layout.scss';
 @import './element.scss';
+@import './hc.scss';
 
 $black: #000000;
 $white: #ffffff;
 
-:root {
+:root, .theme-root[theme=default-light] {
   --bg0: #ffffff;
   --bg1: #f9f9fa;
   --bg2: #f0f0f2;
@@ -50,7 +51,7 @@ $white: #ffffff;
   @include apply-color(info, #909399);
 }
 
-html.dark {
+html.dark, .theme-root[theme=default-dark] {
   --bg0: #000000;
   --bg1: #1e1e20;
   --bg2: #252529;

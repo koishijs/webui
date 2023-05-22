@@ -3,6 +3,7 @@ import { global } from './data'
 import install from './components'
 import Overlay from './components/chat/overlay.vue'
 import Settings from './settings/index.vue'
+import { config } from './config'
 import { initTask } from './loader'
 import { Context } from './context'
 import { createI18n } from 'vue-i18n'
@@ -27,7 +28,7 @@ export const router = createRouter({
 
 export const i18n = createI18n({
   legacy: false,
-  locale: 'zh-CN',
+  locale: config.value.locale,
   fallbackLocale: 'zh-CN',
 })
 

@@ -1,0 +1,35 @@
+:root, .theme-root {
+  &[theme=hc-light] {
+    --bg0: white;
+    --bg1: white;
+    --bg2: white;
+    --bg3: white;
+  
+    --fg0: black;
+    --fg1: black;
+    --fg2: black;
+    --fg3: black;
+  
+    --k-card-border: black;
+    --k-color-border: black;
+    --k-color-divider: black;
+  }
+}
+
+:root, .theme-root {
+  &[theme=hc-dark] {
+    --bg0: black;
+    --bg1: black;
+    --bg2: black;
+    --bg3: black;
+
+    --fg0: white;
+    --fg1: white;
+    --fg2: white;
+    --fg3: white;
+
+    --k-card-border: white;
+    --k-color-border: white;
+    --k-color-divider: white;
+  }
+}

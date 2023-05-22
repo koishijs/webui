@@ -8,6 +8,30 @@ import Progress from './layouts/status-loading.vue'
 import './styles/index.scss'
 
 export default defineExtension((ctx) => {
+  ctx.theme({
+    id: 'default-light',
+    name: '默认 (浅色)',
+    base: 'light',
+  })
+
+  ctx.theme({
+    id: 'default-dark',
+    name: '默认 (深色)',
+    base: 'dark',
+  })
+
+  ctx.theme({
+    id: 'hc-light',
+    name: '高对比 (浅色)',
+    base: 'light',
+  })
+
+  ctx.theme({
+    id: 'hc-dark',
+    name: '高对比 (深色)',
+    base: 'dark',
+  })
+
   ctx.page({
     path: '/',
     name: '欢迎',

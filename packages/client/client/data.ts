@@ -1,37 +1,6 @@
 import { AbstractWebSocket, ClientConfig, Console, DataService, Events } from '@koishijs/plugin-console'
 import { Promisify } from 'koishi'
 import { markRaw, reactive, ref } from 'vue'
-import { RemovableRef, useLocalStorage } from '@vueuse/core'
-
-interface StorageData<T> {
-  version: number
-  data: T
-}
-
-export function createStorage<T extends object>(key: string, version: number, fallback?: () => T) {
-  const storage = useLocalStorage('koishi.console.' + key, {} as StorageData<T>)
-  const initial = fallback ? fallback() : {} as T
-  if (storage.value.version !== version) {
-    storage.value = { version, data: initial }
-  } else if (!Array.isArray(storage.value.data)) {
-    storage.value.data = { ...initial, ...storage.value.data }
-  }
-  return reactive<T>(storage.value['data'])
-}
-
-export let useStorage = <T extends object>(key: string, version: number, fallback?: () => T): RemovableRef<T> => {
-  const initial = fallback ? fallback() : {} as T
-  initial['__version__'] = version
-  const storage = useLocalStorage('koishi.console.' + key, initial)
-  if (storage.value['__version__'] !== version) {
-    storage.value = initial
-  }
-  return storage
-}
-
-export function provideStorage(factory: typeof useStorage) {
-  useStorage = factory
-}
 
 export type Store = {
   [K in keyof Console.Services]?: Console.Services[K] extends DataService<infer T> ? T : never
