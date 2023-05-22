@@ -5,7 +5,7 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   color: var(--fg1);
-  background-color: var(--page-bg);
+  background-color: var(--k-page-bg);
   position: relative;
   transition: color 0.3s ease, background-color 0.3s ease;
 }
@@ -35,12 +35,12 @@ table {
   }
 
   tr {
-    border-top: 1px solid var(--border);
+    border-top: 1px solid var(--k-color-divider);
     transition: border-color 0.3s ease;
   }
 
   tr:last-child {
-    border-bottom: 1px solid var(--border);
+    border-bottom: 1px solid var(--k-color-divider);
   }
 }
 
@@ -56,7 +56,7 @@ table {
   code {
     color: var(--fg2);
     padding: 0.25rem 0.5rem;
-    background-color: var(--page-bg);
+    background-color: var(--k-page-bg);
     border-radius: 3px;
     overflow-wrap: break-word;
     transition: background-color 0.3s ease, color 0.3s ease;

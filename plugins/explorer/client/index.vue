@@ -455,8 +455,8 @@ useEventListener('dragover', (event: DragEvent) => {
   min-width: 12rem;
   padding: 0.5rem 0;
   border-radius: 4px;
-  background-color: var(--card-bg);
-  box-shadow: var(--card-shadow);
+  background-color: var(--k-card-bg);
+  box-shadow: var(--k-card-shadow);
   transition: var(--color-transition);
   font-size: 14px;
 
@@ -467,7 +467,7 @@ useEventListener('dragover', (event: DragEvent) => {
     transition: var(--color-transition);
 
     &:hover {
-      background-color: var(--hover-bg);
+      background-color: var(--k-hover-bg);
     }
   }
 }

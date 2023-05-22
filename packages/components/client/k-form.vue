@@ -56,3 +56,38 @@ const config = computed({
 })
 
 </script>
+
+<style lang="scss">
+
+@media screen and (max-width: 480px) {
+  .k-form {
+    margin: 0 -1.5rem;
+
+    h2 {
+      padding: 0 1.5rem;
+    }
+
+    .k-schema-item {
+      padding: 0.5rem 1.5rem;
+
+      .header {
+        display: block;
+        min-height: unset;
+      }
+
+      .right {
+        display: block;
+
+        > :first-child {
+          margin-top: 0.25rem;
+        }
+
+        > :last-child {
+          margin-bottom: 0.25rem;
+        }
+      }
+    }
+  }
+}
+
+</style>

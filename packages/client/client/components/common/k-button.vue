@@ -65,18 +65,18 @@ function onClick(event: MouseEvent) {
   &.disabled {
     cursor: default;
   }
+
   // default: transparent & framed
   color: var(--fg2);
-  border: 1px solid var(--border);
+  border: 1px solid var(--k-color-border);
   background-color: transparent;
   &.disabled {
     color: var(--disabled);
-    border-color: var(--border);
+    border-color: var(--k-color-border);
   }
   &:hover:not(.disabled) {
     color: var(--fg1);
-    border: 1px solid var(--border-dark);
-    background-color: var(--bg1);
+    border: 1px solid var(--k-color-border);
   }
 
   &.solid {

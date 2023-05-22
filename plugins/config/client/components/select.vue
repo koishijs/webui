@@ -64,7 +64,7 @@ watch(showSelect, async (value, oldValue) => {
   .el-dialog__header {
     margin-right: 0;
     padding: 12px 20px;
-    border-bottom: 1px solid var(--border);
+    border-bottom: 1px solid var(--k-color-divider);
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -91,7 +91,7 @@ watch(showSelect, async (value, oldValue) => {
 
     .tabs {
       width: 7.5rem;
-      border-right: 1px solid var(--border);
+      border-right: 1px solid var(--k-color-divider);
       font-size: 15px;
       flex: 0 0 auto;
 
@@ -114,7 +114,7 @@ watch(showSelect, async (value, oldValue) => {
         transition: var(--color-transition);
 
         &:hover {
-          background-color: var(--bg2);
+          background-color: var(--k-hover-bg);
         }
 
         @media screen and (max-width: 768px) {
@@ -160,7 +160,7 @@ watch(showSelect, async (value, oldValue) => {
         }
 
         &:hover {
-          background-color: var(--bg2);
+          background-color: var(--k-hover-bg);
         }
       }
     }

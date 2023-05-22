@@ -5,6 +5,8 @@ import Layout from './layouts/layout.vue'
 import Status from './layouts/status.vue'
 import Progress from './layouts/status-loading.vue'
 
+import './styles/index.scss'
+
 export default defineExtension((ctx) => {
   ctx.page({
     path: '/',

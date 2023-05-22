@@ -52,7 +52,7 @@ div.bot {
   transition: 0.3s ease;
 
   & + & {
-    border-top: 1px solid var(--border);
+    border-top: 1px solid var(--k-color-divider);
   }
 
   &.active {
@@ -66,7 +66,7 @@ div.bot {
     width: 4rem;
     height: 4rem;
     box-sizing: content-box;
-    border: 1px solid var(--border);
+    border: 1px solid var(--k-color-divider);
     transition: border 0.3s ease;
     border-radius: 100%;
     background-size: 100%;
@@ -81,7 +81,7 @@ div.bot {
       right: -$borderWidth;
       width: 0.875rem;
       height: 0.875rem;
-      border: $borderWidth solid var(--bg0);
+      border: $borderWidth solid var(--k-color-divider);
     }
   }
 

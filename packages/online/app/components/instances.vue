@@ -40,7 +40,7 @@ import { activate, data, instances, remove } from '../utils'
     transition: var(--color-transition);
 
     &:hover {
-      background-color: var(--hover-bg);
+      background-color: var(--k-hover-bg);
     }
 
     .name {

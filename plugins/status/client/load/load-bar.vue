@@ -61,7 +61,7 @@ const caption = computed(() => {
     font-size: 0.8em;
     position: relative;
     display: inline;
-    background-color: var(--bg1);
+    background-color: var(--k-c-divisor);
     border-radius: 1rem;
     overflow: hidden;
     transition: var(--color-transition);
@@ -87,10 +87,10 @@ const caption = computed(() => {
   }
 
   .app {
-    background-color: var(--warning);
+    background-color: var(--k-color-warning);
     transition: color 0.3s ease, background-color 0.3s ease;
     &:hover {
-      background-color: var(--warning-tint);
+      background-color: var(--k-color-warning-tint);
     }
   }
 }

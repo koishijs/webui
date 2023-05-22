@@ -220,11 +220,11 @@ function configure(path: string | true) {
   }
 
   .warning {
-    color: var(--warning);
+    color: var(--k-color-warning);
   }
 
   .danger {
-    color: var(--danger);
+    color: var(--k-color-danger);
   }
 
   .version-badges {

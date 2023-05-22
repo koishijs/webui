@@ -1,0 +1,113 @@
+@use 'sass:color';
+@import './layout.scss';
+@import './element.scss';
+
+$black: #000000;
+$white: #ffffff;
+
+:root {
+  --bg0: #ffffff;
+  --bg1: #f9f9fa;
+  --bg2: #f0f0f2;
+  --bg3: #e3e3e5;
+
+  --fg0: #000000;
+  --fg1: #231f37;
+  --fg2: #545260;
+  --fg3: #7a7887;
+  --fg3t: #7a78877f;
+
+  --k-color-disabled: #909399;
+
+  --hover-inset: 0 0 2px inset #0002;
+
+  --k-card-bg: var(--bg0);
+  --k-card-border: var(--k-card-bg);
+  --k-main-bg: var(--bg0);
+  --k-side-bg: var(--bg1);
+  --k-page-bg: var(--bg0);
+  --k-hover-bg: var(--bg3);
+  --k-activity-bg: var(--bg2);
+
+  --k-color-primary: var(--fg1);
+  --k-color-secondary: var(--fg2);
+  --k-color-border: #c8c9cc;
+  --k-color-divider: #e0e4e8;
+  --k-card-shadow: 0 4px 8px -4px rgb(0 0 0 / 15%);
+  --loading-mask-bg: #f2f3f5bf;
+
+  @mixin apply-color($name, $base) {
+    --k-color-#{$name}: #{$base};
+    --k-color-#{$name}-shade: #{mix($base, $black, 90%)};
+    --k-color-#{$name}-tint: #{mix($base, $white, 80%)};
+    --k-color-#{$name}-fade: #{fade-out($base, 0.9)};
+  }
+
+  @include apply-color(active, #409eff);
+  @include apply-color(success, #67c23a);
+  @include apply-color(warning, #e49400);
+  @include apply-color(danger, #f56c6c);
+  @include apply-color(info, #909399);
+}
+
+html.dark {
+  --bg0: #000000;
+  --bg1: #1e1e20;
+  --bg2: #252529;
+  --bg3: #313136;
+
+  --fg0: #ffffff;
+  --fg1: #e3e5e8;
+  --fg2: #dcddde;
+  --fg3: #b9bbbe;
+
+  --k-card-bg: var(--bg2);
+  --k-card-border: var(--k-color-divider);
+  --k-main-bg: var(--bg3);
+  --k-side-bg: var(--bg2);
+  --k-page-bg: var(--bg2);
+  --k-hover-bg: var(--bg3);
+  --k-activity-bg: var(--bg1);
+
+  --k-color-primary: var(--fg1);
+  --k-color-secondary: var(--fg2);
+  --k-color-border: rgba(82, 82, 89, .8);
+  --k-color-divider: rgba(82, 82, 89, .5);
+  --loading-mask-bg: #202225bf;
+
+  @mixin apply-color($name, $base) {
+    --k-color-#{$name}: #{$base};
+    --k-color-#{$name}-shade: #{mix($base, $black, 80%)};
+    --k-color-#{$name}-tint: #{mix($base, $white, 90%)};
+    --k-color-#{$name}-fade: #{fade-out($base, 0.9)};
+  }
+
+  @include apply-color(active, #7459ff);
+  @include apply-color(success, #3ba55e);
+  @include apply-color(warning, #f9af1b);
+  @include apply-color(danger, #ff595a);
+  @include apply-color(info, #4f545c);
+}
+
+:root {
+  // transitions
+  --color-transition: color 0.3s ease, border-color 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease;
+
+  // fonts
+  --font-family: PingFang SC, Hiragino Sans GB, Microsoft YaHei, SimSun, sans-serif;
+  --font-family-code: Consolas, Monaco, "Andale Mono", "Ubuntu Mono", monospace;
+
+  // compatibility
+  --border: var(--k-color-border);
+  --divider: var(--k-color-divider);
+  --page-bg: var(--k-page-bg);
+  --hover-bg: var(--k-hover-bg);
+  --card-bg: var(--k-card-bg);
+  --card-shadow: var(--k-card-shadow);
+  --success: var(--k-color-success);
+  --error: var(--k-color-danger);
+  --danger: var(--k-color-danger);
+  --warning: var(--k-color-warning);
+  --active: var(--k-color-active);
+  --primary: var(--k-color-active);
+}

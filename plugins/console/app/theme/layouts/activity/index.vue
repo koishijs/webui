@@ -52,11 +52,11 @@ const groups = computed(() => {
   top: 0;
   bottom: 0;
   width: var(--activity-width);
-  background-color: var(--bg1);
+  background-color: var(--k-activity-bg);
   display: flex;
   flex-direction: column;
   justify-content: space-evenly;
-  border-right: var(--border) 1px solid;
+  border-right: var(--k-color-divider) 1px solid;
   transition: var(--color-transition);
 
   .spacer {

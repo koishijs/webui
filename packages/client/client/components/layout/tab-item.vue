@@ -27,7 +27,7 @@ defineProps<{
   text-overflow: ellipsis;
 
   &.active {
-    background-color: var(--hover-bg);
+    background-color: var(--k-hover-bg);
   }
 }
 

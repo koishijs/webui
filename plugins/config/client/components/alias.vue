@@ -74,7 +74,7 @@ function updateAlias() {
     outline: none;
     padding: 0;
     &.invalid {
-      color: var(--error);
+      color: var(--k-color-danger);
     }
   }
 

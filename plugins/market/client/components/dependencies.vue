@@ -98,7 +98,7 @@ const menu = computed(() => [{
     }
 
     tr:hover {
-      background-color: var(--hover-bg);
+      background-color: var(--k-hover-bg);
     }
   }
 

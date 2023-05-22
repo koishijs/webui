@@ -48,8 +48,11 @@ const KSlotItem = defineComponent({
 })
 
 function defineSlotComponent(name: string) {
-  return defineComponent((_, { attrs, slots }) => {
-    return () => h(KSlot, { name, data: attrs, single: true }, slots)
+  return defineComponent({
+    inheritAttrs: false,
+    setup(_, { slots, attrs }) {
+      return () => h(KSlot, { name, data: attrs, single: true }, slots)
+    },
   })
 }
 

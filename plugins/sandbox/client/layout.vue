@@ -210,12 +210,12 @@ async function deleteMessage(data: Message) {
     font-weight: bold;
     font-size: 1.15rem;
     padding: 1rem 0;
-    border-bottom: 1px solid var(--border);
+    border-bottom: 1px solid var(--k-color-divider);
   }
 
   .card-footer {
     padding: 1rem 1.25rem;
-    border-top: 1px solid var(--border);
+    border-top: 1px solid var(--k-color-divider);
 
     .quote {
       opacity: 0.5;
@@ -238,7 +238,7 @@ async function deleteMessage(data: Message) {
   .k-tab-item {
     padding: 0.75rem 1.5rem;
     display: flex;
-    border-bottom: 1px solid var(--border);
+    border-bottom: 1px solid var(--k-color-divider);
 
     > .nick {
       line-height: 2.5rem;
@@ -253,6 +253,7 @@ async function deleteMessage(data: Message) {
       flex-direction: column;
       justify-content: center;
       transition: opacity 0.3s ease;
+      color: var(--fg1);
     }
 
     &:hover > .close {
@@ -270,8 +271,8 @@ async function deleteMessage(data: Message) {
   min-width: 12rem;
   padding: 0.5rem 0;
   border-radius: 4px;
-  background-color: var(--card-bg);
-  box-shadow: var(--card-shadow);
+  background-color: var(--k-card-bg);
+  box-shadow: var(--k-card-shadow);
   transition: var(--color-transition);
   font-size: 14px;
 
@@ -282,7 +283,7 @@ async function deleteMessage(data: Message) {
     transition: var(--color-transition);
 
     &:hover {
-      background-color: var(--hover-bg);
+      background-color: var(--k-hover-bg);
     }
   }
 }

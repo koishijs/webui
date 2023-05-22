@@ -4,15 +4,19 @@
     <p>{{ t('description') }}</p>
     <div class="choices">
       <k-slot name="welcome-choice">
-      <a class="choice" href="https://koishi.chat" rel="noopener noreferer" target="_blank">
-        <h2>{{ t('action.docs.title') }}</h2>
-        <p>{{ t('action.docs.description') }}</p>
-      </a>
-      <a class="choice" href="https://k.ilharp.cc" rel="noopener noreferer" target="_blank">
-        <h2>{{ t('action.forum.title') }}</h2>
-        <p>{{ t('action.forum.description') }}</p>
-      </a>
-    </k-slot>
+        <k-slot-item :order="1000">
+          <a class="choice" href="https://koishi.chat" rel="noopener noreferer" target="_blank">
+            <h2>{{ t('action.docs.title') }}</h2>
+            <p>{{ t('action.docs.description') }}</p>
+          </a>
+        </k-slot-item>
+        <k-slot-item :order="500">
+          <a class="choice" href="https://k.ilharp.cc" rel="noopener noreferer" target="_blank">
+            <h2>{{ t('action.forum.title') }}</h2>
+            <p>{{ t('action.forum.description') }}</p>
+          </a>
+        </k-slot-item>
+      </k-slot>
     </div>
   </div>
 </template>
@@ -72,13 +76,13 @@ if (import.meta.hot) {
     width: 280px;
     box-sizing: border-box;
     padding: var(--welcome-choice-padding);
-    border: 1px solid var(--border);
+    border: 1px solid var(--k-color-divider);
     border-radius: 6px;
     cursor: pointer;
     transition: var(--color-transition);
 
     &:hover {
-      background-color: var(--bg1);
+      background-color: var(--k-side-color);
     }
 
     h2 {

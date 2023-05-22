@@ -72,7 +72,7 @@ import { isLeftAsideOpen } from './utils'
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
-  border-bottom: var(--border) 1px solid;
+  border-bottom: var(--k-color-divider) 1px solid;
   transition: var(--color-transition);
   font-weight: bolder;
 

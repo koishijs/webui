@@ -114,8 +114,8 @@ const menu = computed(() => [refresh.value])
 }
 
 .search-box {
-  background-color: var(--card-bg);
-  box-shadow: var(--card-shadow);
+  background-color: var(--k-card-bg);
+  box-shadow: var(--k-card-shadow);
   transition: var(--color-transition);
 }
 

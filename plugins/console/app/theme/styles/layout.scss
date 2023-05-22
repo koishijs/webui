@@ -1,0 +1,87 @@
+:root {
+  --aside-width: 17.5rem;
+  --activity-width: 4rem;
+  --activity-icon-size: 1.5rem;
+  --header-height: 3rem;
+  --footer-height: 1.75rem;
+
+  --card-margin: 2rem;
+  --card-padding-vertical: 1.5rem;
+  --card-padding-horizontal: 1.5rem;
+
+  @media screen and (max-width: 768px) {
+    --activity-width: 3.5rem;
+    --activity-icon-size: 1.375rem;
+    --card-margin: 1.5rem;
+    --card-padding-vertical: 1rem;
+    --card-padding-horizontal: 1rem;
+  }
+
+  @media screen and (max-width: 480px) {
+    --card-margin: 1rem;
+    --card-padding-vertical: 0.75rem;
+    --card-padding-horizontal: 0.875rem;
+  }
+}
+
+.layout-left {
+  .el-tree {
+    margin-top: 0.5rem;
+    user-select: none;
+    line-height: 2.25rem;
+  }
+
+  .el-tree-node__expand-icon {
+    margin-left: 8px;
+  }
+
+  .el-tree-node {
+    &:focus:not(:hover) > .el-tree-node__content {
+      background-color: unset;
+    }
+
+    &.is-disabled > .el-tree-node__content .label {
+      color: var(--fg3t);
+    }
+
+    &.is-active > .el-tree-node__content {
+      background-color: var(--k-hover-bg);
+      color: var(--active);
+    }
+  }
+
+  .el-tree-node__content {
+    line-height: 2.25rem;
+    height: 2.25rem;
+    transition: var(--color-transition);
+
+    &:hover {
+      background-color: var(--k-hover-bg);
+    }
+  }
+
+  .el-tree-node__label {
+    font-size: 16px;
+    flex: 1 1 auto;
+    margin-right: 0.5rem;
+  }
+}
+
+.k-menu-item {
+  display: block;
+  position: relative;
+  cursor: pointer;
+  user-select: none;
+  color: var(--fg3);
+  transition: var(--color-transition);
+
+  &:hover {
+    color: var(--fg0);
+    background-color: var(--k-hover-bg);
+  }
+
+  &.active {
+    font-weight: bolder;
+    color: var(--active);
+  }
+}

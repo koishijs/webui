@@ -31,7 +31,7 @@ defineOptions({
   cursor: pointer;
 
   &:hover {
-    background-color: var(--hover-bg);
+    background-color: var(--k-hover-bg);
   }
 }
 

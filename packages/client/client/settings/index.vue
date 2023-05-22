@@ -1,5 +1,5 @@
 <template>
-  <k-layout main="darker page-settings">
+  <k-layout main="page-settings">
     <template #left>
       <el-scrollbar>
         <el-tree
@@ -57,7 +57,7 @@ function handleClick(tree: Tree) {
 
 const path = computed({
   get() {
-    const name = route.params.name.toString()
+    const name = route.params.name?.toString()
     return name in components ? name : ''
   },
   set(value) {

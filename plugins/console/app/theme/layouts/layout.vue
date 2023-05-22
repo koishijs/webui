@@ -4,7 +4,7 @@
       <slot name="left"></slot>
     </aside>
 
-    <div class="main-container">
+    <div class="main-container" :class="main">
       <div class="aside-mask" @click="isLeftAsideOpen = !isLeftAsideOpen"></div>
       <layout-header>
         <template #left>
@@ -20,7 +20,7 @@
           </slot>
         </template>
       </layout-header>
-      <main class="layout-main" :class="main">
+      <main class="layout-main">
         <slot></slot>
       </main>
     </div>
@@ -78,9 +78,9 @@ const route = useRoute()
     flex: 0 0 auto;
     position: relative;
     width: var(--aside-width);
-    border-right: var(--border) 1px solid;
+    border-right: var(--k-color-divider) 1px solid;
     transition: var(--color-transition);
-    background-color: var(--bg2);
+    background-color: var(--k-side-bg);
     box-sizing: border-box;
   }
 
@@ -88,13 +88,13 @@ const route = useRoute()
     position: relative;
     flex: 1;
     transition: left 0.3s ease;
-    background-color: var(--bg3);
+    background-color: var(--k-main-bg);
     min-height: 100%;
     display: flex;
     flex-flow: column;
 
     &.darker {
-      background-color: var(--bg2);
+      background-color: var(--k-side-bg);
     }
 
     .layout-main {

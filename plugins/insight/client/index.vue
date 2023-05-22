@@ -233,12 +233,12 @@ const subgraph = computed<Graph>(() => {
 
 g.node {
   circle {
-    stroke: var(--page-bg);
+    stroke: var(--k-page-bg);
     stroke-opacity: 1;
     stroke-width: 2;
     cursor: pointer;
     fill: var(--fg3);
-    transition: r 0.3s ease, fill 0.3s ease, stroke 0.3s ease, box-shadow 0.3s ease;
+    transition: r 0.3s ease, opacity 0.3s ease, fill 0.3s ease, stroke 0.3s ease, box-shadow 0.3s ease;
 
     &:hover {
       fill: var(--active);
@@ -246,13 +246,13 @@ g.node {
   }
 
   .has-highlight &:not(.highlight) circle {
-    fill: var(--bg4);
+    opacity: 0.3;
   }
 }
 
 .has-highlight g.links {
   g.highlight {
-    stroke: var(--primary);
+    stroke: var(--active);
   }
 }
 

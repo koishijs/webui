@@ -9,16 +9,16 @@
   transition: var(--color-transition);
 
   &.online {
-    background-color: var(--success);
+    background-color: var(--k-color-success);
   }
   &.connect, &.reconnect {
-    background-color: var(--warning);
+    background-color: var(--k-color-warning);
   }
   &.error {
-    background-color: var(--error) !important;
+    background-color: var(--k-color-danger) !important;
   }
   &.offline {
-    background-color: var(--disabled);
+    background-color: var(--k-color-disabled);
   }
 }
 

@@ -24,7 +24,7 @@
 
   .image {
     width: 10rem;
-    color: var(--page-bg);
+    color: var(--k-page-bg);
     transition: color 0.3s ease;
 
     svg {

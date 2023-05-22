@@ -67,7 +67,7 @@ const target = computed(() => {
     position: absolute;
     border-radius: 1rem;
     color: #ffffff;
-    background-color: var(--error);
+    background-color: var(--k-color-danger);
     top: 50%;
     right: 1.5rem;
     transform: translateY(-50%);

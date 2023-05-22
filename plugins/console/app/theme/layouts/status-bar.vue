@@ -15,11 +15,11 @@
   height: var(--footer-height);
   left: var(--activity-width);
   right: 0;
-  background-color: var(--bg3);
+  background-color: var(--k-status-bg, var(--k-side-bg));
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-  border-top: var(--border) 1px solid;
+  border-top: var(--k-color-divider) 1px solid;
   transition: var(--color-transition);
   font-size: 0.875rem;
   line-height: var(--footer-height);

@@ -53,7 +53,7 @@ defineEmits(['message-contextmenu'])
     padding: 0.5rem 0.7rem;
     width: fit-content;
     border-radius: 0.5rem;
-    background-color: var(--page-bg);
+    background-color: var(--k-page-bg);
     word-break: break-all;
     transition: background-color ease .3s;
 
@@ -68,7 +68,7 @@ defineEmits(['message-contextmenu'])
       border-bottom-width: 8px;
       border-bottom-color: currentColor;
       border-radius: 0 0 0 32px;
-      color: var(--page-bg);
+      color: var(--k-page-bg);
       transition: color ease .3s;
     }
 
