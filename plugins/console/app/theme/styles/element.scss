@@ -7,7 +7,7 @@
   --el-border-color-light: var(--k-color-divider);
   --el-border-color-lighter: var(--k-color-divider);
   --el-border-color-extra-light: var(--k-color-divider);
-  --el-color-primary: var(--k-color-primary);
+  --el-color-primary: var(--fg1);
   --el-color-primary-light-9: var(--bg1);
   --el-color-success: var(--k-color-success);
   --el-color-warning: var(--k-color-warning);
@@ -24,19 +24,6 @@
 
 .el-input-number, .el-popper {
   --el-fill-color-light: transparent;
-}
-
-.theme-color {
-  @mixin apply-color($name) {
-    &.#{$name} {
-      color: var(--#{$name});
-    }
-  }
-
-  @include apply-color(primary);
-  @include apply-color(success);
-  @include apply-color(warning);
-  @include apply-color(danger);
 }
 
 .k-icon {

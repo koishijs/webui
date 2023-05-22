@@ -36,7 +36,7 @@ function onClick() {
 
 .k-hint {
   opacity: 0.5;
-  color: var(--fg2);
+  color: var(--k-text-normal);
   margin-left: 0.25rem;
   transition: 0.3s ease;
   vertical-align: -2px;

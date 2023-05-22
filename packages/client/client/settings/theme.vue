@@ -1,17 +1,22 @@
 <template>
   <k-content>
-    <div class="theme-list">
+    <div class="theme-gallery">
       <template v-for="(_, key) in themes" :key="key">
-        <div class="theme-item">
+        <div class="theme-item" @click="config.theme = key">
           <div class="theme-container">
-            <div class="theme-root" :theme="key">
+            <div class="theme-root" :class="key.endsWith('-dark') ? 'dark' : 'light'" :theme="key">
               <div class="theme-block-1"></div>
               <div class="theme-block-2"></div>
               <div class="theme-block-3"></div>
-              <div class="theme-content">Koishi</div>
+              <div class="theme-content">
+                <span class="active">Koi</span>
+                <span class="normal">shi</span>
+              </div>
             </div>
           </div>
-          <el-radio v-model="config.theme" :label="key"></el-radio>
+          <el-radio :model-value="config.theme" :label="key">
+            {{ tt(themes[key].name) }}
+          </el-radio>
         </div>
       </template>
     </div>
@@ -20,13 +25,15 @@
 
 <script lang="ts" setup>
 
-import { config, themes } from '..'
+import { config, themes, useI18nText } from '..'
+
+const tt = useI18nText()
 
 </script>
 
 <style lang="scss" scoped>
 
-.theme-list {
+.theme-gallery {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
@@ -37,6 +44,7 @@ import { config, themes } from '..'
   display: flex;
   flex-direction: column;
   justify-content: center;
+  cursor: pointer;
   gap: 0.5rem;
 
   .el-radio {
@@ -49,8 +57,8 @@ import { config, themes } from '..'
 }
 
 .theme-root {
-  width: 320px;
-  height: 240px;
+  width: 240px;
+  height: 180px;
   position: relative;
 
   .theme-block-1 {
@@ -82,12 +90,22 @@ import { config, themes } from '..'
     width: 100%;
     height: 100%;
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     align-items: center;
     justify-content: center;
     font-size: 2rem;
-    color: var(--fg1);
     z-index: 100;
+    font-weight: 500;
+    letter-spacing: 1px;
+    font-family: var(--font-family);
+
+    span.normal {
+      color: var(--k-text-dark);
+    }
+
+    span.active {
+      color: var(--k-color-active);
+    }
   }
 }
 

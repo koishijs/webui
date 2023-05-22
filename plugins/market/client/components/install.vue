@@ -197,6 +197,19 @@ function configure(path: string | true) {
 
 <style lang="scss">
 
+.theme-color {
+  @mixin apply-color($name) {
+    &.#{$name} {
+      color: var(--#{$name});
+    }
+  }
+
+  @include apply-color(primary);
+  @include apply-color(success);
+  @include apply-color(warning);
+  @include apply-color(danger);
+}
+
 .install-panel {
   .el-dialog__header {
     display: flex;

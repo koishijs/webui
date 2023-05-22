@@ -6,19 +6,17 @@
 $black: #000000;
 $white: #ffffff;
 
-:root, .theme-root[theme=default-light] {
+:root, .theme-root.light {
   --bg0: #ffffff;
   --bg1: #f9f9fa;
   --bg2: #f0f0f2;
   --bg3: #e3e3e5;
 
   --fg0: #000000;
-  --fg1: #231f37;
-  --fg2: #545260;
-  --fg3: #7a7887;
+  --fg1: rgba(60, 60, 67);
+  --fg2: rgba(60, 60, 67, .8);
+  --fg3: rgba(60, 60, 67, .5);
   --fg3t: #7a78877f;
-
-  --k-color-disabled: #909399;
 
   --hover-inset: 0 0 2px inset #0002;
 
@@ -30,10 +28,15 @@ $white: #ffffff;
   --k-hover-bg: var(--bg3);
   --k-activity-bg: var(--bg2);
 
-  --k-color-primary: var(--fg1);
-  --k-color-secondary: var(--fg2);
   --k-color-border: #c8c9cc;
   --k-color-divider: #e0e4e8;
+  --k-color-disabled: #909399;
+
+  --k-text-dark: var(--fg1);
+  --k-text-normal: var(--fg2);
+  --k-text-light: var(--fg3);
+  --k-text-active: var(--k-color-active);
+
   --k-card-shadow: 0 4px 8px -4px rgb(0 0 0 / 15%);
   --loading-mask-bg: #f2f3f5bf;
 
@@ -51,16 +54,16 @@ $white: #ffffff;
   @include apply-color(info, #909399);
 }
 
-html.dark, .theme-root[theme=default-dark] {
+html.dark, .theme-root.dark {
   --bg0: #000000;
   --bg1: #1e1e20;
   --bg2: #252529;
   --bg3: #313136;
 
   --fg0: #ffffff;
-  --fg1: #e3e5e8;
-  --fg2: #dcddde;
-  --fg3: #b9bbbe;
+  --fg1: rgba(255, 255, 245, .86);
+  --fg2: rgba(255, 255, 245, .6);
+  --fg3: rgba(255, 255, 245, .38);
 
   --k-card-bg: var(--bg2);
   --k-card-border: var(--k-color-divider);
@@ -70,10 +73,15 @@ html.dark, .theme-root[theme=default-dark] {
   --k-hover-bg: var(--bg3);
   --k-activity-bg: var(--bg1);
 
-  --k-color-primary: var(--fg1);
-  --k-color-secondary: var(--fg2);
   --k-color-border: rgba(82, 82, 89, .8);
   --k-color-divider: rgba(82, 82, 89, .5);
+  --k-color-disabled: #909399;
+
+  --k-text-dark: var(--fg1);
+  --k-text-normal: var(--fg2);
+  --k-text-light: var(--fg3);
+  --k-text-active: var(--k-text-dark);
+
   --loading-mask-bg: #202225bf;
 
   @mixin apply-color($name, $base) {
@@ -111,4 +119,6 @@ html.dark, .theme-root[theme=default-dark] {
   --warning: var(--k-color-warning);
   --active: var(--k-color-active);
   --primary: var(--k-color-active);
+  --k-color-primary: var(--fg1);
+  --k-color-secondary: var(--fg2);
 }

@@ -147,7 +147,7 @@ function toggleQuery(item: Badge, event: MouseEvent) {
 .market-filter-item {
   display: flex;
   margin: 4px 0;
-  color: var(--k-color-secondary);
+  color: var(--k-text-normal);
   transition: color 0.5s;
   align-items: center;
   z-index: 2;
@@ -155,7 +155,7 @@ function toggleQuery(item: Badge, event: MouseEvent) {
   cursor: pointer;
 
   &:hover {
-    color: var(--k-color-primary);
+    color: var(--k-text-dark);
   }
 
   &.active {

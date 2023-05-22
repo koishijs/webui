@@ -27,7 +27,7 @@ defineProps<{
   .k-icon {
     height: 2.5rem;
     width: 3rem;
-    color: var(--fg2);
+    color: var(--k-text-normal);
     transition: color 0.3s ease;
 
     @media screen and (max-width: 768px) {

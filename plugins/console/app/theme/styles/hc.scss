@@ -1,4 +1,4 @@
-:root, .theme-root {
+:root, .theme-root.light {
   &[theme=hc-light] {
     --bg0: white;
     --bg1: white;
@@ -16,7 +16,7 @@
   }
 }
 
-:root, .theme-root {
+:root, .theme-root.dark {
   &[theme=hc-dark] {
     --bg0: black;
     --bg1: black;

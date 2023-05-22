@@ -67,7 +67,7 @@ function onClick(event: MouseEvent) {
   }
 
   // default: transparent & framed
-  color: var(--fg2);
+  color: var(--k-text-normal);
   border: 1px solid var(--k-color-border);
   background-color: transparent;
   &.disabled {
@@ -75,7 +75,7 @@ function onClick(event: MouseEvent) {
     border-color: var(--k-color-border);
   }
   &:hover:not(.disabled) {
-    color: var(--fg1);
+    color: var(--k-text-dark);
     border: 1px solid var(--k-color-border);
   }
 

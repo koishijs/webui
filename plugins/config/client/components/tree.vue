@@ -178,11 +178,11 @@ onActivated(async () => {
         justify-content: center;
         align-items: center;
         opacity: 0.75;
-        color: var(--fg3);
+        color: var(--k-text-light);
         transition: var(--color-transition);
 
         &:hover {
-          color: var(--fg2);
+          color: var(--k-text-dark);
           opacity: 1 !important;
         }
       }

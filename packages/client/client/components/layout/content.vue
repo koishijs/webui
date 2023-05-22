@@ -12,7 +12,8 @@
   --content-padding: 3rem;
 
   margin: auto;
-  max-width: 50rem;
+  max-width: 60rem;
+  box-sizing: border-box;
   padding: 3rem var(--content-padding);
 
   > :first-child {

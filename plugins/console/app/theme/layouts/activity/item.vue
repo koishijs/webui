@@ -37,30 +37,39 @@ const target = computed(() => {
   align-items: center;
   position: relative;
   transition: var(--color-transition);
+  color: var(--k-text-light);
   cursor: pointer;
 
   .menu-icon {
     height: var(--activity-icon-size);
   }
 
-  $marker-width: 4px;
-
-  &.active {
-    color: var(--active);
+  &:hover {
+    color: var(--k-text-dark);
   }
 
-  .layout-activity &.active::before {
+  &.active {
+    color: var(--k-text-active);
+  }
+
+  $marker-width: 4px;
+
+  .layout-activity &::before {
     content: '';
     position: absolute;
     top: 50%;
     left: 0;
     width: $marker-width;
     height: 2rem;
-    transform: translateY(-50%);
+    transform: translateX(-100%) translateY(-50%);
     display: block;
     border-radius: 0 $marker-width $marker-width 0;
-    background-color: var(--active);
-    transition: var(--color-transition);
+    background-color: var(--k-text-active);
+    transition: all 0.3s ease;
+  }
+
+  .layout-activity &.active::before {
+    transform: translateY(-50%);
   }
 
   .badge {

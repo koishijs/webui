@@ -10,26 +10,22 @@ import './styles/index.scss'
 export default defineExtension((ctx) => {
   ctx.theme({
     id: 'default-light',
-    name: '默认 (浅色)',
-    base: 'light',
+    name: 'Default Light',
   })
 
   ctx.theme({
     id: 'default-dark',
-    name: '默认 (深色)',
-    base: 'dark',
+    name: 'Default Dark',
   })
 
   ctx.theme({
     id: 'hc-light',
-    name: '高对比 (浅色)',
-    base: 'light',
+    name: 'High Contrast Light',
   })
 
   ctx.theme({
     id: 'hc-dark',
-    name: '高对比 (深色)',
-    base: 'dark',
+    name: 'High Contrast Dark',
   })
 
   ctx.page({

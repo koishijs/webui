@@ -1,5 +1,8 @@
 <template>
   <k-layout main="page-settings">
+    <template #header>
+      {{ components[path].label }}
+    </template>
     <template #left>
       <el-scrollbar>
         <el-tree
@@ -28,11 +31,11 @@ const router = useRouter()
 
 const components = {
   '': {
-    label: '通用',
+    label: '通用设置',
     component: General,
   },
   appearance: {
-    label: '外观',
+    label: '外观设置',
     component: Theme,
   },
 }
