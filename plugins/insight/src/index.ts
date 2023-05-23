@@ -64,6 +64,17 @@ class Insight extends DataService<Insight.Payload> {
     const nodes: Insight.Node[] = []
     const edges: Insight.Link[] = []
 
+    const services = {} as Record<number, string[]>
+    const descriptors = Object.getOwnPropertyDescriptors(Context.prototype)
+    for (const key in descriptors) {
+      const desc = descriptors[key]
+      if ('value' in desc || key.includes('.') || key.includes(':')) continue
+      const ctx: Context = this.ctx[key]?.[Context.source]
+      if (ctx?.scope.uid) {
+        (services[ctx.scope.uid] ||= []).push(key)
+      }
+    }
+
     for (const runtime of this.ctx.registry.values()) {
       // Suppose we have the following types of nodes:
       // - A, B: parent plugin states
@@ -90,7 +101,9 @@ class Insight extends DataService<Insight.Payload> {
       function addNode(state: EffectScope) {
         const { uid, alias, disposables, status } = state
         const weight = disposables.length
-        const node = { uid, name, weight, status }
+        const isGroup = name === 'Group'
+        const isRoot = uid === 0
+        const node = { uid, name, weight, status, isGroup, isRoot, services: services[uid] }
         if (alias) node.name += ` <${format(alias)}>`
         nodes.push(node)
       }
@@ -146,6 +159,9 @@ namespace Insight {
     name: string
     weight: number
     status: ScopeStatus
+    isGroup?: boolean
+    isRoot?: boolean
+    services?: string[]
   }
 
   export interface Link {

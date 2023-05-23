@@ -110,7 +110,11 @@ useEventListener('touchend', onDragEnd)
 
 function onMouseEnterNode(node: Node, event: MouseEvent) {
   fNode.value = node
-  tooltip.activate('插件：' + node.name, event)
+  const result = ['插件：' + node.name]
+  if (node.services) {
+    result.push('提供服务：' + node.services.join('，'))
+  }
+  tooltip.activate(result.join('\n'), event)
 }
 
 function onMouseLeaveNode(node: Node, event: MouseEvent) {
