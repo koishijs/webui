@@ -14,24 +14,19 @@
             :link="link"
             :class="{ highlight: subgraph.links.has(link) }"
             @mouseenter="onMouseEnterLink"
-            @mouseleave="onMouseLeaveLink">
-          </link-view>
+            @mouseleave="onMouseLeaveLink"
+          ></link-view>
         </g>
         <g class="nodes">
-          <g class="node"
+          <node-view
             v-for="(node, index) in nodes" :key="index"
             :class="{ highlight: subgraph.nodes.has(node) }"
-          >
-            <circle
-              :r="fNode === node ? 12 : 9"
-              :cx="node.x"
-              :cy="node.y"
-              @mouseenter.stop.prevent="onMouseEnterNode(node, $event)"
-              @mouseleave.stop.prevent="onMouseLeaveNode(node, $event)"
-              @mousedown.stop.prevent="onDragStart(node, $event)"
-              @touchstart.stop.prevent="onDragStart(node, $event)"
-            />
-          </g>
+            :node="node" :is-active="node === fNode"
+            @mouseenter.stop.prevent="onMouseEnterNode(node, $event)"
+            @mouseleave.stop.prevent="onMouseLeaveNode(node, $event)"
+            @mousedown.stop.prevent="onDragStart(node, $event)"
+            @touchstart.stop.prevent="onDragStart(node, $event)"
+          ></node-view>
         </g>
       </svg>
       <transition name="fade">
@@ -52,6 +47,7 @@ import { useElementSize, useEventListener } from '@vueuse/core'
 import { Node, Link } from './utils'
 import * as d3 from 'd3-force'
 import LinkView from './link.vue'
+import NodeView from './node.vue'
 
 const root = ref<HTMLElement>()
 const { width, height } = useElementSize(root)
@@ -176,50 +172,37 @@ interface Graph {
   links: Set<Link>
 }
 
-const subgraph = computed<Graph>(() => {
-  if (fLink.value) {
-    return {
-      nodes: new Set([fLink.value.source, fLink.value.target]),
-      links: new Set([fLink.value]),
-    }
-  }
-  if (!fNode.value) return { nodes: new Set(), links: new Set() }
-  const g1: Graph = {
-    nodes: new Set([fNode.value]),
+const getEmptyGraph = (): Graph => ({ nodes: new Set(), links: new Set() })
+
+const getLinkGraph = (link: Link): Graph => ({
+  nodes: new Set([link.source, link.target]),
+  links: new Set([link]),
+})
+
+const getAncestorGraph = (node: Node): Graph => {
+  const graph: Graph = {
+    nodes: new Set([node]),
     links: new Set(),
   }
   let flag = true
   while (flag) {
     flag = false
     for (const link of links.value) {
-      if (g1.links.has(link) || link.type !== 'solid') continue
-      if (g1.nodes.has(link.source) && !g1.nodes.has(link.target)) {
-        g1.nodes.add(link.target)
-        g1.links.add(link)
+      if (graph.links.has(link)) continue
+      if (graph.nodes.has(link.target)) {
+        graph.nodes.add(link.source)
+        graph.links.add(link)
         flag = true
       }
     }
   }
-  const g2: Graph = {
-    nodes: new Set([fNode.value]),
-    links: new Set(),
-  }
-  flag = true
-  while (flag) {
-    flag = false
-    for (const link of links.value) {
-      if (g2.links.has(link) || link.type !== 'solid') continue
-      if (g2.nodes.has(link.target) && !g2.nodes.has(link.source)) {
-        g2.nodes.add(link.source)
-        g2.links.add(link)
-        flag = true
-      }
-    }
-  }
-  return {
-    nodes: new Set([...g1.nodes, ...g2.nodes]),
-    links: new Set([...g1.links, ...g2.links]),
-  }
+  return graph
+}
+
+const subgraph = computed<Graph>(() => {
+  if (fLink.value) return getLinkGraph(fLink.value)
+  if (!fNode.value) return getEmptyGraph()
+  return getAncestorGraph(fNode.value)
 })
 
 </script>
@@ -229,31 +212,6 @@ const subgraph = computed<Graph>(() => {
 .insight {
   width: 100%;
   height: 100%;
-}
-
-g.node {
-  circle {
-    stroke: var(--k-page-bg);
-    stroke-opacity: 1;
-    stroke-width: 2;
-    cursor: pointer;
-    fill: var(--fg3);
-    transition: r 0.3s ease, opacity 0.3s ease, fill 0.3s ease, stroke 0.3s ease, box-shadow 0.3s ease;
-
-    &:hover {
-      fill: var(--active);
-    }
-  }
-
-  .has-highlight &:not(.highlight) circle {
-    opacity: 0.3;
-  }
-}
-
-.has-highlight g.links {
-  g.highlight {
-    stroke: var(--active);
-  }
 }
 
 .tooltip {

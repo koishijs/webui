@@ -60,7 +60,6 @@ const arrow = computed(() => {
 
 <style lang="scss" scoped>
 
-
 g.link {
   line {
     transition: 0.3s ease;
@@ -71,20 +70,23 @@ g.link {
       stroke-dasharray: 6 6;
     }
     &.shadow {
-      stroke: transparent;
+      stroke: transparent !important;
       stroke-width: 6;
       cursor: pointer;
     }
     &:not(.shadow) {
-      stroke: var(--fg3);
+      stroke: var(--k-text-light);
       stroke-opacity: 0.3;
       stroke-width: 3;
       pointer-events: none;
     }
   }
 
-  .has-highlight &:not(.highlight) line:not(.shadow) {
+  .has-highlight &:not(.highlight) line {
     stroke-opacity: 0.1;
+  }
+  &.highlight line {
+    stroke: var(--k-text-dark);
   }
 }
 
