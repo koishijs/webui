@@ -1,109 +1,113 @@
 <template>
-  <k-content>
-    <div class="theme-gallery">
-      <template v-for="(_, key) in themes" :key="key">
-        <div class="theme-item" @click="config.theme = key">
-          <div class="theme-container">
+  <schema-base>
+    <template #title><slot name="title"></slot></template>
+    <template #desc><slot name="desc"></slot></template>
+    <template #menu><slot name="menu"></slot></template>
+    <template #prefix><slot name="prefix"></slot></template>
+    <template #suffix><slot name="suffix"></slot></template>
+    <template #control>
+      <el-select popper-class="theme-select" v-model="model">
+        <template v-for="(_, key) in themes" :key="key">
+          <el-option :value="key" v-if="key.endsWith('-' + schema.meta.extra.mode)">
             <div class="theme-root" :class="key.endsWith('-dark') ? 'dark' : 'light'" :theme="key">
               <div class="theme-block-1"></div>
               <div class="theme-block-2"></div>
               <div class="theme-block-3"></div>
-              <div class="theme-content">
-                <span class="active">Koi</span>
-                <span class="normal">shi</span>
+              <div class="theme-title">
+                {{ tt(themes[key].name) }}
               </div>
             </div>
-          </div>
-          <el-radio :model-value="config.theme" :label="key">
-            {{ tt(themes[key].name) }}
-          </el-radio>
-        </div>
-      </template>
-    </div>
-  </k-content>
+          </el-option>
+        </template>
+      </el-select>
+    </template>
+  </schema-base>
 </template>
 
-<script lang="ts" setup>
+<script setup lang="ts">
 
-import { config, themes, useI18nText } from '..'
+import { PropType, computed } from 'vue'
+import { themes, useI18nText } from '..'
+import { Schema, SchemaBase, useConfig } from '@koishijs/components'
+
+defineProps({
+  schema: {} as PropType<Schema>,
+  modelValue: {} as PropType<any[]>,
+  disabled: {} as PropType<boolean>,
+  prefix: {} as PropType<string>,
+  initial: {} as PropType<{}>,
+})
+
+const emit = defineEmits(['update:modelValue'])
 
 const tt = useI18nText()
 
+const config = useConfig()
+
+const model = computed({
+  get() {
+    return tt(themes[config.value].name)
+  },
+  set(value) {
+    emit('update:modelValue', value)
+  },
+})
+
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 
-.theme-gallery {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 2rem;
-}
+.el-select-dropdown.theme-select {
+  overflow: hidden;
 
-.theme-item {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  cursor: pointer;
-  gap: 0.5rem;
-
-  .el-radio {
-    justify-content: center;
-  }
-}
-
-.theme-container {
-  border: 1px solid var(--k-color-border);
-}
-
-.theme-root {
-  width: 240px;
-  height: 180px;
-  position: relative;
-
-  .theme-block-1 {
-    position: absolute;
-    width: 33%;
-    height: 100%;
-    background-color: var(--bg1);
+  .el-select-dropdown__list {
+    margin: 0 !important;
   }
 
-  .theme-block-2 {
-    position: absolute;
-    left: 33%;
-    width: 34%;
-    height: 100%;
-    background-color: var(--bg2);
+  .el-select-dropdown__item {
+    padding: 0;
   }
 
-  .theme-block-3 {
-    position: absolute;
-    left: 67%;
-    width: 33%;
-    height: 100%;
-    background-color: var(--bg3);
-  }
-
-  .theme-content {
-    position: absolute;
-    left: 0;
+  .theme-root {
     width: 100%;
     height: 100%;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: center;
-    font-size: 2rem;
-    z-index: 100;
-    font-weight: 500;
-    letter-spacing: 1px;
-    font-family: var(--font-family);
+    position: relative;
 
-    span.normal {
-      color: var(--k-text-dark);
+    .theme-block-1 {
+      position: absolute;
+      width: 33%;
+      height: 100%;
+      background-color: var(--bg1);
     }
 
-    span.active {
+    .theme-block-2 {
+      position: absolute;
+      left: 33%;
+      width: 34%;
+      height: 100%;
+      background-color: var(--bg2);
+    }
+
+    .theme-block-3 {
+      position: absolute;
+      left: 67%;
+      width: 33%;
+      height: 100%;
+      background-color: var(--bg3);
+    }
+
+    .theme-title {
+      position: absolute;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: center;
+      font-size: 1em;
+      z-index: 100;
+      font-family: var(--font-family);
       color: var(--k-color-primary);
     }
   }

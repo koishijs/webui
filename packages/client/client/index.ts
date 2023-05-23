@@ -2,7 +2,7 @@ import { createRouter, createWebHistory, START_LOCATION } from 'vue-router'
 import { global } from './data'
 import install from './components'
 import Overlay from './components/chat/overlay.vue'
-import Settings from './settings/index.vue'
+import internal from './settings'
 import { config } from './config'
 import { initTask } from './loader'
 import { Context } from './context'
@@ -36,18 +36,11 @@ root.app.use(install)
 root.app.use(i18n)
 root.app.use(router)
 
+root.plugin(internal)
+
 root.slot({
   type: 'global',
   component: Overlay,
-})
-
-root.page({
-  path: '/settings/:name*',
-  name: '用户设置',
-  icon: 'activity:settings',
-  position: 'bottom',
-  order: -100,
-  component: Settings,
 })
 
 root.on('activity', data => !data)

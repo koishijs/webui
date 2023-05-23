@@ -24,7 +24,7 @@
 import { useRoute, useRouter } from 'vue-router'
 import { computed } from 'vue'
 import General from './general.vue'
-import Theme from './theme.vue'
+import Appearance from './appearance.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -36,7 +36,7 @@ const components = {
   },
   appearance: {
     label: '外观设置',
-    component: Theme,
+    component: Appearance,
   },
 }
 
