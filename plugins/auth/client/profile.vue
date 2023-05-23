@@ -87,7 +87,7 @@ const menu = computed(() => [{
   disabled: !diff.value || !Object.keys(diff.value).length,
   action: update,
 }, {
-  type: 'error',
+  type: 'danger',
   icon: 'sign-out',
   label: '退出登录',
   action: logout,

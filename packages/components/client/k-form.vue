@@ -1,7 +1,7 @@
 <template>
   <form class="k-form">
     <slot name="prolog"></slot>
-    <h2 class="k-schema-header" v-if="showHeader ?? !hasTitle(resolved)">
+    <h2 class="k-schema-header" v-if="showHeader || !hasTitle(resolved)">
       <slot name="title">基础设置</slot>
     </h2>
     <k-schema

@@ -160,7 +160,7 @@ if (import.meta.hot) {
   box-shadow: 0 0 0 2px inset transparent;
 
   &:hover {
-    box-shadow: 0 0 0 2px inset var(--k-color-active);
+    box-shadow: 0 0 0 2px inset var(--k-color-primary);
   }
 
   .market-icon {

@@ -175,7 +175,7 @@ if (import.meta.hot) {
   font-weight: 500;
   white-space: nowrap;
   vertical-align: baseline;
-  background-color: var(--k-color-active);
+  background-color: var(--k-fill-normal);
   cursor: pointer;
   user-select: none;
   transition: opacity 0.3s ease, background-color 0.3s ease;

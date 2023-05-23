@@ -13,10 +13,9 @@ $white: #ffffff;
   --bg3: #e3e3e5;
 
   --fg0: #000000;
-  --fg1: rgba(60, 60, 67);
-  --fg2: rgba(60, 60, 67, .8);
-  --fg3: rgba(60, 60, 67, .5);
-  --fg3t: #7a78877f;
+  --fg1: rgba(40, 40, 44);
+  --fg2: rgba(40, 40, 44, .7);
+  --fg3: rgba(40, 40, 44, .4);
 
   --hover-inset: 0 0 2px inset #0002;
 
@@ -35,7 +34,7 @@ $white: #ffffff;
   --k-text-dark: var(--fg1);
   --k-text-normal: var(--fg2);
   --k-text-light: var(--fg3);
-  --k-text-active: var(--k-color-active);
+  --k-text-active: var(--k-color-primary);
 
   --k-card-shadow: 0 4px 8px -4px rgb(0 0 0 / 15%);
   --loading-mask-bg: #f2f3f5bf;
@@ -47,7 +46,8 @@ $white: #ffffff;
     --k-color-#{$name}-fade: #{fade-out($base, 0.9)};
   }
 
-  @include apply-color(active, #409eff);
+  @include apply-color(primary, #409eff);
+  @include apply-color(secondary, #909399);
   @include apply-color(success, #67c23a);
   @include apply-color(warning, #e49400);
   @include apply-color(danger, #f56c6c);
@@ -61,9 +61,9 @@ html.dark, .theme-root.dark {
   --bg3: #313136;
 
   --fg0: #ffffff;
-  --fg1: rgba(255, 255, 245, .86);
+  --fg1: rgba(255, 255, 245, .9);
   --fg2: rgba(255, 255, 245, .6);
-  --fg3: rgba(255, 255, 245, .38);
+  --fg3: rgba(255, 255, 245, .4);
 
   --k-card-bg: var(--bg2);
   --k-card-border: var(--k-color-divider);
@@ -91,7 +91,8 @@ html.dark, .theme-root.dark {
     --k-color-#{$name}-fade: #{fade-out($base, 0.9)};
   }
 
-  @include apply-color(active, #7459ff);
+  @include apply-color(primary, #7459ff);
+  @include apply-color(secondary, #4f545c);
   @include apply-color(success, #3ba55e);
   @include apply-color(warning, #f9af1b);
   @include apply-color(danger, #ff595a);
@@ -106,6 +107,15 @@ html.dark, .theme-root.dark {
   --font-family: PingFang SC, Hiragino Sans GB, Microsoft YaHei, SimSun, sans-serif;
   --font-family-code: Consolas, Monaco, "Andale Mono", "Ubuntu Mono", monospace;
 
+  // fallback
+  --k-color-border-dark: var(--k-color-border);
+  --k-color-border-light: var(--k-color-border);
+  --k-color-divider-dark: var(--k-color-divider);
+  --k-color-divider-light: var(--k-color-divider);
+
+  --k-fill-normal: var(--k-color-primary);
+  --k-fill-disabled: var(--k-color-disabled);
+
   // compatibility
   --border: var(--k-color-border);
   --divider: var(--k-color-divider);
@@ -117,8 +127,7 @@ html.dark, .theme-root.dark {
   --error: var(--k-color-danger);
   --danger: var(--k-color-danger);
   --warning: var(--k-color-warning);
-  --active: var(--k-color-active);
-  --primary: var(--k-color-active);
-  --k-color-primary: var(--fg1);
-  --k-color-secondary: var(--fg2);
+  --active: var(--k-color-primary);
+  --primary: var(--k-color-primary);
+  --k-color-active: var(--active);
 }

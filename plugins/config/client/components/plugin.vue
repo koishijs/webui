@@ -71,7 +71,7 @@
 
   <template v-else-if="current.label">
     <k-slot name="plugin-missing" single>
-      <k-comment type="error">
+      <k-comment type="danger">
         <p>此插件尚未安装。</p>
       </k-comment>
     </k-slot>

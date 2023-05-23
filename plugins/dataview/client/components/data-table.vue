@@ -58,7 +58,7 @@
               size="small"
             >
               <template #suffix>
-                <k-button frameless type="error" @click="onCancelInput(scope)">
+                <k-button frameless type="danger" @click="onCancelInput(scope)">
                   <k-icon name="times-full"></k-icon>
                 </k-button>
               </template>
@@ -87,7 +87,7 @@
             cancel-button-text="否"
           >
             <template #reference>
-              <k-button frameless type="error" :disabled="existChanges">
+              <k-button frameless type="danger" :disabled="existChanges">
                 <k-icon name="times-full"></k-icon>
               </k-button>
             </template>

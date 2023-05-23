@@ -19,7 +19,7 @@
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-  border-top: var(--k-color-divider) 1px solid;
+  border-top: var(--k-status-divider, var(--k-color-divider-dark)) 1px solid;
   transition: var(--color-transition);
   font-size: 0.875rem;
   line-height: var(--footer-height);

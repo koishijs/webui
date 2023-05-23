@@ -34,7 +34,7 @@
       </market-list>
     </el-scrollbar>
 
-    <k-comment v-else type="error" class="market-error">
+    <k-comment v-else type="danger" class="market-error">
       <p>无法连接到插件市场。这可能是以下原因导致的：</p>
       <ul>
         <li>无法连接到网络，请检查你的网络连接和代理设置</li>

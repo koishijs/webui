@@ -159,7 +159,7 @@ function toggleQuery(item: Badge, event: MouseEvent) {
   }
 
   &.active {
-    color: var(--k-color-active);
+    color: var(--k-text-active);
 
     &.verified, &.newborn {
       color: var(--k-color-success);

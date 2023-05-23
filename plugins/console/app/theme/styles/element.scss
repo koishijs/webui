@@ -3,12 +3,11 @@
   --el-text-color-primary: var(--fg2);
   --el-input-text-color: var(--fg1);
   --el-border-color: var(--k-color-border);
-  --el-border-color-base: var(--k-color-border);
-  --el-border-color-light: var(--k-color-divider);
+  --el-border-color-light: var(--k-color-border-light);
   --el-border-color-lighter: var(--k-color-divider);
-  --el-border-color-extra-light: var(--k-color-divider);
-  --el-color-primary: var(--fg1);
-  --el-color-primary-light-9: var(--bg1);
+  --el-border-color-extra-light: var(--k-color-divider-light);
+  --el-border-color-hover: var(--active);
+  --el-color-primary: var(--k-color-primary);
   --el-color-success: var(--k-color-success);
   --el-color-warning: var(--k-color-warning);
   --el-color-danger: var(--k-color-danger);
@@ -19,11 +18,15 @@
   --el-fill-color-blank: transparent;
   --el-disabled-bg-color: var(--card-bg);
   --el-fill-color: var(--card-bg);
-  --el-fill-color-light: var(--bg2);
+  --el-fill-color-light: var(--k-hover-bg);
 }
 
 .el-input-number, .el-popper {
   --el-fill-color-light: transparent;
+}
+
+.el-input-number__decrease:hover, .el-input-number__increase:hover {
+  background-color: var(--bg1);
 }
 
 .k-icon {
@@ -81,8 +84,17 @@
   z-index: 500;
 }
 
-html.dark .el-switch {
-  --el-switch-off-color: #72767d;
+html .el-switch {
+  --el-switch-on-color: var(--k-fill-normal);
+}
+
+.el-button {
+  --el-button-hover-bg-color: var(--bg1);
+}
+
+.el-switch__core .el-switch__action,
+.el-slider__button {
+  --el-color-white: var(--bg2);
 }
 
 html.dark .el-popper.is-dark {
@@ -97,6 +109,10 @@ html.dark .el-popper.is-dark {
     background: var(--bg1);
     transition: var(--color-transition);
   }
+}
+
+.el-button {
+  --el-button-hover-border-color: var(--active);
 }
 
 .right-adjacent {

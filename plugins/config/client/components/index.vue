@@ -137,7 +137,7 @@ const menu = computed(() => {
       }
     },
   }, {
-    type: 'error',
+    type: 'danger',
     icon: 'trash-can',
     label: isGroup ? '移除分组' : '移除插件',
     disabled: isGlobal,

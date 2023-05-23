@@ -56,7 +56,7 @@ const groups = computed(() => {
   display: flex;
   flex-direction: column;
   justify-content: space-evenly;
-  border-right: var(--k-color-divider) 1px solid;
+  border-right: var(--k-activity-divider, var(--k-color-divider-dark)) 1px solid;
   transition: var(--color-transition);
 
   .spacer {

@@ -46,7 +46,7 @@ table {
 
 .markdown {
   a, code a {
-    color: var(--active);
+    color: var(--k-text-active);
 
     &:hover {
       text-decoration: underline;
@@ -54,7 +54,7 @@ table {
   }
 
   code {
-    color: var(--fg2);
+    color: var(--k-text-normal);
     padding: 0.25rem 0.5rem;
     background-color: var(--k-page-bg);
     border-radius: 3px;

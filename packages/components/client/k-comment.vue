@@ -1,5 +1,5 @@
 <template>
-  <div class="k-comment" :class="type">
+  <div class="k-comment" :class="type === 'error' ? 'danger' : type">
     <k-icon :name="icon"></k-icon>
     <slot>
       <p>{{ title }}</p>
@@ -31,10 +31,10 @@ const icon = computed(() => {
 
 @mixin apply-color($name) {
   &.#{$name} {
-    border-left-color: var(--#{$name});
-    background-color: var(--#{$name}-fade);
+    border-left-color: var(--k-color-#{$name});
+    background-color: var(--k-color-#{$name}-fade);
     .k-icon {
-      color: var(--#{$name});
+      color: var(--k-color-#{$name});
     }
   }
 }
@@ -58,13 +58,14 @@ const icon = computed(() => {
     border-radius: 100%;
     font-weight: 700;
     font-size: 20px;
-    background-color: var(--card-bg);
+    background-color: var(--k-card-bg);
   }
 
   @include apply-color(primary);
+  @include apply-color(secondary);
   @include apply-color(warning);
   @include apply-color(success);
-  @include apply-color(error);
+  @include apply-color(danger);
 
   & + & {
     margin-top: -1rem;

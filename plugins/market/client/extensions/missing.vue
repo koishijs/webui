@@ -1,5 +1,5 @@
 <template>
-  <k-comment type="error">
+  <k-comment type="danger">
     <p>此插件尚未安装，<span class="link" @click="gotoMarket">点击前往插件市场</span>。</p>
   </k-comment>
 </template>

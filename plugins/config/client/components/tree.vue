@@ -141,10 +141,6 @@ onActivated(async () => {
     height: 15px;
   }
 
-  .readonly {
-    color: var(--fg3t);
-  }
-
   .el-tree-node {
     &.is-group > .el-tree-node__content {
       font-weight: bold;

@@ -78,7 +78,7 @@ const route = useRoute()
     flex: 0 0 auto;
     position: relative;
     width: var(--aside-width);
-    border-right: var(--k-color-divider) 1px solid;
+    border-right: var(--k-color-divider-dark) 1px solid;
     transition: var(--color-transition);
     background-color: var(--k-side-bg);
     box-sizing: border-box;

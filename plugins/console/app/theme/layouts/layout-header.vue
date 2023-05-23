@@ -8,7 +8,7 @@
       </div>
     </div>
     <div class="left">
-      <slot name="left">{{ $route.name }}</slot>
+      <slot name="left">{{ route.name }}</slot>
     </div>
     <div class="right">
       <slot name="right"></slot>
@@ -19,6 +19,9 @@
 <script lang="ts" setup>
 
 import { isLeftAsideOpen } from './utils'
+import { useRoute } from 'vue-router'
+
+const route = useRoute()
 
 </script>
 
@@ -72,7 +75,7 @@ import { isLeftAsideOpen } from './utils'
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
-  border-bottom: var(--k-color-divider) 1px solid;
+  border-bottom: var(--k-color-divider-dark) 1px solid;
   transition: var(--color-transition);
   font-weight: bolder;
 

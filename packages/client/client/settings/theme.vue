@@ -104,7 +104,7 @@ const tt = useI18nText()
     }
 
     span.active {
-      color: var(--k-color-active);
+      color: var(--k-color-primary);
     }
   }
 }
