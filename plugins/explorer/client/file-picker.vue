@@ -16,7 +16,7 @@
         </template>
         <el-scrollbar>
           <div class="entry" v-for="entry in entries" :key="entry.name" @click="handleClick(entry)">
-            {{ entry.name }}
+            <k-icon class="entry-icon" :name="entry.type"></k-icon>{{ entry.name }}
           </div>
         </el-scrollbar>
         <template #footer>
@@ -48,7 +48,7 @@ const emit = defineEmits(['update:modelValue'])
 const hint = computed(() => {
   const { filters = ['file'] } = props.schema.meta.extra
   if (filters.includes('directory')) {
-    return filters.length === 1 ? '选择目录' : '选择文件或目录'
+    return filters.length === 1 ? '选择目录' : '选择目录或文件'
   } else {
     return '选择文件'
   }
@@ -98,7 +98,7 @@ function toPrevious() {
   .back-button {
     width: 2rem;
     height: 2rem;
-    margin-right: 0.5rem;
+    margin-right: 0.75rem;
   }
 
   .el-dialog__body {
@@ -108,13 +108,21 @@ function toPrevious() {
   }
 
   .entry {
-    padding: 0.25rem 1rem;
+    display: flex;
+    align-items: center;
+    padding: 0.25rem 0.5rem;
     border-radius: 4px;
     font-size: 14px;
     cursor: pointer;
 
     &:hover {
       background-color: var(--k-hover-bg);
+    }
+
+    .entry-icon {
+      height: 1rem;
+      width: 1.25rem;
+      margin-right: 0.5rem;
     }
   }
 
