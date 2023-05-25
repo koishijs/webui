@@ -6,14 +6,19 @@
     <template #prefix><slot name="prefix"></slot></template>
     <template #suffix><slot name="suffix"></slot></template>
     <template #control>
-      <el-button @click="showDialog = true">{{ lastname || '选择文件' }}</el-button>
+      <el-button @click="showDialog = true">{{ lastname || hint }}</el-button>
       <el-dialog class="file-picker" destroy-on-close v-model="showDialog">
         <template #header>
-          从 {{ current }} 选择文件
+          <el-button class="back-button" :disabled="current === '/'" @click="toPrevious()">
+            <k-icon name="chevron-left"></k-icon>
+          </el-button>
+          从 {{ current }} {{ hint }}
         </template>
-        <div class="entry" v-for="entry in entries" :key="entry.name" @click="handleClick(entry)">
-          {{ entry.name }}
-        </div>
+        <el-scrollbar>
+          <div class="entry" v-for="entry in entries" :key="entry.name" @click="handleClick(entry)">
+            {{ entry.name }}
+          </div>
+        </el-scrollbar>
         <template #footer>
           <el-button @click="showDialog = false">取消</el-button>
           <el-button type="primary" @click="showDialog = false">确定</el-button>
@@ -28,7 +33,7 @@
 import { computed, PropType, ref } from 'vue'
 import { Schema, SchemaBase, store } from '@koishijs/client'
 import { files } from './store'
-import { Entry } from '../src'
+import { Entry } from '@koishijs/plugin-explorer'
 
 const props = defineProps({
   schema: {} as PropType<Schema>,
@@ -39,6 +44,15 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['update:modelValue'])
+
+const hint = computed(() => {
+  const { filters = ['file'] } = props.schema.meta.extra
+  if (filters.includes('directory')) {
+    return filters.length === 1 ? '选择目录' : '选择文件或目录'
+  } else {
+    return '选择文件'
+  }
+})
 
 const showDialog = ref(false)
 const current = ref('/')
@@ -62,6 +76,11 @@ const lastname = computed(() => {
   return index === -1 ? props.modelValue : props.modelValue.slice(index + 1)
 })
 
+function toPrevious() {
+  const index = current.value.slice(0, -1).lastIndexOf('/')
+  current.value = current.value.slice(0, index + 1)
+}
+
 </script>
 
 <style lang="scss">
@@ -71,9 +90,21 @@ const lastname = computed(() => {
   display: flex;
   flex-direction: column;
 
+  header {
+    display: flex;
+    align-items: center;
+  }
+
+  .back-button {
+    width: 2rem;
+    height: 2rem;
+    margin-right: 0.5rem;
+  }
+
   .el-dialog__body {
     flex: 1 1 auto;
     overflow: auto;
+    padding: 20px 20px;
   }
 
   .entry {

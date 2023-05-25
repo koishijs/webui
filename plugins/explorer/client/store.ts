@@ -1,6 +1,6 @@
 import { Dict, store } from '@koishijs/client'
 import { reactive, watch } from 'vue'
-import { Entry } from '@koishijs/plugin-explorer/src'
+import { Entry } from '@koishijs/plugin-explorer'
 
 export const files = reactive<Dict<Entry>>({})
 
