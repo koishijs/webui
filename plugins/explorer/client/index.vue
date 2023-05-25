@@ -91,15 +91,6 @@
       </span>
     </template>
   </el-dialog>
-
-  <el-dialog v-model="showUploading" destroy-on-close>
-    请将文件拖动到窗口内以上传。
-    <template #footer>
-      <span class="dialog-footer">
-        <el-button @click="uploading = null">取消</el-button>
-      </span>
-    </template>
-  </el-dialog>
 </template>
 
 <script lang="ts" setup>
@@ -107,9 +98,9 @@
 import { ref, computed, watch, onActivated, nextTick } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useDark, useElementSize, useEventListener } from '@vueuse/core'
-import { send, store, base64ToArrayBuffer, arrayBufferToBase64 } from '@koishijs/client'
+import { send, store, base64ToArrayBuffer } from '@koishijs/client'
 import { Entry } from '@koishijs/plugin-explorer'
-import { files, vFocus } from './store'
+import { files, uploading, vFocus } from './store'
 import { model } from './editor'
 import * as monaco from 'monaco-editor'
 
@@ -128,16 +119,10 @@ const menuTarget = ref<TreeEntry>(null)
 const renaming = ref<string>(null)
 const data = ref<TreeEntry[]>([])
 const removing = ref<string>(null)
-const uploading = ref<string>(null)
 
 const showRemoving = computed({
   get: () => !!removing.value,
   set: (v) => removing.value = null,
-})
-
-const showUploading = computed({
-  get: () => !!uploading.value,
-  set: (v) => uploading.value = null,
 })
 
 function* getExpanded(tree: TreeEntry[]) {
@@ -374,36 +359,6 @@ async function downloadFile(filename: string) {
   a.click()
   URL.revokeObjectURL(url)
 }
-
-function handleDataTransfer(event: Event, transfer: DataTransfer) {
-  const prefix = uploading.value
-  for (const item of transfer.items) {
-    if (item.kind !== 'file') continue
-    event.preventDefault()
-    const file = item.getAsFile()
-    const reader = new FileReader()
-    reader.addEventListener('load', function () {
-      send('explorer/write', prefix + file.name, arrayBufferToBase64(reader.result as ArrayBuffer), true)
-    }, false)
-    reader.readAsArrayBuffer(file)
-  }
-  uploading.value = null
-}
-
-useEventListener('drop', (event: DragEvent) => {
-  if (!uploading.value) return
-  handleDataTransfer(event, event.dataTransfer)
-})
-
-useEventListener('paste', (event: ClipboardEvent) => {
-  if (!uploading.value) return
-  handleDataTransfer(event, event.clipboardData)
-})
-
-useEventListener('dragover', (event: DragEvent) => {
-  if (!uploading.value) return
-  event.preventDefault()
-})
 
 </script>
 

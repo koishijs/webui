@@ -29,11 +29,14 @@
         </el-scrollbar>
         <template #footer>
           <div class="left">
-            <el-button v-if="options.allowCreate" @click="createFolder()">创建新目录</el-button>
+            <template v-if="options.allowCreate">
+              <el-button v-if="allowFile" @click="uploading = current + '/'">上传文件</el-button>
+              <el-button v-if="allowDir" @click="createFolder()">创建目录</el-button>
+            </template>
           </div>
           <div class="right">
             <el-button @click="showDialog = false">取消</el-button>
-            <el-button v-if="allowDirectory" type="primary" @click="confirm()">选定当前目录</el-button>
+            <el-button v-if="allowDir" type="primary" @click="confirm()">选定当前目录</el-button>
           </div>
         </template>
       </el-dialog>
@@ -45,7 +48,7 @@
 
 import { computed, PropType, ref } from 'vue'
 import { isNullable, Schema, SchemaBase, send, store, useConfig } from '@koishijs/client'
-import { files, vFocus } from './store'
+import { files, uploading, vFocus } from './store'
 import { Entry } from '@koishijs/plugin-explorer'
 import {} from 'koishi'
 
@@ -66,10 +69,11 @@ const options = computed<Schemastery.Path.Options>(() => ({
   ...props.schema.meta.extra,
 }))
 
-const allowDirectory = computed(() => options.value.filters.includes('directory'))
+const allowDir = computed(() => options.value.filters.includes('directory'))
+const allowFile = computed(() => options.value.filters.some(x => x !== 'directory'))
 
 const hint = computed(() => {
-  if (allowDirectory.value) {
+  if (allowDir.value) {
     return options.value.filters.length === 1 ? '选择目录' : '选择目录或文件'
   } else {
     return '选择文件'
@@ -80,7 +84,19 @@ const showDialog = ref(false)
 const current = ref('/')
 
 const entries = computed(() => {
-  return files[current.value.slice(0, -1)]?.children || store?.explorer || []
+  const children = files[current.value.slice(0, -1)]?.children || store?.explorer || []
+  const { filters } = options.value
+  return children.filter((entry) => {
+    if (entry.type === 'directory') return true
+    if (entry.type === 'file') {
+      if (filters.includes('file')) return true
+      return filters.some((filter) => {
+        const index = entry.name.lastIndexOf('.')
+        const ext = index === -1 ? '' : entry.name.slice(index + 1)
+        return typeof filter === 'object' && filter.extensions?.includes(ext)
+      })
+    }
+  })
 })
 
 function handleClick(entry: Entry) {
@@ -142,7 +158,7 @@ function toPrevious() {
 
 function confirm() {
   showDialog.value = false
-  if (allowDirectory.value) {
+  if (allowDir.value) {
     config.value = current.value.slice(1, -1)
   }
 }
@@ -195,6 +211,10 @@ function confirm() {
   .el-dialog__footer {
     display: flex;
     justify-content: space-between;
+
+    .el-button + .el-button {
+      margin-left: 1rem;
+    }
   }
 }
 

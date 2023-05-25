@@ -3,6 +3,7 @@ import {} from '@koishijs/plugin-explorer/src'
 import FilePicker from './file-picker.vue'
 import Layout from './index.vue'
 import Status from './status.vue'
+import Upload from './upload.vue'
 import './icons'
 import './editor'
 
@@ -12,6 +13,11 @@ export default (ctx: Context) => {
     role: 'path',
     component: FilePicker,
     validate: value => typeof value === 'string',
+  })
+
+  ctx.slot({
+    type: 'global',
+    component: Upload,
   })
 
   ctx.page({

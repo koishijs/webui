@@ -1,5 +1,5 @@
 import { Dict, store } from '@koishijs/client'
-import { Directive, reactive, watch } from 'vue'
+import { Directive, reactive, ref, watch } from 'vue'
 import { Entry } from '@koishijs/plugin-explorer'
 
 export const files = reactive<Dict<Entry>>({})
@@ -24,3 +24,5 @@ watch(() => store.explorer, () => {
 export const vFocus: Directive = {
   mounted: (el) => el.focus(),
 }
+
+export const uploading = ref<string>(null)
