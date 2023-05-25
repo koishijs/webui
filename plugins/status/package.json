@@ -1,7 +1,7 @@
 {
   "name": "@koishijs/plugin-status",
   "description": "Status view for Koishi",
-  "version": "7.1.2",
+  "version": "7.1.3",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
   "files": [
@@ -40,11 +40,11 @@
     }
   },
   "peerDependencies": {
-    "@koishijs/plugin-console": "^5.8.4",
+    "@koishijs/plugin-console": "^5.9.4",
     "koishi": "^4.13.0"
   },
   "devDependencies": {
-    "@koishijs/client": "^5.8.4",
+    "@koishijs/client": "^5.9.4",
     "@types/envinfo": "^7.8.1",
     "koishi": "^4.13.0"
   },

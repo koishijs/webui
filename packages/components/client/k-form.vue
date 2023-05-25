@@ -70,12 +70,12 @@ const config = computed({
     .k-schema-item {
       padding: 0.5rem 1.5rem;
 
-      .header {
+      .k-schema-main {
         display: block;
         min-height: unset;
       }
 
-      .right {
+      .k-schema-right {
         display: block;
 
         > :first-child {

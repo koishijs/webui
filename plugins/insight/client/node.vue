@@ -12,16 +12,16 @@
     />
     <g class="service" v-if="node.services">
       <line
-        :x1="node.x - (isActive ? 6 : 4)"
+        :x1="node.x - (isActive ? 5 : 4)"
         :y1="node.y"
-        :x2="node.x + (isActive ? 6 : 4)"
+        :x2="node.x + (isActive ? 5 : 4)"
         :y2="node.y"
       />
       <line
         :x1="node.x"
-        :y1="node.y - (isActive ? 6 : 4)"
+        :y1="node.y - (isActive ? 5 : 4)"
         :x2="node.x"
-        :y2="node.y + (isActive ? 6 : 4)"
+        :y2="node.y + (isActive ? 5 : 4)"
       />
     </g>
   </g>
@@ -66,6 +66,7 @@ g.node {
     stroke-opacity: 1;
     stroke-width: 2;
     transition: all 0.3s ease;
+    stroke-linecap: round;
   }
 }
 

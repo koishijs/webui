@@ -26,7 +26,7 @@
     "online"
   ],
   "devDependencies": {
-    "@koishijs/client": "^5.8.4",
+    "@koishijs/client": "^5.9.4",
     "@koishijs/fs": "^1.3.2",
     "@koishijs/os": "^1.0.1",
     "@koishijs/url": "^1.0.3",
