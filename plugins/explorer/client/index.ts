@@ -7,6 +7,8 @@ import Upload from './upload.vue'
 import './icons'
 import './editor'
 
+import './editor.scss'
+
 export default (ctx: Context) => {
   ctx.schema({
     type: 'string',

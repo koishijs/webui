@@ -1,5 +1,5 @@
 import { RemovableRef, useLocalStorage, usePreferredDark } from '@vueuse/core'
-import { reactive, watchEffect } from 'vue'
+import { computed, reactive, watchEffect } from 'vue'
 
 export let useStorage = <T extends object>(key: string, version: number, fallback?: () => T): RemovableRef<T> => {
   const initial = fallback ? fallback() : {} as T
@@ -53,18 +53,22 @@ export const config = useStorage<Config>('config', 1.1, () => ({
   locale: 'zh-CN',
 }))
 
-const isDark = usePreferredDark()
+const preferDark = usePreferredDark()
 
-function resolveThemeMode(theme: Config.Theme) {
-  if (theme.mode !== 'auto') return theme.mode
-  return isDark.value ? 'dark' : 'light'
+const mode = computed(() => {
+  const mode = config.value.theme.mode
+  if (mode !== 'auto') return mode
+  return preferDark.value ? 'dark' : 'light'
+})
+
+export function useColorMode() {
+  return mode
 }
 
 watchEffect(() => {
   const root = window.document.querySelector('html')
-  const mode = resolveThemeMode(config.value.theme)
-  root.setAttribute('theme', config.value.theme[mode])
-  if (mode === 'dark') {
+  root.setAttribute('theme', config.value.theme[mode.value])
+  if (mode.value === 'dark') {
     root.classList.add('dark')
   } else {
     root.classList.remove('dark')

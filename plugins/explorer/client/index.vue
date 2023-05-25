@@ -97,8 +97,8 @@
 
 import { ref, computed, watch, onActivated, nextTick } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { useDark, useElementSize, useEventListener } from '@vueuse/core'
-import { send, store, base64ToArrayBuffer } from '@koishijs/client'
+import { useElementSize, useEventListener } from '@vueuse/core'
+import { base64ToArrayBuffer, send, store, useColorMode } from '@koishijs/client'
 import { Entry } from '@koishijs/plugin-explorer'
 import { files, uploading, vFocus } from './store'
 import { model } from './editor'
@@ -163,13 +163,13 @@ watch(keyword, (val) => {
   tree.value.filter(val)
 })
 
-const isDark = useDark()
+const mode = useColorMode()
 
 watch(editor, () => {
   if (!editor.value) return instance = null
   instance = monaco.editor.create(editor.value, {
     model,
-    theme: isDark.value ? 'vs-dark' : 'vs-light',
+    theme: 'vs-' + mode.value,
     tabSize: 2,
   })
 })
@@ -180,8 +180,8 @@ watch([width, height], () => {
   instance?.layout()
 })
 
-watch(isDark, () => {
-  monaco.editor.setTheme(isDark.value ? 'vs-dark' : 'vs-light')
+watch(mode, () => {
+  monaco.editor.setTheme('vs-' + mode.value)
 })
 
 const active = computed<string>({
