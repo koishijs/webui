@@ -1,5 +1,5 @@
 import { Dict, store } from '@koishijs/client'
-import { reactive, watch } from 'vue'
+import { Directive, reactive, watch } from 'vue'
 import { Entry } from '@koishijs/plugin-explorer'
 
 export const files = reactive<Dict<Entry>>({})
@@ -20,3 +20,7 @@ watch(() => store.explorer, () => {
     delete files[filename]
   }
 }, { immediate: true })
+
+export const vFocus: Directive = {
+  mounted: (el) => el.focus(),
+}

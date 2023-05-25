@@ -104,18 +104,14 @@
 
 <script lang="ts" setup>
 
-import { Directive, ref, computed, watch, onActivated, nextTick } from 'vue'
+import { ref, computed, watch, onActivated, nextTick } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useDark, useElementSize, useEventListener } from '@vueuse/core'
 import { send, store, base64ToArrayBuffer, arrayBufferToBase64 } from '@koishijs/client'
-import { Entry } from '../src'
-import { files } from './store'
+import { Entry } from '@koishijs/plugin-explorer'
+import { files, vFocus } from './store'
 import { model } from './editor'
 import * as monaco from 'monaco-editor'
-
-const vFocus: Directive = {
-  mounted: (el) => el.focus()
-}
 
 interface TreeEntry extends Entry {
   expanded?: boolean
@@ -373,7 +369,7 @@ async function downloadFile(filename: string) {
   const blob = new Blob([base64ToArrayBuffer(base64)])
   const url = URL.createObjectURL(blob)
   const a = document.createElement("a")
-  a.href = url;
+  a.href = url
   a.download = filename
   a.click()
   URL.revokeObjectURL(url)
