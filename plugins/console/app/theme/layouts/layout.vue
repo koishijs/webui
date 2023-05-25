@@ -4,7 +4,7 @@
       <slot name="left"></slot>
     </aside>
 
-    <div class="main-container" :class="main">
+    <div class="main-container">
       <div class="aside-mask" @click="isLeftAsideOpen = !isLeftAsideOpen"></div>
       <layout-header>
         <template #left>
@@ -20,7 +20,7 @@
           </slot>
         </template>
       </layout-header>
-      <main class="layout-main">
+      <main class="layout-main" :class="main">
         <slot></slot>
       </main>
     </div>
