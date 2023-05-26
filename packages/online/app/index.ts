@@ -1,7 +1,7 @@
 import { connect, global, root } from '@koishijs/client'
 import Instances from './components/instances.vue'
 import ClientWebSocket from './socket'
-import '@koishijs/console/app'
+import '@koishijs/client/app'
 
 root.slot({
   type: 'home',

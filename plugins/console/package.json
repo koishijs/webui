@@ -14,7 +14,6 @@
       "import": "./lib/shared/index.mjs"
     },
     "./src/*": "./src/*",
-    "./app/*": "./app/index.ts",
     "./package.json": "./package.json"
   },
   "files": [
@@ -67,8 +66,5 @@
     "open": "^8.4.2",
     "uuid": "^8.3.2",
     "ws": "^8.13.0"
-  },
-  "yakumo": {
-    "client": "./scripts/client"
   }
 }

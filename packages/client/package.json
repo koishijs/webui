@@ -4,6 +4,7 @@
   "version": "5.9.4",
   "main": "client/index.ts",
   "files": [
+    "app",
     "client",
     "lib",
     "bin.js",
@@ -48,5 +49,8 @@
     "vue": "^3.3.2",
     "vue-i18n": "^9.2.2",
     "vue-router": "^4.2.0"
+  },
+  "yakumo": {
+    "client": "./scripts/client"
   }
 }
