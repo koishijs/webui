@@ -1,20 +1,23 @@
 import * as cordis from 'cordis'
 import { Schema, SchemaBase } from '@koishijs/components'
 import { Dict, remove } from 'cosmokit'
-import { App, Component, createApp, defineComponent, h, inject, markRaw, reactive, resolveComponent } from 'vue'
+import { App, Component, createApp, defineComponent, h, inject, markRaw, onBeforeUnmount, provide, reactive, resolveComponent } from 'vue'
 import { Activity } from './activity'
 import { SlotOptions } from './components'
+import { useColorMode, useConfig } from './config'
+
+const config = useConfig()
+const mode = useColorMode()
 
 // layout api
 
-export interface Theme {
+export interface ThemeOptions {
   id: string
   name: string | Dict<string>
+  components?: Dict<Component>
 }
 
 export type Computed<T> = T | (() => T)
-
-export const views = reactive<Dict<SlotOptions[]>>({})
 
 export interface Events<C extends Context> extends cordis.Events<C> {
   'activity'(activity: Activity): boolean
@@ -24,21 +27,29 @@ export interface Context {
   [Context.events]: Events<this>
 }
 
-export function useCordis() {
-  return inject('cordis') as Context
+export function useContext() {
+  const parent = inject('cordis') as Context
+  let _ctx: Context
+  const fork = parent.plugin((ctx) => {
+    _ctx = ctx as any
+  })
+  onBeforeUnmount(() => fork.dispose())
+  return _ctx
 }
 
 interface SettingOptions {
-  key: string
-  title: string
+  id: string
+  title?: string
+  order?: number
   schema?: Schema
   component?: Component
 }
 
 export class Context extends cordis.Context {
   app: App
-  themes = reactive<Dict<Theme>>({})
-  settings = reactive<Dict<SettingOptions>>({})
+  views = reactive<Dict<SlotOptions[]>>({})
+  themes = reactive<Dict<ThemeOptions>>({})
+  settings = reactive<Dict<SettingOptions[]>>({})
 
   constructor() {
     super()
@@ -53,6 +64,15 @@ export class Context extends cordis.Context {
     this.app.provide('cordis', this)
   }
 
+  protected wrapComponent(component: Component) {
+    if (!component) return
+    const caller = this[Context.current] || this
+    return defineComponent((props, { slots }) => {
+      provide('cordis', caller)
+      return () => h(component, props, slots)
+    })
+  }
+
   /** @deprecated */
   addView(options: SlotOptions) {
     return this.slot(options)
@@ -64,9 +84,10 @@ export class Context extends cordis.Context {
   }
 
   slot(options: SlotOptions) {
+    markRaw(options)
     options.order ??= 0
-    markRaw(options.component)
-    const list = views[options.type] ||= []
+    options.component = this.wrapComponent(options.component)
+    const list = this.views[options.type] ||= []
     const index = list.findIndex(a => a.order < options.order)
     if (index >= 0) {
       list.splice(index, 0, options)
@@ -77,26 +98,41 @@ export class Context extends cordis.Context {
   }
 
   page(options: Activity.Options) {
+    options.component = this.wrapComponent(options.component)
     const activity = new Activity(options)
-    return this.scope.collect('page', () => {
-      return activity.dispose()
-    })
+    return this.scope.collect('page', () => activity.dispose())
   }
 
   schema(extension: SchemaBase.Extension) {
     SchemaBase.extensions.add(extension)
+    extension.component = this.wrapComponent(extension.component)
     return this.scope.collect('schema', () => SchemaBase.extensions.delete(extension))
   }
 
   extendSettings(options: SettingOptions) {
     markRaw(options)
-    this.settings[options.key] = options
-    return this.scope.collect('settings', () => delete this.settings[options.key])
+    options.order ??= 0
+    options.component = this.wrapComponent(options.component)
+    const list = this.settings[options.id] ||= []
+    const index = list.findIndex(a => a.order < options.order)
+    if (index >= 0) {
+      list.splice(index, 0, options)
+    } else {
+      list.push(options)
+    }
+    return this.scope.collect('settings', () => delete this.settings[options.id])
   }
 
-  theme(options: Theme) {
+  theme(options: ThemeOptions) {
     markRaw(options)
     this.themes[options.id] = options
+    for (const [type, component] of Object.entries(options.components || {})) {
+      this.slot({
+        type,
+        when: () => config.value.theme[mode.value] === options.id,
+        component,
+      })
+    }
     return this.scope.collect('view', () => delete this.themes[options.id])
   }
 }

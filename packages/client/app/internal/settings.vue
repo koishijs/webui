@@ -1,8 +1,9 @@
 <template>
   <k-layout main="page-settings">
     <template #header>
-      {{ ctx.settings[path].title }}
+      {{ ctx.settings[path][0]?.title }}
     </template>
+
     <template #left>
       <el-scrollbar>
         <el-tree
@@ -13,8 +14,14 @@
         ></el-tree>
       </el-scrollbar>
     </template>
+
     <keep-alive>
-      <component :is="ctx.settings[path].component || Fallback" :key="path" />
+      <k-content :key="path">
+        <template v-for="item of ctx.settings[path]">
+          <component v-if="item.component" :is="item.component" />
+          <k-form v-else-if="item.schema" :schema="item.schema" v-model="config" :initial="config" />
+        </template>
+      </k-content>
     </keep-alive>
   </k-layout>
 </template>
@@ -23,13 +30,13 @@
 
 import { useRoute, useRouter } from 'vue-router'
 import { computed } from 'vue'
-import { useCordis } from '@koishijs/client'
-import Fallback from './fallback.vue'
+import { useConfig, useContext } from '@koishijs/client'
 
 const route = useRoute()
 const router = useRouter()
 
-const ctx = useCordis()
+const config = useConfig()
+const ctx = useContext()
 
 interface Tree {
   id: string
@@ -37,7 +44,7 @@ interface Tree {
   children?: Tree[]
 }
 
-const data = computed(() => Object.entries(ctx.settings).map<Tree>(([id, { title }]) => ({
+const data = computed(() => Object.entries(ctx.settings).map<Tree>(([id, [{ title }]]) => ({
   id,
   label: title,
 })))

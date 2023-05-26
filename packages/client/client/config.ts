@@ -61,6 +61,7 @@ const mode = computed(() => {
   return preferDark.value ? 'dark' : 'light'
 })
 
+export const useConfig = () => config
 export const useColorMode = () => mode
 
 watchEffect(() => {

@@ -1,7 +1,5 @@
-import { Context } from '@koishijs/client'
-import Appearance from './appearance.vue'
-import General from './general.vue'
-import Settings from './index.vue'
+import { Context, Schema } from '@koishijs/client'
+import Settings from './settings.vue'
 import Theme from './theme.vue'
 
 export default function (ctx: Context) {
@@ -21,14 +19,28 @@ export default function (ctx: Context) {
   })
 
   ctx.extendSettings({
-    key: '',
+    id: '',
     title: '通用设置',
-    component: General,
+    order: 1000,
+    schema: Schema.object({
+      locale: Schema.union(['zh-CN', 'en-US']).description('语言设置。'),
+    }).description('通用设置'),
   })
 
   ctx.extendSettings({
-    key: 'appearance',
+    id: 'appearance',
     title: '外观设置',
-    component: Appearance,
+    order: 1000,
+    schema: Schema.object({
+      theme: Schema.object({
+        mode: Schema.union([
+          Schema.const('auto').description('跟随系统'),
+          Schema.const('dark').description('深色'),
+          Schema.const('light').description('浅色'),
+        ]).description('主题偏好。'),
+        dark: Schema.string().role('theme', { mode: 'dark' }).description('深色主题。'),
+        light: Schema.string().role('theme', { mode: 'light' }).description('浅色主题。'),
+      }).description('主题设置'),
+    }),
   })
 }

@@ -1,4 +1,4 @@
-import { views } from '..'
+import { useContext } from '../context'
 import { App, Component, defineComponent, h } from 'vue'
 
 export interface SlotItem {
@@ -18,11 +18,12 @@ export const KSlot = defineComponent({
     single: Boolean,
   },
   setup(props, { slots }) {
+    const ctx = useContext()
     return () => {
       const internal = props.single ? [] : [...slots.default?.() || []]
         .filter(node => node.type === KSlotItem)
         .map(node => ({ node, order: node.props?.order || 0 }))
-      const external = [...views[props.name] || []]
+      const external = [...ctx.views[props.name] || []]
         .filter(item => !item.when || item.when())
         .map(item => ({
           node: h(item.component, { data: props.data, ...props.data }, slots),

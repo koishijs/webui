@@ -27,7 +27,7 @@
 <script setup lang="ts">
 
 import { PropType, computed } from 'vue'
-import { useCordis, useI18nText } from '@koishijs/client'
+import { useContext, useI18nText } from '@koishijs/client'
 import { Schema, SchemaBase } from '@koishijs/components'
 
 defineProps({
@@ -40,7 +40,7 @@ defineProps({
 
 const emit = defineEmits(['update:modelValue'])
 
-const ctx = useCordis()
+const ctx = useContext()
 
 const tt = useI18nText()
 
