@@ -63,7 +63,8 @@
 <script lang="ts" setup>
 
 import { computed, PropType } from 'vue'
-import { clone, IconEllipsis, Schema } from 'schemastery-vue'
+import { clone } from 'cosmokit'
+import { IconEllipsis, Schema } from 'schemastery-vue'
 import KFilterButton from './k-filter-button.vue'
 
 const props = defineProps({

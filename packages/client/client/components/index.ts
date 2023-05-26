@@ -1,6 +1,6 @@
 import { App } from 'vue'
 import Markdown from 'marked-vue'
-import components from '@koishijs/components'
+import components, { SchemaBase } from '@koishijs/components'
 import Element, { ElLoading, ElMessage, ElMessageBox } from 'element-plus'
 
 import common from './common'
@@ -25,7 +25,7 @@ export * from '@koishijs/components'
 
 export { icons, ChatImage }
 
-components.extensions.add({
+SchemaBase.extensions.add({
   type: 'any',
   role: 'dynamic',
   component: Dynamic,

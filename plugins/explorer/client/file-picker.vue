@@ -47,7 +47,7 @@
 <script lang="ts" setup>
 
 import { computed, PropType, ref } from 'vue'
-import { isNullable, Schema, SchemaBase, send, store, useConfig } from '@koishijs/client'
+import { isNullable, Schema, SchemaBase, send, store } from '@koishijs/client'
 import { files, uploading, vFocus } from './store'
 import { Entry } from '@koishijs/plugin-explorer'
 import {} from 'koishi'
@@ -60,7 +60,7 @@ const props = defineProps({
   initial: {} as PropType<{}>,
 })
 
-const config = useConfig<string>()
+const config = SchemaBase.useModel<string>()
 
 defineEmits(['update:modelValue'])
 
