@@ -2,7 +2,6 @@ import { createRouter, createWebHistory, START_LOCATION } from 'vue-router'
 import { global } from './data'
 import install from './components'
 import Overlay from './components/chat/overlay.vue'
-import internal from './settings'
 import { config } from './config'
 import { initTask } from './loader'
 import { Context } from './context'
@@ -35,8 +34,6 @@ export const i18n = createI18n({
 root.app.use(install)
 root.app.use(i18n)
 root.app.use(router)
-
-root.plugin(internal)
 
 root.slot({
   type: 'global',

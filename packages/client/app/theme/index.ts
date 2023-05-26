@@ -1,4 +1,4 @@
-import { defineExtension } from '@koishijs/client'
+import { Context } from '@koishijs/client'
 import Home from './pages/home.vue'
 import App from './layouts/index.vue'
 import Layout from './layouts/layout.vue'
@@ -7,7 +7,7 @@ import Progress from './layouts/status-loading.vue'
 
 import './styles/index.scss'
 
-export default defineExtension((ctx) => {
+export default function (ctx: Context) {
   ctx.theme({
     id: 'default-light',
     name: 'Default Light',
@@ -58,4 +58,4 @@ export default defineExtension((ctx) => {
     component: Status,
     order: -1000,
   })
-})
+}

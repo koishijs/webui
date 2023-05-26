@@ -6,7 +6,7 @@
 
 <script lang="ts" setup>
 
-import { config } from '..'
+import { config } from '@koishijs/client'
 import { Schema } from '@koishijs/components'
 
 const schema = Schema.object({

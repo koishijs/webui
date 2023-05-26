@@ -7,14 +7,14 @@
     <template #suffix><slot name="suffix"></slot></template>
     <template #control>
       <el-select popper-class="theme-select" v-model="model">
-        <template v-for="(_, key) in themes" :key="key">
+        <template v-for="(_, key) in ctx.themes" :key="key">
           <el-option :value="key" v-if="key.endsWith('-' + schema.meta.extra.mode)">
             <div class="theme-root" :class="key.endsWith('-dark') ? 'dark' : 'light'" :theme="key">
               <div class="theme-block-1"></div>
               <div class="theme-block-2"></div>
               <div class="theme-block-3"></div>
               <div class="theme-title">
-                {{ tt(themes[key].name) }}
+                {{ tt(ctx.themes[key].name) }}
               </div>
             </div>
           </el-option>
@@ -27,8 +27,8 @@
 <script setup lang="ts">
 
 import { PropType, computed } from 'vue'
-import { themes, useI18nText } from '..'
-import { Schema, SchemaBase, useConfig } from '@koishijs/components'
+import { useCordis, useI18nText } from '@koishijs/client'
+import { Schema, SchemaBase } from '@koishijs/components'
 
 defineProps({
   schema: {} as PropType<Schema>,
@@ -40,13 +40,15 @@ defineProps({
 
 const emit = defineEmits(['update:modelValue'])
 
+const ctx = useCordis()
+
 const tt = useI18nText()
 
-const config = useConfig()
+const config = SchemaBase.useModel()
 
 const model = computed({
   get() {
-    return tt(themes[config.value].name)
+    return tt(ctx.themes[config.value].name)
   },
   set(value) {
     emit('update:modelValue', value)

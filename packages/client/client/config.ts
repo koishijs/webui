@@ -61,9 +61,7 @@ const mode = computed(() => {
   return preferDark.value ? 'dark' : 'light'
 })
 
-export function useColorMode() {
-  return mode
-}
+export const useColorMode = () => mode
 
 watchEffect(() => {
   const root = window.document.querySelector('html')

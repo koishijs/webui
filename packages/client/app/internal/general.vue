@@ -6,7 +6,7 @@
 
 <script lang="ts" setup>
 
-import { config, Schema } from '..'
+import { config, Schema } from '@koishijs/client'
 
 const schema = Schema.object({
   locale: Schema.union(['zh-CN', 'en-US']).description('语言设置。'),

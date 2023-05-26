@@ -30,6 +30,7 @@
   },
   "dependencies": {
     "@satorijs/element": "^2.4.2",
+    "cosmokit": "^1.4.2",
     "schemastery-vue": "5.0.3"
   }
 }

@@ -1,7 +1,7 @@
 <template>
   <k-layout main="page-settings">
     <template #header>
-      {{ components[path].label }}
+      {{ ctx.settings[path].title }}
     </template>
     <template #left>
       <el-scrollbar>
@@ -14,7 +14,7 @@
       </el-scrollbar>
     </template>
     <keep-alive>
-      <component :is="components[path].component" :key="path" />
+      <component :is="ctx.settings[path].component || Fallback" :key="path" />
     </keep-alive>
   </k-layout>
 </template>
@@ -23,22 +23,13 @@
 
 import { useRoute, useRouter } from 'vue-router'
 import { computed } from 'vue'
-import General from './general.vue'
-import Appearance from './appearance.vue'
+import { useCordis } from '@koishijs/client'
+import Fallback from './fallback.vue'
 
 const route = useRoute()
 const router = useRouter()
 
-const components = {
-  '': {
-    label: '通用设置',
-    component: General,
-  },
-  appearance: {
-    label: '外观设置',
-    component: Appearance,
-  },
-}
+const ctx = useCordis()
 
 interface Tree {
   id: string
@@ -46,12 +37,10 @@ interface Tree {
   children?: Tree[]
 }
 
-const data = computed(() => {
-  return Object.entries(components).map<Tree>(([id, { label }]) => ({
-    id,
-    label,
-  }))
-})
+const data = computed(() => Object.entries(ctx.settings).map<Tree>(([id, { title }]) => ({
+  id,
+  label: title,
+})))
 
 function handleClick(tree: Tree) {
   if (tree.children) return
@@ -61,10 +50,10 @@ function handleClick(tree: Tree) {
 const path = computed({
   get() {
     const name = route.params.name?.toString()
-    return name in components ? name : ''
+    return name in ctx.settings ? name : ''
   },
   set(value) {
-    if (!(value in components)) value = ''
+    if (!(value in ctx.settings)) value = ''
     router.replace('/settings/' + value)
   },
 })

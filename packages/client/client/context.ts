@@ -1,7 +1,7 @@
 import * as cordis from 'cordis'
-import components from '@koishijs/components'
+import { Schema, SchemaBase } from '@koishijs/components'
 import { Dict, remove } from 'cosmokit'
-import { App, createApp, defineComponent, h, inject, markRaw, reactive, resolveComponent } from 'vue'
+import { App, Component, createApp, defineComponent, h, inject, markRaw, reactive, resolveComponent } from 'vue'
 import { Activity } from './activity'
 import { SlotOptions } from './components'
 
@@ -15,7 +15,6 @@ export interface Theme {
 export type Computed<T> = T | (() => T)
 
 export const views = reactive<Dict<SlotOptions[]>>({})
-export const themes = reactive<Dict<Theme>>({})
 
 export interface Events<C extends Context> extends cordis.Events<C> {
   'activity'(activity: Activity): boolean
@@ -25,12 +24,21 @@ export interface Context {
   [Context.events]: Events<this>
 }
 
-export function useContext() {
-  return inject('root') as Context
+export function useCordis() {
+  return inject('cordis') as Context
+}
+
+interface SettingOptions {
+  key: string
+  title: string
+  schema?: Schema
+  component?: Component
 }
 
 export class Context extends cordis.Context {
   app: App
+  themes = reactive<Dict<Theme>>({})
+  settings = reactive<Dict<SettingOptions>>({})
 
   constructor() {
     super()
@@ -42,7 +50,7 @@ export class Context extends cordis.Context {
         ]
       },
     }))
-    this.app.provide('root', this)
+    this.app.provide('cordis', this)
   }
 
   /** @deprecated */
@@ -75,14 +83,20 @@ export class Context extends cordis.Context {
     })
   }
 
-  schema(extension: components.Extension) {
-    components.extensions.add(extension)
-    return this.scope.collect('schema', () => components.extensions.delete(extension))
+  schema(extension: SchemaBase.Extension) {
+    SchemaBase.extensions.add(extension)
+    return this.scope.collect('schema', () => SchemaBase.extensions.delete(extension))
+  }
+
+  extendSettings(options: SettingOptions) {
+    markRaw(options)
+    this.settings[options.key] = options
+    return this.scope.collect('settings', () => delete this.settings[options.key])
   }
 
   theme(options: Theme) {
     markRaw(options)
-    themes[options.id] = options
-    return this.scope.collect('view', () => delete themes[options.id])
+    this.themes[options.id] = options
+    return this.scope.collect('view', () => delete this.themes[options.id])
   }
 }
