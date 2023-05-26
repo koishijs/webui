@@ -92,8 +92,8 @@ const entries = computed(() => {
       if (filters.includes('file')) return true
       return filters.some((filter) => {
         const index = entry.name.lastIndexOf('.')
-        const ext = index === -1 ? '' : entry.name.slice(index + 1)
-        return typeof filter === 'object' && filter.extensions?.includes(ext)
+        const ext = index === -1 ? '' : entry.name.slice(index)
+        return filter === ext
       })
     }
   })

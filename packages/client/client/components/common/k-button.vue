@@ -67,7 +67,7 @@ function onClick(event: MouseEvent) {
   }
 
   // default: transparent & framed
-  color: var(--k-text-normal);
+  color: var(--el-button-text-color);
   border: 1px solid var(--k-color-border);
   background-color: transparent;
   &.disabled {

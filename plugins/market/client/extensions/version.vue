@@ -1,19 +1,19 @@
 <template>
   <!-- navigation -->
   <div class="navigation" v-if="remote">
-    <a class="k-button" target="_blank"
+    <a class="el-button" target="_blank"
       v-if="remote.links.homepage"
       :href="remote.links.homepage"
     >插件主页</a>
-    <a class="k-button" target="_blank"
+    <a class="el-button" target="_blank"
       v-if="remote.links.npm && data.local.version"
       :href="remote.links.npm + '/v/' + data.local.version"
     >当前版本：{{ data.local.version }}</a>
-    <a class="k-button" target="_blank"
+    <a class="el-button" target="_blank"
       v-if="remote.links.repository"
       :href="remote.links.repository"
     >存储库</a>
-    <a class="k-button" target="_blank"
+    <a class="el-button" target="_blank"
       v-if="remote.links.bugs"
       :href="remote.links.bugs"
     >问题反馈</a>
