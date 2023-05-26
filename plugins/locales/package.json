@@ -44,7 +44,7 @@
     }
   },
   "peerDependencies": {
-    "@koishijs/plugin-console": "^5.9.4",
+    "@koishijs/plugin-console": "^5.10.0",
     "koishi": "^4.13.0"
   },
   "peerDependenciesMeta": {
@@ -53,8 +53,8 @@
     }
   },
   "devDependencies": {
-    "@koishijs/client": "^5.9.4",
-    "@koishijs/plugin-console": "^5.9.4",
+    "@koishijs/client": "^5.10.0",
+    "@koishijs/plugin-console": "^5.10.0",
     "@koishijs/plugin-mock": "^2.4.3",
     "@types/js-yaml": "^4.0.5",
     "@types/throttle-debounce": "^2.1.0"

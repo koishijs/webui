@@ -1,7 +1,7 @@
 {
   "name": "@koishijs/client",
   "description": "Koishi Console Client",
-  "version": "5.9.4",
+  "version": "5.10.0",
   "main": "client/index.ts",
   "files": [
     "app",
@@ -34,7 +34,7 @@
     "build"
   ],
   "dependencies": {
-    "@koishijs/components": "1.1.5",
+    "@koishijs/components": "1.2.0",
     "@maikolib/vite-plugin-yaml": "^1.0.1",
     "@vitejs/plugin-vue": "^4.2.3",
     "@vueuse/core": "^10.1.2",

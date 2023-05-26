@@ -48,12 +48,12 @@
     }
   },
   "peerDependencies": {
-    "@koishijs/plugin-console": "^5.9.4",
+    "@koishijs/plugin-console": "^5.10.0",
     "koishi": "^4.13.0"
   },
   "devDependencies": {
     "@koishijs/assets": "^1.0.2",
-    "@koishijs/client": "^5.9.4",
+    "@koishijs/client": "^5.10.0",
     "echarts": "^5.4.2",
     "koishi": "^4.13.0",
     "vue-echarts": "^6.5.5"
