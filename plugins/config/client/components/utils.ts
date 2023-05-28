@@ -103,6 +103,35 @@ export interface Tree {
   children?: Tree[]
 }
 
+export const current = ref<Tree>()
+
+export const name = computed(() => {
+  if (!current.value) return
+  const { label, target } = current.value
+  const shortname = target || label
+  if (shortname.includes('/')) {
+    const [left, right] = shortname.split('/')
+    return [`${left}/koishi-plugin-${right}`].find(name => name in store.packages)
+  }
+  return [
+    `@koishijs/plugin-${shortname}`,
+    `koishi-plugin-${shortname}`,
+  ].find(name => name in store.packages)
+})
+
+export const type = computed(() => {
+  const env = envMap.value[name.value]
+  if (!env) return
+  if (env.warning && current.value.disabled) return 'warning'
+  for (const name in env.using) {
+    if (store.services?.[name]) {
+      if (env.impl.includes(name)) return 'warning'
+    } else {
+      if (env.using[name].required) return 'warning'
+    }
+  }
+})
+
 function getTree(parent: Tree, plugins: any): Tree[] {
   const trees: Tree[] = []
   for (let key in plugins) {

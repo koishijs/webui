@@ -80,9 +80,10 @@
 
 <script lang="ts" setup>
 
-import { store, send } from '@koishijs/client'
+import { store, send, useAction, message } from '@koishijs/client'
 import { computed, provide, watch } from 'vue'
-import { envMap, SettingsData, Tree } from './utils'
+import { useRouter } from 'vue-router'
+import { coreDeps, envMap, name, SettingsData, splitPath, Tree } from './utils'
 import KModifier from './modifier.vue'
 
 const props = defineProps<{
@@ -95,19 +96,6 @@ const emit = defineEmits(['update:modelValue'])
 const config = computed({
   get: () => props.modelValue,
   set: value => emit('update:modelValue', value),
-})
-
-const name = computed(() => {
-  const { label, target } = props.current
-  const shortname = target || label
-  if (shortname.includes('/')) {
-    const [left, right] = shortname.split('/')
-    return [`${left}/koishi-plugin-${right}`].find(name => name in store.packages)
-  }
-  return [
-    `@koishijs/plugin-${shortname}`,
-    `koishi-plugin-${shortname}`,
-  ].find(name => name in store.packages)
 })
 
 const env = computed(() => envMap.value[name.value])
@@ -130,6 +118,33 @@ const data = computed<SettingsData>(() => ({
   config: config.value,
   current: props.current,
 }))
+
+const router = useRouter()
+
+useAction('config.save', {
+  disabled: () => !name.value,
+  action: async () => {
+    await execute(props.current.disabled ? 'unload' : 'reload')
+    message.success(props.current.disabled ? '配置已保存。' : '配置已重载。')
+  },
+})
+
+useAction('config.toggle', {
+  disabled: () => !name.value || coreDeps.includes(name.value),
+  action: async () => {
+    await execute(props.current.disabled ? 'reload' : 'unload')
+    message.success(props.current.disabled ? '插件已启用。' : '插件已停用。')
+  },
+})
+
+async function execute(event: 'unload' | 'reload') {
+  await send(`manager/${event}`, props.current.path, config.value, props.current.target)
+  if (props.current.target) {
+    const segments = splitPath(props.current.path)
+    segments[segments.length - 1] = props.current.target
+    router.replace('/plugins/' + segments.join('/'))
+  }
+}
 
 </script>
 

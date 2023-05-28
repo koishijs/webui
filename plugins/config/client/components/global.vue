@@ -4,7 +4,7 @@
 
 <script lang="ts" setup>
 
-import { store } from '@koishijs/client'
+import { send, store, useAction } from '@koishijs/client'
 import { computed } from 'vue'
 import { Tree } from './utils'
 
@@ -18,6 +18,10 @@ const emit = defineEmits(['update:modelValue'])
 const config = computed({
   get: () => props.modelValue,
   set: value => emit('update:modelValue', value),
+})
+
+useAction('config.save', {
+  action: () => send('manager/app-reload', config.value),
 })
 
 </script>
