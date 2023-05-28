@@ -17,7 +17,7 @@ export interface ThemeOptions {
   components?: Dict<Component>
 }
 
-export type Computed<T> = T | (() => T)
+export type MaybeGetter<T> = T | (() => T)
 
 export interface Events<C extends Context> extends cordis.Events<C> {
   'activity'(activity: Activity): boolean
@@ -29,12 +29,30 @@ export interface Context {
 
 export function useContext() {
   const parent = inject('cordis') as Context
-  let _ctx: Context
-  const fork = parent.plugin((ctx) => {
-    _ctx = ctx as any
-  })
+  const fork = parent.plugin(() => {})
   onBeforeUnmount(() => fork.dispose())
-  return _ctx
+  return fork.ctx
+}
+
+export interface ActionOptions {
+  disabled?: MaybeGetter<boolean>
+  action: (...args: any[]) => any
+}
+
+export function useAction(id: string, options: ActionOptions) {
+  const ctx = useContext()
+  ctx.action(id, options)
+  return options.action
+}
+
+export interface LayoutMenuItem extends ActionOptions, Omit<MenuItem, 'id'> {}
+
+export interface MenuItem {
+  id: string
+  type?: MaybeGetter<string>
+  label: MaybeGetter<string>
+  icon?: MaybeGetter<string>
+  order?: number
 }
 
 interface SettingOptions {
@@ -45,8 +63,24 @@ interface SettingOptions {
   component?: Component
 }
 
+interface Ordered {
+  order?: number
+}
+
+function insert<T extends Ordered>(list: T[], item: T) {
+  markRaw(item)
+  const index = list.findIndex(a => a.order < item.order)
+  if (index >= 0) {
+    list.splice(index, 0, item)
+  } else {
+    list.push(item)
+  }
+}
+
 export class Context extends cordis.Context {
   app: App
+  menus = reactive<Dict<MenuItem[]>>({})
+  actions = reactive<Dict<ActionOptions[]>>({})
   views = reactive<Dict<SlotOptions[]>>({})
   themes = reactive<Dict<ThemeOptions>>({})
   settings = reactive<Dict<SettingOptions[]>>({})
@@ -84,16 +118,10 @@ export class Context extends cordis.Context {
   }
 
   slot(options: SlotOptions) {
-    markRaw(options)
     options.order ??= 0
     options.component = this.wrapComponent(options.component)
     const list = this.views[options.type] ||= []
-    const index = list.findIndex(a => a.order < options.order)
-    if (index >= 0) {
-      list.splice(index, 0, options)
-    } else {
-      list.push(options)
-    }
+    insert(list, options)
     return this.scope.collect('view', () => remove(list, options))
   }
 
@@ -109,18 +137,29 @@ export class Context extends cordis.Context {
     return this.scope.collect('schema', () => SchemaBase.extensions.delete(extension))
   }
 
+  action(id: string, options: ActionOptions) {
+    const list = this.actions[id] ||= []
+    markRaw(options)
+    list.push(options)
+    return this.scope.collect('actions', () => remove(list, options))
+  }
+
+  menu(id: string, items: MenuItem[]) {
+    const list = this.menus[id] ||= []
+    items.forEach(item => insert(list, item))
+    return this.scope.collect('menus', () => {
+      items.forEach(item => remove(list, item))
+      return true
+    })
+  }
+
   extendSettings(options: SettingOptions) {
     markRaw(options)
     options.order ??= 0
     options.component = this.wrapComponent(options.component)
     const list = this.settings[options.id] ||= []
-    const index = list.findIndex(a => a.order < options.order)
-    if (index >= 0) {
-      list.splice(index, 0, options)
-    } else {
-      list.push(options)
-    }
-    return this.scope.collect('settings', () => delete this.settings[options.id])
+    insert(list, options)
+    return this.scope.collect('settings', () => remove(list, options))
   }
 
   theme(options: ThemeOptions) {

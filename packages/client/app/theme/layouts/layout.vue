@@ -12,11 +12,12 @@
         </template>
         <template #right>
           <slot name="menu">
-            <el-tooltip v-for="{ icon, label, type, disabled, action } in menu || []" :disabled="!!disabled" :content="label" placement="bottom">
-              <span class="menu-item" :class="[type, { disabled }]" @click="action()">
-                <k-icon class="menu-icon" :name="icon"></k-icon>
-              </span>
-            </el-tooltip>
+            <template v-if="typeof menu === 'string'">
+              <layout-menu-item v-for="item in ctx.menus[menu]" v-bind="{ ...item, ...ctx.actions[item.id]?.[0] }"></layout-menu-item>
+            </template>
+            <template v-else>
+              <layout-menu-item v-for="item in menu" v-bind="item" />
+            </template>
           </slot>
         </template>
       </layout-header>
@@ -34,26 +35,21 @@
 <script lang="ts" setup>
 
 import { useRoute } from 'vue-router'
+import { ActionOptions, useContext } from '@koishijs/client'
 import { isLeftAsideOpen } from './utils'
 import LayoutHeader from './layout-header.vue'
-
-export interface MenuItem {
-  icon: string
-  label: string
-  type?: string
-  disabled?: boolean
-  action?: Function
-}
+import LayoutMenuItem from './layout-menu-item.vue'
 
 defineProps<{
   main?: string
   left?: string
   right?: string
   container?: string
-  menu?: MenuItem[]
+  menu?: string | (ActionOptions | string)[]
 }>()
 
 const route = useRoute()
+const ctx = useContext()
 
 </script>
 
