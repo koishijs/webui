@@ -45,7 +45,7 @@ export function useAction(id: string, options: ActionOptions) {
   return options.action
 }
 
-export interface LayoutMenuItem extends ActionOptions, Omit<MenuItem, 'id'> {}
+export type LegacyMenuItem = Partial<ActionOptions> & Omit<MenuItem, 'id'>
 
 export interface MenuItem {
   id: string

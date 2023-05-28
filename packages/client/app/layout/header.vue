@@ -1,6 +1,11 @@
 <template>
   <div class="layout-header">
-    <div class="toggle-sidebar-button" role="button" tabindex="0" @click="isLeftAsideOpen = !isLeftAsideOpen">
+    <div
+      class="toggle-sidebar-button"
+      role="button"
+      tabindex="0"
+      @click="$emit('update:isLeftAsideOpen', !isLeftAsideOpen)"
+    >
       <div class="icon">
         <span></span>
         <span></span>
@@ -18,8 +23,14 @@
 
 <script lang="ts" setup>
 
-import { isLeftAsideOpen } from './utils'
 import { useRoute } from 'vue-router'
+
+defineProps<{
+  isLeftAsideOpen: boolean
+  isRightAsideOpen: boolean
+}>()
+
+defineEmits(['update:isLeftAsideOpen', 'update:isRightAsideOpen'])
 
 const route = useRoute()
 

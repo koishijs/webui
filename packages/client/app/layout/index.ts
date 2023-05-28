@@ -1,10 +1,10 @@
 import { Context } from '@koishijs/client'
-import App from './index.vue'
+import Layout from './layout.vue'
 
 export default function (ctx: Context) {
   ctx.slot({
-    type: 'root',
-    component: App,
+    type: 'layout',
+    component: Layout,
     order: -1000,
   })
 }

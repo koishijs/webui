@@ -1,12 +1,12 @@
 <template>
-  <div class="layout-container" :class="[container, { 'has-left-aside': $slots.left, 'has-right-aside': $slots.right }]">
+  <div class="layout-container" :class="[container, styles]">
     <aside class="layout-left" :class="left" v-if="$slots.left">
       <slot name="left"></slot>
     </aside>
 
     <div class="main-container">
       <div class="aside-mask" @click="isLeftAsideOpen = !isLeftAsideOpen"></div>
-      <layout-header>
+      <layout-header v-model:isLeftAsideOpen="isLeftAsideOpen" v-model:isRightAsideOpen="isRightAsideOpen">
         <template #left>
           <slot name="header">{{ route.meta.activity?.name }}</slot>
         </template>
@@ -34,22 +34,33 @@
 
 <script lang="ts" setup>
 
+import { computed, ref, useSlots } from 'vue'
 import { useRoute } from 'vue-router'
-import { ActionOptions, useContext } from '@koishijs/client'
-import { isLeftAsideOpen } from './utils'
-import LayoutHeader from './layout-header.vue'
-import LayoutMenuItem from './layout-menu-item.vue'
+import { LegacyMenuItem, useContext } from '@koishijs/client'
+import LayoutHeader from './header.vue'
+import LayoutMenuItem from './menu-item.vue'
 
 defineProps<{
   main?: string
   left?: string
   right?: string
   container?: string
-  menu?: string | (ActionOptions | string)[]
+  menu?: string | LegacyMenuItem[]
 }>()
 
+const slots = useSlots()
 const route = useRoute()
 const ctx = useContext()
+
+const isLeftAsideOpen = ref(false)
+const isRightAsideOpen = ref(false)
+
+const styles = computed(() => ({
+  'has-left-aside': slots.left,
+  'has-right-aside': slots.right,
+  'is-left-aside-open': isLeftAsideOpen.value,
+  'is-right-aside-open': isRightAsideOpen.value,
+}))
 
 </script>
 
@@ -63,7 +74,7 @@ const ctx = useContext()
   left: var(--activity-width);
   bottom: var(--footer-height);
   right: 0;
-  background-color: var(--card-bg);
+  background-color: var(--k-card-bg);
   transition: var(--color-transition);
   display: flex;
   flex-direction: row;
@@ -137,13 +148,13 @@ const ctx = useContext()
     }
   }
 
-  .is-left-aside-open .layout-container.has-left-aside {
+  .layout-container.is-left-aside-open.has-left-aside {
     .main-container {
       left: calc(var(--aside-width) + var(--activity-width));
     }
   }
 
-  .is-left-aside-open .layout-container:not(.has-left-aside) {
+  .layout-container.is-left-aside-open:not(.has-left-aside) {
     .main-container {
       left: var(--activity-width);
     }

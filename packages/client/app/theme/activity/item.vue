@@ -13,8 +13,9 @@
 <script lang="ts" setup>
 
 import { computed } from 'vue'
-import { Activity, routeCache } from '../utils'
+import { Activity } from '@koishijs/client'
 import { Placement } from 'element-plus'
+import { routeCache } from './utils'
 
 const props = defineProps<{
   data: Activity,

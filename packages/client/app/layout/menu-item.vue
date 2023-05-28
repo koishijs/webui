@@ -8,10 +8,10 @@
 
 <script lang="ts" setup>
 
-import { LayoutMenuItem } from '@koishijs/client'
+import { LegacyMenuItem } from '@koishijs/client'
 import { computed, toValue } from 'vue'
 
-const props = defineProps<LayoutMenuItem>()
+const props = defineProps<LegacyMenuItem>()
 
 const disabled = computed(() => toValue(props.disabled))
 
