@@ -121,11 +121,6 @@ const styles = computed(() => ({
       opacity: 0;
       z-index: 300;
       transition: opacity 0.3s ease;
-
-      .is-left-aside-open & {
-        opacity: 0.25;
-        pointer-events: auto;
-      }
     }
   }
 }
@@ -146,17 +141,24 @@ const styles = computed(() => ({
       width: 100vw;
       bottom: 0;
     }
-  }
 
-  .layout-container.is-left-aside-open.has-left-aside {
-    .main-container {
-      left: calc(var(--aside-width) + var(--activity-width));
-    }
-  }
+    &.is-left-aside-open {
+      &.has-left-aside {
+        .main-container {
+          left: calc(var(--aside-width) + var(--activity-width));
+        }
+      }
 
-  .layout-container.is-left-aside-open:not(.has-left-aside) {
-    .main-container {
-      left: var(--activity-width);
+      &:not(.has-left-aside) {
+        .main-container {
+          left: var(--activity-width);
+        }
+      }
+
+      .aside-mask {
+        opacity: 0.25;
+        pointer-events: auto;
+      }
     }
   }
 }
