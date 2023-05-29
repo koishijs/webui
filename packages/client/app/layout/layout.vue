@@ -13,7 +13,7 @@
         <template #right>
           <slot name="menu">
             <template v-if="typeof menu === 'string'">
-              <layout-menu-item v-for="item in ctx.menus[menu]" v-bind="{ ...item, ...ctx.actions[item.id]?.[0] }"></layout-menu-item>
+              <layout-menu-item v-for="item in ctx.internal.menus[menu]" v-bind="{ ...item, ...ctx.internal.actions[item.id]?.[0] }"></layout-menu-item>
             </template>
             <template v-else>
               <layout-menu-item v-for="item in menu" v-bind="item" />

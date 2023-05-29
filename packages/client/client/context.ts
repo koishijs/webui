@@ -1,10 +1,14 @@
 import * as cordis from 'cordis'
 import { Schema, SchemaBase } from '@koishijs/components'
-import { Dict, remove } from 'cosmokit'
-import { App, Component, createApp, defineComponent, h, inject, markRaw, onBeforeUnmount, provide, reactive, resolveComponent } from 'vue'
+import { Dict, Intersect, remove } from 'cosmokit'
+import {
+  App, Component, createApp, defineComponent, h, inject, markRaw, MaybeRefOrGetter,
+  onBeforeUnmount, provide, reactive, resolveComponent, shallowReactive, toValue,
+} from 'vue'
 import { Activity } from './activity'
 import { SlotOptions } from './components'
 import { useColorMode, useConfig } from './config'
+import { ActionContext } from '.'
 
 const config = useConfig()
 const mode = useColorMode()
@@ -17,7 +21,7 @@ export interface ThemeOptions {
   components?: Dict<Component>
 }
 
-export type MaybeGetter<T> = T | (() => T)
+export type MaybeGetter<T> = T | ((scope: Flatten<ActionContext>) => T)
 
 export interface Events<C extends Context> extends cordis.Events<C> {
   'activity'(activity: Activity): boolean
@@ -35,14 +39,8 @@ export function useContext() {
 }
 
 export interface ActionOptions {
-  disabled?: MaybeGetter<boolean>
-  action: (...args: any[]) => any
-}
-
-export function useAction(id: string, options: ActionOptions) {
-  const ctx = useContext()
-  ctx.action(id, options)
-  return options.action
+  disabled?: (scope: Flatten<ActionContext>) => boolean
+  action: (scope: Flatten<ActionContext>) => any
 }
 
 export type LegacyMenuItem = Partial<ActionOptions> & Omit<MenuItem, 'id'>
@@ -77,13 +75,40 @@ function insert<T extends Ordered>(list: T[], item: T) {
   }
 }
 
-export class Context extends cordis.Context {
-  app: App
+type Store<S extends {}> = { [K in keyof S]?: MaybeRefOrGetter<S[K]> }
+
+type Flatten<S extends {}> = Intersect<{
+  [K in keyof S]: K extends `${infer L}.${infer R}`
+    ? { [P in L]: Flatten<{ [P in R]: S[K] }> }
+    : { [P in K]: S[K] }
+}[keyof S]>
+
+class Internal {
+  scope = shallowReactive<Store<ActionContext>>({})
   menus = reactive<Dict<MenuItem[]>>({})
   actions = reactive<Dict<ActionOptions[]>>({})
   views = reactive<Dict<SlotOptions[]>>({})
   themes = reactive<Dict<ThemeOptions>>({})
   settings = reactive<Dict<SettingOptions[]>>({})
+
+  createScope(prefix = '') {
+    return new Proxy({}, {
+      get: (target, key) => {
+        if (typeof key === 'symbol') return target[key]
+        key = prefix + key
+        if (key in this.scope) return toValue(this.scope[key])
+        const _prefix = key + '.'
+        if (Object.keys(this.scope).some(k => k.startsWith(_prefix))) {
+          return this.createScope(key + '.')
+        }
+      },
+    })
+  }
+}
+
+export class Context extends cordis.Context {
+  app: App
+  internal = new Internal()
 
   constructor() {
     super()
@@ -120,7 +145,7 @@ export class Context extends cordis.Context {
   slot(options: SlotOptions) {
     options.order ??= 0
     options.component = this.wrapComponent(options.component)
-    const list = this.views[options.type] ||= []
+    const list = this.internal.views[options.type] ||= []
     insert(list, options)
     return this.scope.collect('view', () => remove(list, options))
   }
@@ -138,14 +163,14 @@ export class Context extends cordis.Context {
   }
 
   action(id: string, options: ActionOptions) {
-    const list = this.actions[id] ||= []
+    const list = this.internal.actions[id] ||= []
     markRaw(options)
     list.push(options)
     return this.scope.collect('actions', () => remove(list, options))
   }
 
   menu(id: string, items: MenuItem[]) {
-    const list = this.menus[id] ||= []
+    const list = this.internal.menus[id] ||= []
     items.forEach(item => insert(list, item))
     return this.scope.collect('menus', () => {
       items.forEach(item => remove(list, item))
@@ -153,18 +178,23 @@ export class Context extends cordis.Context {
     })
   }
 
-  extendSettings(options: SettingOptions) {
+  define<K extends keyof ActionContext>(key: K, value: MaybeRefOrGetter<ActionContext[K]>) {
+    this.internal.scope[key] = value as any
+    return this.scope.collect('activate', () => delete this.internal.scope[key])
+  }
+
+  settings(options: SettingOptions) {
     markRaw(options)
     options.order ??= 0
     options.component = this.wrapComponent(options.component)
-    const list = this.settings[options.id] ||= []
+    const list = this.internal.settings[options.id] ||= []
     insert(list, options)
     return this.scope.collect('settings', () => remove(list, options))
   }
 
   theme(options: ThemeOptions) {
     markRaw(options)
-    this.themes[options.id] = options
+    this.internal.themes[options.id] = options
     for (const [type, component] of Object.entries(options.components || {})) {
       this.slot({
         type,
@@ -172,6 +202,6 @@ export class Context extends cordis.Context {
         component,
       })
     }
-    return this.scope.collect('view', () => delete this.themes[options.id])
+    return this.scope.collect('view', () => delete this.internal.themes[options.id])
   }
 }

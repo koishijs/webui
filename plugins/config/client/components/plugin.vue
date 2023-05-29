@@ -80,7 +80,7 @@
 
 <script lang="ts" setup>
 
-import { store, send, useAction, message } from '@koishijs/client'
+import { store, send, useContext, message } from '@koishijs/client'
 import { computed, provide, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { coreDeps, envMap, name, SettingsData, splitPath, Tree } from './utils'
@@ -120,8 +120,9 @@ const data = computed<SettingsData>(() => ({
 }))
 
 const router = useRouter()
+const ctx = useContext()
 
-useAction('config.save', {
+ctx.action('config.save', {
   disabled: () => !name.value,
   action: async () => {
     await execute(props.current.disabled ? 'unload' : 'reload')
@@ -129,7 +130,7 @@ useAction('config.save', {
   },
 })
 
-useAction('config.toggle', {
+ctx.action('config.toggle', {
   disabled: () => !name.value || coreDeps.includes(name.value),
   action: async () => {
     await execute(props.current.disabled ? 'reload' : 'unload')

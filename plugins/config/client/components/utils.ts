@@ -91,6 +91,12 @@ export const envMap = computed(() => {
     .map(name => [name, getEnvInfo(name)]))
 })
 
+declare module '@koishijs/client' {
+  interface ActionContext {
+    'config.tree': Tree
+  }
+}
+
 export interface Tree {
   id: string
   alias: string

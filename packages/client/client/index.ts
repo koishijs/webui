@@ -17,6 +17,8 @@ export * from './utils'
 
 export default install
 
+export interface ActionContext {}
+
 export const root = new Context()
 
 export const router = createRouter({

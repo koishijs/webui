@@ -52,8 +52,8 @@
 
 import { computed, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { clone, store, useAction } from '@koishijs/client'
-import { addItem, current, plugins, removeItem, showSelect, Tree } from './utils'
+import { clone, store, useContext } from '@koishijs/client'
+import { addItem, current, plugins, removeItem, showSelect } from './utils'
 import GlobalSettings from './global.vue'
 import GroupSettings from './group.vue'
 import TreeView from './tree.vue'
@@ -83,17 +83,21 @@ watch(() => plugins.value.paths[path.value], (value) => {
   config.value = clone(value.config)
 }, { immediate: true })
 
-useAction('config.remove', {
+const ctx = useContext()
+
+ctx.define('config.tree', current)
+
+ctx.action('config.remove', {
   disabled: () => !current.value.path,
   action: () => showRemove.value = true,
 })
 
-useAction('config.add-plugin', {
+ctx.action('config.add-plugin', {
   disabled: () => current.value.path && !current.value.children,
   action: () => showSelect.value = true,
 })
 
-useAction('config.add-group', {
+ctx.action('config.add-group', {
   disabled: () => current.value.path && !current.value.children,
   action: () => addItem(current.value.path, 'group', 'group'),
 })

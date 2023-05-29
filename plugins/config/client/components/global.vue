@@ -4,7 +4,7 @@
 
 <script lang="ts" setup>
 
-import { send, store, useAction } from '@koishijs/client'
+import { send, store, useContext } from '@koishijs/client'
 import { computed } from 'vue'
 import { Tree } from './utils'
 
@@ -20,7 +20,9 @@ const config = computed({
   set: value => emit('update:modelValue', value),
 })
 
-useAction('config.save', {
+const ctx = useContext()
+
+ctx.action('config.save', {
   action: () => send('manager/app-reload', config.value),
 })
 

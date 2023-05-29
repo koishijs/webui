@@ -18,7 +18,7 @@ export default function (ctx: Context) {
     component: Theme,
   })
 
-  ctx.extendSettings({
+  ctx.settings({
     id: '',
     title: '通用设置',
     order: 1000,
@@ -27,7 +27,7 @@ export default function (ctx: Context) {
     }).description('通用设置'),
   })
 
-  ctx.extendSettings({
+  ctx.settings({
     id: 'appearance',
     title: '外观设置',
     order: 1000,

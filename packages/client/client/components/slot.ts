@@ -23,7 +23,7 @@ export const KSlot = defineComponent({
       const internal = props.single ? [] : [...slots.default?.() || []]
         .filter(node => node.type === KSlotItem)
         .map(node => ({ node, order: node.props?.order || 0 }))
-      const external = [...ctx.views[props.name] || []]
+      const external = [...ctx.internal.views[props.name] || []]
         .filter(item => !item.when || item.when())
         .map(item => ({
           node: h(item.component, { data: props.data, ...props.data }, slots),

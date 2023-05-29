@@ -1,6 +1,6 @@
 <template>
   <el-tooltip :disabled="disabled" :content="toValue(label)" placement="bottom">
-    <span class="menu-item" :class="[type, { disabled }]" @click="action()">
+    <span class="menu-item" :class="[type, { disabled }]" @click="action(ctx.internal.createScope())">
       <k-icon class="menu-icon" :name="toValue(icon)"></k-icon>
     </span>
   </el-tooltip>
@@ -8,11 +8,18 @@
 
 <script lang="ts" setup>
 
-import { LegacyMenuItem } from '@koishijs/client'
-import { computed, toValue } from 'vue'
+import { LegacyMenuItem, MaybeGetter, useContext } from '@koishijs/client'
+import { computed } from 'vue'
 
 const props = defineProps<LegacyMenuItem>()
 
-const disabled = computed(() => toValue(props.disabled))
+const ctx = useContext()
+
+const disabled = computed(() => props.disabled ? toValue(props.disabled) : true)
+
+function toValue<T>(getter: MaybeGetter<T>): T {
+  if (typeof getter !== 'function') return getter
+  return (getter as any)(ctx.internal.createScope())
+}
 
 </script>

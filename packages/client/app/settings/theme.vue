@@ -7,14 +7,14 @@
     <template #suffix><slot name="suffix"></slot></template>
     <template #control>
       <el-select popper-class="theme-select" v-model="model">
-        <template v-for="(_, key) in ctx.themes" :key="key">
+        <template v-for="(_, key) in ctx.internal.themes" :key="key">
           <el-option :value="key" v-if="key.endsWith('-' + schema.meta.extra.mode)">
             <div class="theme-root" :class="key.endsWith('-dark') ? 'dark' : 'light'" :theme="key">
               <div class="theme-block-1"></div>
               <div class="theme-block-2"></div>
               <div class="theme-block-3"></div>
               <div class="theme-title">
-                {{ tt(ctx.themes[key].name) }}
+                {{ tt(ctx.internal.themes[key].name) }}
               </div>
             </div>
           </el-option>
@@ -48,7 +48,7 @@ const config = SchemaBase.useModel()
 
 const model = computed({
   get() {
-    return tt(ctx.themes[config.value].name)
+    return tt(ctx.internal.themes[config.value].name)
   },
   set(value) {
     emit('update:modelValue', value)
