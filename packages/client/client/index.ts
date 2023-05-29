@@ -19,6 +19,19 @@ export default install
 
 export interface ActionContext {}
 
+export interface Config {
+  theme: Config.Theme
+  locale?: string
+}
+
+export namespace Config {
+  export interface Theme {
+    mode: 'auto' | 'dark' | 'light'
+    dark: string
+    light: string
+  }
+}
+
 export const root = new Context()
 
 export const router = createRouter({

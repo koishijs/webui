@@ -57,6 +57,7 @@ interface SettingOptions {
   id: string
   title?: string
   order?: number
+  disabled?: () => boolean
   schema?: Schema
   component?: Component
 }

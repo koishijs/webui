@@ -1,5 +1,6 @@
 import { RemovableRef, useLocalStorage, usePreferredDark } from '@vueuse/core'
 import { computed, reactive, watchEffect } from 'vue'
+import { Config } from '.'
 
 export let useStorage = <T extends object>(key: string, version: number, fallback?: () => T): RemovableRef<T> => {
   const initial = fallback ? fallback() : {} as T
@@ -29,19 +30,6 @@ export function createStorage<T extends object>(key: string, version: number, fa
     storage.value.data = { ...initial, ...storage.value.data }
   }
   return reactive<T>(storage.value['data'])
-}
-
-export interface Config {
-  theme: Config.Theme
-  locale?: string
-}
-
-export namespace Config {
-  export interface Theme {
-    mode: 'auto' | 'dark' | 'light'
-    dark: string
-    light: string
-  }
 }
 
 export const config = useStorage<Config>('config', 1.1, () => ({

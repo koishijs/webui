@@ -77,7 +77,10 @@ export const initTask = new Promise<void>((resolve) => {
 
     await Promise.all(newValue.map(load))
 
-    if (!oldValue) resolve()
+    if (!oldValue) {
+      resolve()
+      if (!root.events.isActive) root.start()
+    }
   }, { deep: true })
 })
 
