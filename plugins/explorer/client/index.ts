@@ -35,4 +35,36 @@ export default (ctx: Context) => {
     type: 'status-right',
     component: Status,
   })
+
+  ctx.menu('explorer', [{
+    id: 'explorer.save',
+    icon: 'save',
+    label: '保存',
+  }, {
+    id: 'explorer.refresh',
+    icon: 'refresh',
+    label: '刷新',
+  }])
+
+  ctx.menu('explorer.tree', [{
+    id: '.create-file',
+    label: '新建文件',
+  }, {
+    id: '.create-directory',
+    label: '新建文件夹',
+  }, {
+    id: '.upload',
+    label: '上传文件',
+  }, {
+    id: '.download',
+    label: '下载文件',
+  }, {
+    id: '@separator',
+  }, {
+    id: '.rename',
+    label: '重命名',
+  }, {
+    id: '.remove',
+    label: '删除',
+  }])
 }

@@ -1,20 +1,11 @@
 <template>
-  <k-layout>
+  <k-layout menu="explorer">
     <template #header>
       资源管理器{{ active ? ' - ' + active : '' }}
     </template>
 
-    <template #menu>
-      <span class="menu-item" :class="{ disabled: files[active]?.newValue === files[active]?.oldValue }" @click.prevent="send('explorer/write', active, files[active].newValue)">
-        <k-icon class="menu-icon" name="save"></k-icon>
-      </span>
-      <span class="menu-item" @click.prevent="send('explorer/refresh')">
-        <k-icon class="menu-icon" name="refresh"></k-icon>
-      </span>
-    </template>
-
     <template #left>
-      <el-scrollbar ref="root" @contextmenu.stop="handleContextMenu($event)">
+      <el-scrollbar ref="root" @contextmenu.stop="trigger($event, rootEntry)">
         <div class="search">
           <el-input v-model="keyword" #suffix>
             <k-icon name="search"></k-icon>
@@ -31,7 +22,7 @@
           :allow-drop="allowDrop"
           :default-expanded-keys="expandedKeys"
           @node-click="handleClick"
-          @node-contextmenu="handleContextMenu"
+          @node-contextmenu="trigger"
           @node-expand="handleExpand"
           @node-collapse="handleCollapse"
           @node-drop="handleDrop"
@@ -59,27 +50,6 @@
     <k-empty v-else>在左侧栏选择要查看的文件</k-empty>
   </k-layout>
 
-  <teleport to="body">
-    <div ref="menu" class="context-menu" v-if="menuTarget">
-      <template v-if="menuTarget.type === 'directory'">
-        <div class="item" @click.prevent="createEntry('file')">新建文件</div>
-        <div class="item" @click.prevent="createEntry('directory')">新建文件夹</div>
-        <div class="item" @click.prevent="uploading = menuTarget.filename + '/'">上传文件</div>
-      </template>
-      <template v-else>
-        <div class="item" @click.prevent="downloadFile(menuTarget.filename)">下载</div>
-      </template>
-      <template v-if="menuTarget.filename">
-        <div class="item" @click.prevent="initRemove(menuTarget)">
-          删除
-        </div>
-        <div class="item" @click.prevent="cancelRename(), renaming = menuTarget.filename">
-          重命名
-        </div>
-      </template>
-    </div>
-  </teleport>
-
   <el-dialog v-model="showRemoving" destroy-on-close>
     你真的要删除文件{{ removing?.endsWith('/') ? '夹' : '' }} {{ removing }} 吗？
     <template #footer>
@@ -97,28 +67,71 @@
 
 import { ref, computed, watch, onActivated, nextTick } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { useElementSize, useEventListener } from '@vueuse/core'
-import { base64ToArrayBuffer, send, store, useColorMode } from '@koishijs/client'
+import { useElementSize } from '@vueuse/core'
+import { base64ToArrayBuffer, send, store, useColorMode, useContext, useMenu } from '@koishijs/client'
 import { Entry } from '@koishijs/plugin-explorer'
-import { files, uploading, vFocus } from './store'
+import { files, TreeEntry, uploading, vFocus } from './store'
 import { model } from './editor'
 import * as monaco from 'monaco-editor'
 
-interface TreeEntry extends Entry {
-  expanded?: boolean
-}
-
+const ctx = useContext()
 const route = useRoute()
 const router = useRouter()
 const keyword = ref('')
 const tree = ref(null)
-const menu = ref(null)
 const root = ref<{ $el: HTMLElement }>(null)
 const editor = ref(null)
-const menuTarget = ref<TreeEntry>(null)
 const renaming = ref<string>(null)
 const data = ref<TreeEntry[]>([])
 const removing = ref<string>(null)
+
+const trigger = useMenu('explorer.tree')
+
+ctx.action('explorer.save', {
+  disabled: () => files[active.value]?.newValue === files[active.value]?.oldValue,
+  action: async () => {
+    const content = files[active.value].newValue
+    await send('explorer/write', active.value, content)
+    files[active.value].oldValue = content
+  },
+})
+
+ctx.action('explorer.refresh', {
+  action: () => send('explorer/refresh'),
+})
+
+ctx.action('explorer.tree.create-file', {
+  disabled: ({ explorer }) => explorer.tree.type !== 'directory',
+  action: ({ explorer }) => createEntry(explorer.tree, 'file'),
+})
+
+ctx.action('explorer.tree.create-directory', {
+  disabled: ({ explorer }) => explorer.tree.type !== 'directory',
+  action: ({ explorer }) => createEntry(explorer.tree, 'directory'),
+})
+
+ctx.action('explorer.tree.upload', {
+  disabled: ({ explorer }) => explorer.tree.type !== 'directory',
+  action: ({ explorer }) => uploading.value = explorer.tree.filename + '/',
+})
+
+ctx.action('explorer.tree.download', {
+  disabled: ({ explorer }) => explorer.tree.type !== 'file',
+  action: ({ explorer }) => downloadFile(explorer.tree.filename),
+})
+
+ctx.action('explorer.tree.remove', {
+  disabled: ({ explorer }) => !explorer.tree.filename,
+  action: ({ explorer }) => initRemove(explorer.tree),
+})
+
+ctx.action('explorer.tree.rename', {
+  disabled: ({ explorer }) => !explorer.tree.filename,
+  action: ({ explorer }) => {
+    cancelRename()
+    renaming.value = explorer.tree.filename
+  },
+})
 
 const showRemoving = computed({
   get: () => !!removing.value,
@@ -148,14 +161,6 @@ function merge(base: TreeEntry[], head: Entry[]) {
 watch(() => store.explorer, (value) => {
   data.value = merge(data.value, value) || []
 }, { immediate: true })
-
-useEventListener('click', () => {
-  menuTarget.value = null
-})
-
-useEventListener('contextmenu', () => {
-  menuTarget.value = null
-})
 
 let instance: monaco.editor.IStandaloneCodeEditor = null
 
@@ -205,9 +210,9 @@ function filterNode(value: string, data: TreeEntry) {
   return data.name.toLowerCase().includes(keyword.value.toLowerCase())
 }
 
-function createEntry(type: 'file' | 'directory') {
+function createEntry(entry: TreeEntry, type: 'file' | 'directory') {
   cancelRename()
-  renaming.value = menuTarget.value.filename + '/'
+  renaming.value = entry.filename + '/'
   files[renaming.value] = {
     type,
     name: '',
@@ -215,8 +220,8 @@ function createEntry(type: 'file' | 'directory') {
     oldValue: '',
     newValue: '',
   }
-  menuTarget.value.expanded = true
-  menuTarget.value.children.push(files[renaming.value])
+  entry.expanded = true
+  entry.children.push(files[renaming.value])
 }
 
 function confirmRename(entry: TreeEntry) {
@@ -311,19 +316,12 @@ async function handleClick(data: TreeEntry) {
   active.value = data.filename
 }
 
-async function handleContextMenu(event: MouseEvent, entry?: TreeEntry) {
-  event.preventDefault()
-  menuTarget.value = entry || {
-    name: '',
-    filename: '',
-    type: 'directory',
-    children: data.value,
-  }
-  await nextTick()
-  const { clientX, clientY } = event
-  menu.value.style.left = clientX + 'px'
-  menu.value.style.top = clientY + 'px'
-}
+const rootEntry = computed<TreeEntry>(() => ({
+  name: '',
+  filename: '',
+  type: 'directory',
+  children: data.value,
+}))
 
 function handleExpand(entry: TreeEntry) {
   entry.expanded = true
@@ -398,29 +396,6 @@ async function downloadFile(filename: string) {
 .right {
   height: 100%;
   margin: 0 0.75rem;
-}
-
-.context-menu {
-  position: fixed;
-  z-index: 1000;
-  min-width: 12rem;
-  padding: 0.5rem 0;
-  border-radius: 4px;
-  background-color: var(--k-card-bg);
-  box-shadow: var(--k-card-shadow);
-  transition: var(--color-transition);
-  font-size: 14px;
-
-  .item {
-    user-select: none;
-    padding: 0.25rem 1.5rem;
-    cursor: pointer;
-    transition: var(--color-transition);
-
-    &:hover {
-      background-color: var(--k-hover-bg);
-    }
-  }
 }
 
 </style>

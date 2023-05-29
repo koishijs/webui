@@ -2,6 +2,16 @@ import { Dict, store } from '@koishijs/client'
 import { Directive, reactive, ref, watch } from 'vue'
 import { Entry } from '@koishijs/plugin-explorer'
 
+declare module '@koishijs/client' {
+  interface ActionContext {
+    'explorer.tree': TreeEntry
+  }
+}
+
+export interface TreeEntry extends Entry {
+  expanded?: boolean
+}
+
 export const files = reactive<Dict<Entry>>({})
 
 watch(() => store.explorer, () => {

@@ -31,7 +31,7 @@
           <div class="left">
             <template v-if="options.allowCreate">
               <el-button v-if="allowFile" @click="uploading = current + '/'">上传文件</el-button>
-              <el-button v-if="allowDir" @click="createFolder()">创建目录</el-button>
+              <el-button v-if="allowDir" @click="createFolder()">创建文件夹</el-button>
             </template>
           </div>
           <div class="right">
