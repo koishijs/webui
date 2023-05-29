@@ -125,16 +125,18 @@ const ctx = useContext()
 ctx.action('config.save', {
   disabled: () => !name.value,
   action: async () => {
-    await execute(props.current.disabled ? 'unload' : 'reload')
-    message.success(props.current.disabled ? '配置已保存。' : '配置已重载。')
+    const { disabled } = props.current
+    await execute(disabled ? 'unload' : 'reload')
+    message.success(disabled ? '配置已保存。' : '配置已重载。')
   },
 })
 
 ctx.action('config.toggle', {
   disabled: () => !name.value || coreDeps.includes(name.value),
   action: async () => {
-    await execute(props.current.disabled ? 'reload' : 'unload')
-    message.success(props.current.disabled ? '插件已启用。' : '插件已停用。')
+    const { disabled } = props.current
+    await execute(disabled ? 'reload' : 'unload')
+    message.success(disabled ? '插件已启用。' : '插件已停用。')
   },
 })
 

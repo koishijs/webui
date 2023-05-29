@@ -7,6 +7,7 @@
   </router-view>
   <div class="loading" v-else v-loading="true" element-loading-text="正在加载数据……"></div>
   <status-bar></status-bar>
+  <menu-list></menu-list>
   <k-slot name="global"></k-slot>
 </template>
 
@@ -17,6 +18,7 @@ import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 import ActivityBar from './activity/index.vue'
 import StatusBar from './status.vue'
+import MenuList from './menu/index.vue'
 
 const route = useRoute()
 

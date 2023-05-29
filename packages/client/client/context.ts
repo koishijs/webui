@@ -47,8 +47,8 @@ export type LegacyMenuItem = Partial<ActionOptions> & Omit<MenuItem, 'id'>
 
 export interface MenuItem {
   id: string
+  label?: MaybeGetter<string>
   type?: MaybeGetter<string>
-  label: MaybeGetter<string>
   icon?: MaybeGetter<string>
   order?: number
 }
@@ -86,10 +86,11 @@ type Flatten<S extends {}> = Intersect<{
 class Internal {
   scope = shallowReactive<Store<ActionContext>>({})
   menus = reactive<Dict<MenuItem[]>>({})
-  actions = reactive<Dict<ActionOptions[]>>({})
+  actions = reactive<Dict<ActionOptions>>({})
   views = reactive<Dict<SlotOptions[]>>({})
   themes = reactive<Dict<ThemeOptions>>({})
   settings = reactive<Dict<SettingOptions[]>>({})
+  activeMenus = reactive<{ id: string; styles: Partial<CSSStyleDeclaration> }[]>([])
 
   createScope(prefix = '') {
     return new Proxy({}, {
@@ -103,6 +104,16 @@ class Internal {
         }
       },
     })
+  }
+}
+
+export function useMenu<K extends keyof ActionContext>(id: K) {
+  const ctx = useContext()
+  return (event: MouseEvent, value: MaybeRefOrGetter<ActionContext[K]>) => {
+    ctx.define(id, value)
+    event.preventDefault()
+    const { clientX, clientY } = event
+    ctx.internal.activeMenus.splice(0, Infinity, { id, styles: { left: clientX + 'px', top: clientY + 'px' } })
   }
 }
 
@@ -163,10 +174,9 @@ export class Context extends cordis.Context {
   }
 
   action(id: string, options: ActionOptions) {
-    const list = this.internal.actions[id] ||= []
     markRaw(options)
-    list.push(options)
-    return this.scope.collect('actions', () => remove(list, options))
+    this.internal.actions[id] = options
+    return this.scope.collect('actions', () => delete this.internal.actions[id])
   }
 
   menu(id: string, items: MenuItem[]) {

@@ -1,7 +1,7 @@
 <template>
   <k-layout class="page-sandbox">
     <template #left>
-      <div class="card-header k-menu-item" @click="createUser">添加用户</div>
+      <div class="card-header k-tab-menu-item" @click="createUser">添加用户</div>
       <div class="user-container">
         <el-scrollbar>
           <k-tab-group :data="userMap" v-model="config.user" #="{ name }">

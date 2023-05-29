@@ -21,6 +21,8 @@ $white: #ffffff;
 
   --k-card-bg: var(--bg0);
   --k-card-border: var(--k-card-bg);
+  --k-card-shadow: 0 4px 8px -4px rgb(0 0 0 / 15%);
+  --k-menu-bg: var(--bg0);
   --k-main-bg: var(--bg0);
   --k-side-bg: var(--bg1);
   --k-page-bg: var(--bg0);
@@ -36,7 +38,6 @@ $white: #ffffff;
   --k-text-light: var(--fg3);
   --k-text-active: var(--k-color-primary);
 
-  --k-card-shadow: 0 4px 8px -4px rgb(0 0 0 / 15%);
   --loading-mask-bg: #f2f3f5bf;
 
   @mixin apply-color($name, $base) {
@@ -67,6 +68,8 @@ html.dark, .theme-root.dark {
 
   --k-card-bg: var(--bg2);
   --k-card-border: var(--k-color-divider);
+  --k-card-shadow: 0 4px 8px -4px rgb(0 0 0 / 15%);
+  --k-menu-bg: var(--bg0);
   --k-main-bg: var(--bg3);
   --k-side-bg: var(--bg2);
   --k-page-bg: var(--bg2);
@@ -107,6 +110,9 @@ html.dark, .theme-root.dark {
   --font-family: PingFang SC, Hiragino Sans GB, Microsoft YaHei, SimSun, sans-serif;
   --font-family-code: Consolas, Monaco, "Andale Mono", "Ubuntu Mono", monospace;
 
+  // layout
+  --k-menu-padding-vertical: 0.375rem;
+
   // fallback
   --k-color-border-dark: var(--k-color-border);
   --k-color-border-light: var(--k-color-divider);
@@ -115,6 +121,8 @@ html.dark, .theme-root.dark {
 
   --k-fill-normal: var(--k-color-primary);
   --k-fill-disabled: var(--k-color-disabled);
+
+  --k-menu-shadow: var(--k-card-shadow);
 
   // compatibility
   --border: var(--k-color-border);
