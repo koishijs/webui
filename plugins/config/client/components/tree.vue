@@ -18,6 +18,7 @@
       :allow-drag="allowDrag"
       :allow-drop="allowDrop"
       @node-click="handleClick"
+      @node-contextmenu="trigger"
       @node-drop="handleDrop"
       @node-expand="handleExpand"
       @node-collapse="handleCollapse"
@@ -33,12 +34,14 @@
 <script lang="ts" setup>
 
 import { ref, computed, onActivated, nextTick, watch } from 'vue'
-import { send } from '@koishijs/client'
+import { send, useMenu } from '@koishijs/client'
 import { Tree, plugins, setPath, splitPath } from './utils'
 
 const props = defineProps<{
   modelValue: string
 }>()
+
+const trigger = useMenu('config.tree')
 
 const emits = defineEmits(['update:modelValue'])
 

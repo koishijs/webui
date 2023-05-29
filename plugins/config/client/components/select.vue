@@ -1,5 +1,10 @@
 <template>
-  <el-dialog v-if="store.packages" v-model="showSelect" class="plugin-select">
+  <el-dialog
+    v-if="store.packages"
+    :modelValue="!!select"
+    @update:modelValue="select = null"
+    class="plugin-select"
+  >
     <template #header>
       <slot name="title" :packages="packages">
         <span class="title">选择插件</span>
@@ -24,16 +29,13 @@
 
 import { router, send, store, useI18nText } from '@koishijs/client'
 import { computed, inject, nextTick, ref, watch } from 'vue'
-import { showSelect } from './utils'
-import { useRoute } from 'vue-router'
 import { PackageProvider } from '@koishijs/plugin-config'
+import { select } from './utils'
 
 const tt = useI18nText()
 
 const keyword = ref('')
 const input = ref()
-
-const route = useRoute()
 
 const filter = inject('plugin-select-filter', (data: PackageProvider.Data) => true)
 
@@ -42,15 +44,15 @@ const packages = computed(() => Object.values(store.packages).filter(({ name, sh
 }))
 
 function configure(shortname: string) {
-  showSelect.value = false
-  let path = route.path.slice(9)
+  let path = select.value.path
+  select.value = null
   if (path) path += '/'
   path += shortname + ':' + Math.random().toString(36).slice(2, 8)
   send('manager/unload', path, {})
   router.push('/plugins/' + path)
 }
 
-watch(showSelect, async (value, oldValue) => {
+watch(select, async (value) => {
   if (!value) return
   await nextTick()
   await input.value.focus()

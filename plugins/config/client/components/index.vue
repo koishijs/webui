@@ -38,11 +38,18 @@
       <plugin-settings v-else :current="current" v-model="config"></plugin-settings>
     </k-content>
 
-    <el-dialog v-model="showRemove" title="确认移除" destroy-on-close>
-      确定要移除{{ current.children ? `分组 ${current.alias}` : `插件 ${current.label}` }} 吗？此操作不可撤销！
+    <el-dialog
+      v-model="showRemove"
+      title="确认移除"
+      destroy-on-close
+      @closed="remove = null"
+    >
+      <template v-if="remove">
+        确定要移除{{ remove.children ? `分组 ${remove.alias}` : `插件 ${remove.label}` }} 吗？此操作不可撤销！
+      </template>
       <template #footer>
         <el-button @click="showRemove = false">取消</el-button>
-        <el-button type="danger" @click="(showRemove = false, removeItem(current.path))">确定</el-button>
+        <el-button type="danger" @click="(showRemove = false, removeItem(remove.path))">确定</el-button>
       </template>
     </el-dialog>
   </k-layout>
@@ -53,7 +60,7 @@
 import { computed, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { clone, store, useContext } from '@koishijs/client'
-import { addItem, current, plugins, removeItem, showSelect } from './utils'
+import { Tree, addItem, current, plugins, removeItem, select } from './utils'
 import GlobalSettings from './global.vue'
 import GroupSettings from './group.vue'
 import TreeView from './tree.vue'
@@ -76,7 +83,12 @@ const path = computed<string>({
 
 const config = ref()
 
+const remove = ref<Tree>()
 const showRemove = ref(false)
+
+watch(remove, (value) => {
+  if (value) showRemove.value = true
+})
 
 watch(() => plugins.value.paths[path.value], (value) => {
   current.value = value
@@ -85,21 +97,36 @@ watch(() => plugins.value.paths[path.value], (value) => {
 
 const ctx = useContext()
 
-ctx.define('config.tree', current)
+ctx.define('config.current', current)
 
 ctx.action('config.remove', {
   disabled: () => !current.value.path,
-  action: () => showRemove.value = true,
+  action: () => remove.value = current.value,
 })
 
 ctx.action('config.add-plugin', {
   disabled: () => current.value.path && !current.value.children,
-  action: () => showSelect.value = true,
+  action: () => select.value = current.value,
 })
 
 ctx.action('config.add-group', {
   disabled: () => current.value.path && !current.value.children,
   action: () => addItem(current.value.path, 'group', 'group'),
+})
+
+ctx.action('config.tree.remove', {
+  disabled: ({ config }) => !config.tree.path,
+  action: ({ config }) => remove.value = config.tree,
+})
+
+ctx.action('config.tree.add-plugin', {
+  disabled: ({ config }) => config.tree.path && !config.tree.children,
+  action: ({ config }) => select.value = config.tree,
+})
+
+ctx.action('config.tree.add-group', {
+  disabled: ({ config }) => config.tree.path && !config.tree.children,
+  action: ({ config }) => addItem(config.tree.path, 'group', 'group'),
 })
 
 </script>

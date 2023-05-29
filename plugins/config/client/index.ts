@@ -40,18 +40,18 @@ export default (ctx: Context) => {
 
   ctx.menu('config', [{
     id: 'config.toggle',
-    type: ({ config }) => config.tree?.disabled ? '' : type.value,
-    icon: ({ config }) => config.tree?.disabled ? 'play' : 'stop',
-    label: ({ config }) => config.tree?.disabled ? '启用插件' : '停用插件',
+    type: ({ config }) => config.current?.disabled ? '' : type.value,
+    icon: ({ config }) => config.current?.disabled ? 'play' : 'stop',
+    label: ({ config }) => config.current?.disabled ? '启用插件' : '停用插件',
   }, {
     id: 'config.save',
-    icon: ({ config }) => config.tree?.disabled ? 'save' : 'check',
-    label: ({ config }) => config.tree?.disabled ? '保存配置' : '重载配置',
+    icon: ({ config }) => config.current?.disabled ? 'save' : 'check',
+    label: ({ config }) => config.current?.disabled ? '保存配置' : '重载配置',
   }, {
     id: 'config.remove',
     type: 'danger',
     icon: 'trash-can',
-    label: ({ config }) => config.tree?.children ? '移除分组' : '移除插件',
+    label: ({ config }) => config.current?.children ? '移除分组' : '移除插件',
   }, {
     id: 'config.add-plugin',
     icon: 'add-plugin',
@@ -60,5 +60,19 @@ export default (ctx: Context) => {
     id: 'config.add-group',
     icon: 'add-group',
     label: '添加分组',
+  }])
+
+  ctx.menu('config.tree', [{
+    id: '.add-plugin',
+    label: '添加插件',
+  }, {
+    id: '.add-group',
+    label: '添加分组',
+  }, {
+    id: '@separator',
+  }, {
+    id: '.remove',
+    type: 'danger',
+    label: ({ config }) => config.tree?.children ? '移除分组' : '移除插件',
   }])
 }

@@ -27,7 +27,7 @@ export interface EnvInfo {
   warning?: boolean
 }
 
-export const showSelect = ref(false)
+export const select = ref<Tree>()
 
 export const coreDeps = [
   '@koishijs/plugin-console',
@@ -93,6 +93,7 @@ export const envMap = computed(() => {
 
 declare module '@koishijs/client' {
   interface ActionContext {
+    'config.current': Tree
     'config.tree': Tree
   }
 }
