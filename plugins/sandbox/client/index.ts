@@ -11,4 +11,12 @@ export default (ctx: Context) => {
     authority: 4,
     component: Sandbox,
   })
+
+  ctx.menu('sandbox.message', [{
+    id: '.delete',
+    label: '删除消息',
+  }, {
+    id: '.quote',
+    label: '引用回复',
+  }])
 }

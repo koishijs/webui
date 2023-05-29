@@ -32,7 +32,7 @@
       </k-content>
       <template v-else :key="channel">
         <virtual-list :data="config.messages[channel] || []" #="data" pinned>
-          <chat-message :data="data" @message-contextmenu="handleContextMenu($event, data)"></chat-message>
+          <chat-message :data="data"></chat-message>
         </virtual-list>
         <div class="card-footer">
           <div class="quote" v-if="quote">
@@ -44,30 +44,25 @@
       </template>
     </keep-alive>
   </k-layout>
-
-  <teleport to="body">
-    <div ref="menu" class="message-context-menu" v-if="menuTarget">
-      <div class="item" @click.prevent="deleteMessage(menuTarget)">
-        删除消息
-      </div>
-      <div class="item" @click.prevent="quote = menuTarget, menuTarget = null">
-        引用回复
-      </div>
-    </div>
-  </teleport>
 </template>
 
 <script lang="ts" setup>
 
-import { clone, message, send, Schema, ChatInput, VirtualList, deepEqual } from '@koishijs/client'
-import { useEventListener } from '@vueuse/core'
-import { computed, nextTick, ref, watch } from 'vue'
+import { clone, message, send, Schema, ChatInput, VirtualList, deepEqual, useContext } from '@koishijs/client'
+import { computed, ref, watch } from 'vue'
+import { Message } from '@koishijs/plugin-sandbox'
 import { api, channel, config, words, panelTypes } from './utils'
 import ChatMessage from './message.vue'
-import { Message } from '../src'
 
-const menuTarget = ref<Message>()
-const menu = ref()
+const ctx = useContext()
+
+ctx.action('sandbox.message.delete', {
+  action: ({ sandbox }) => deleteMessage(sandbox.message),
+})
+
+ctx.action('sandbox.message.quote', {
+  action: ({ sandbox }) => quote.value = sandbox.message,
+})
 
 const schema = Schema.object({
   authority: Schema.natural().description('权限等级'),
@@ -155,26 +150,8 @@ function sendMessage(content: string) {
   quote.value = null
 }
 
-async function handleContextMenu(event: MouseEvent, data: Message) {
-  event.preventDefault()
-  menuTarget.value = data
-  await nextTick()
-  const { clientX, clientY } = event
-  menu.value.style.left = clientX + 'px'
-  menu.value.style.top = clientY + 'px'
-}
-
-useEventListener('click', () => {
-  menuTarget.value = null
-})
-
-useEventListener('contextmenu', () => {
-  menuTarget.value = null
-})
-
 async function deleteMessage(data: Message) {
   await send('sandbox/delete-message', data.platform, data.user, data.channel, data.id)
-  menuTarget.value = null
   api.deleteMessage({ messageId: data.id, channelId: data.channel })
 }
 

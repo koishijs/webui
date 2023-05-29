@@ -2,7 +2,7 @@
   <div class="chat-message">
     <div class="avatar">{{ data.user[0] }}</div>
     <div class="nickname">{{ data.user }}</div>
-    <div class="message-box" @contextmenu.stop="$emit('message-contextmenu', $event)">
+    <div class="message-box" @contextmenu.stop="trigger($event, data)">
       <blockquote class="quote" v-if="data.quote">
         <span class="abstract">{{ data.quote.content }}</span>
       </blockquote>
@@ -13,14 +13,14 @@
 
 <script lang="ts" setup>
 
-import { Message } from '@koishijs/plugin-sandbox/src'
-import { MessageContent } from '@koishijs/client'
+import { Message } from '@koishijs/plugin-sandbox'
+import { MessageContent, useMenu } from '@koishijs/client'
 
 defineProps<{
   data: Message
 }>()
 
-defineEmits(['message-contextmenu'])
+const trigger = useMenu('sandbox.message')
 
 </script>
 

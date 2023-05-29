@@ -4,6 +4,12 @@ import type { RemovableRef } from '@vueuse/core'
 import type { Dict } from 'koishi'
 import { computed } from 'vue'
 
+declare module '@koishijs/client' {
+  interface ActionContext {
+    'sandbox.message': Message
+  }
+}
+
 export const panelTypes = {
   private: '私聊模式',
   guild: '群聊模式',
