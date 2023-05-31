@@ -26,7 +26,7 @@ const ctx = useContext()
   position: fixed;
   z-index: 1000;
   min-width: 12rem;
-  padding: var(--k-menu-padding-vertical) 0;
+  padding: var(--k-menu-padding-y) 0;
   border-radius: 6px;
   background-color: var(--k-menu-bg);
   box-shadow: var(--k-menu-shadow);
@@ -34,7 +34,7 @@ const ctx = useContext()
   font-size: 14px;
 
   .k-menu-separator {
-    margin: var(--k-menu-padding-vertical) 0;
+    margin: var(--k-menu-padding-y) 0;
     border-top: 1px solid var(--k-color-border);
 
     &:first-child, &:last-child {

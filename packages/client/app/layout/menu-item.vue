@@ -15,7 +15,11 @@ const props = defineProps<LegacyMenuItem>()
 
 const ctx = useContext()
 
-const disabled = computed(() => props.disabled ? toValue(props.disabled) : false)
+const disabled = computed(() => {
+  if (!props.action) return true
+  if (!props.disabled) return false
+  return toValue(props.disabled)
+})
 
 function toValue<T>(getter: MaybeGetter<T>): T {
   if (typeof getter !== 'function') return getter

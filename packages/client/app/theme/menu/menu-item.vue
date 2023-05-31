@@ -43,7 +43,9 @@ function toValue<T>(getter: MaybeGetter<T>): T {
 
 .k-menu-item {
   user-select: none;
-  padding: 0.25rem 1.5rem;
+  margin: 0 var(--k-menu-padding-x);
+  padding: 0.375rem 1.25rem;
+  border-radius: 4px;
   cursor: pointer;
   transition: var(--color-transition);
 

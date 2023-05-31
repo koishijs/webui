@@ -89,7 +89,9 @@ html .el-switch {
 }
 
 .el-button {
-  --el-button-hover-bg-color: var(--bg1);
+  --el-button-hover-bg-color: var(--k-button-hover-bg);
+  --el-button-hover-border-color: var(--k-color-active);
+  transition: var(--color-transition);
 }
 
 .el-switch__core .el-switch__action,
@@ -109,10 +111,6 @@ html.dark .el-popper.is-dark {
     background: var(--bg1);
     transition: var(--color-transition);
   }
-}
-
-.el-button {
-  --el-button-hover-border-color: var(--active);
 }
 
 .right-adjacent {
