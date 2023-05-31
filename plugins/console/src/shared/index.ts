@@ -37,6 +37,8 @@ export interface Entry {
 }
 
 export class EntryProvider extends DataService<string[]> {
+  static using = []
+
   constructor(ctx: Context) {
     super(ctx, 'entry', { immediate: true })
   }
