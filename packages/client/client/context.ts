@@ -10,6 +10,21 @@ import { SlotOptions } from './components'
 import { useColorMode, useConfig } from './config'
 import { ActionContext } from '.'
 
+export type Plugin = cordis.Plugin<Context>
+
+export namespace Plugin {
+  export type Function<T = any> = cordis.Plugin.Function<T, Context>
+  export type Constructor<T = any> = cordis.Plugin.Constructor<T, Context>
+  export type Object<S = any, T = any> = cordis.Plugin.Object<S, T, Context>
+}
+
+export type EffectScope = cordis.EffectScope<Context>
+export type ForkScope = cordis.ForkScope<Context>
+export type MainScope = cordis.MainScope<Context>
+export type Service = cordis.Service<Context>
+
+export const Service = cordis.Service<Context>
+
 const config = useConfig()
 const mode = useColorMode()
 

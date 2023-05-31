@@ -50,8 +50,6 @@ function findAncestors(scope: EffectScope, suffix: string[] = []): string[] {
 }
 
 export default class CommandProvider extends DataService<CommandData[]> {
-  static using = ['console'] as const
-
   cached: CommandData[]
   update = debounce(0, () => this.refresh())
 

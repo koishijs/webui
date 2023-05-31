@@ -17,6 +17,7 @@ const responseHooks: Record<string, [Function, Function]> = {}
 export function send<T extends keyof Events>(type: T, ...args: Parameters<Events[T]>): Promisify<ReturnType<Events[T]>>
 export function send(type: string, ...args: any[]) {
   if (!socket.value) return
+  console.debug('↑%c', 'color:brown', type, args)
   const id = Math.random().toString(36).slice(2, 9)
   socket.value.send(JSON.stringify({ id, type, args }))
   return new Promise((resolve, reject) => {
@@ -84,7 +85,7 @@ export function connect(callback: () => AbstractWebSocket) {
   value.addEventListener('message', (ev) => {
     refresh()
     const data = JSON.parse(ev.data)
-    console.debug('%c', 'color:purple', data.type, data.body)
+    console.debug('↓%c', 'color:purple', data.type, data.body)
     if (data.type in listeners) {
       listeners[data.type](data.body)
     }

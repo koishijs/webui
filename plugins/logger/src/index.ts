@@ -15,8 +15,6 @@ declare module '@koishijs/plugin-console' {
 }
 
 class LogProvider extends DataService<string[]> {
-  static using = ['console'] as const
-
   root: string
   date: string
   files: number[] = []

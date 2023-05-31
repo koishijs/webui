@@ -218,7 +218,7 @@ namespace NodeConsole {
       timeout: Schema.number().default(Time.minute),
     }),
     devMode: Schema.boolean().default(process.env.NODE_ENV === 'development').hidden(),
-    cacheDir: Schema.string().default('.vite').hidden(),
+    cacheDir: Schema.string().default('cache/vite').hidden(),
   }).i18n({
     'zh-CN': require('./locales/zh-CN'),
   })

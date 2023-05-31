@@ -10,8 +10,8 @@ export namespace DataService {
 
 export abstract class DataService<T = never> extends Service {
   static filter = false
-
   static keys = new Set<string>()
+  static using = ['console']
 
   static define(name: keyof Console.Services) {
     this.keys.add(name)

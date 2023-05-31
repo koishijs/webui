@@ -4,8 +4,6 @@ import { helpers } from 'envinfo'
 import which from 'which-pm-runs'
 
 class EnvInfoProvider extends DataService<Dict<Dict<string>>> {
-  static using = ['console'] as const
-
   private task: Promise<Dict<Dict<string>>>
 
   constructor(ctx: Context, public config: EnvInfoProvider.Config) {
