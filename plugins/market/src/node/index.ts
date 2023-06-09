@@ -1,23 +1,28 @@
 import { Context, Schema } from 'koishi'
 import { resolve } from 'path'
+import Dependencies from './deps'
 import Installer from './installer'
 import MarketProvider from './market'
 
 export * from '../shared'
 
-export { Installer }
+export { Dependencies, Installer }
+
+declare module 'koishi' {
+  interface Context {
+    installer: Installer
+  }
+}
 
 declare module '@koishijs/plugin-console' {
   namespace Console {
     interface Services {
-      dependencies: Installer
+      dependencies: Dependencies
     }
   }
 }
 
-export const filter = false
 export const name = 'market'
-export const using = ['console', 'loader'] as const
 
 export interface Config {
   registry?: Installer.Config
@@ -35,10 +40,14 @@ export function apply(ctx: Context, config: Config) {
   }
 
   ctx.plugin(Installer, config.registry)
-  ctx.plugin(MarketProvider, config.search)
 
-  ctx.console.addEntry({
-    dev: resolve(__dirname, '../../client/index.ts'),
-    prod: resolve(__dirname, '../../dist'),
+  ctx.using(['console', 'installer'], (ctx) => {
+    ctx.plugin(Dependencies)
+    ctx.plugin(MarketProvider, config.search)
+
+    ctx.console.addEntry({
+      dev: resolve(__dirname, '../../client/index.ts'),
+      prod: resolve(__dirname, '../../dist'),
+    })
   })
 }

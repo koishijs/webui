@@ -4,8 +4,6 @@ import { MarketProvider as BaseMarketProvider } from '../shared'
 import { throttle } from 'throttle-debounce'
 
 class MarketProvider extends BaseMarketProvider {
-  static using = ['console.dependencies']
-
   private http: Quester
   private failed: string[] = []
   private scanner: Scanner
@@ -22,7 +20,6 @@ class MarketProvider extends BaseMarketProvider {
     this.failed = []
     this.fullCache = {}
     this.tempCache = {}
-    this.ctx.console.dependencies.refresh()
     await this.prepare()
     this.refresh()
   }
@@ -43,7 +40,7 @@ class MarketProvider extends BaseMarketProvider {
 
   async collect() {
     const { timeout } = this.config
-    const registry = this.ctx.console.dependencies.http
+    const registry = this.ctx.installer.http
 
     this.failed = []
     this.scanner = new Scanner(registry.get)

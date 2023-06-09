@@ -6,7 +6,7 @@ import { ConfigWriter, ServiceProvider } from '../shared'
 export * from '../shared'
 
 export const name = 'config'
-export const using = ['console', 'loader'] as const
+export const using = ['console'] as const
 
 export interface Config {}
 

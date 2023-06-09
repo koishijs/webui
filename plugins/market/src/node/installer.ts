@@ -1,48 +1,31 @@
-import { Context, Dict, Logger, pick, Quester, Schema, Time, valueMap } from 'koishi'
-import { DataService } from '@koishijs/plugin-console'
-import { PackageJson, Registry, RemotePackage } from '@koishijs/registry'
+import { Context, defineProperty, Dict, Logger, pick, Quester, Schema, Service, Time, valueMap } from 'koishi'
+import { PackageJson, Registry } from '@koishijs/registry'
 import { resolve } from 'path'
-import { promises as fsp } from 'fs'
-import { loadManifest } from './utils'
+import { promises as fsp, readFileSync } from 'fs'
 import { compare, satisfies, valid } from 'semver'
+import { Dependency } from '../shared'
 import {} from '@koishijs/loader'
 import getRegistry from 'get-registry'
 import which from 'which-pm-runs'
 import spawn from 'execa'
 import pMap from 'p-map'
 
-declare module '@koishijs/plugin-console' {
-  interface Events {
-    'market/install'(deps: Dict<string>): Promise<number>
-  }
-}
-
 const logger = new Logger('market')
 
-const depKeys = ['peerDependencies', 'peerDependenciesMeta', 'deprecated'] as const
-
-export interface Dependency {
-  /**
-   * requested semver range
-   * @example `^1.2.3` -> `1.2.3`
-   */
-  request: string
-  /**
-   * installed package version
-   * @example `1.2.5`
-   */
-  resolved?: string
-  /** whether it is a workspace package */
-  workspace?: boolean
-  /** all available versions */
-  versions?: Dict<Pick<RemotePackage, typeof depKeys[number]>>
-  /** latest version */
-  latest?: string
-  /** valid (unsupported) syntax */
-  invalid?: boolean
+export interface LocalPackage extends PackageJson {
+  private?: boolean
+  $workspace?: boolean
 }
 
-class Installer extends DataService<Dict<Dependency>> {
+export function loadManifest(name: string) {
+  const filename = require.resolve(name + '/package.json')
+  const meta: LocalPackage = JSON.parse(readFileSync(filename, 'utf8'))
+  meta.dependencies ||= {}
+  defineProperty(meta, '$workspace', !filename.includes('node_modules'))
+  return meta
+}
+
+class Installer extends Service {
   public http: Quester
   public registry: string
 
@@ -51,24 +34,18 @@ class Installer extends DataService<Dict<Dependency>> {
   private task: Promise<Dict<Dependency>>
 
   constructor(public ctx: Context, public config: Installer.Config) {
-    super(ctx, 'dependencies', { authority: 4 })
+    super(ctx, 'installer')
     this.manifest = loadManifest(this.cwd)
-
-    ctx.console.addListener('market/install', this.installDep, { authority: 4 })
   }
 
   get cwd() {
     return this.ctx.baseDir
   }
 
-  async prepare() {
+  async start() {
     const { endpoint, timeout } = this.config
     this.registry = endpoint || await getRegistry()
     this.http = this.ctx.http.extend({ endpoint: this.registry, timeout })
-  }
-
-  async start() {
-    await this.prepare()
   }
 
   private async _get() {
@@ -92,7 +69,7 @@ class Installer extends DataService<Dict<Dependency>> {
       try {
         const registry = await this.http.get<Registry>(`/${name}`)
         const entries = Object.values(registry.versions)
-          .map(item => [item.version, pick(item, depKeys)] as const)
+          .map(item => [item.version, pick(item, Dependency.keys)] as const)
           .sort(([a], [b]) => compare(b, a))
         result[name].latest = entries[0][0]
         result[name].versions = Object.fromEntries(entries)
@@ -176,8 +153,6 @@ class Installer extends DataService<Dict<Dependency>> {
       this.ctx.loader.fullReload()
     }
 
-    this.refresh()
-    this.ctx.console.packages?.refresh()
     return 0
   }
 }
