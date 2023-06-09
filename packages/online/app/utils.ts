@@ -73,11 +73,12 @@ export async function activate(id?: string) {
     loader.config = {
       plugins: {
         'console': {},
+        'dataview': {},
         'help': {},
         'insight': {},
-        'sandbox': {},
         'market': {},
-        'dataview': {},
+        'sandbox': {},
+        'theme-vanilla': {},
       },
     }
     await fs.writeFile(filename, dump(loader.config))

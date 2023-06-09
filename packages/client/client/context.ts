@@ -215,6 +215,13 @@ export class Context extends cordis.Context {
     options.component = this.wrapComponent(options.component)
     const list = this.internal.settings[options.id] ||= []
     insert(list, options)
+    if (options.schema) {
+      try {
+        options.schema(config.value, { autofix: true })
+      } catch (error) {
+        console.error(error)
+      }
+    }
     return this.scope.collect('settings', () => remove(list, options))
   }
 

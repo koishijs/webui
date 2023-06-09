@@ -32,7 +32,7 @@ export function createStorage<T extends object>(key: string, version: number, fa
   return reactive<T>(storage.value['data'])
 }
 
-export const config = useStorage<Config>('config', 1.1, () => ({
+export const config = useStorage<Config>('config', undefined, () => ({
   theme: {
     mode: 'auto',
     dark: 'default-dark',

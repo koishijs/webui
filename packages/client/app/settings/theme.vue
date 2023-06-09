@@ -48,7 +48,7 @@ const config = SchemaBase.useModel()
 
 const model = computed({
   get() {
-    return tt(ctx.internal.themes[config.value].name)
+    return tt(ctx.internal.themes[config.value]?.name)
   },
   set(value) {
     emit('update:modelValue', value)
