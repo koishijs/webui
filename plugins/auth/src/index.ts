@@ -10,6 +10,7 @@ declare module 'koishi' {
 
   interface User {
     password: string
+    config: any
   }
 
   interface Tables {
@@ -53,7 +54,7 @@ export interface LoginToken {
 
 export type Auth =
   & Pick<LoginToken, 'token' | 'expiredAt'>
-  & Pick<User, 'id' | 'name' | 'authority'>
+  & Pick<User, 'id' | 'name' | 'authority' | 'config'>
 
 interface AuthData extends Auth {
   tokens: Omit<LoginToken, 'token' | 'id'>[]
@@ -75,7 +76,7 @@ export interface UserLogin extends Pick<User, 'id' | 'name'> {
   expiredAt: number
 }
 
-export type UserUpdate = Partial<Pick<User, 'name' | 'password'>>
+export type UserUpdate = Partial<Pick<User, 'name' | 'password' | 'config'>>
 
 function toHash(password: string) {
   return createHash('sha256').update(password).digest('hex')
@@ -89,6 +90,11 @@ class AuthService extends Service {
 
     ctx.model.extend('user', {
       password: 'string(255)',
+      config: {
+        type: 'json',
+        length: 65535,
+        initial: null,
+      },
     })
 
     ctx.model.extend('token', {
@@ -127,7 +133,9 @@ class AuthService extends Service {
     }])
   }
 
-  async setAuth(client: Client, auth = client.auth) {
+  async setAuth(client: Client, auth = client.auth, passive = false) {
+    client.auth = auth
+    if (passive) return
     if (auth) {
       const bindings = await this.ctx.database.get('binding', { aid: auth.id })
       bindings.forEach(binding => delete binding.aid)
@@ -137,12 +145,11 @@ class AuthService extends Service {
     } else {
       client.send({ type: 'data', body: { key: 'user', value: null } })
     }
-    client.auth = auth
     client.ctx.emit('console/connection', client)
     client.refresh()
   }
 
-  async createToken(client: Client, type: LoginType, user: Pick<User, 'id' | 'name' | 'authority'>) {
+  async createToken(client: Client, type: LoginType, user: Pick<User, 'id' | 'name' | 'authority' | 'config'>) {
     const { headers, socket } = client.request
     const createdAt = new Date()
     const lastUsedAt = new Date()
@@ -161,7 +168,7 @@ class AuthService extends Service {
 
     ctx.console.addListener('login/password', async function (name, password) {
       password = toHash(password)
-      const [user] = await ctx.database.get('user', { name }, ['password', 'name', 'id', 'authority'])
+      const [user] = await ctx.database.get('user', { name }, ['password', 'name', 'id', 'authority', 'config'])
       if (!user || user.password !== password) throw new Error('用户名或密码错误。')
       await self.createToken(this, 'password', omit(user, ['password']))
     })
@@ -169,7 +176,7 @@ class AuthService extends Service {
     ctx.console.addListener('login/token', async function (aid, token) {
       const [data] = await ctx.database.get('token', { id: aid, token }, ['expiredAt'])
       if (!data || data.expiredAt <= Date.now()) throw new Error('令牌已失效。')
-      const [user] = await ctx.database.get('user', { id: aid }, ['id', 'name', 'authority'])
+      const [user] = await ctx.database.get('user', { id: aid }, ['id', 'name', 'authority', 'config'])
       if (!user) throw new Error('用户不存在。')
       await ctx.database.set('token', { token }, { lastUsedAt: new Date() })
       await self.setAuth(this, { ...user, ...data, token })
@@ -209,7 +216,7 @@ class AuthService extends Service {
         await ctx.database.set('binding', { platform, pid }, { aid: state[2].auth.id })
         return self.setAuth(state[2], state[2].auth)
       } else {
-        const user = await session.observeUser(['id', 'name', 'authority'])
+        const user = await session.observeUser(['id', 'name', 'authority', 'config'])
         return self.createToken(state[2], 'platform', user)
       }
     }, true)
@@ -242,7 +249,7 @@ class AuthService extends Service {
       if (data.password) data.password = toHash(data.password)
       await ctx.database.set('user', { id: this.auth.id }, data)
       Object.assign(this.auth, data)
-      await self.setAuth(this)
+      await self.setAuth(this, undefined, true)
     })
 
     ctx.console.addListener('user/unbind', async function (platform, pid) {

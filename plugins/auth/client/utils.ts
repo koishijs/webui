@@ -1,8 +1,15 @@
-import { ref, watch } from 'vue'
-import { message, pick, router, store, useStorage } from '@koishijs/client'
+import { ref } from 'vue'
+import { useStorage } from '@koishijs/client'
 import { LoginToken } from '@koishijs/plugin-auth'
 
-interface AuthConfig extends Partial<LoginToken> {
+declare module '@koishijs/client' {
+  interface Config {
+    sync?: boolean
+  }
+}
+
+interface SharedConfig extends Partial<LoginToken> {
+  sync?: boolean
   name?: string
   authType: 0 | 1
   platform?: string
@@ -11,25 +18,9 @@ interface AuthConfig extends Partial<LoginToken> {
   password?: string
 }
 
-export const config = useStorage<AuthConfig>('auth', 2, () => ({
+export const shared = useStorage<SharedConfig>('auth', 2, () => ({
   authType: 0,
 }))
 
-export const showDialog = ref(false)
-
-watch(() => store.user, (value, oldValue) => {
-  showDialog.value = false
-  if (!value) {
-    return router.push('/login')
-  }
-
-  if (oldValue) return
-  Object.assign(config.value, pick(value, ['id', 'name', 'token', 'expiredAt']))
-  message.success(`欢迎回来，${value.name || 'Koishi 用户'}！`)
-  const from = router.currentRoute.value.redirectedFrom
-  if (from && !from.path.startsWith('/login')) {
-    router.push(from)
-  } else {
-    router.push('/profile')
-  }
-})
+export const showLoginDialog = ref(false)
+export const showSyncDialog = ref(false)

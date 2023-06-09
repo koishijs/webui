@@ -1,5 +1,6 @@
-import { Context, icons, message, router, send, store } from '@koishijs/client'
-import { config } from './utils'
+import { Context, deepEqual, icons, message, pick, router, Schema, send, store, useConfig } from '@koishijs/client'
+import { defineComponent, h, resolveComponent, watch } from 'vue'
+import { shared, showLoginDialog, showSyncDialog } from './utils'
 import Login from './login.vue'
 import Profile from './profile.vue'
 import At from './icons/at.vue'
@@ -9,6 +10,7 @@ import SignIn from './icons/sign-in.vue'
 import SignOut from './icons/sign-out.vue'
 import UserFull from './icons/user-full.vue'
 import BindDialog from './bind-dialog.vue'
+import SyncDialog from './sync-dialog.vue'
 
 icons.register('at', At)
 icons.register('check', Check)
@@ -18,8 +20,8 @@ icons.register('sign-out', SignOut)
 icons.register('user-full', UserFull)
 
 export default (ctx: Context) => {
-  if (config.value.token && config.value.expiredAt > Date.now()) {
-    send('login/token', config.value.id, config.value.token).catch(e => message.error(e.message))
+  if (shared.value.token && shared.value.expiredAt > Date.now()) {
+    send('login/token', shared.value.id, shared.value.token).catch(e => message.error(e.message))
   }
 
   ctx.on('activity', (data) => {
@@ -64,4 +66,56 @@ export default (ctx: Context) => {
     type: 'global',
     component: BindDialog,
   })
+
+  ctx.slot({
+    type: 'global',
+    component: SyncDialog,
+  })
+
+  ctx.settings({
+    id: 'user',
+    title: '用户设置',
+    component: defineComponent(() => () => h(resolveComponent('k-form'), {
+      schema: Schema.object({
+        sync: Schema.boolean().description('在多个客户端间同步设置。'),
+      }).description('同步设置'),
+      initial: shared.value,
+      modelValue: shared.value,
+      'onUpdate:modelValue': (value: any) => shared.value = value,
+    })),
+  })
+
+  const config = useConfig()
+
+  function checkSync() {
+    if (deepEqual(store.user.config, config.value)) return
+    showSyncDialog.value = true
+  }
+
+  ctx.on('dispose', watch(config, async (value) => {
+    if (!value || !store.user || !shared.value.sync) return
+    await send('user/update', { config: value })
+  }, { deep: true }))
+
+  ctx.on('dispose', watch(() => shared.value.sync, async (value) => {
+    if (value && store.user) checkSync()
+  }))
+
+  ctx.on('dispose', watch(() => store.user, (value, oldValue) => {
+    showLoginDialog.value = false
+    if (!value) {
+      return router.push('/login')
+    }
+
+    if (shared.value.sync) checkSync()
+    if (oldValue) return
+    Object.assign(shared.value, pick(value, ['id', 'name', 'token', 'expiredAt']))
+    message.success(`欢迎回来，${value.name || 'Koishi 用户'}！`)
+    const from = router.currentRoute.value.redirectedFrom
+    if (from && !from.path.startsWith('/login')) {
+      router.push(from)
+    } else {
+      router.push('/profile')
+    }
+  }))
 }

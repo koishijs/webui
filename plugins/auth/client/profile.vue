@@ -5,7 +5,7 @@
 
       <h2 class="k-schema-header">
         平台绑定
-        <el-button solid class="right" @click="showDialog = true">添加</el-button>
+        <el-button solid class="right" @click="showLoginDialog = true">添加</el-button>
       </h2>
       <div class="k-schema-item" v-for="({ platform, pid, bid }) in store.user.bindings">
         <div class="header">
@@ -37,7 +37,7 @@
 <script lang="ts" setup>
 
 import { send, store } from '@koishijs/client'
-import { config, showDialog } from './utils'
+import { shared, showLoginDialog } from './utils'
 import { computed, ref } from 'vue'
 import { message, Schema } from '@koishijs/client'
 import { UserUpdate } from '@koishijs/plugin-auth'
@@ -51,17 +51,17 @@ const diff = ref<UserUpdate>({})
 
 const schema = computed(() => {
   const result: Schema<UserUpdate> = Schema.object({
-    name: Schema.string().description('用户名').default(config.value.name),
-    password: Schema.string().role('secret').description('密码').default(config.value.password),
+    name: Schema.string().description('用户名').default(shared.value.name),
+    password: Schema.string().role('secret').description('密码').default(shared.value.password),
   }).description('基本资料')
   return result
 })
 
 async function logout() {
   store.user = null
-  delete config.value.id
-  delete config.value.token
-  delete config.value.expiredAt
+  delete shared.value.id
+  delete shared.value.token
+  delete shared.value.expiredAt
   return send('user/logout')
 }
 
@@ -69,7 +69,7 @@ async function update() {
   try {
     await send('user/update', diff.value)
     message.success('修改成功！')
-    Object.assign(config.value, diff.value)
+    Object.assign(shared.value, diff.value)
     Object.assign(store.user, diff.value)
     diff.value = {}
   } catch (e) {

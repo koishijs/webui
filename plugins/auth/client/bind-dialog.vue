@@ -1,17 +1,16 @@
 <template>
-  <el-dialog center v-model="showDialog" class="bind-dialog">
+  <el-dialog center v-model="showLoginDialog" class="bind-dialog">
     <login-form></login-form>
   </el-dialog>
 </template>
 
 <script lang="ts" setup>
 
-import { showDialog } from './utils'
+import { showLoginDialog } from './utils'
 import LoginForm from './login-form.vue'
 
 </script>
 
 <style lang="scss">
-
 
 </style>
