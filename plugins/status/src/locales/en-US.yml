@@ -1,6 +1,6 @@
 commands:
   status:
-    description: Display the status
+    description: 查看运行状态
     messages:
       status:
         online: 运行中
