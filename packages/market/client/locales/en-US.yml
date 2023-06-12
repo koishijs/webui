@@ -18,10 +18,10 @@ category:
   all: 所有插件
   other: 未分类
   core: 核心功能
-  adapter: 适配器
+  adapter: Adapter
   storage: 存储服务
   extension: 扩展功能
-  console: 控制台
+  console: Console
   manage: 管理工具
   preset: 行为预设
   image: 图片服务
