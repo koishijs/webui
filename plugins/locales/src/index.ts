@@ -87,7 +87,10 @@ namespace LocaleProvider {
   }
 
   export const Config: Schema<Config> = Schema.object({
-    root: Schema.string().default('data/locales').description('存放本地化文件的根目录。'),
+    root: Schema.path({
+      filters: ['directory'],
+      allowCreate: true,
+    }).default('data/locales').description('存放本地化文件的根目录。'),
   })
 }
 
