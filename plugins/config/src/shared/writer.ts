@@ -1,5 +1,5 @@
 import { DataService } from '@koishijs/plugin-console'
-import { Context, remove } from 'koishi'
+import { Context, Logger, remove } from 'koishi'
 import { Loader } from '@koishijs/loader'
 
 declare module '@koishijs/plugin-console' {
@@ -14,6 +14,8 @@ declare module '@koishijs/plugin-console' {
     'manager/meta'(path: string, config: any): void
   }
 }
+
+const logger = new Logger('loader')
 
 export function splitPath(path: string) {
   return path.split(/\/?(@[\w-]+\/[\w:-]+|[\w:-]+)\/?/).filter(Boolean)
@@ -60,7 +62,14 @@ export class ConfigWriter extends DataService<Context.Config> {
     }, { authority: 4 })
 
     for (const key of ['teleport', 'reload', 'unload', 'remove', 'group', 'meta', 'alias'] as const) {
-      ctx.console.addListener(`manager/${key}`, this[key].bind(this), { authority: 4 })
+      ctx.console.addListener(`manager/${key}`, async (...args: any[]) => {
+        try {
+          await this[key].apply(this, args)
+        } catch (error) {
+          logger.error(error)
+          throw new Error('failed')
+        }
+      }, { authority: 4 })
     }
 
     ctx.on('config', () => this.refresh())

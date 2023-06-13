@@ -126,8 +126,12 @@ ctx.action('config.save', {
   disabled: () => !name.value,
   action: async () => {
     const { disabled } = props.current
-    await execute(disabled ? 'unload' : 'reload')
-    message.success(disabled ? '配置已保存。' : '配置已重载。')
+    try {
+      await execute(disabled ? 'unload' : 'reload')
+      message.success(disabled ? '配置已保存。' : '配置已重载。')
+    } catch (error) {
+      message.error('操作失败，请检查日志！')
+    }
   },
 })
 
@@ -135,8 +139,12 @@ ctx.action('config.toggle', {
   disabled: () => !name.value || coreDeps.includes(name.value),
   action: async () => {
     const { disabled } = props.current
-    await execute(disabled ? 'reload' : 'unload')
-    message.success(disabled ? '插件已启用。' : '插件已停用。')
+    try {
+      await execute(disabled ? 'reload' : 'unload')
+      message.success(disabled ? '插件已启用。' : '插件已停用。')
+    } catch (error) {
+      message.error('操作失败，请检查日志！')
+    }
   },
 })
 
