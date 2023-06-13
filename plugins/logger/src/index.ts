@@ -1,10 +1,9 @@
-import { Context, Logger, remove, Schema, Time } from 'koishi'
+import { Context, Dict, Logger, remove, Schema, Time } from 'koishi'
 import { DataService } from '@koishijs/plugin-console'
 import { resolve } from 'path'
-import { promises as fsp, mkdirSync, readdirSync } from 'fs'
-import { FileHandle } from 'fs/promises'
-
-const { open, rm } = fsp
+import { mkdirSync, readdirSync } from 'fs'
+import { rm } from 'fs/promises'
+import { FileWriter } from './file'
 
 declare module '@koishijs/plugin-console' {
   namespace Console {
@@ -14,10 +13,10 @@ declare module '@koishijs/plugin-console' {
   }
 }
 
-class LogProvider extends DataService<string[]> {
+class LogProvider extends DataService<Logger.Record[]> {
   root: string
   date: string
-  files: number[] = []
+  files: Dict<number> = {}
   writer: FileWriter
 
   constructor(ctx: Context, private config: LogProvider.Config = {}) {
@@ -28,10 +27,15 @@ class LogProvider extends DataService<string[]> {
       prod: resolve(__dirname, '../dist'),
     })
 
-    this.ctx.on('ready', () => {
+    ctx.on('ready', () => {
       this.prepareWriter()
       this.prepareLogger()
     }, true)
+
+    ctx.on('dispose', () => {
+      this.writer?.close()
+      this.writer = null
+    })
   }
 
   prepareWriter() {
@@ -39,44 +43,41 @@ class LogProvider extends DataService<string[]> {
     mkdirSync(this.root, { recursive: true })
 
     for (const filename of readdirSync(this.root)) {
-      if (!filename.endsWith('.log')) continue
-      this.files.push(Time.getDateNumber(new Date(filename.slice(0, -4)), 0))
+      const capture = /^(\d{4}-\d{2}-\d{2})-(\d+)\.log$/.exec(filename)
+      if (!capture) continue
+      this.files[capture[1]] = Math.max(this.files[capture[1]] ?? 0, +capture[2])
     }
 
-    this.createFile()
-
-    this.ctx.on('dispose', () => {
-      this.writer?.close()
-      this.writer = null
-    })
+    const date = new Date().toISOString().slice(0, 10)
+    this.createFile(date, this.files[date] ??= 1)
   }
 
-  createFile() {
-    this.date = Time.template('yyyy-MM-dd')
-    this.writer = new FileWriter(`${this.root}/${this.date}.log`)
+  async createFile(date: string, index: number) {
+    this.writer = new FileWriter(date, `${this.root}/${date}-${index}.log`)
 
     const { maxAge } = this.config
     if (!maxAge) return
 
-    const current = Time.getDateNumber(new Date(), 0)
-    this.files = this.files.filter((date) => {
-      if (date >= current - maxAge) return true
-      rm(`${this.root}/${Time.template('yyyy-MM-dd', Time.fromDateNumber(date, 0))}.log`)
-    })
+    const now = Date.now()
+    for (const date in this.files) {
+      if (now - +new Date(date) < maxAge * Time.day) continue
+      for (let index = 1; index <= this.files[date]; ++index) {
+        await rm(`${this.root}/${date}-${index}.log`)
+      }
+    }
   }
 
   prepareLogger() {
-    if (this.ctx.prologue) {
-      for (const line of this.ctx.prologue) {
-        this.printText(line)
+    if (this.ctx.loader.prolog) {
+      for (const record of this.ctx.loader.prolog) {
+        this.record(record)
       }
-      this.ctx.root.prologue = null
+      this.ctx.root.loader.prolog = null
     }
 
     const target: Logger.Target = {
       colors: 3,
-      showTime: 'yyyy-MM-dd hh:mm:ss',
-      print: this.printText.bind(this),
+      record: this.record.bind(this),
     }
 
     Logger.targets.push(target)
@@ -86,13 +87,18 @@ class LogProvider extends DataService<string[]> {
     })
   }
 
-  printText(text: string) {
-    if (!text.startsWith(this.date)) {
+  record(record: Logger.Record) {
+    const date = new Date(record.timestamp).toISOString().slice(0, 10)
+    if (this.writer.date !== date) {
       this.writer.close()
-      this.createFile()
+      this.createFile(date, this.files[date] = 1)
     }
-    this.writer.write(text)
-    this.patch([text])
+    this.writer.write(record)
+    this.patch([record])
+    if (this.writer.size >= this.config.maxSize) {
+      this.writer.close()
+      this.createFile(date, ++this.files[date])
+    }
   }
 
   async get() {
@@ -104,41 +110,17 @@ namespace LogProvider {
   export interface Config {
     root?: string
     maxAge?: number
+    maxSize?: number
   }
 
   export const Config: Schema<Config> = Schema.object({
-    root: Schema.string().default('logs').description('存放输出日志的本地目录。'),
+    root: Schema.path({
+      filters: ['directory'],
+      allowCreate: true,
+    }).default('data/logs').description('存放输出日志的本地目录。'),
     maxAge: Schema.natural().default(30).description('日志文件保存的最大天数。'),
+    maxSize: Schema.natural().default(1024 * 100).description('单个日志文件的最大大小。'),
   })
 }
 
 export default LogProvider
-
-class FileWriter {
-  private task: Promise<FileHandle>
-  private content: string[] = []
-
-  constructor(path: string) {
-    this.task = open(path, 'a+').then(async (handle) => {
-      const text = await handle.readFile('utf-8')
-      if (text) this.content = text.split(/\n(?=\S)/g)
-      return handle
-    })
-  }
-
-  async read() {
-    await this.task
-    return this.content
-  }
-
-  async write(text: string) {
-    const handle = await this.task
-    await handle.write(text + '\n')
-    this.content.push(text)
-  }
-
-  async close() {
-    const handle = await this.task
-    await handle.close()
-  }
-}
