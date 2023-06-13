@@ -21,7 +21,9 @@ export namespace Activity {
     authority?: number
     position?: 'top' | 'bottom'
     fields?: Field[]
+    /** @deprecated */
     when?: () => boolean
+    disabled?: () => boolean
   }
 }
 
@@ -71,6 +73,7 @@ export class Activity {
     if (root.bail('activity', this)) return
     if (!this.fields.every(key => store[key])) return
     if (this.when && !this.when()) return
+    if (this.disabled?.()) return
     return this.options.position ?? 'top'
   }
 

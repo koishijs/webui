@@ -68,10 +68,9 @@ export interface MenuItem {
   order?: number
 }
 
-interface SettingOptions {
+interface SettingOptions extends Ordered {
   id: string
   title?: string
-  order?: number
   disabled?: () => boolean
   schema?: Schema
   component?: Component
@@ -172,6 +171,7 @@ export class Context extends cordis.Context {
   slot(options: SlotOptions) {
     options.order ??= 0
     options.component = this.wrapComponent(options.component)
+    if (options.when) options.disabled = () => !options.when()
     const list = this.internal.views[options.type] ||= []
     insert(list, options)
     return this.scope.collect('view', () => remove(list, options))
@@ -231,7 +231,7 @@ export class Context extends cordis.Context {
     for (const [type, component] of Object.entries(options.components || {})) {
       this.slot({
         type,
-        when: () => config.value.theme[mode.value] === options.id,
+        disabled: () => config.value.theme[mode.value] !== options.id,
         component,
       })
     }

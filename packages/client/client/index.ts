@@ -6,6 +6,7 @@ import { config } from './config'
 import { initTask } from './loader'
 import { Context } from './context'
 import { createI18n } from 'vue-i18n'
+import { watchEffect } from 'vue'
 
 export * from './activity'
 export * from './components'
@@ -42,8 +43,11 @@ export const router = createRouter({
 
 export const i18n = createI18n({
   legacy: false,
-  locale: config.value.locale,
   fallbackLocale: 'zh-CN',
+})
+
+watchEffect(() => {
+  i18n.global.locale.value = config.value.locale
 })
 
 root.app.use(install)
