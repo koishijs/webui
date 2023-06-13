@@ -279,13 +279,13 @@ namespace AuthService {
 
   export const Admin: Schema<Admin> = Schema.intersect([
     Schema.object({
-      enabled: Schema.boolean().default(true).description('启用管理员账号。'),
+      enabled: Schema.boolean().default(true),
     }),
     Schema.union([
       Schema.object({
         enabled: Schema.const(true),
-        username: Schema.string().default('admin').description('管理员用户名。'),
-        password: Schema.string().role('secret').required().description('管理员密码。'),
+        username: Schema.string().default('admin'),
+        password: Schema.string().role('secret').required(),
       }),
       Schema.object({}),
     ]),
@@ -300,12 +300,14 @@ namespace AuthService {
   export const Config: Schema<Config> = Schema.intersect([
     Schema.object({
       admin: Admin,
-    }).description('管理员设置'),
+    }),
     Schema.object({
-      authTokenExpire: Schema.natural().role('ms').default(Time.week).min(Time.hour).description('用户令牌有效期。'),
-      loginTokenExpire: Schema.natural().role('ms').default(Time.minute * 10).min(Time.minute).description('登录令牌有效期。'),
-    }).description('高级设置'),
-  ])
+      authTokenExpire: Schema.natural().role('ms').default(Time.week).min(Time.hour),
+      loginTokenExpire: Schema.natural().role('ms').default(Time.minute * 10).min(Time.minute),
+    }),
+  ]).i18n({
+    'zh-CN': require('./locales/zh-CN'),
+  })
 }
 
 export default AuthService
