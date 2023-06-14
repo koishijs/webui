@@ -1,5 +1,4 @@
-import { Context, Logger, pick, Schema } from 'koishi'
-import { Registry } from '@koishijs/registry'
+import { Context, pick, Schema } from 'koishi'
 import { gt } from 'semver'
 import { resolve } from 'path'
 import Dependencies from './deps'
@@ -23,8 +22,6 @@ declare module '@koishijs/plugin-console' {
     }
   }
 }
-
-const logger = new Logger('market')
 
 export const name = 'market'
 
@@ -50,24 +47,27 @@ export function apply(ctx: Context, config: Config) {
   ctx.plugin(Installer, config.registry)
 
   ctx.using(['installer'], (ctx) => {
-    ctx.command('plugin.install [name]', { authority: 4 })
+    ctx.command('plugin.install <name>', { authority: 4 })
       .alias('.i')
       .action(async ({ session }, name) => {
         if (!name) return session.text('.expect-name')
+
+        // check local dependencies
+        const names = ctx.installer.resolveName(name)
         const deps = await ctx.installer.get()
-        if (deps[name]) return session.text('.already-installed')
-        let registry: Registry
-        try {
-          registry = await ctx.installer.getRegistry(name)
-        } catch (error) {
-          logger.warn(error)
-          return session.text('.unknown-error')
-        }
+        name = names.find((name) => deps[name])
+        if (name) return session.text('.already-installed')
+
+        // find proper version
+        const result = await ctx.installer.findVersion(names)
+        if (!result) return session.text('.not-found')
+
+        // set restart message
         ctx.envData.message = {
           ...pick(session, ['sid', 'channelId', 'guildId', 'subtype']),
           content: session.text('.success'),
         }
-        await ctx.installer.install({ [name]: registry.version })
+        await ctx.installer.install(result)
         ctx.envData.message = null
         return session.text('.success')
       })
@@ -76,28 +76,41 @@ export function apply(ctx: Context, config: Config) {
       .alias('.r')
       .action(async ({ session }, name) => {
         if (!name) return session.text('.expect-name')
+
+        // check local dependencies
+        const names = ctx.installer.resolveName(name)
         const deps = await ctx.installer.get()
-        if (!deps[name]) return session.text('.not-installed')
-        ctx.envData.message = {
-          ...pick(session, ['sid', 'channelId', 'guildId', 'subtype']),
-          content: session.text('.success'),
-        }
+        name = names.find((name) => deps[name])
+        if (!name) return session.text('.not-installed')
+
         await ctx.installer.install({ [name]: null })
-        ctx.envData.message = null
         return session.text('.success')
       })
 
-    ctx.command('plugin.upgrade', { authority: 4 })
+    ctx.command('plugin.upgrade [name...]', { authority: 4 })
       .alias('.update', '.up')
-      .action(async ({ session }) => {
+      .option('self', '-s, --koishi')
+      .action(async ({ session, options }, ...names) => {
+        async function getPackages(names: string[]) {
+          if (!names.length) return Object.keys(deps)
+          names = names.map((name) => {
+            const names = ctx.installer.resolveName(name)
+            return names.find((name) => deps[name])
+          }).filter(Boolean)
+          if (options.self) names.push('koishi')
+          return names
+        }
+
         const deps = await ctx.installer.get()
-        const names = Object.keys(deps).filter((name) => {
+        names = await getPackages(names)
+        names = names.filter((name) => {
           const { latest, resolved, invalid } = deps[name]
           try {
             return !invalid && gt(latest, resolved)
           } catch {}
         })
         if (!names.length) return session.text('.all-updated')
+
         const output = names.map((name) => {
           const { latest, resolved } = deps[name]
           return `${name}: ${resolved} -> ${latest}`
@@ -109,6 +122,7 @@ export function apply(ctx: Context, config: Config) {
         if (!['Y', 'y'].includes(result?.trim())) {
           return session.text('.cancelled')
         }
+
         ctx.envData.message = {
           ...pick(session, ['sid', 'channelId', 'guildId', 'subtype']),
           content: session.text('.success'),

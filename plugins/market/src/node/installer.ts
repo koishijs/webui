@@ -1,5 +1,5 @@
 import { Context, defineProperty, Dict, Logger, pick, Quester, Schema, Service, Time, valueMap } from 'koishi'
-import { PackageJson, Registry } from '@koishijs/registry'
+import Scanner, { PackageJson, Registry } from '@koishijs/registry'
 import { resolve } from 'path'
 import { promises as fsp, readFileSync } from 'fs'
 import { compare, satisfies, valid } from 'semver'
@@ -48,8 +48,29 @@ class Installer extends Service {
     this.http = this.ctx.http.extend({ endpoint: this.registry, timeout })
   }
 
-  getRegistry(name: string) {
-    return this.http.get<Registry>(`/${name}`)
+  resolveName(name: string) {
+    if (name.startsWith('@koishijs/plugin-')) return [name]
+    if (name.match(/(^|\/)koishi-plugin-/)) return [name]
+    if (name[0] === '@') {
+      const [left, right] = name.split('/')
+      return [`${left}/koishi-plugin-${right}`]
+    } else {
+      return [`@koishijs/plugin-${name}`, `koishi-plugin-${name}`]
+    }
+  }
+
+  async findVersion(names: string[]) {
+    const entries = await Promise.all(names.map(async (name) => {
+      try {
+        const registry = await this.http.get<Registry>(`/${name}`)
+        const versions = Object.values(registry.versions).filter((remote) => {
+          return !remote.deprecated && Scanner.isCompatible('4', remote)
+        }).sort((a, b) => compare(b.version, a.version))
+        if (!versions.length) return
+        return { [name]: versions[0].version }
+      } catch (e) {}
+    }))
+    return entries.find(Boolean)
   }
 
   private async _get() {
@@ -71,7 +92,7 @@ class Installer extends Service {
       }
 
       try {
-        const registry = await this.getRegistry(name)
+        const registry = await this.http.get<Registry>(`/${name}`)
         const entries = Object.values(registry.versions)
           .map(item => [item.version, pick(item, Dependency.keys)] as const)
           .sort(([a], [b]) => compare(b, a))

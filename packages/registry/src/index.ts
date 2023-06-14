@@ -287,16 +287,20 @@ export default class Scanner {
     this.total = this.objects.length
   }
 
+  static isCompatible(range: string, remote: RemotePackage) {
+    const { peerDependencies = {} } = remote
+    const declaredVersion = peerDependencies['koishi']
+    try {
+      return declaredVersion && intersects(range, declaredVersion)
+    } catch {}
+  }
+
   public async process(object: SearchObject, range: string, onRegistry: AnalyzeConfig['onRegistry']) {
     const { name } = object.package
     const official = name.startsWith('@koishijs/plugin-')
     const registry = await this.request<Registry>(`/${name}`)
     const compatible = Object.values(registry.versions).filter((remote) => {
-      const { peerDependencies = {} } = remote
-      const declaredVersion = peerDependencies['koishi']
-      try {
-        return declaredVersion && intersects(range, declaredVersion)
-      } catch {}
+      return Scanner.isCompatible(range, remote)
     })
 
     await onRegistry?.(registry, compatible)
