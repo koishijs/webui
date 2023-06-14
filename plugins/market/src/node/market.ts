@@ -94,10 +94,10 @@ namespace MarketProvider {
   }
 
   export const Config: Schema<Config> = Schema.object({
-    endpoint: Schema.string().role('link').description('用于搜索插件市场的网址。默认跟随 registry 设置。'),
-    timeout: Schema.number().role('time').default(Time.second * 30).description('搜索插件市场的超时时间。'),
-    proxyAgent: Schema.string().role('link').description('用于搜索插件市场的代理。'),
-  }).description('搜索设置')
+    endpoint: Schema.string().role('link'),
+    timeout: Schema.number().role('time').default(Time.second * 30),
+    proxyAgent: Schema.string().role('link'),
+  })
 }
 
 export default MarketProvider

@@ -1,0 +1,28 @@
+commands.plugin:
+  description: 插件管理
+
+commands.plugin.install:
+  description: 安装依赖
+  messages:
+    expect-name: 请输入依赖名。
+    already-installed: 该依赖已安装。
+    unknown-error: 遇到未知错误。
+    success: 安装成功！
+
+commands.plugin.uninstall:
+  description: 卸载依赖
+  messages:
+    expect-name: 请输入依赖名。
+    not-installed: 该依赖未安装。
+    unknown-error: 遇到未知错误。
+    success: 卸载成功！
+
+commands.plugin.upgrade:
+  description: 升级依赖
+  messages:
+    all-updated: 所有依赖已是最新版本。
+    available: 有可用的依赖更新：
+    prompt: 输入「Y」升级全部依赖，输入「N」取消操作。
+    cancelled: 已取消操作。
+    unknown-error: 遇到未知错误。
+    success: 升级成功！

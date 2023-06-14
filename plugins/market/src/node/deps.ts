@@ -13,7 +13,7 @@ class Dependencies extends DataService<Dict<Dependency>> {
     super(ctx, 'dependencies', { authority: 4 })
 
     ctx.console.addListener('market/install', async (deps) => {
-      const code = await ctx.installer.installDep(deps)
+      const code = await ctx.installer.install(deps)
       this.refresh()
       this.ctx.console.packages?.refresh()
       return code

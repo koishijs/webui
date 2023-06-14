@@ -48,6 +48,10 @@ class Installer extends Service {
     this.http = this.ctx.http.extend({ endpoint: this.registry, timeout })
   }
 
+  getRegistry(name: string) {
+    return this.http.get<Registry>(`/${name}`)
+  }
+
   private async _get() {
     const result = valueMap(this.manifest.dependencies, (request) => {
       return { request: request.replace(/^[~^]/, '') } as Dependency
@@ -67,7 +71,7 @@ class Installer extends Service {
       }
 
       try {
-        const registry = await this.http.get<Registry>(`/${name}`)
+        const registry = await this.getRegistry(name)
         const entries = Object.values(registry.versions)
           .map(item => [item.version, pick(item, Dependency.keys)] as const)
           .sort(([a], [b]) => compare(b, a))
@@ -120,14 +124,14 @@ class Installer extends Service {
     await fsp.writeFile(filename, JSON.stringify(this.manifest, null, 2))
   }
 
-  install() {
+  private _install() {
     const args: string[] = []
     if (this.agent !== 'yarn') args.push('install')
     args.push('--registry', this.registry)
     return this.exec(this.agent, args)
   }
 
-  installDep = async (deps: Dict<string>) => {
+  async install(deps: Dict<string>) {
     const oldPayload = await this.get()
     await this.override(deps)
 
@@ -140,7 +144,7 @@ class Installer extends Service {
     }
 
     if (shouldInstall) {
-      const code = await this.install()
+      const code = await this._install()
       if (code) return code
     }
 
@@ -164,9 +168,9 @@ namespace Installer {
   }
 
   export const Config: Schema<Config> = Schema.object({
-    endpoint: Schema.string().role('link').description('插件的下载源。默认跟随当前项目的 npm config。'),
-    timeout: Schema.number().role('time').default(Time.second * 5).description('获取插件数据的超时时间。'),
-  }).description('插件源设置')
+    endpoint: Schema.string().role('link'),
+    timeout: Schema.number().role('time').default(Time.second * 5),
+  })
 }
 
 export default Installer
