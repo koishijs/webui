@@ -1,25 +1,29 @@
 <template>
   <div
-    class="navbar-item"
+    class="activity-item"
     :class="{ 'active': isActive, 'drag-over': hasDragOver }"
-    @contextmenu.stop="trigger($event, data)"
+    @contextmenu.stop="trigger($event, children[0])"
     @dragenter="handleDragEnter"
     @dragleave="handleDragLeave"
-    @drop.stop.prevent>
-    <el-tooltip :placement="placement" popper-class="activity-item-tooltip">
+    @drop="handleDrop"
+    @dragover.prevent>
+    <el-tooltip placement="right" :popper-class="`activity-item-tooltip`">
       <template #content>
-        <div class="title">{{ data.name }}</div>
-        <div class="desc" v-if="data.desc">{{ data.desc }}</div>
+        <div class="activity-info">
+          <div class="title">{{ children[hoverIndex].name }}</div>
+          <div class="desc" v-if="children[hoverIndex].desc">{{ children[hoverIndex].desc }}</div>
+        </div>
+        <div class="activity-group" v-if="children.length > 1">
+          <div class="activity-group-item" v-for="(child, index) in children.slice(1)" :key="child.id">
+            <activity-button
+              :data="child"
+              @mouseenter="hoverIndex = index + 1"
+              @mouseleave="hoverIndex = 0"
+            ></activity-button>
+          </div>
+        </div>
       </template>
-      <router-link
-        class="navbar-button"
-        draggable="true"
-        :to="target"
-        :class="{ 'dragging': isDragging }"
-        @dragend="handleDragEnd"
-        @dragstart="handleDragStart">
-        <k-icon class="menu-icon" :name="data.icon"></k-icon>
-      </router-link>
+      <activity-button :data="children[0]"></activity-button>
     </el-tooltip>
   </div>
 </template>
@@ -28,35 +32,31 @@
 
 import { computed, ref } from 'vue'
 import { useRoute } from 'vue-router'
-import { Activity, useMenu } from '@koishijs/client'
+import { Activity, useConfig, useMenu } from '@koishijs/client'
 import { Placement } from 'element-plus'
-import { routeCache } from './utils'
+import ActivityButton from './button.vue'
+import { watch } from 'vue'
 
 const route = useRoute()
 
 const props = defineProps<{
-  data: Activity,
-  placement: Placement,
+  children: Activity[]
+  placement: Placement
 }>()
 
-const target = computed(() => {
-  return routeCache[props.data.id] || props.data.path.replace(/:.+/, '')
+const isActive = computed(() => {
+  return Object.values(props.children).some(child => route.meta?.activity?.id === child.id)
 })
 
-const isActive = computed(() => route.meta?.activity?.id === props.data.id)
-
-const isDragging = ref(false)
 const hasDragOver = ref(false)
 
 const trigger = useMenu('theme.activity')
 
-function handleDragStart(event: DragEvent) {
-  isDragging.value = true
-}
+const hoverIndex = ref(0)
 
-function handleDragEnd(event: DragEvent) {
-  isDragging.value = false
-}
+watch(() => props.children, () => {
+  hoverIndex.value = 0
+})
 
 function handleDragEnter(event: DragEvent) {
   hasDragOver.value = true
@@ -66,11 +66,24 @@ function handleDragLeave(event: DragEvent) {
   hasDragOver.value = false
 }
 
+const config = useConfig()
+
+function handleDrop(event: DragEvent) {
+  hasDragOver.value = false
+  const text = event.dataTransfer.getData('text/plain')
+  if (!text.startsWith('activity:')) return
+  const id = text.slice(9)
+  const target = props.children[0].id
+  if (target === id || !target) return
+  event.preventDefault()
+  ;((config.value.activities ??= {})[id] ??= {}).parent = target
+}
+
 </script>
 
 <style lang="scss">
 
-.navbar-item {
+.activity-item {
   position: relative;
   box-sizing: border-box;
   width: var(--activity-width);
@@ -96,58 +109,32 @@ function handleDragLeave(event: DragEvent) {
   }
 }
 
-.navbar-button {
-  height: calc(var(--activity-width) - 2 * var(--activity-padding));
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  position: relative;
-  transition: var(--color-transition);
-  color: var(--k-text-light);
-  border-radius: var(--activity-padding);
-  cursor: pointer;
-
-  .menu-icon {
-    height: var(--activity-icon-size);
-    pointer-events: none;
-  }
-
-  &:hover, &.dragging {
-    color: var(--k-text-dark);
-    background-color: var(--k-hover-bg);
-  }
-
-  &.active {
-    color: var(--k-text-active);
-  }
-
-  .badge {
-    position: absolute;
-    border-radius: 1rem;
-    color: #ffffff;
-    background-color: var(--k-color-danger);
-    top: 50%;
-    right: 1.5rem;
-    transform: translateY(-50%);
-    line-height: 1;
-    padding: 4px 8px;
-    font-size: 0.75rem;
-    font-weight: bolder;
-    transition: var(--color-transition);
-  }
-}
-
 .activity-item-tooltip {
-  padding: 6px 11px;
-  line-height: 1.6;
+  padding: 0;
 
-  .title {
-    font-size: 13px;
-    font-weight: 500;
+  .activity-info {
+    padding: 6px 11px;
+    line-height: 1.6;
+
+    .title {
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+    .desc {
+      font-size: 12px;
+    }
   }
 
-  .desc {
-    font-size: 12px;
+  .activity-group {
+    display: flex;
+    padding: var(--activity-padding);
+    gap: 0 var(--activity-padding);
+    border-top: 1px solid var(--k-color-divider);
+
+    .activity-group-item {
+      width: calc(var(--activity-width) - 2 * var(--activity-padding));
+    }
   }
 }
 

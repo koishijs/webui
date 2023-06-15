@@ -40,10 +40,10 @@ export class Activity {
   _disposables: Disposable[] = []
 
   constructor(public options: Activity.Options) {
-    Object.assign(this, omit(options, ['icon', 'name', 'desc', 'position']))
+    Object.assign(this, omit(options, ['icon', 'name', 'desc', 'disabled']))
     const { path, id = getActivityId(path), component } = options
     this._disposables.push(router.addRoute({ path, name: id, component, meta: { activity: this } }))
-    this.id ??= path
+    this.id ??= id
     this.handleUpdate()
     this.order ??= 0
     this.authority ??= 0
@@ -73,12 +73,11 @@ export class Activity {
     return toValue(this.options.desc)
   }
 
-  get position() {
-    if (root.bail('activity', this)) return
-    if (!this.fields.every(key => store[key])) return
-    if (this.when && !this.when()) return
-    if (this.disabled?.()) return
-    return this.options.position ?? 'top'
+  disabled() {
+    if (root.bail('activity', this)) return true
+    if (!this.fields.every(key => store[key])) return true
+    if (this.when && !this.when()) return true
+    if (this.options.disabled?.()) return true
   }
 
   dispose() {

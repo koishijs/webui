@@ -4,16 +4,14 @@
     @contextmenu.stop="trigger($event, null)">
     <template v-for="data in groups.top" :key="data.id">
       <activity-separator />
-      <activity-item placement="right" :data="data"></activity-item>
+      <activity-item placement="right" :children="data"></activity-item>
     </template>
     <activity-separator />
-    <activity-group v-if="groups.hidden">
-      <activity-item v-for="data in groups.hidden" placement="bottom" :key="data.id" :data="data"></activity-item>
-    </activity-group>
+    <activity-item v-if="groups.hidden" placement="bottom" :children="groups.hidden"></activity-item>
     <div v-else class="spacer"></div>
     <activity-separator />
     <template v-for="data in groups.bottom" :key="data.id">
-      <activity-item placement="right" :data="data"></activity-item>
+      <activity-item placement="right" :children="data"></activity-item>
       <activity-separator />
     </template>
   </nav>
@@ -23,37 +21,54 @@
 
 import { computed } from 'vue'
 import { useWindowSize } from '@vueuse/core'
-import { activities, Activity, useMenu } from '@koishijs/client'
+import { activities, Activity, useConfig, useMenu } from '@koishijs/client'
 import ActivityItem from './item.vue'
-import ActivityGroup from './group.vue'
 import ActivitySeparator from './separator.vue'
 
+const config = useConfig()
+const trigger = useMenu('theme.activity')
 const { height, width } = useWindowSize()
 
 const groups = computed(() => {
   let hidden: Activity[]
   const unit = width.value <= 768 ? 52 : 56
   const total = height.value - (width.value <= 768 ? 4 : 8)
-  const list = Object.values(activities)
-    .filter(data => data.position)
-    .sort((a, b) => a.order - b.order)
+  const available = Object.fromEntries(Object
+    .entries(activities)
+    .filter(([, data]) => !data.disabled())
+    .map(([key, data]) => [key, [data]]))
+  for (const id of Object.keys(available)) {
+    const override = config.value.activities?.[id]
+    if (!override) continue
+    if (override.hidden) {
+      delete available[id]
+      continue
+    }
+    Object.assign(available[id], override)
+    const parent = available[override.parent]
+    if (parent) {
+      parent.push(available[id][0])
+      delete available[id]
+    }
+  }
+  const list = Object.values(available).sort(([a], [b]) => a.order - b.order)
   if (list.length * unit > total) {
     hidden = list
       .splice(0, list.length + 1 - Math.floor(total / unit))
-      .sort((a, b) => {
+      .sort(([a], [b]) => {
         const scale = a.position === 'top' ? -1 : 1
         if (a.position === b.position) {
           return scale * (a.order - b.order)
         }
         return scale
       })
+      .flat()
+    hidden.unshift({ icon: 'activity:ellipsis' } as Activity)
   }
-  const top = list.filter(data => data.position === 'top').reverse()
-  const bottom = list.filter(data => data.position === 'bottom')
+  const top = list.filter(([data]) => data.position !== 'bottom').reverse()
+  const bottom = list.filter(([data]) => data.position === 'bottom')
   return { top, bottom, hidden }
 })
-
-const trigger = useMenu('theme.activity')
 
 </script>
 

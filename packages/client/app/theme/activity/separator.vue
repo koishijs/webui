@@ -4,12 +4,15 @@
     :class="{ 'drag-over': hasDragOver }"
     @dragenter="handleDragEnter"
     @dragleave="handleDragLeave"
+    @drop.prevent.stop="handleDragLeave($event), $emit('drop', $event)"
   ></div>
 </template>
 
 <script lang="ts" setup>
 
 import { ref } from 'vue'
+
+defineEmits(['drop'])
 
 const hasDragOver = ref(false)
 
