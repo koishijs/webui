@@ -1,6 +1,9 @@
 :root {
   --aside-width: 17.5rem;
   --activity-width: 4rem;
+  --activity-padding: 0.5rem;
+  --activity-marker-width: 4px;
+  --activity-marker-height: 1.75rem;
   --activity-icon-size: 1.5rem;
   --header-height: 3rem;
   --footer-height: 1.75rem;
@@ -12,6 +15,7 @@
   @media screen and (max-width: 768px) {
     --aside-width: 17rem;
     --activity-width: 3.5rem;
+    --activity-padding: 0.25rem;
     --activity-icon-size: 1.375rem;
     --card-margin: 1.5rem;
     --card-padding-vertical: 1rem;

@@ -3,7 +3,7 @@
     <template #content>
       <slot></slot>
     </template>
-    <div class="navbar-item">
+    <div class="navbar-button">
       <k-icon class="menu-icon" name="activity:ellipsis"></k-icon>
     </div>
   </el-tooltip>

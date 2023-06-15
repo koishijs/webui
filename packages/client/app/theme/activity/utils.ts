@@ -1,6 +1,12 @@
 import { reactive } from 'vue'
 import { RouteRecordName } from 'vue-router'
-import { global, router } from '@koishijs/client'
+import { Activity, global, router } from '@koishijs/client'
+
+declare module '@koishijs/client' {
+  interface ActionContext {
+    'theme.activity': Activity
+  }
+}
 
 export const routeCache = reactive<Record<RouteRecordName, string>>({})
 

@@ -31,13 +31,17 @@ export const activities = reactive<Dict<Activity>>({})
 
 export interface Activity extends Activity.Options {}
 
+function getActivityId(path: string) {
+  return path.split('/').find(Boolean) ?? ''
+}
+
 export class Activity {
   id: string
   _disposables: Disposable[] = []
 
   constructor(public options: Activity.Options) {
     Object.assign(this, omit(options, ['icon', 'name', 'desc', 'position']))
-    const { path, id = path, component } = options
+    const { path, id = getActivityId(path), component } = options
     this._disposables.push(router.addRoute({ path, name: id, component, meta: { activity: this } }))
     this.id ??= path
     this.handleUpdate()

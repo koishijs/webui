@@ -30,7 +30,7 @@ export default function (ctx: Context) {
   ctx.settings({
     id: 'appearance',
     title: '外观设置',
-    order: 1000,
+    order: 900,
     schema: Schema.object({
       theme: Schema.object({
         mode: Schema.union([
@@ -42,5 +42,11 @@ export default function (ctx: Context) {
         light: Schema.string().role('theme', { mode: 'light' }).description('浅色主题。'),
       }).description('主题设置'),
     }),
+  })
+
+  ctx.settings({
+    id: 'activity',
+    title: '活动栏设置',
+    order: 800,
   })
 }
