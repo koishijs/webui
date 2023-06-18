@@ -44,9 +44,9 @@ export default function (ctx: Context) {
     }),
   })
 
-  ctx.settings({
-    id: 'activity',
-    title: '活动栏设置',
-    order: 800,
-  })
+  // ctx.settings({
+  //   id: 'activity',
+  //   title: '活动栏设置',
+  //   order: 800,
+  // })
 }

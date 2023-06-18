@@ -74,9 +74,22 @@ function handleDrop(event: DragEvent) {
   if (!text.startsWith('activity:')) return
   const id = text.slice(9)
   const target = props.children[0].id
-  if (target === id || !target) return
+  if (target === id) return
   event.preventDefault()
-  ;((config.value.activities ??= {})[id] ??= {}).parent = target
+
+  const override = (config.value.activities ??= {})[id] ??= {}
+  if (override.parent === target) {
+    delete override.parent
+    ;(config.value.activities[target] ??= {}).parent = id
+    for (const key in config.value.activities) {
+      const override = config.value.activities[key]
+      if (override?.parent === target) {
+        override.parent = id
+      }
+    }
+  } else {
+    override.parent = target
+  }
 }
 
 </script>

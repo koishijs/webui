@@ -2,24 +2,24 @@
   <nav
     class="layout-activity"
     @contextmenu.stop="trigger($event, null)">
-    <template v-for="data in groups.top" :key="data.id">
-      <activity-separator />
+    <template v-for="(data, index) in groups.top" :key="data[0].id">
+      <activity-separator position="top" :index="index" />
       <activity-item placement="right" :children="data"></activity-item>
     </template>
-    <activity-separator />
+    <activity-separator position="top" :index="groups.top.length" />
     <activity-item v-if="groups.hidden" placement="bottom" :children="groups.hidden"></activity-item>
     <div v-else class="spacer"></div>
-    <activity-separator />
-    <template v-for="data in groups.bottom" :key="data.id">
+    <activity-separator position="bottom" :index="groups.top.length" />
+    <template v-for="(data, index) in groups.bottom" :key="data.id">
       <activity-item placement="right" :children="data"></activity-item>
-      <activity-separator />
+      <activity-separator position="bottom" :index="index" />
     </template>
   </nav>
 </template>
 
 <script lang="ts" setup>
 
-import { computed } from 'vue'
+import { computed, provide } from 'vue'
 import { useWindowSize } from '@vueuse/core'
 import { activities, Activity, useConfig, useMenu } from '@koishijs/client'
 import ActivityItem from './item.vue'
@@ -44,7 +44,7 @@ const groups = computed(() => {
       delete available[id]
       continue
     }
-    Object.assign(available[id], override)
+    Object.assign(available[id][0], override)
     const parent = available[override.parent]
     if (parent) {
       parent.push(available[id][0])
@@ -69,6 +69,8 @@ const groups = computed(() => {
   const bottom = list.filter(([data]) => data.position === 'bottom')
   return { top, bottom, hidden }
 })
+
+provide('groups', groups)
 
 </script>
 

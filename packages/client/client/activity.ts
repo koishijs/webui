@@ -40,12 +40,13 @@ export class Activity {
   _disposables: Disposable[] = []
 
   constructor(public options: Activity.Options) {
+    options.order ??= 0
+    options.position ??= 'top'
     Object.assign(this, omit(options, ['icon', 'name', 'desc', 'disabled']))
     const { path, id = getActivityId(path), component } = options
     this._disposables.push(router.addRoute({ path, name: id, component, meta: { activity: this } }))
     this.id ??= id
     this.handleUpdate()
-    this.order ??= 0
     this.authority ??= 0
     this.fields ??= []
     activities[this.id] = this
