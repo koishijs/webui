@@ -48,7 +48,7 @@ export default (ctx: Context) => {
     icon: 'sign-in',
     position: 'bottom',
     order: 500,
-    when: () => !store.user,
+    disabled: () => !!store.user,
     component: Login,
   })
 

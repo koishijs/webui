@@ -26,11 +26,11 @@
     "online"
   ],
   "devDependencies": {
-    "@koishijs/client": "^5.11.2",
+    "@koishijs/client": "^5.11.4",
     "@koishijs/fs": "^1.3.2",
     "@koishijs/os": "^1.0.1",
     "@koishijs/url": "^1.0.3",
-    "@koishijs/loader": "^3.2.3"
+    "@koishijs/loader": "^3.2.4"
   },
   "yakumo": {
     "client": "./scripts/build"
