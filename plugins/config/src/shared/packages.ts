@@ -1,11 +1,11 @@
 import { Context, Dict, EffectScope, Logger, Schema } from 'koishi'
 import { DataService } from '@koishijs/plugin-console'
-import { Manifest, MarketResult, PackageJson } from '@koishijs/registry'
+import { Manifest, PackageJson, SearchResult } from '@koishijs/registry'
 import { debounce } from 'throttle-debounce'
 
 declare module '@koishijs/loader' {
   interface Loader {
-    market: MarketResult
+    market: SearchResult
   }
 }
 

@@ -1,5 +1,5 @@
 import { makeArray } from '@koishijs/core'
-import { MarketResult } from '@koishijs/registry'
+import { SearchResult } from '@koishijs/registry'
 import { Loader, unwrapExports } from '@koishijs/loader'
 import { global } from '@koishijs/client'
 import process from 'process'
@@ -22,7 +22,7 @@ if (process.env.NODE_ENV !== 'development') {
 class BrowserLoader extends Loader {
   public envData: any = {}
   public config: any = { plugins: {} }
-  public market: MarketResult
+  public market: SearchResult
 
   async init(filename?: string) {
     await super.init(filename)
@@ -33,7 +33,8 @@ class BrowserLoader extends Loader {
     if (process.env.NODE_ENV === 'development') return
     this.market = await fetch(global.endpoint + '/play.json').then(res => res.json())
     for (const object of this.market.objects) {
-      this.cache[object.shortname] = `${global.endpoint}/modules/${object.name}/index.js`
+      const shortname = object.package.name.replace(/(koishi-|^@koishijs\/)plugin-/, '')
+      this.cache[shortname] = `${global.endpoint}/modules/${object.package.name}/index.js`
     }
   }
 

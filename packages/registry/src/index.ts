@@ -119,6 +119,8 @@ export interface Extension {
   score: Score
   rating: number
   verified: boolean
+  license: string
+  manifest: Manifest
   publishSize?: number
   installSize?: number
   downloads?: {
@@ -126,7 +128,7 @@ export interface Extension {
   }
 }
 
-export interface SearchObject extends Extension {
+export interface SearchObject extends Extension, Pick<RemotePackage, 'deprecated' | 'peerDependencies' | 'peerDependenciesMeta'> {
   package: SearchPackage
   searchScore: number
   ignored?: boolean
@@ -165,8 +167,6 @@ export interface SharedPackage extends DatedPackage {
 export interface AnalyzedPackage extends SearchPackage, Extension {
   contributors: User[]
   shortname: string
-  license: string
-  manifest: Manifest
   createdAt: string
   updatedAt: string
   versions?: Dict<Partial<RemotePackage>>
@@ -177,6 +177,7 @@ export interface CollectConfig {
   margin?: number
   timeout?: number
   ignored?: string[]
+  endpoint?: string
 }
 
 export interface AnalyzeConfig {
@@ -264,6 +265,7 @@ export default class Scanner {
   private async search(offset: number, config: CollectConfig) {
     const { step = 250, timeout = Time.second * 30 } = config
     const result = await this.request<SearchResult>(`/-/v1/search?text=koishi+plugin&size=${step}&from=${offset}`, { timeout })
+    this.version = result.version
     for (const object of result.objects) {
       this.cache[object.package.name] = object
     }
