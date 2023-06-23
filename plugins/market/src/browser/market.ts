@@ -15,7 +15,7 @@ export default class MarketProvider extends BaseMarketProvider {
     const market = await this.prepare()
     if (!market) return { data: {}, failed: 0, total: 0, progress: 0 }
     return {
-      data: Object.fromEntries(market.objects.map(item => [item.name, item])),
+      data: Object.fromEntries(market.objects.map(item => [item.package.name, item])),
       failed: 0,
       total: market.objects.length,
       progress: market.objects.length,

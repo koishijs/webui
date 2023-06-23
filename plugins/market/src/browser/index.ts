@@ -1,15 +1,10 @@
 import { Context, Schema } from 'koishi'
-import Dependencies from './deps'
 import MarketProvider from './market'
 
-export * from './deps'
 export * from './market'
 export * from '../shared'
 
-export {
-  Dependencies,
-  MarketProvider,
-}
+export { MarketProvider }
 
 export const filter = false
 export const name = 'market'
@@ -20,7 +15,6 @@ export interface Config {}
 export const Config: Schema<Config> = Schema.object({})
 
 export function apply(ctx: Context, config: Config) {
-  ctx.plugin(Dependencies)
   ctx.plugin(MarketProvider)
 
   ctx.console.addEntry(process.env.KOISHI_BASE ? [

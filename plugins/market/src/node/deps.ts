@@ -1,6 +1,6 @@
 import { Context, Dict, Schema } from 'koishi'
 import { DataService } from '@koishijs/plugin-console'
-import { Dependency } from '../shared'
+import { Dependency } from './installer'
 
 declare module '@koishijs/plugin-console' {
   interface Events {

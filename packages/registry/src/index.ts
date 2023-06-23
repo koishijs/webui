@@ -128,7 +128,9 @@ export interface Extension {
   }
 }
 
-export interface SearchObject extends Extension, Pick<RemotePackage, 'deprecated' | 'peerDependencies' | 'peerDependenciesMeta'> {
+export interface DependencyMeta extends Pick<RemotePackage, 'deprecated' | 'peerDependencies' | 'peerDependenciesMeta'> {}
+
+export interface SearchObject extends Extension, DependencyMeta {
   package: SearchPackage
   searchScore: number
   ignored?: boolean

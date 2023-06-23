@@ -1,5 +1,5 @@
 import { Context, defineProperty, Dict, Logger, pick, Quester, Schema, Service, Time, valueMap } from 'koishi'
-import Scanner, { PackageJson, Registry } from '@koishijs/registry'
+import Scanner, { DependencyMeta, PackageJson, Registry, RemotePackage } from '@koishijs/registry'
 import { resolve } from 'path'
 import { promises as fsp, readFileSync } from 'fs'
 import { compare, satisfies, valid } from 'semver'
@@ -11,6 +11,23 @@ import spawn from 'execa'
 import pMap from 'p-map'
 
 const logger = new Logger('market')
+
+export interface Dependency {
+  /**
+   * requested semver range
+   * @example `^1.2.3` -> `1.2.3`
+   */
+  request: string
+  /**
+   * installed package version
+   * @example `1.2.5`
+   */
+  resolved?: string
+  /** whether it is a workspace package */
+  workspace?: boolean
+  /** valid (unsupported) syntax */
+  invalid?: boolean
+}
 
 export interface LocalPackage extends PackageJson {
   private?: boolean
@@ -29,6 +46,8 @@ class Installer extends Service {
   public http: Quester
   public registry: string
 
+  private packageTasks: Dict<Promise<Dict<DependencyMeta>>>
+  private packageCache: Dict<Dict<DependencyMeta>>
   private agent = which()?.name || 'npm'
   private manifest: PackageJson
   private task: Promise<Dict<Dependency>>
@@ -73,6 +92,25 @@ class Installer extends Service {
     return entries.find(Boolean)
   }
 
+  private async _getPackage(name: string) {
+    try {
+      const registry = await this.http.get<Registry>(`/${name}`)
+      return this.setPackage(name, Object.values(registry.versions))
+    } catch (e) {
+      logger.warn(e.message)
+    }
+  }
+
+  setPackage(name: string, versions: RemotePackage[]) {
+    return this.packageCache[name] = Object.fromEntries(versions
+      .map(item => [item.version, pick(item, Dependency.keys)] as const)
+      .sort(([a], [b]) => compare(b, a)))
+  }
+
+  getPackage(name: string) {
+    return this.packageTasks[name] ||= this._getPackage(name)
+  }
+
   private async _get() {
     const result = valueMap(this.manifest.dependencies, (request) => {
       return { request: request.replace(/^[~^]/, '') } as Dependency
@@ -88,18 +126,6 @@ class Installer extends Service {
 
       if (!valid(result[name].request)) {
         result[name].invalid = true
-        return
-      }
-
-      try {
-        const registry = await this.http.get<Registry>(`/${name}`)
-        const entries = Object.values(registry.versions)
-          .map(item => [item.version, pick(item, Dependency.keys)] as const)
-          .sort(([a], [b]) => compare(b, a))
-        result[name].latest = entries[0][0]
-        result[name].versions = Object.fromEntries(entries)
-      } catch (e) {
-        logger.warn(e.message)
       }
     }, { concurrency: 10 })
     return result

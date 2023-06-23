@@ -1,6 +1,6 @@
 import { Context, Dict, Logger, Time } from 'koishi'
 import { DataService } from '@koishijs/plugin-console'
-import { AnalyzedPackage, MarketResult, RemotePackage } from '@koishijs/registry'
+import { SearchObject, SearchResult } from '@koishijs/registry'
 
 declare module '@koishijs/plugin-console' {
   interface Events {
@@ -12,27 +12,6 @@ declare module '@koishijs/plugin-console' {
       market: MarketProvider
     }
   }
-}
-
-export interface Dependency {
-  /**
-   * requested semver range
-   * @example `^1.2.3` -> `1.2.3`
-   */
-  request: string
-  /**
-   * installed package version
-   * @example `1.2.5`
-   */
-  resolved?: string
-  /** whether it is a workspace package */
-  workspace?: boolean
-  /** all available versions */
-  versions?: Dict<Pick<RemotePackage, typeof Dependency.keys[number]>>
-  /** latest version */
-  latest?: string
-  /** valid (unsupported) syntax */
-  invalid?: boolean
 }
 
 export namespace Dependency {
@@ -64,9 +43,9 @@ export abstract class MarketProvider extends DataService<MarketProvider.Payload>
     this._timestamp = Date.now()
   }
 
-  abstract collect(): Promise<void | MarketResult>
+  abstract collect(): Promise<void | SearchResult>
 
-  async prepare(): Promise<MarketResult> {
+  async prepare(): Promise<SearchResult> {
     return this._task ||= this.collect().catch((error) => {
       logger.warn(error)
       this._error = error
@@ -76,7 +55,7 @@ export abstract class MarketProvider extends DataService<MarketProvider.Payload>
 
 export namespace MarketProvider {
   export interface Payload {
-    data: Dict<AnalyzedPackage>
+    data: Dict<SearchObject>
     total: number
     failed: number
     progress: number
