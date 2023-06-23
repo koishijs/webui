@@ -103,7 +103,7 @@ class Installer extends Service {
       this.fullCache[name] = this.tempCache[name] = getVersions(Object.values(registry.versions).filter((remote) => {
         return !Scanner.isPlugin(name) || Scanner.isCompatible('4', remote)
       }))
-      this.ctx.console?.dependencies?.flushData()
+      this.ctx.console?.registry?.flushData()
       return this.fullCache[name]
     } catch (e) {
       logger.warn(e.message)
@@ -112,7 +112,7 @@ class Installer extends Service {
 
   setPackage(name: string, versions: RemotePackage[]) {
     this.fullCache[name] = this.tempCache[name] = getVersions(versions)
-    this.ctx.console?.dependencies?.flushData()
+    this.ctx.console?.registry?.flushData()
     this.pkgTasks[name] = Promise.resolve(this.fullCache[name])
   }
 
@@ -147,18 +147,14 @@ class Installer extends Service {
     return this.depTask ||= this._getDeps()
   }
 
-  async get(force = false) {
-    if (force) {
-      this.depTask = null
-      this.pkgTasks = {}
-      this.fullCache = {}
-      this.tempCache = {}
-    }
-    const dependencies = await this.getDeps()
-    return {
-      dependencies,
-      registry: this.fullCache,
-    }
+  refresh(refresh = false) {
+    this.depTask = null
+    this.pkgTasks = {}
+    this.fullCache = {}
+    this.tempCache = {}
+    if (!refresh) return
+    this.ctx.console.registry?.refresh()
+    this.ctx.console.packages?.refresh()
   }
 
   async exec(command: string, args: string[]) {
@@ -204,7 +200,7 @@ class Installer extends Service {
   }
 
   async install(deps: Dict<string>) {
-    const oldDeps = await this.get()
+    const oldDeps = await this.getDeps()
     await this.override(deps)
 
     let shouldInstall = false
@@ -220,7 +216,8 @@ class Installer extends Service {
       if (code) return code
     }
 
-    const newDeps = await this.get(true)
+    this.refresh()
+    const newDeps = await this.getDeps()
     for (const name in oldDeps) {
       const { resolved, workspace } = oldDeps[name]
       if (workspace || !newDeps[name]) continue

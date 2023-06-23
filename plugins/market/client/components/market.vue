@@ -50,13 +50,13 @@ import { router, store, global } from '@koishijs/client'
 import { computed, provide, ref, watch } from 'vue'
 import { refresh, active } from '../utils'
 import { getSorted, kConfig, MarketFilter, MarketList, MarketSearch } from '@koishijs/market'
-import { AnalyzedPackage } from '@koishijs/registry'
+import { SearchObject } from '@koishijs/registry'
 
-function installed(data: AnalyzedPackage) {
+function installed(data: SearchObject) {
   if (store.packages) {
-    return !!store.packages[data.name]
+    return !!store.packages[data.package.name]
   } else {
-    return !!store.dependencies?.[data.name]
+    return !!store.dependencies?.[data.package.name]
   }
 }
 
@@ -86,8 +86,8 @@ watch(prompt, (value) => {
   }
 }, { deep: true })
 
-function handleClick(data: AnalyzedPackage) {
-  active.value = data.name
+function handleClick(data: SearchObject) {
+  active.value = data.package.name
 }
 
 const menu = computed(() => [refresh.value])

@@ -1,13 +1,13 @@
-import { Context, pick, Schema } from 'koishi'
+import { Context, Dict, pick, Schema } from 'koishi'
 import { gt } from 'semver'
 import { resolve } from 'path'
-import Dependencies from './deps'
+import { DependencyProvider, RegistryProvider } from './deps'
 import Installer from './installer'
 import MarketProvider from './market'
 
 export * from '../shared'
 
-export { Dependencies, Installer }
+export { Installer }
 
 declare module 'koishi' {
   interface Context {
@@ -18,8 +18,14 @@ declare module 'koishi' {
 declare module '@koishijs/plugin-console' {
   namespace Console {
     interface Services {
-      dependencies: Dependencies
+      dependencies: DependencyProvider
+      registry: RegistryProvider
     }
+  }
+
+  interface Events {
+    'market/install'(deps: Dict<string>): Promise<number>
+    'market/registry'(name: string): Promise<void>
   }
 }
 
@@ -137,12 +143,25 @@ export function apply(ctx: Context, config: Config) {
   })
 
   ctx.using(['console', 'installer'], (ctx) => {
-    ctx.plugin(Dependencies)
+    ctx.plugin(DependencyProvider)
+    ctx.plugin(RegistryProvider)
     ctx.plugin(MarketProvider, config.search)
 
     ctx.console.addEntry({
       dev: resolve(__dirname, '../../client/index.ts'),
       prod: resolve(__dirname, '../../dist'),
     })
+
+    ctx.console.addListener('market/install', async (deps) => {
+      const code = await ctx.installer.install(deps)
+      ctx.console.dependencies?.refresh()
+      ctx.console.registry?.refresh()
+      ctx.console.packages?.refresh()
+      return code
+    }, { authority: 4 })
+
+    ctx.console.addListener('market/registry', async (name) => {
+      await ctx.installer.getPackage(name)
+    }, { authority: 4 })
   })
 }

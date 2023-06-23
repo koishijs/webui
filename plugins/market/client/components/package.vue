@@ -24,8 +24,8 @@
     </td>
 
     <td>
-      <el-button v-if="local.workspace || local.versions" @click="active = name">修改</el-button>
-      <template v-else-if="local.invalid">暂不支持</template>
+      <template v-if="local.invalid">暂不支持</template>
+      <el-button v-else-if="local.workspace || remote" @click="active = name">修改</el-button>
       <template v-else>版本获取失败</template>
     </td>
   </tr>
@@ -43,9 +43,8 @@ const props = defineProps({
   name: String,
 })
 
-const local = computed(() => {
-  return store.dependencies[props.name]
-})
+const local = computed(() => store.dependencies[props.name])
+const remote = computed(() => store.registry[props.name])
 
 const compare = computed(() => {
   if (local.value.invalid) return

@@ -18,6 +18,13 @@ receive('market/patch', (data) => {
   }
 })
 
+receive('market/registry', (data) => {
+  store.registry = {
+    ...store.registry,
+    ...data,
+  }
+})
+
 export default (ctx: Context) => {
   ctx.plugin(extensions)
 
@@ -61,7 +68,7 @@ export default (ctx: Context) => {
       icon: 'activity:deps',
       order: 700,
       authority: 4,
-      fields: ['dependencies'],
+      fields: ['dependencies', 'registry'],
       component: Dependencies,
     })
   }

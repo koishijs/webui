@@ -4,7 +4,7 @@
       <span :id="titleId" :class="[titleClass, '']">
         {{ active.replace(/(koishi-|^@koishijs\/)plugin-/, '') + (workspace ? ' (工作区)' : '') }}
       </span>
-      <el-select v-if="!workspace" :disabled="workspace" v-model="selectVersion">
+      <el-select v-if="data" :disabled="workspace" v-model="selectVersion">
         <el-option v-for="({ result }, version) in data" :key="version" :value="version">
           {{ version }}
           <template v-if="version === current">(当前)</template>
@@ -16,7 +16,11 @@
     <p class="danger" v-if="danger">{{ danger }}</p>
     <p class="warning" v-if="warning">{{ warning }}</p>
 
-    <el-scrollbar v-if="active && !workspace && data[version] && Object.keys(data[version].peers).length">
+    <div v-if="!data && active && !workspace">
+      <p>正在加载版本数据……</p>
+    </div>
+
+    <el-scrollbar v-if="data?.[version] && Object.keys(data[version].peers).length">
       <table>
         <tr>
           <td>依赖名称</td>
@@ -62,7 +66,7 @@
           <el-button v-if="current" @click="installDep('')">移除</el-button>
           <el-button v-else @click="installDep(version)" :disabled="unchanged">添加</el-button>
         </template>
-        <template v-else>
+        <template v-else-if="data">
           <el-button v-if="current" @click="installDep('')">移除</el-button>
           <el-button :type="result" @click="installDep(version)" :disabled="unchanged">
             {{ current ? '更新' : '安装' }}
@@ -107,8 +111,15 @@ const selectVersion = computed({
 })
 
 const unchanged = computed(() => version.value === store.dependencies[active.value]?.request)
-const current = computed(() => store.dependencies[active.value]?.resolved)
+const current = computed(() => store.dependencies?.[active.value]?.resolved)
 const local = computed(() => store.packages?.[active.value])
+const versions = computed(() => store.registry?.[active.value])
+
+watch(active, (name) => {
+  if (name && !workspace.value && !versions.value) {
+    send('market/registry', name)
+  }
+}, { immediate: true })
 
 const workspace = computed(() => {
   // workspace plugins:     dependencies ? packages √
@@ -123,7 +134,7 @@ const data = computed(() => {
 
 const danger = computed(() => {
   if (workspace.value) return
-  const deprecated = store.dependencies[active.value]?.versions?.[version.value]?.deprecated
+  const deprecated = versions.value?.[version.value]?.deprecated
   if (deprecated) return deprecated
   if (store.market?.data[active.value]?.insecure) {
     return '警告：从此插件的最新版本中检测出安全性问题。安装或升级此插件可能导致严重问题。'
@@ -154,7 +165,7 @@ watch(() => active.value, (value) => {
   if (!value) return
   version.value = config.value.override[active.value]
     || store.dependencies[active.value]?.request
-    || store.market.data[value].version
+    || store.market.data[value].package.version
 }, { immediate: true })
 
 function* find(target: string, plugins: {}, prefix: string): IterableIterator<[string, boolean]> {

@@ -1,21 +1,21 @@
 <template>
   <!-- navigation -->
-  <div class="navigation" v-if="remote">
+  <div class="navigation" v-if="object">
     <a class="el-button" target="_blank"
-      v-if="remote.links.homepage"
-      :href="remote.links.homepage"
+      v-if="object.package.links.homepage"
+      :href="object.package.links.homepage"
     >插件主页</a>
     <a class="el-button" target="_blank"
-      v-if="remote.links.npm && data.local.version"
-      :href="remote.links.npm + '/v/' + data.local.version"
+      v-if="object.package.links.npm && data.local.version"
+      :href="object.package.links.npm + '/v/' + data.local.version"
     >当前版本：{{ data.local.version }}</a>
     <a class="el-button" target="_blank"
-      v-if="remote.links.repository"
-      :href="remote.links.repository"
+      v-if="object.package.links.repository"
+      :href="object.package.links.repository"
     >存储库</a>
     <a class="el-button" target="_blank"
-      v-if="remote.links.bugs"
-      :href="remote.links.bugs"
+      v-if="object.package.links.bugs"
+      :href="object.package.links.bugs"
     >问题反馈</a>
   </div>
 
@@ -25,8 +25,8 @@
   </k-comment>
 
   <!-- deprecated -->
-  <k-comment v-if="dep?.versions?.[dep?.resolved]?.deprecated" type="danger">
-    <p>此版本已废弃，请尽快迁移：{{ dep.versions[dep.resolved].deprecated }}</p>
+  <k-comment v-if="versions?.[dep?.resolved]?.deprecated" type="danger">
+    <p>此版本已废弃，请尽快迁移：{{ versions[dep.resolved].deprecated }}</p>
   </k-comment>
 
   <!-- external -->
@@ -46,13 +46,14 @@ const props = defineProps<{
   data: SettingsData
 }>()
 
-const remote = computed(() => store.market.data?.[props.data.name])
+const object = computed(() => store.market.data?.[props.data.name])
 const dep = computed(() => store.dependencies[props.data.name])
+const versions = computed(() => store.registry[props.data.name])
 
 const hasUpdate = computed(() => {
-  if (!remote.value?.versions || props.data.local.workspace) return
+  if (!versions.value || props.data.local.workspace) return
   try {
-    return gt(remote.value.version, props.data.local.version)
+    return gt(object.value.package.version, props.data.local.version)
   } catch {}
 })
 
