@@ -28,13 +28,13 @@
     <k-markdown inline class="desc" :source="tt(data.manifest.description)"></k-markdown>
     <div class="footer">
       <el-tooltip :content="timeAgo(data.updatedAt)" placement="top">
-        <a class="shrink" target="_blank" :href="data.links.npm">
-          <market-icon name="tag"></market-icon>{{ data.version }}
+        <a class="shrink" target="_blank" :href="data.package.links.npm">
+          <market-icon name="tag"></market-icon>{{ data.package.version }}
         </a>
       </el-tooltip>
       <template v-if="data.installSize">
         <span class="spacer"></span>
-        <a target="_blank" :href="data.links.size">
+        <a target="_blank" :href="data.package.links.size">
           <market-icon name="file-archive"></market-icon>{{ formatSize(data.installSize) }}
         </a>
       </template>
@@ -65,7 +65,7 @@
 <script lang="ts" setup>
 
 import { computed, inject } from 'vue'
-import { AnalyzedPackage } from '@koishijs/registry'
+import { SearchObject } from '@koishijs/registry'
 import { useI18nText } from '@koishijs/components'
 import { badges, getUsers, resolveCategory, validate } from '@koishijs/market'
 import { kConfig } from '../utils'
@@ -77,7 +77,7 @@ import * as md5 from 'spark-md5'
 defineEmits(['query'])
 
 const props = defineProps<{
-  data: AnalyzedPackage
+  data: SearchObject
   gravatar?: string
 }>()
 
@@ -85,7 +85,7 @@ const config = inject(kConfig, {})
 
 const tt = useI18nText()
 
-const homepage = computed(() => props.data.links.homepage || props.data.links.repository)
+const homepage = computed(() => props.data.package.links.homepage || props.data.package.links.repository)
 
 const badge = computed(() => {
   for (const type in badges) {

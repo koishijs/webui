@@ -1,4 +1,4 @@
-import { AnalyzedPackage, User } from '@koishijs/registry'
+import { SearchObject, User } from '@koishijs/registry'
 import { InjectionKey } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { Dict } from 'cosmokit'
@@ -10,14 +10,14 @@ export const useMarketI18n = () => useI18n({
   },
 })
 
-export function getUsers(data: AnalyzedPackage) {
+export function getUsers(data: SearchObject) {
   const result: Record<string, User> = {}
-  for (const user of data.contributors) {
+  for (const user of data.package.contributors) {
     if (!user.email) continue
     result[user.email] ||= user
   }
-  if (!data.maintainers.some(user => result[user.email])) {
-    return data.maintainers.map(({ email, username }) => ({
+  if (!data.package.maintainers.some(user => result[user.email])) {
+    return data.package.maintainers.map(({ email, username }) => ({
       email,
       name: username,
     }))
@@ -62,21 +62,22 @@ export const badges: Dict<Badge> = {
 interface Comparator {
   icon: string
   hidden?: boolean
-  compare(a: AnalyzedPackage, b: AnalyzedPackage, words: string[]): number
+  compare(a: SearchObject, b: SearchObject, words: string[]): number
 }
 
-function getSimilarity(data: AnalyzedPackage, word: string) {
+function getSimilarity(data: SearchObject, word: string) {
   word = word.replace('koishi-plugin-', '').replace('@koishijs/plugin-', '')
-  if (data.shortname === word) return 10
-  if (data.shortname.startsWith(word)) return 5
-  if (data.shortname.includes(word)) return 2
+  const shortname = data.package.name.replace(/(koishi-|^@koishijs\/)plugin-/, '')
+  if (shortname === word) return 10
+  if (shortname.startsWith(word)) return 5
+  if (shortname.includes(word)) return 2
   return [
-    ...data.keywords,
+    ...data.package.keywords,
     ...Object.values(data.manifest.description),
   ].some(keyword => keyword.includes(word)) ? 1 : 0
 }
 
-function getSimRating(data: AnalyzedPackage, words: string[]) {
+function getSimRating(data: SearchObject, words: string[]) {
   words = words.filter(w => w && !w.includes(':'))
   let result = 0
   for (const word of words) {
@@ -128,7 +129,7 @@ export const categories = [
 ]
 
 export interface MarketConfig {
-  installed?(data: AnalyzedPackage): boolean
+  installed?(data: SearchObject): boolean
 }
 
 interface ValidateConfig extends MarketConfig {
@@ -137,7 +138,7 @@ interface ValidateConfig extends MarketConfig {
 
 export const kConfig = Symbol('market.config') as InjectionKey<MarketConfig>
 
-export function getSorted(market: AnalyzedPackage[], words: string[]) {
+export function getSorted(market: SearchObject[], words: string[]) {
   return market?.slice().filter((data) => {
     return !data.manifest.hidden || words.includes('show:hidden')
   }).sort((a, b) => {
@@ -157,7 +158,7 @@ export function getSorted(market: AnalyzedPackage[], words: string[]) {
   })
 }
 
-export function getFiltered(market: AnalyzedPackage[], words: string[], config?: MarketConfig) {
+export function getFiltered(market: SearchObject[], words: string[], config?: MarketConfig) {
   return market.filter((data) => {
     const users = getUsers(data)
     return words.every((word) => {
@@ -183,7 +184,7 @@ export function validateWord(word: string) {
   return operators.includes(key)
 }
 
-export function validate(data: AnalyzedPackage, word: string, config: ValidateConfig = {}) {
+export function validate(data: SearchObject, word: string, config: ValidateConfig = {}) {
   const { locales, service } = data.manifest
   if (word.startsWith('impl:')) {
     return service.implements.includes(word.slice(5))

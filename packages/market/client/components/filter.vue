@@ -57,12 +57,12 @@
 
 import { computed, inject, ref, watch } from 'vue'
 import { Badge, badges, kConfig, validate, comparators, categories, resolveCategory, useMarketI18n } from '../utils'
-import { AnalyzedPackage } from '@koishijs/registry'
+import { SearchObject } from '@koishijs/registry'
 import MarketIcon from '../icons'
 
 const props = defineProps<{
   modelValue: string[]
-  data?: AnalyzedPackage[]
+  data?: SearchObject[]
 }>()
 
 const emit = defineEmits(['update:modelValue'])

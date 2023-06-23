@@ -1,5 +1,5 @@
 import { compare, intersects } from 'semver'
-import { Awaitable, defineProperty, Dict, pick, Time } from 'cosmokit'
+import { Awaitable, defineProperty, Dict, Time } from 'cosmokit'
 import { Ensure } from './utils'
 import pMap from 'p-map'
 
@@ -16,9 +16,10 @@ export interface BasePackage {
   description: string
 }
 
-export type DependencyType = 'dependencies' | 'devDependencies' | 'peerDependencies' | 'optionalDependencies'
+export type DependencyKey = 'dependencies' | 'devDependencies' | 'peerDependencies' | 'optionalDependencies'
+export type DependencyMetaKey = 'deprecated' | 'peerDependencies' | 'peerDependenciesMeta'
 
-export interface PackageJson extends BasePackage, Partial<Record<DependencyType, Record<string, string>>> {
+export interface PackageJson extends BasePackage, Partial<Record<DependencyKey, Record<string, string>>> {
   main?: string
   module?: string
   browser?: string
@@ -100,13 +101,9 @@ export interface Registry extends BasePackage {
 
 export interface DatedPackage extends BasePackage {
   date: string
-  category?: string
-  insecure?: boolean
-  portable?: boolean
-  object?: SearchObject
 }
 
-export interface SearchPackage extends DatedPackage {
+export interface SearchPackage extends DatedPackage, Pick<RemotePackage, DependencyMetaKey> {
   links: Dict<string>
   author?: User
   contributors?: User[]
@@ -115,25 +112,26 @@ export interface SearchPackage extends DatedPackage {
   maintainers: User[]
 }
 
-export interface Extension {
+export interface SearchObject {
+  shortname: string
+  package: SearchPackage
+  searchScore: number
   score: Score
   rating: number
   verified: boolean
+  category?: string
+  portable?: boolean
+  insecure?: boolean
+  ignored?: boolean
   license: string
   manifest: Manifest
+  createdAt: string
+  updatedAt: string
   publishSize?: number
   installSize?: number
   downloads?: {
     lastMonth: number
   }
-}
-
-export interface DependencyMeta extends Pick<RemotePackage, 'deprecated' | 'peerDependencies' | 'peerDependenciesMeta'> {}
-
-export interface SearchObject extends Extension, DependencyMeta {
-  package: SearchPackage
-  searchScore: number
-  ignored?: boolean
 }
 
 export interface Score {
@@ -157,23 +155,6 @@ export interface SearchResult {
   forceTime?: number
 }
 
-export interface MarketResult {
-  timestamp: number
-  objects: AnalyzedPackage[]
-}
-
-export interface SharedPackage extends DatedPackage {
-  versions: Dict<Partial<RemotePackage>>
-}
-
-export interface AnalyzedPackage extends SearchPackage, Extension {
-  contributors: User[]
-  shortname: string
-  createdAt: string
-  updatedAt: string
-  versions?: Dict<Partial<RemotePackage>>
-}
-
 export interface CollectConfig {
   step?: number
   margin?: number
@@ -187,7 +168,7 @@ export interface AnalyzeConfig {
   concurrency?: number
   before?(object: SearchObject): void
   onRegistry?(registry: Registry, versions: RemotePackage[]): Awaitable<void>
-  onSuccess?(item: AnalyzedPackage, object: SearchObject): Awaitable<void>
+  onSuccess?(object: SearchObject, versions: RemotePackage[]): Awaitable<void>
   onFailure?(name: string, reason: any): Awaitable<void>
   onSkipped?(name: string): Awaitable<void>
   after?(object: SearchObject): void
@@ -284,14 +265,18 @@ export default class Scanner {
     }
     this.objects = Object.values(this.cache).filter((object) => {
       const { name } = object.package
-      const official = /^@koishijs\/plugin-[0-9a-z-]+$/.test(name)
-      const community = /(^|\/)koishi-plugin-[0-9a-z-]+$/.test(name)
-      return !object.ignored && !ignored.includes(name) && (official || community)
+      return !object.ignored && !ignored.includes(name) && Scanner.isPlugin(name)
     })
     this.total = this.objects.length
   }
 
-  static isCompatible(range: string, remote: RemotePackage) {
+  static isPlugin(name: string) {
+    const official = /^@koishijs\/plugin-[0-9a-z-]+$/.test(name)
+    const community = /(^|\/)koishi-plugin-[0-9a-z-]+$/.test(name)
+    return official || community
+  }
+
+  static isCompatible(range: string, remote: Pick<RemotePackage, 'peerDependencies'>) {
     const { peerDependencies = {} } = remote
     const declaredVersion = peerDependencies['koishi']
     try {
@@ -305,45 +290,32 @@ export default class Scanner {
     const registry = await this.request<Registry>(`/${name}`)
     const compatible = Object.values(registry.versions).filter((remote) => {
       return Scanner.isCompatible(range, remote)
-    })
+    }).sort((a, b) => compare(b.version, a.version))
 
     await onRegistry?.(registry, compatible)
-    const versions = compatible
-      .filter(item => !item.deprecated)
-      .sort((a, b) => compare(b.version, a.version))
+    const versions = compatible.filter(item => !item.deprecated)
     if (!versions.length) return
 
     const latest = registry.versions[versions[0].version]
     const manifest = conclude(latest)
-
     const times = compatible.map(item => registry.time[item.version]).sort()
-    const shortname = name.replace(/(koishi-|^@koishijs\/)plugin-/, '')
-    const keywords = (latest.keywords ?? [])
+
+    object.shortname = name.replace(/(koishi-|^@koishijs\/)plugin-/, '')
+    object.verified = official
+    object.manifest = manifest
+    object.insecure = manifest.insecure
+    object.category = manifest.category
+    object.createdAt = times[0]
+    object.updatedAt = times[times.length - 1]
+    object.package.contributors ??= latest.author ? [latest.author] : []
+    object.package.keywords = (latest.keywords ?? [])
       .map(keyword => keyword.toLowerCase())
       .filter((keyword) => {
         return !keyword.includes(':')
-          && !shortname.includes(keyword)
+          && !object.shortname.includes(keyword)
           && !stopWords.some(word => keyword.includes(word))
       })
-
-    const analyzed: AnalyzedPackage = {
-      name,
-      manifest,
-      shortname,
-      keywords,
-      createdAt: times[0],
-      updatedAt: times[times.length - 1],
-      verified: object.verified ?? official,
-      category: object.package.category || manifest.category,
-      insecure: object.package.insecure || manifest.insecure,
-      versions: Object.fromEntries(versions.map(item => [item.version, item])),
-      contributors: latest.contributors ?? (latest.author ? [latest.author] : []),
-      ...pick(object, ['score', 'rating', 'downloads', 'installSize', 'publishSize']),
-      ...pick(object.package, ['date', 'links', 'publisher', 'maintainers', 'portable']),
-      ...pick(latest, ['version', 'description', 'license', 'author']),
-    }
-    defineProperty(analyzed, 'object', object)
-    return analyzed
+    return versions
   }
 
   public async analyze(config: AnalyzeConfig) {
@@ -354,10 +326,10 @@ export default class Scanner {
       before?.(object)
       const { name } = object.package
       try {
-        const analyzed = await this.process(object, version, onRegistry)
-        if (analyzed) {
-          await onSuccess?.(analyzed, object)
-          return analyzed
+        const versions = await this.process(object, version, onRegistry)
+        if (versions) {
+          await onSuccess?.(object, versions)
+          return versions
         } else {
           object.ignored = true
           await onSkipped?.(name)

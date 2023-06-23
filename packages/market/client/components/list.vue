@@ -5,7 +5,7 @@
     <div class="market-container">
       <market-package
         v-for="data in pages[page - 1]"
-        :key="data.name"
+        :key="data.package.name"
         class="k-card"
         :data="data"
         :gravatar="gravatar"
@@ -30,14 +30,14 @@
 <script lang="ts" setup>
 
 import { computed, inject, ref } from 'vue'
-import { AnalyzedPackage } from '@koishijs/registry'
+import { SearchObject } from '@koishijs/registry'
 import { getSorted, getFiltered, hasFilter, kConfig } from '../utils'
 import MarketPackage from './package.vue'
 
 const props = withDefaults(defineProps<{
   modelValue: string[],
-  data: AnalyzedPackage[],
-  installed?: (data: AnalyzedPackage) => boolean,
+  data: SearchObject[],
+  installed?: (data: SearchObject) => boolean,
   pageSize?: number,
   gravatar?: string,
 }>(), {
@@ -55,7 +55,7 @@ const packages = computed(() => getFiltered(all.value, props.modelValue, config)
 const page = ref(1)
 
 const pages = computed(() => {
-  const result: AnalyzedPackage[][] = []
+  const result: SearchObject[][] = []
   for (let i = 0; i < packages.value.length; i += props.pageSize) {
     result.push(packages.value.slice(i, i + props.pageSize))
   }
