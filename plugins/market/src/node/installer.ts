@@ -148,10 +148,10 @@ class Installer extends Service {
   }
 
   refresh(refresh = false) {
-    this.depTask = null
     this.pkgTasks = {}
     this.fullCache = {}
     this.tempCache = {}
+    this.depTask = this._getDeps()
     if (!refresh) return
     this.ctx.console.registry?.refresh()
     this.ctx.console.packages?.refresh()

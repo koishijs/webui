@@ -24,7 +24,6 @@ class RegistryProvider extends DataService<Dict<Dict<Pick<RemotePackage, Depende
   }
 
   flushData = throttle(500, () => {
-    console.log(this.ctx.installer.tempCache)
     this.ctx.console.broadcast('market/registry', this.ctx.installer.tempCache)
     this.ctx.installer.tempCache = {}
   })

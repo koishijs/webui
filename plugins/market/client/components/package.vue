@@ -13,7 +13,7 @@
     </td>
 
     <td>
-      <el-select v-if="!local.workspace && !local.invalid" v-model="version">
+      <el-select v-if="data" v-model="version">
         <el-option value="">移除依赖</el-option>
         <el-option v-for="({ result }, version) in data" :key="version" :value="version">
           {{ version }}
@@ -25,7 +25,7 @@
 
     <td>
       <template v-if="local.invalid">暂不支持</template>
-      <el-button v-else-if="local.workspace || remote" @click="active = name">修改</el-button>
+      <el-button v-else-if="local.workspace || versions" @click="active = name">修改</el-button>
       <template v-else>版本获取失败</template>
     </td>
   </tr>
@@ -44,7 +44,7 @@ const props = defineProps({
 })
 
 const local = computed(() => store.dependencies[props.name])
-const remote = computed(() => store.registry[props.name])
+const versions = computed(() => store.registry[props.name])
 
 const compare = computed(() => {
   if (local.value.invalid) return
@@ -71,7 +71,10 @@ const version = computed({
   },
 })
 
-const data = computed(() => analyzeVersions(props.name))
+const data = computed(() => {
+  if (local.value.workspace || local.value.invalid) return
+  return analyzeVersions(props.name)
+})
 
 </script>
 
