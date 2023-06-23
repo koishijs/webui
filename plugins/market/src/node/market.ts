@@ -15,13 +15,13 @@ class MarketProvider extends BaseMarketProvider {
     if (config.endpoint) this.http = ctx.http.extend(config)
   }
 
-  async start() {
+  async start(refresh = false) {
     super.start()
     this.failed = []
     this.fullCache = {}
     this.tempCache = {}
+    if (refresh) this.ctx.console.dependencies.refresh(true)
     await this.prepare()
-    this.refresh()
   }
 
   stop() {
@@ -67,7 +67,8 @@ class MarketProvider extends BaseMarketProvider {
         onRegistry: (registry, versions) => {
           this.ctx.installer.setPackage(registry.name, versions)
         },
-        onSuccess: (item, object) => {
+        onSuccess: (object, versions) => {
+          this.fullCache[object.package.name] = this.tempCache[object.package.name] = object
         },
         after: () => this.flushData(),
       })

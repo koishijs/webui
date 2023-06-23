@@ -2,11 +2,6 @@ import { MarketProvider as BaseMarketProvider } from '../shared'
 import {} from '@koishijs/plugin-config'
 
 export default class MarketProvider extends BaseMarketProvider {
-  start() {
-    super.start()
-    this.refresh()
-  }
-
   async collect() {
     return this.ctx.loader.market
   }

@@ -54,7 +54,7 @@ export function apply(ctx: Context, config: Config) {
 
         // check local dependencies
         const names = ctx.installer.resolveName(name)
-        const deps = await ctx.installer.get()
+        const deps = await ctx.installer.getDeps()
         name = names.find((name) => deps[name])
         if (name) return session.text('.already-installed')
 
@@ -79,7 +79,7 @@ export function apply(ctx: Context, config: Config) {
 
         // check local dependencies
         const names = ctx.installer.resolveName(name)
-        const deps = await ctx.installer.get()
+        const deps = await ctx.installer.getDeps()
         name = names.find((name) => deps[name])
         if (!name) return session.text('.not-installed')
 
@@ -101,7 +101,7 @@ export function apply(ctx: Context, config: Config) {
           return names
         }
 
-        const deps = await ctx.installer.get()
+        const deps = await ctx.installer.getDeps()
         names = await getPackages(names)
         names = names.filter((name) => {
           const { latest, resolved, invalid } = deps[name]

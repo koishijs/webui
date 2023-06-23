@@ -1,9 +1,8 @@
 import { Context, defineProperty, Dict, Logger, pick, Quester, Schema, Service, Time, valueMap } from 'koishi'
-import Scanner, { DependencyMeta, PackageJson, Registry, RemotePackage } from '@koishijs/registry'
+import Scanner, { DependencyMetaKey, PackageJson, Registry, RemotePackage } from '@koishijs/registry'
 import { resolve } from 'path'
 import { promises as fsp, readFileSync } from 'fs'
 import { compare, satisfies, valid } from 'semver'
-import { Dependency } from '../shared'
 import {} from '@koishijs/loader'
 import getRegistry from 'get-registry'
 import which from 'which-pm-runs'
@@ -27,6 +26,8 @@ export interface Dependency {
   workspace?: boolean
   /** valid (unsupported) syntax */
   invalid?: boolean
+  /** latest version */
+  latest?: string
 }
 
 export interface LocalPackage extends PackageJson {
@@ -42,15 +43,22 @@ export function loadManifest(name: string) {
   return meta
 }
 
+function getVersions(versions: RemotePackage[]) {
+  return Object.fromEntries(versions
+    .map(item => [item.version, pick(item, ['peerDependencies', 'peerDependenciesMeta', 'deprecated'])] as const)
+    .sort(([a], [b]) => compare(b, a)))
+}
+
 class Installer extends Service {
   public http: Quester
-  public registry: string
+  public endpoint: string
+  public fullCache: Dict<Dict<Pick<RemotePackage, DependencyMetaKey>>> = {}
+  public tempCache: Dict<Dict<Pick<RemotePackage, DependencyMetaKey>>> = {}
 
-  private packageTasks: Dict<Promise<Dict<DependencyMeta>>>
-  private packageCache: Dict<Dict<DependencyMeta>>
+  private pkgTasks: Dict<Promise<Dict<Pick<RemotePackage, DependencyMetaKey>>>> = {}
   private agent = which()?.name || 'npm'
   private manifest: PackageJson
-  private task: Promise<Dict<Dependency>>
+  private depTask: Promise<Dict<Dependency>>
 
   constructor(public ctx: Context, public config: Installer.Config) {
     super(ctx, 'installer')
@@ -63,8 +71,8 @@ class Installer extends Service {
 
   async start() {
     const { endpoint, timeout } = this.config
-    this.registry = endpoint || await getRegistry()
-    this.http = this.ctx.http.extend({ endpoint: this.registry, timeout })
+    this.endpoint = endpoint || await getRegistry()
+    this.http = this.ctx.http.extend({ endpoint: this.endpoint, timeout })
   }
 
   resolveName(name: string) {
@@ -81,12 +89,9 @@ class Installer extends Service {
   async findVersion(names: string[]) {
     const entries = await Promise.all(names.map(async (name) => {
       try {
-        const registry = await this.http.get<Registry>(`/${name}`)
-        const versions = Object.values(registry.versions).filter((remote) => {
-          return !remote.deprecated && Scanner.isCompatible('4', remote)
-        }).sort((a, b) => compare(b.version, a.version))
+        const versions = Object.entries(await this.getPackage(name))
         if (!versions.length) return
-        return { [name]: versions[0].version }
+        return { [name]: versions[0][0] }
       } catch (e) {}
     }))
     return entries.find(Boolean)
@@ -95,23 +100,27 @@ class Installer extends Service {
   private async _getPackage(name: string) {
     try {
       const registry = await this.http.get<Registry>(`/${name}`)
-      return this.setPackage(name, Object.values(registry.versions))
+      this.fullCache[name] = this.tempCache[name] = getVersions(Object.values(registry.versions).filter((remote) => {
+        return !Scanner.isPlugin(name) || Scanner.isCompatible('4', remote)
+      }))
+      this.ctx.console?.dependencies?.flushData()
+      return this.fullCache[name]
     } catch (e) {
       logger.warn(e.message)
     }
   }
 
   setPackage(name: string, versions: RemotePackage[]) {
-    return this.packageCache[name] = Object.fromEntries(versions
-      .map(item => [item.version, pick(item, Dependency.keys)] as const)
-      .sort(([a], [b]) => compare(b, a)))
+    this.fullCache[name] = this.tempCache[name] = getVersions(versions)
+    this.ctx.console?.dependencies?.flushData()
+    this.pkgTasks[name] = Promise.resolve(this.fullCache[name])
   }
 
   getPackage(name: string) {
-    return this.packageTasks[name] ||= this._getPackage(name)
+    return this.pkgTasks[name] ||= this._getPackage(name)
   }
 
-  private async _get() {
+  private async _getDeps() {
     const result = valueMap(this.manifest.dependencies, (request) => {
       return { request: request.replace(/^[~^]/, '') } as Dependency
     })
@@ -127,13 +136,29 @@ class Installer extends Service {
       if (!valid(result[name].request)) {
         result[name].invalid = true
       }
+
+      const versions = await this.getPackage(name)
+      result[name].latest = Object.keys(versions)[0]
     }, { concurrency: 10 })
     return result
   }
 
+  getDeps() {
+    return this.depTask ||= this._getDeps()
+  }
+
   async get(force = false) {
-    if (!force && this.task) return this.task
-    return this.task = this._get()
+    if (force) {
+      this.depTask = null
+      this.pkgTasks = {}
+      this.fullCache = {}
+      this.tempCache = {}
+    }
+    const dependencies = await this.getDeps()
+    return {
+      dependencies,
+      registry: this.fullCache,
+    }
   }
 
   async exec(command: string, args: string[]) {
@@ -174,17 +199,17 @@ class Installer extends Service {
   private _install() {
     const args: string[] = []
     if (this.agent !== 'yarn') args.push('install')
-    args.push('--registry', this.registry)
+    args.push('--registry', this.endpoint)
     return this.exec(this.agent, args)
   }
 
   async install(deps: Dict<string>) {
-    const oldPayload = await this.get()
+    const oldDeps = await this.get()
     await this.override(deps)
 
     let shouldInstall = false
     for (const name in deps) {
-      const { resolved } = oldPayload[name] || {}
+      const { resolved } = oldDeps[name] || {}
       if (deps[name] && resolved && satisfies(resolved, deps[name], { includePrerelease: true })) continue
       shouldInstall = true
       break
@@ -195,11 +220,11 @@ class Installer extends Service {
       if (code) return code
     }
 
-    const newPayload = await this.get(true)
-    for (const name in oldPayload) {
-      const { resolved, workspace } = oldPayload[name]
-      if (workspace || !newPayload[name]) continue
-      if (newPayload[name].resolved === resolved) continue
+    const newDeps = await this.get(true)
+    for (const name in oldDeps) {
+      const { resolved, workspace } = oldDeps[name]
+      if (workspace || !newDeps[name]) continue
+      if (newDeps[name].resolved === resolved) continue
       if (!(require.resolve(name) in require.cache)) continue
       this.ctx.loader.fullReload()
     }

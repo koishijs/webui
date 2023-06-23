@@ -1,6 +1,8 @@
 import { Context, Dict, Schema } from 'koishi'
 import { DataService } from '@koishijs/plugin-console'
+import { DependencyMetaKey, RemotePackage } from '@koishijs/registry'
 import { Dependency } from './installer'
+import { throttle } from 'throttle-debounce'
 
 declare module '@koishijs/plugin-console' {
   interface Events {
@@ -8,7 +10,7 @@ declare module '@koishijs/plugin-console' {
   }
 }
 
-class Dependencies extends DataService<Dict<Dependency>> {
+class Dependencies extends DataService<Dependencies.Payload> {
   constructor(public ctx: Context, public config: Dependencies.Config) {
     super(ctx, 'dependencies', { authority: 4 })
 
@@ -20,6 +22,15 @@ class Dependencies extends DataService<Dict<Dependency>> {
     }, { authority: 4 })
   }
 
+  stop() {
+    this.flushData.cancel()
+  }
+
+  flushData = throttle(500, () => {
+    this.ctx.console.broadcast('market/registry', this.ctx.installer.tempCache)
+    this.ctx.installer.tempCache = {}
+  })
+
   async get(force = false) {
     return this.ctx.installer.get(force)
   }
@@ -28,6 +39,11 @@ class Dependencies extends DataService<Dict<Dependency>> {
 namespace Dependencies {
   export interface Config {}
   export const Config: Schema<Config> = Schema.object({})
+
+  export interface Payload {
+    dependencies: Dict<Dependency>
+    registry: Dict<Dict<Pick<RemotePackage, DependencyMetaKey>>>
+  }
 }
 
 export default Dependencies
