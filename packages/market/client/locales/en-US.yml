@@ -9,28 +9,28 @@ badge:
   preview: Preview
   newborn: Newborn
 sort:
-  default: 综合
-  rating: 按评分
-  download: 按下载量
-  created: 按创建时间
-  updated: 按更新时间
+  default: Overall
+  rating: Rating
+  download: Downloads
+  created: Created
+  updated: Updated
 category:
-  all: 所有插件
-  other: 未分类
-  core: 核心功能
+  all: All
+  other: Uncategorized
+  core: Core
   adapter: adapters
-  storage: 存储服务
-  extension: 扩展功能
+  storage: Storage
+  extension: Extension
   console: Koishi Console
-  manage: 管理工具
-  preset: 行为预设
-  image: 图片服务
-  media: 资讯服务
-  tool: 实用工具
-  ai: 人工智能
-  meme: 趣味交互
-  game: 娱乐玩法
-  gametool: 游戏工具
+  manage: Administration
+  preset: Behavior
+  image: Image
+  media: Information
+  tool: Utilities
+  ai: AI
+  meme: Meme
+  game: Entertainment
+  gametool: Game Tools
 time:
   just-now: Just now
   minutes-ago: '{0} minute(s) ago'
