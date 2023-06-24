@@ -117,9 +117,11 @@ namespace LogProvider {
     root: Schema.path({
       filters: ['directory'],
       allowCreate: true,
-    }).default('data/logs').description('存放输出日志的本地目录。'),
-    maxAge: Schema.natural().default(30).description('日志文件保存的最大天数。'),
-    maxSize: Schema.natural().default(1024 * 100).description('单个日志文件的最大大小。'),
+    }).default('data/logs'),
+    maxAge: Schema.natural().default(30),
+    maxSize: Schema.natural().default(1024 * 100),
+  }).i18n({
+    'zh-CN': require('./locales/zh-CN'),
   })
 }
 
