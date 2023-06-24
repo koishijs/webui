@@ -4,7 +4,9 @@
     <div class="nickname">{{ data.user }}</div>
     <div class="message-box" @contextmenu.stop="trigger($event, data)">
       <blockquote class="quote" v-if="data.quote">
-        <span class="abstract">{{ data.quote.content }}</span>
+        <span class="abstract">
+          <message-content :content="data.quote.content"/>
+        </span>
       </blockquote>
       <message-content :content="data.content"/>
     </div>
