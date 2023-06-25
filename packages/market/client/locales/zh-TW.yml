@@ -1,26 +1,26 @@
 type:
   sort: 排序
-  filter: 筛选
-  category: 分类
+  filter: 篩選
+  category: 分類
 badge:
-  installed: 已下载
-  verified: 官方认证
+  installed: 已下載
+  verified: 官方認證
   insecure: 不安全
-  preview: 开发中
+  preview: 開發中
   newborn: 近期新增
 sort:
-  default: 综合
-  rating: 按评分
-  download: 按下载量
-  created: 按创建时间
-  updated: 按更新时间
+  default: 綜合
+  rating: 依評分
+  download: 依下載量
+  created: 依創建時間
+  updated: 依更新時間
 category:
-  all: 所有插件
-  other: 未分类
+  all: 所有外掛程式
+  other: 未分類
   core: 核心功能
-  adapter: 适配器
-  storage: 存储服务
-  extension: 扩展功能
+  adapter: 適配器
+  storage: 儲存服務
+  extension: 擴展功能
   console: 控制台
   manage: 管理工具
   preset: 行为预设
