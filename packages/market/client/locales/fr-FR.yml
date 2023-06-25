@@ -1,11 +1,11 @@
 type:
-  sort: 排序
-  filter: 筛选
-  category: 分类
+  sort: Ordre
+  filter: Filtre
+  category: Catégories
 badge:
-  installed: 已下载
-  verified: 官方认证
-  insecure: 不安全
+  installed: Téléchargées
+  verified: Officielle vérifiée 
+  insecure: Non garantie 
   preview: 开发中
   newborn: 近期新增
 sort:
