@@ -18,7 +18,7 @@ category:
   all: All
   other: Uncategorized
   core: Core
-  adapter: adapters
+  adapter: Adapters
   storage: Storage
   extension: Extension
   console: Koishi Console
@@ -37,4 +37,4 @@ time:
   hours-ago: '{0} hour(s) ago'
   days-ago: '{0} day(s) ago'
 search:
-  placeholder: 输入想要查询的插件名
+  placeholder: Search plugins by name
