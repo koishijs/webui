@@ -6,10 +6,10 @@ badge:
   installed: Téléchargées
   verified: Officielle vérifiée 
   insecure: Non garantie 
-  preview: 开发中
+  preview: En développement
   newborn: 近期新增
 sort:
-  default: 综合
+  default: Générales
   rating: 按评分
   download: 按下载量
   created: 按创建时间
