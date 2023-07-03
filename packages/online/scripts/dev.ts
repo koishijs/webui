@@ -2,6 +2,7 @@ import { createReadStream, Stats } from 'fs'
 import { readFile, stat } from 'fs/promises'
 import { extname, resolve } from 'path'
 import { ViteDevServer } from 'vite'
+import { LocalScanner } from '@koishijs/registry'
 import { noop } from '@koishijs/utils'
 import yaml from '@maikolib/vite-plugin-yaml'
 import Koa from 'koa'
@@ -55,6 +56,13 @@ router.get('(/.+)*/sql-wasm.wasm', async (ctx) => {
   ctx.type = 'application/wasm'
 })
 
+const scanner = new LocalScanner(__dirname)
+
+router.get('/portable.json', async (ctx) => {
+  await scanner.collect()
+  ctx.body = scanner
+})
+
 router.get('/modules(/.+)+/index.js', async (ctx) => {
   const name = ctx.params[0].slice(1)
   try {
@@ -100,6 +108,7 @@ async function createVite() {
       dedupe: ['vue', 'vue-demi', 'vue-router', 'element-plus', '@vueuse/core', '@popperjs/core'],
       alias: {
         '@koishijs/core': '@koishijs/core/src/index.ts',
+        '@koishijs/loader': '@koishijs/loader/src/shared.ts',
         '@koishijs/plugin-console': '@koishijs/plugin-console/src/browser/index.ts',
         '@minatojs/driver-sqlite': '@minatojs/driver-sqlite/src/index.ts',
         '@minatojs/sql-utils': '@minatojs/sql-utils/src/index.ts',
