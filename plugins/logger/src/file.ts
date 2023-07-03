@@ -1,5 +1,6 @@
 import { FileHandle, open } from 'fs/promises'
 import { Logger } from 'koishi'
+import { Buffer } from 'buffer'
 
 export class FileWriter {
   public data: Logger.Record[]

@@ -1,9 +1,9 @@
 import { Context, Dict, Logger, remove, Schema, Time } from 'koishi'
 import { DataService } from '@koishijs/plugin-console'
 import { resolve } from 'path'
-import { mkdirSync, readdirSync } from 'fs'
-import { rm } from 'fs/promises'
+import { mkdir, readdir, rm } from 'fs/promises'
 import { FileWriter } from './file'
+import zhCN from './locales/zh-CN.yml'
 
 declare module '@koishijs/plugin-console' {
   namespace Console {
@@ -22,27 +22,34 @@ class LogProvider extends DataService<Logger.Record[]> {
   constructor(ctx: Context, private config: LogProvider.Config = {}) {
     super(ctx, 'logs', { authority: 4 })
 
-    ctx.console.addEntry({
+    ctx.console.addEntry(process.env.KOISHI_BASE ? [
+      process.env.KOISHI_BASE + '/dist/index.js',
+      process.env.KOISHI_BASE + '/dist/style.css',
+    ] : process.env.KOISHI_ENV === 'browser' ? [
+      // @ts-ignore
+      import.meta.url.replace(/\/src\/[^/]+$/, '/client/index.ts'),
+    ] : {
       dev: resolve(__dirname, '../client/index.ts'),
       prod: resolve(__dirname, '../dist'),
     })
-
-    ctx.on('ready', () => {
-      this.prepareWriter()
-      this.prepareLogger()
-    }, true)
-
-    ctx.on('dispose', () => {
-      this.writer?.close()
-      this.writer = null
-    })
   }
 
-  prepareWriter() {
-    this.root = resolve(this.ctx.baseDir, this.config.root)
-    mkdirSync(this.root, { recursive: true })
+  async start() {
+    await this.prepareWriter()
+    this.prepareLogger()
+    this.refresh()
+  }
 
-    for (const filename of readdirSync(this.root)) {
+  async stop() {
+    await this.writer?.close()
+    this.writer = null
+  }
+
+  async prepareWriter() {
+    this.root = resolve(this.ctx.baseDir, this.config.root)
+    await mkdir(this.root, { recursive: true })
+
+    for (const filename of await readdir(this.root)) {
       const capture = /^(\d{4}-\d{2}-\d{2})-(\d+)\.log$/.exec(filename)
       if (!capture) continue
       this.files[capture[1]] = Math.max(this.files[capture[1]] ?? 0, +capture[2])
@@ -68,23 +75,22 @@ class LogProvider extends DataService<Logger.Record[]> {
   }
 
   prepareLogger() {
-    if (this.ctx.loader.prolog) {
-      for (const record of this.ctx.loader.prolog) {
-        this.record(record)
-      }
-      this.ctx.root.loader.prolog = null
-    }
-
     const target: Logger.Target = {
       colors: 3,
       record: this.record.bind(this),
     }
 
     Logger.targets.push(target)
-
     this.ctx.on('dispose', () => {
       remove(Logger.targets, target)
+      if (this.ctx.loader) {
+        this.ctx.loader.prolog = []
+      }
     })
+
+    for (const record of this.ctx.loader?.prolog || []) {
+      this.record(record)
+    }
   }
 
   record(record: Logger.Record) {
@@ -121,7 +127,7 @@ namespace LogProvider {
     maxAge: Schema.natural().default(30),
     maxSize: Schema.natural().default(1024 * 100),
   }).i18n({
-    'zh-CN': require('./locales/zh-CN'),
+    'zh-CN': zhCN,
   })
 }
 
