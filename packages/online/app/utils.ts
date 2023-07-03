@@ -72,10 +72,14 @@ export async function activate(id?: string) {
   } catch {
     loader.config = {
       plugins: {
+        'config': {},
         'console': {},
+        'database-sqlite': {},
         'dataview': {},
         'help': {},
         'insight': {},
+        'locales': {},
+        'logger': {},
         'market': {},
         'sandbox': {},
         'theme-vanilla': {},

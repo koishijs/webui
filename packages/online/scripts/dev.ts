@@ -61,6 +61,11 @@ const scanner = new LocalScanner(__dirname)
 
 router.get('/portable.json', async (ctx) => {
   await scanner.collect()
+  for (const object of scanner.objects) {
+    object.package.contributors = []
+    object.package.maintainers = []
+    object.package.links = {}
+  }
   ctx.body = scanner
 })
 

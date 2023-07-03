@@ -1,19 +1,26 @@
-import { makeArray } from '@koishijs/core'
 import { SearchResult } from '@koishijs/registry'
-import { Loader, unwrapExports } from '@koishijs/loader'
+import { Loader } from '@koishijs/loader'
 import { global } from '@koishijs/client'
+import { Logger } from '@koishijs/core'
+import { Buffer } from 'buffer'
 import process from 'process'
 
 export * from '@koishijs/loader'
 
 if (process.env.NODE_ENV !== 'development') {
   globalThis.process = process
+  globalThis.Buffer = Buffer
 }
 
 class BrowserLoader extends Loader {
   public envData: any = {}
   public config: any = { plugins: {} }
   public market: SearchResult
+
+  constructor() {
+    Logger.targets = []
+    super()
+  }
 
   async init(filename?: string) {
     await super.init(filename)
@@ -28,20 +35,12 @@ class BrowserLoader extends Loader {
     }
   }
 
-  async resolve(name: string) {
-    return this.cache[name]
-  }
-
-  async resolvePlugin(name: string) {
-    const urls = makeArray(this.cache[name])
-    for (const url of urls) {
-      try {
-        return unwrapExports(await import(/* @vite-ignore */ url))
-      } catch (err) {
-        console.log(url, err)
-      }
+  async import(name: string) {
+    try {
+      return await import(/* @vite-ignore */ this.cache[name])
+    } catch (err) {
+      console.warn(err)
     }
-    console.warn(`cannot resolve plugin ${name}`)
   }
 
   fullReload() {

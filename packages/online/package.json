@@ -30,7 +30,7 @@
     "@koishijs/fs": "^1.3.2",
     "@koishijs/os": "^1.0.1",
     "@koishijs/url": "^1.0.3",
-    "@koishijs/loader": "^3.2.4"
+    "@koishijs/loader": "^4.0.0"
   },
   "yakumo": {
     "client": "./scripts/build"

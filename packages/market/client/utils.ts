@@ -112,7 +112,6 @@ export const comparators: Dict<Comparator> = {
 }
 
 export const categories = [
-  'core',
   'adapter',
   'storage',
   'extension',
