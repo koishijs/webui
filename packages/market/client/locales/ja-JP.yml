@@ -1,0 +1,40 @@
+type:
+  sort: 並び順
+  filter: 絞り込み
+  category: カテゴリ
+badge:
+  installed: ダウンロード済
+  verified: 公式認証
+  insecure: 非推奨
+  preview: "開発中\n"
+  newborn: 最近追加
+sort:
+  default: 全般
+  rating: レーティング
+  download: ダウンロード
+  created: 作成日時
+  updated: 更新日時
+category:
+  all: 利用可能なプラグイン
+  other: カテゴリなし
+  core: 核心功能
+  adapter: アダプター
+  storage: 静的ストレージ
+  extension: 拡張機能
+  console: コンソール
+  manage: 管理ツール
+  preset: ボット行為
+  image: イラスト検索
+  media: 情報提供
+  tool: ユーティリティツール
+  ai: 人工知能
+  meme: ミーム関連
+  game: 独自遊戯
+  gametool: ゲームツール
+time:
+  just-now: しばらく前
+  minutes-ago: '{0} 分前'
+  hours-ago: '{0} 時間前'
+  days-ago: '{0} 日前'
+search:
+  placeholder: 输入想要查询的插件名

@@ -1,0 +1,9 @@
+registry:
+  $description: 插件源设置
+  endpoint: 插件的下载源。默认跟随当前项目的 npm config。
+  timeout: 获取插件数据的超时时间。
+search:
+  $description: 搜索设置
+  endpoint: 用于搜索插件市场的网址。默认跟随插件源设置。
+  timeout: 搜索插件市场的超时时间。
+  proxyAgent: 用于搜索插件市场的代理。

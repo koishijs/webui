@@ -1,0 +1,40 @@
+type:
+  sort: Sort
+  filter: Filter
+  category: Category
+badge:
+  installed: Installed
+  verified: Verified
+  insecure: Insecure
+  preview: Preview
+  newborn: Newborn
+sort:
+  default: Overall
+  rating: Rating
+  download: Downloads
+  created: Created
+  updated: Updated
+category:
+  all: All
+  other: Uncategorized
+  core: Core
+  adapter: Adapters
+  storage: Storage
+  extension: Extension
+  console: Koishi Console
+  manage: Administration
+  preset: Behavior
+  image: Image
+  media: Information
+  tool: Utilities
+  ai: AI
+  meme: Meme
+  game: Entertainment
+  gametool: Game Tools
+time:
+  just-now: Just now
+  minutes-ago: '{0} minute(s) ago'
+  hours-ago: '{0} hour(s) ago'
+  days-ago: '{0} day(s) ago'
+search:
+  placeholder: Search plugins by name

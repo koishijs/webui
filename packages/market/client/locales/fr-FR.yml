@@ -1,0 +1,40 @@
+type:
+  sort: Ordre
+  filter: Filtre
+  category: Catégories
+badge:
+  installed: Téléchargées
+  verified: Officielle vérifiée
+  insecure: Non garantie
+  preview: En développement
+  newborn: 近期新增
+sort:
+  default: Générales
+  rating: Par score
+  download: Par téléchargées
+  created: Par date de création
+  updated: Par date de mise à jour
+category:
+  all: Plugins disponibles
+  other: Non catégorisé
+  core: 核心功能
+  adapter: Adaptateurs
+  storage: Stockage
+  extension: Extension
+  console: Console
+  manage: Administration
+  preset: Comportement
+  image: Image
+  media: Information
+  tool: Outils
+  ai: IA
+  meme: Mème
+  game: Divertissement
+  gametool: Outils des jeux
+time:
+  just-now: A l'instant
+  minutes-ago: 'Il y a {0} minute(s)'
+  hours-ago: 'Il y a {0} heure(s)'
+  days-ago: 'Il y a {0} jour(s)'
+search:
+  placeholder: 输入想要查询的插件名

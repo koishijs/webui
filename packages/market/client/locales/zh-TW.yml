@@ -1,0 +1,40 @@
+type:
+  sort: 排序
+  filter: 篩選
+  category: 分類
+badge:
+  installed: 已下載
+  verified: 官方認證
+  insecure: 不安全
+  preview: 開發中
+  newborn: 近期新增
+sort:
+  default: 綜合
+  rating: 依評分
+  download: 依下載量
+  created: 依創建時間
+  updated: 依更新時間
+category:
+  all: 所有外掛程式
+  other: 未分類
+  core: 核心功能
+  adapter: 適配器
+  storage: 儲存服務
+  extension: 擴展功能
+  console: 控制台
+  manage: 管理工具
+  preset: 行为预设
+  image: 图片服务
+  media: 资讯服务
+  tool: 实用工具
+  ai: 人工智能
+  meme: 趣味交互
+  game: 娱乐玩法
+  gametool: 游戏工具
+time:
+  just-now: 刚刚
+  minutes-ago: '{0} 分钟前'
+  hours-ago: '{0} 小时前'
+  days-ago: '{0} 天前'
+search:
+  placeholder: 输入想要查询的插件名
