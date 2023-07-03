@@ -1,13 +1,15 @@
 <template>
   <k-layout :main="`darker page-home${socket ? '' : ' loading'}`">
-    <k-card v-if="global.unsupported">
-      <p v-for="(line, index) in global.unsupported" :key="index">{{ line }}</p>
-    </k-card>
-    <el-scrollbar v-else-if="socket">
-      <welcome></welcome>
-      <div><k-slot name="home"></k-slot></div>
-      <div class="card-grid profile-grid"><k-slot name="numeric"></k-slot></div>
-      <div class="card-grid chart-grid"><k-slot name="chart"></k-slot></div>
+    <el-scrollbar v-if="socket">
+      <k-slot name="home">
+        <k-slot-item :order="1000">
+          <welcome></welcome>
+        </k-slot-item>
+        <k-slot-item :order="0">
+          <div class="card-grid profile-grid"><k-slot name="numeric"></k-slot></div>
+          <div class="card-grid chart-grid"><k-slot name="chart"></k-slot></div>
+        </k-slot-item>
+      </k-slot>
     </el-scrollbar>
     <div v-else>
       <k-card class="connect">{{ global.messages?.connecting || '正在连接到 Koishi 服务器……' }}</k-card>

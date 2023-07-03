@@ -1,10 +1,27 @@
-import { connect, global, root } from '@koishijs/client'
+import { connect, global, icons, root } from '@koishijs/client'
+import Docs from './icons/docs.vue'
+import Forum from './icons/forum.vue'
+import Home from './components/home.vue'
 import Instances from './components/instances.vue'
 import ClientWebSocket from './socket'
 import '@koishijs/client/app'
 
-root.slot({
-  type: 'home',
+icons.register('activity:docs', Docs)
+icons.register('activity:forum', Forum)
+
+root.page({
+  id: 'home',
+  path: '/',
+  name: '欢迎',
+  icon: 'activity:home',
+  order: 1000,
+  component: Home,
+})
+
+root.page({
+  id: 'instances',
+  path: '/instances',
+  name: '实例管理',
   order: 900,
   component: Instances,
 })
