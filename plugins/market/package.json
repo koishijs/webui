@@ -1,7 +1,7 @@
 {
   "name": "@koishijs/plugin-market",
   "description": "Manage your bots and plugins with console",
-  "version": "2.1.1",
+  "version": "2.2.3",
   "main": "lib/node/index.js",
   "typings": "lib/index.d.ts",
   "exports": {
@@ -54,19 +54,19 @@
     }
   },
   "peerDependencies": {
-    "@koishijs/plugin-console": "^5.11.4",
-    "koishi": "^4.13.4"
+    "@koishijs/plugin-console": "^5.11.6",
+    "koishi": "^4.13.6"
   },
   "devDependencies": {
-    "@koishijs/client": "^5.11.4",
-    "@koishijs/market": "^3.3.0",
-    "@koishijs/plugin-config": "^2.1.1",
+    "@koishijs/client": "^5.11.6",
+    "@koishijs/market": "^4.0.1",
+    "@koishijs/plugin-config": "^2.2.2",
     "@types/semver": "^7.5.0",
     "@types/throttle-debounce": "^2.1.0",
     "@types/which-pm-runs": "^1.0.0"
   },
   "dependencies": {
-    "@koishijs/registry": "^5.0.1",
+    "@koishijs/registry": "^6.0.2",
     "execa": "^5.1.1",
     "get-registry": "^1.1.0",
     "ns-require": "^1.1.4",
