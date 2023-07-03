@@ -1,5 +1,5 @@
 <template>
-  <el-dialog v-if="store.dependencies" v-model="showDialog" class="install-panel" @closed="active = ''">
+  <el-dialog v-model="showDialog" class="install-panel" @closed="active = ''">
     <template v-if="active" #header="{ titleId, titleClass }">
       <span :id="titleId" :class="[titleClass, '']">
         {{ active.replace(/(koishi-|^@koishijs\/)plugin-/, '') + (workspace ? ' (工作区)' : '') }}
@@ -99,7 +99,7 @@ const version = ref<string>()
 
 const selectVersion = computed({
   get() {
-    if (store.dependencies[active.value]?.request === version.value) {
+    if (store.dependencies?.[active.value]?.request === version.value) {
       return version.value + ' (当前)'
     } else {
       return version.value
@@ -110,7 +110,7 @@ const selectVersion = computed({
   },
 })
 
-const unchanged = computed(() => version.value === store.dependencies[active.value]?.request)
+const unchanged = computed(() => version.value === store.dependencies?.[active.value]?.request)
 const current = computed(() => store.dependencies?.[active.value]?.resolved)
 const local = computed(() => store.packages?.[active.value])
 const versions = computed(() => store.registry?.[active.value])
@@ -124,7 +124,7 @@ watch(active, (name) => {
 const workspace = computed(() => {
   // workspace plugins:     dependencies ? packages √
   // workspace non-plugins: dependencies √ packages ×
-  return store.dependencies[active.value]?.workspace || local.value?.workspace
+  return store.dependencies?.[active.value]?.workspace || local.value?.workspace
 })
 
 const data = computed(() => {
@@ -164,7 +164,7 @@ watch(() => active.value, (value) => {
   showDialog.value = !!value
   if (!value) return
   version.value = config.value.override[active.value]
-    || store.dependencies[active.value]?.request
+    || store.dependencies?.[active.value]?.request
     || store.market.data[value].package.version
 }, { immediate: true })
 

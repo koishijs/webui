@@ -10,7 +10,7 @@ class PackageScanner extends LocalScanner {
     super(service.ctx.baseDir)
   }
 
-  async onError(error: any) {
+  async onError(error: any, name: string) {
     logger.warn('failed to resolve %c', name)
     logger.warn(error)
   }

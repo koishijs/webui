@@ -61,10 +61,6 @@ import { global, socket } from '@koishijs/client'
 
 <style lang="scss" scoped>
 
-.k-content {
-  max-width: 55rem;
-}
-
 h1 {
   line-height: 40px;
   font-size: 32px;
@@ -103,6 +99,11 @@ p a {
 .k-card {
   width: 200px;
   display: inline-block;
+  transition: var(--color-transition);
+
+  &:hover {
+    background-color: var(--k-hover-bg);
+  }
 
   :deep(.k-card-body) {
     margin: 1rem 0;

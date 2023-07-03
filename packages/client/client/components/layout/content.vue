@@ -12,7 +12,7 @@
   --content-padding: 3rem;
 
   margin: auto;
-  max-width: 60rem;
+  max-width: 55rem;
   box-sizing: border-box;
   padding: 3rem var(--content-padding);
 
