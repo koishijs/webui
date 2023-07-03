@@ -2,7 +2,7 @@ import { $, Context, Dict, Random, Schema, User } from 'koishi'
 import { DataService } from '@koishijs/plugin-console'
 import { resolve } from 'path'
 import { SandboxBot } from './bot'
-import zh from './locales/zh.yml'
+import zhCN from './locales/zh-CN.yml'
 
 declare module 'koishi' {
   interface Events {
@@ -82,6 +82,7 @@ export function apply(ctx: Context, config: Config) {
     channelId,
     guildId: channelId === '@' + userId ? undefined : channelId,
     subtype: channelId === '@' + userId ? 'private' : 'group',
+    isDirect: channelId === '@' + userId,
     timestamp: Date.now(),
     author: {
       userId,
@@ -171,7 +172,7 @@ export function apply(ctx: Context, config: Config) {
     }
   })
 
-  ctx.i18n.define('zh', zh)
+  ctx.i18n.define('zh', zhCN)
 
   ctx.intersect(session => session.platform.startsWith('sandbox:'))
     .command('clear')
