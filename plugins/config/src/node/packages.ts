@@ -1,4 +1,4 @@
-import { Context, EffectScope, Logger, remove } from 'koishi'
+import { Context, Logger, remove } from 'koishi'
 import { LocalScanner } from '@koishijs/registry'
 import { unwrapExports } from '@koishijs/loader'
 import * as shared from '../shared'
@@ -17,8 +17,9 @@ class PackageScanner extends LocalScanner {
 
   async parsePackage(name: string, entry: string) {
     const result = await super.parsePackage(name, entry)
-    if (require.resolve[entry]) {
-      this.service.cache[name] = await this.service.parseExports(name)
+    if (require.cache[entry]) {
+      const shortname = name.replace(/(koishi-|^@koishijs\/)plugin-/, '')
+      this.service.cache[shortname] = await this.service.parseExports(name)
     }
     return result
   }
@@ -52,14 +53,5 @@ export class PackageProvider extends shared.PackageProvider {
   async collect(forced: boolean) {
     await this.scanner.collect(forced)
     return this.scanner.objects
-  }
-
-  update(state: EffectScope) {
-    const entry = Object.keys(require.cache).find((key) => {
-      return unwrapExports(require.cache[key].exports) === state.runtime.plugin
-    })
-    if (!this.cache[entry]) return
-    this.parseRuntime(state, this.cache[entry])
-    this.refresh(false)
   }
 }

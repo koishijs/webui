@@ -40,7 +40,7 @@ receive('data', ({ key, value }) => {
 receive('patch', ({ key, value }) => {
   if (Array.isArray(store[key])) {
     store[key].push(...value)
-  } else {
+  } else if (store[key]) {
     Object.assign(store[key], value)
   }
 })

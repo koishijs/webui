@@ -51,7 +51,6 @@ export default (ctx: Context) => {
     icon: 'activity:market',
     order: 750,
     authority: 4,
-    fields: ['dependencies'],
     component: Market,
   })
 

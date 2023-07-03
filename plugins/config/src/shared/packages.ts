@@ -28,16 +28,20 @@ export abstract class PackageProvider extends DataService<Dict<PackageProvider.D
     ctx.on('internal/fork', callback)
 
     ctx.console.addListener('config/request-runtime', async (name) => {
-      this.cache[name] = await this.parseExports(name)
+      const shortname = name.replace(/(koishi-|^@koishijs\/)plugin-/, '')
+      this.cache[shortname] = await this.parseExports(name)
       this.refresh(false)
     }, { authority: 4 })
   }
 
   abstract collect(forced: boolean): Promise<PackageProvider.Data[]>
-  abstract import(name: string): Promise<any>
+  abstract import(key: string): Promise<any>
 
   update(state: EffectScope) {
-    this.refresh(true)
+    const shortname = this.ctx.loader.keyFor(state.runtime.plugin)
+    if (!this.cache[shortname]) return
+    this.parseRuntime(state, this.cache[shortname])
+    this.refresh(false)
   }
 
   parseRuntime(state: EffectScope, result: PackageProvider.RuntimeData) {
@@ -49,8 +53,8 @@ export abstract class PackageProvider extends DataService<Dict<PackageProvider.D
     const objects = (await this.collect(forced)).slice()
     for (const object of objects) {
       object.name = object.package?.name || ''
-      if (!this.cache[object.package?.name]) continue
-      object.runtime = this.cache[object.package.name]
+      if (!this.cache[object.shortname]) continue
+      object.runtime = this.cache[object.shortname]
     }
 
     // add app config

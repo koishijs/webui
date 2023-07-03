@@ -24,10 +24,7 @@ export abstract class MarketProvider extends DataService<MarketProvider.Payload>
   constructor(ctx: Context) {
     super(ctx, 'market', { authority: 4 })
 
-    ctx.console.addListener('market/refresh', async () => {
-      await this.start(true)
-      this.refresh()
-    }, { authority: 4 })
+    ctx.console.addListener('market/refresh', () => this.start(true), { authority: 4 })
 
     ctx.on('console/connection', async (client) => {
       if (!ctx.console.clients[client.id]) return
@@ -40,6 +37,7 @@ export abstract class MarketProvider extends DataService<MarketProvider.Payload>
   start(refresh = false): Awaitable<void> {
     this._task = null
     this._timestamp = Date.now()
+    this.refresh()
   }
 
   abstract collect(): Promise<void | SearchResult>

@@ -16,12 +16,12 @@ class MarketProvider extends BaseMarketProvider {
   }
 
   async start(refresh = false) {
-    super.start()
     this.failed = []
     this.fullCache = {}
     this.tempCache = {}
     if (refresh) this.ctx.installer.refresh(true)
     await this.prepare()
+    super.start()
   }
 
   stop() {

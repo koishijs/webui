@@ -31,7 +31,7 @@ const loaders: Dict<(path: string) => Promise<Disposable>> = {
 
 export interface LoadResult {
   done: boolean
-  task: Promise<any>
+  task: Promise<Disposable>
   isExtension: boolean
 }
 
@@ -42,7 +42,7 @@ function notify() {
   progress.value = results.filter(({ done }) => done).length / results.length
 }
 
-export function queue(key: string, callback: (key: string) => Promise<any>, isExtension = false) {
+export function queue(key: string, callback: (key: string) => Promise<Disposable>, isExtension = false) {
   const task = callback(key)
   const result = { done: false, task, isExtension }
   task.finally(() => {
