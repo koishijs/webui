@@ -17,7 +17,6 @@ sort:
 category:
   all: Plugins disponibles
   other: Non catégorisé
-  core: 核心功能
   adapter: Adaptateurs
   storage: Stockage
   extension: Extension
