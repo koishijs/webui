@@ -17,7 +17,6 @@ sort:
 category:
   all: 所有外掛程式
   other: 未分類
-  core: 核心功能
   adapter: 適配器
   storage: 儲存服務
   extension: 擴展功能
