@@ -172,7 +172,7 @@ export function apply(ctx: Context, config: Config) {
     }
   })
 
-  ctx.i18n.define('zh', zhCN)
+  ctx.i18n.define('zh-CN', zhCN)
 
   ctx.intersect(session => session.platform.startsWith('sandbox:'))
     .command('clear')

@@ -32,7 +32,7 @@ export interface DatabaseInfo extends Driver.Stats {
 
 class DatabaseProvider extends DataService<DatabaseInfo> {
   static filter = false
-  static using = ['console', 'database'] as const
+  static using = ['console', 'database']
 
   task: Promise<DatabaseInfo>
 

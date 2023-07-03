@@ -135,9 +135,6 @@ class Explorer extends DataService<Entry[]> {
 }
 
 namespace Explorer {
-  export const filter = false
-  export const using = ['console'] as const
-
   export interface Config {
     ignored?: string[]
   }

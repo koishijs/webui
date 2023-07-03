@@ -48,7 +48,7 @@ export function apply(ctx: Context, config: Config) {
     return ctx.logger('app').warn('@koishijs/plugin-market is only available for json/yaml config file')
   }
 
-  ctx.i18n.define('zh', require('./locales/message.zh-CN'))
+  ctx.i18n.define('zh-CN', require('./locales/message.zh-CN'))
 
   ctx.plugin(Installer, config.registry)
 
@@ -70,7 +70,7 @@ export function apply(ctx: Context, config: Config) {
 
         // set restart message
         ctx.envData.message = {
-          ...pick(session, ['sid', 'channelId', 'guildId', 'subtype']),
+          ...pick(session, ['sid', 'channelId', 'guildId', 'isDirect']),
           content: session.text('.success'),
         }
         await ctx.installer.install(result)
@@ -130,7 +130,7 @@ export function apply(ctx: Context, config: Config) {
         }
 
         ctx.envData.message = {
-          ...pick(session, ['sid', 'channelId', 'guildId', 'subtype']),
+          ...pick(session, ['sid', 'channelId', 'guildId', 'isDirect']),
           content: session.text('.success'),
         }
         await ctx.installer.install(names.reduce((result, name) => {

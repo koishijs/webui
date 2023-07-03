@@ -83,7 +83,7 @@ class ProfileProvider extends DataService<ProfileProvider.Payload> {
   constructor(ctx: Context, private config: ProfileProvider.Config) {
     super(ctx, 'status')
 
-    ctx.i18n.define('zh', zhCN)
+    ctx.i18n.define('zh-CN', zhCN)
 
     const { tickInterval } = config
     ctx.on('ready', () => {
