@@ -46,6 +46,7 @@ router.get(uiPath + '(/.+)*', async (ctx, next) => {
 })
 
 const browserEntries = {
+  '@koishijs/plugin-config': '../src/browser/index.ts',
   '@koishijs/plugin-console': '../src/browser/index.ts',
   '@koishijs/plugin-market': '../src/browser/index.ts',
 }
@@ -65,13 +66,8 @@ router.get('/portable.json', async (ctx) => {
 
 router.get('/modules(/.+)+/index.js', async (ctx) => {
   const name = ctx.params[0].slice(1)
-  try {
-    const entry = resolve(require.resolve(name + '/package.json'), browserEntries[name] || '../src/index.ts')
-    ctx.redirect(`/vite/@fs${entry}`)
-  } catch {
-    ctx.body = 'throw new Error()'
-    ctx.type = '.js'
-  }
+  const entry = resolve(require.resolve(name + '/package.json'), browserEntries[name] || '../src/index.ts')
+  ctx.redirect(`/vite/@fs${entry}`)
 })
 
 async function transformHtml(template: string) {

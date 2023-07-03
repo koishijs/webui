@@ -1,6 +1,6 @@
 import { Context, Dict, EffectScope, Logger, Schema } from 'koishi'
 import { DataService } from '@koishijs/plugin-console'
-import { Manifest, PackageJson, SearchResult } from '@koishijs/registry'
+import { PackageJson, SearchObject, SearchResult } from '@koishijs/registry'
 import { debounce } from 'throttle-debounce'
 
 declare module '@koishijs/loader' {
@@ -18,18 +18,26 @@ declare module '@koishijs/plugin-console' {
 const logger = new Logger('config')
 
 export abstract class PackageProvider extends DataService<Dict<PackageProvider.Data>> {
+  cache: Dict<PackageProvider.RuntimeData> = {}
+
   constructor(ctx: Context) {
     super(ctx, 'packages', { authority: 4 })
 
     const callback = debounce(0, this.update.bind(this))
     ctx.on('internal/runtime', callback)
     ctx.on('internal/fork', callback)
+
+    ctx.console.addListener('config/request-runtime', async (name) => {
+      this.cache[name] = await this.parseExports(name)
+      this.refresh(false)
+    }, { authority: 4 })
   }
 
-  abstract getManifest(name: string): Promise<Manifest>
+  abstract collect(forced: boolean): Promise<PackageProvider.Data[]>
+  abstract import(name: string): Promise<any>
 
   update(state: EffectScope) {
-    this.refresh()
+    this.refresh(true)
   }
 
   parseRuntime(state: EffectScope, result: PackageProvider.RuntimeData) {
@@ -37,9 +45,28 @@ export abstract class PackageProvider extends DataService<Dict<PackageProvider.D
     result.forkable = state.runtime.isForkable
   }
 
-  async parseExports(name: string, callback: () => Promise<any>) {
+  async get(forced = false) {
+    const objects = (await this.collect(forced)).slice()
+    for (const object of objects) {
+      object.name = object.package?.name || ''
+      if (!this.cache[object.package?.name]) continue
+      object.runtime = this.cache[object.package.name]
+    }
+
+    // add app config
+    objects.unshift({
+      name: '',
+      runtime: {
+        schema: Context.Config,
+      },
+      package: { name: '' },
+    } as any as PackageProvider.Data)
+    return Object.fromEntries(objects.map(data => [data.name, data]))
+  }
+
+  async parseExports(name: string) {
     try {
-      const exports = await callback()
+      const exports = await this.import(name)
       const result: PackageProvider.RuntimeData = {}
       result.schema = exports?.Config || exports?.schema
       result.usage = exports?.usage
@@ -59,12 +86,10 @@ export abstract class PackageProvider extends DataService<Dict<PackageProvider.D
 }
 
 export namespace PackageProvider {
-  export interface Data extends Partial<PackageJson> {
+  export interface Data extends Pick<SearchObject, 'shortname' | 'workspace' | 'manifest' | 'portable'> {
+    name?: string
     runtime?: RuntimeData
-    portable?: boolean
-    shortname?: string
-    workspace?: boolean
-    manifest?: Manifest
+    package: Pick<PackageJson, 'name' | 'version' | 'peerDependencies' | 'peerDependenciesMeta'>
   }
 
   export interface RuntimeData {

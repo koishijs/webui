@@ -46,10 +46,10 @@ function getEnvInfo(name: string) {
   const services = new Set<string>()
 
   // check peer dependencies
-  for (const name in local.peerDependencies ?? {}) {
+  for (const name in local.package.peerDependencies ?? {}) {
     if (!name.includes('@koishijs/plugin-') && !name.includes('koishi-plugin-')) continue
     if (coreDeps.includes(name)) continue
-    const required = !local.peerDependenciesMeta?.[name]?.optional
+    const required = !local.package.peerDependenciesMeta?.[name]?.optional
     const active = !!store.packages[name]?.runtime?.id
     result.peer[name] = { required, active }
     for (const service of store.packages[name]?.manifest?.service.implements ?? []) {

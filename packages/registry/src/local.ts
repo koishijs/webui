@@ -16,7 +16,7 @@ export class LocalScanner {
     defineProperty(this, 'cache', {})
   }
 
-  onError(reason: any) {}
+  onError(reason: any, name: string) {}
 
   async _collect() {
     this.cache = {}
@@ -62,7 +62,7 @@ export class LocalScanner {
       const entry = require.resolve(name)
       this.cache[entry] = await this.parsePackage(name, entry)
     } catch (error) {
-      this.onError(error)
+      this.onError(error, name)
     }
   }
 
@@ -83,7 +83,6 @@ export class LocalScanner {
       package: pick(data, [
         'name',
         'version',
-        'description',
         'peerDependencies',
         'peerDependenciesMeta',
       ]),
