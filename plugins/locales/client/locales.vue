@@ -51,7 +51,7 @@
             autosize
             type="textarea"
             :modelValue="(store.locales['$' + locale]?.[`${active}.${path}`] as any)"
-            :placeholder="store.locales[locale][`${active}.${path}`] || store.locales[''][`${active}.${path}`] as any"
+            :placeholder="store.locales[locale]?.[`${active}.${path}`] || store.locales[''][`${active}.${path}`] as any"
             @update:modelValue="handleUpdate(locale, path, $event)"
           ></el-input>
         </div>
@@ -73,7 +73,7 @@ import { useDebounceFn } from '@vueuse/core'
 const route = useRoute()
 const router = useRouter()
 
-const displayLocales = ref(['zh', 'en'])
+const displayLocales = ref(['zh-CN', 'en-US'])
 const tree = ref(null)
 const keyword = ref('')
 

@@ -8,127 +8,108 @@ import zhCN from './locales/zh-CN.yml'
 declare module '@koishijs/plugin-console' {
   namespace Console {
     interface Services {
-      logs: LogProvider
+      logs: DataService<Logger.Record[]>
     }
   }
 }
 
-class LogProvider extends DataService<Logger.Record[]> {
-  root: string
-  date: string
-  files: Dict<number> = {}
-  writer: FileWriter
+export const name = 'logger'
 
-  constructor(ctx: Context, private config: LogProvider.Config = {}) {
-    super(ctx, 'logs', { authority: 4 })
+export interface Config {
+  root?: string
+  maxAge?: number
+  maxSize?: number
+}
 
-    ctx.console.addEntry(process.env.KOISHI_BASE ? [
-      process.env.KOISHI_BASE + '/dist/index.js',
-      process.env.KOISHI_BASE + '/dist/style.css',
-    ] : process.env.KOISHI_ENV === 'browser' ? [
-      // @ts-ignore
-      import.meta.url.replace(/\/src\/[^/]+$/, '/client/index.ts'),
-    ] : {
-      dev: resolve(__dirname, '../client/index.ts'),
-      prod: resolve(__dirname, '../dist'),
-    })
+export const Config: Schema<Config> = Schema.object({
+  root: Schema.path({
+    filters: ['directory'],
+    allowCreate: true,
+  }).default('data/logs'),
+  maxAge: Schema.natural().default(30),
+  maxSize: Schema.natural().default(1024 * 100),
+}).i18n({
+  'zh-CN': zhCN,
+})
+
+export async function apply(ctx: Context, config: Config) {
+  const root = resolve(ctx.baseDir, config.root)
+  await mkdir(root, { recursive: true })
+
+  const files: Dict<number> = {}
+  for (const filename of await readdir(root)) {
+    const capture = /^(\d{4}-\d{2}-\d{2})-(\d+)\.log$/.exec(filename)
+    if (!capture) continue
+    files[capture[1]] = Math.max(files[capture[1]] ?? 0, +capture[2])
   }
 
-  async start() {
-    await this.prepareWriter()
-    this.prepareLogger()
-    this.refresh()
-  }
+  let writer: FileWriter
+  async function createFile(date: string, index: number) {
+    writer = new FileWriter(date, `${root}/${date}-${index}.log`)
 
-  async stop() {
-    await this.writer?.close()
-    this.writer = null
-  }
-
-  async prepareWriter() {
-    this.root = resolve(this.ctx.baseDir, this.config.root)
-    await mkdir(this.root, { recursive: true })
-
-    for (const filename of await readdir(this.root)) {
-      const capture = /^(\d{4}-\d{2}-\d{2})-(\d+)\.log$/.exec(filename)
-      if (!capture) continue
-      this.files[capture[1]] = Math.max(this.files[capture[1]] ?? 0, +capture[2])
-    }
-
-    const date = new Date().toISOString().slice(0, 10)
-    this.createFile(date, this.files[date] ??= 1)
-  }
-
-  async createFile(date: string, index: number) {
-    this.writer = new FileWriter(date, `${this.root}/${date}-${index}.log`)
-
-    const { maxAge } = this.config
+    const { maxAge } = config
     if (!maxAge) return
 
     const now = Date.now()
-    for (const date in this.files) {
+    for (const date in files) {
       if (now - +new Date(date) < maxAge * Time.day) continue
-      for (let index = 1; index <= this.files[date]; ++index) {
-        await rm(`${this.root}/${date}-${index}.log`)
+      for (let index = 1; index <= files[date]; ++index) {
+        await rm(`${root}/${date}-${index}.log`)
       }
     }
   }
 
-  prepareLogger() {
-    const target: Logger.Target = {
-      colors: 3,
-      record: this.record.bind(this),
-    }
+  const date = new Date().toISOString().slice(0, 10)
+  createFile(date, files[date] ??= 1)
 
-    Logger.targets.push(target)
-    this.ctx.on('dispose', () => {
-      remove(Logger.targets, target)
-      if (this.ctx.loader) {
-        this.ctx.loader.prolog = []
+  const target: Logger.Target = {
+    colors: 3,
+    record: (record: Logger.Record) => {
+      const date = new Date(record.timestamp).toISOString().slice(0, 10)
+      if (writer.date !== date) {
+        writer.close()
+        createFile(date, files[date] = 1)
       }
-    })
+      writer.write(record)
+      ctx.console?.logs?.patch([record])
+      if (writer.size >= config.maxSize) {
+        writer.close()
+        createFile(date, ++files[date])
+      }
+    },
+  }
 
-    for (const record of this.ctx.loader?.prolog || []) {
-      this.record(record)
+  Logger.targets.push(target)
+  ctx.on('dispose', () => {
+    writer?.close()
+    remove(Logger.targets, target)
+    if (ctx.loader) {
+      ctx.loader.prolog = []
     }
+  })
+
+  for (const record of ctx.loader?.prolog || []) {
+    target.record(record)
   }
 
-  record(record: Logger.Record) {
-    const date = new Date(record.timestamp).toISOString().slice(0, 10)
-    if (this.writer.date !== date) {
-      this.writer.close()
-      this.createFile(date, this.files[date] = 1)
+  ctx.plugin(class LogProvider extends DataService<Logger.Record[]> {
+    constructor(ctx: Context, private config: Config = {}) {
+      super(ctx, 'logs', { authority: 4 })
+
+      ctx.console.addEntry(process.env.KOISHI_BASE ? [
+        process.env.KOISHI_BASE + '/dist/index.js',
+        process.env.KOISHI_BASE + '/dist/style.css',
+      ] : process.env.KOISHI_ENV === 'browser' ? [
+        // @ts-ignore
+        import.meta.url.replace(/\/src\/[^/]+$/, '/client/index.ts'),
+      ] : {
+        dev: resolve(__dirname, '../client/index.ts'),
+        prod: resolve(__dirname, '../dist'),
+      })
     }
-    this.writer.write(record)
-    this.patch([record])
-    if (this.writer.size >= this.config.maxSize) {
-      this.writer.close()
-      this.createFile(date, ++this.files[date])
+
+    async get() {
+      return writer?.read()
     }
-  }
-
-  async get() {
-    return this.writer?.read()
-  }
-}
-
-namespace LogProvider {
-  export interface Config {
-    root?: string
-    maxAge?: number
-    maxSize?: number
-  }
-
-  export const Config: Schema<Config> = Schema.object({
-    root: Schema.path({
-      filters: ['directory'],
-      allowCreate: true,
-    }).default('data/logs'),
-    maxAge: Schema.natural().default(30),
-    maxSize: Schema.natural().default(1024 * 100),
-  }).i18n({
-    'zh-CN': zhCN,
   })
 }
-
-export default LogProvider

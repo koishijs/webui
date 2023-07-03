@@ -23,12 +23,18 @@ const logger = new Logger('locales')
 class LocaleProvider extends DataService<Dict<I18n.Store>> {
   update = debounce(0, () => this.refresh())
 
-  constructor(ctx: Context, private config: LocaleProvider.Config) {
+  constructor(ctx: Context, private config: Config) {
     super(ctx, 'locales', { authority: 4 })
 
     ctx.on('internal/i18n', this.update)
 
-    ctx.console.addEntry({
+    ctx.console.addEntry(process.env.KOISHI_BASE ? [
+      process.env.KOISHI_BASE + '/dist/index.js',
+      process.env.KOISHI_BASE + '/dist/style.css',
+    ] : process.env.KOISHI_ENV === 'browser' ? [
+      // @ts-ignore
+      import.meta.url.replace(/\/src\/[^/]+$/, '/client/index.ts'),
+    ] : {
       dev: resolve(__dirname, '../client/index.ts'),
       prod: resolve(__dirname, '../dist'),
     })
@@ -42,56 +48,56 @@ class LocaleProvider extends DataService<Dict<I18n.Store>> {
     })
   }
 
-  // cp() can only be used since node 16
-  async cp(src: string, dest: string) {
-    const dirents = await readdir(src, { withFileTypes: true })
-    for (const dirent of dirents) {
-      const srcFile = join(src, dirent.name)
-      const destFile = join(dest, dirent.name)
-      if (dirent.isFile()) {
-        await copyFile(srcFile, destFile)
-      } else if (dirent.isDirectory()) {
-        await mkdir(destFile)
-        await this.cp(srcFile, destFile)
-      }
-    }
-  }
-
-  async start() {
-    const legacy = resolve(this.ctx.baseDir, 'locales')
-    const folder = resolve(this.ctx.baseDir, this.config.root)
-    await mkdir(folder, { recursive: true })
-    const stats: Stats = await stat(legacy).catch(() => null)
-    if (stats?.isDirectory()) {
-      logger.info('migrating to data directory')
-      await this.cp(legacy, folder)
-      await rm(legacy, { recursive: true, force: true })
-    }
-    const files = await readdir(folder)
-    for (const file of files) {
-      if (!file.endsWith('.yml')) continue
-      logger.debug('loading locale %s', file)
-      const content = await readFile(resolve(folder, file), 'utf8')
-      this.ctx.i18n.define('$' + file.split('.')[0], load(content) as any)
-    }
-  }
-
   async get() {
     return this.ctx.i18n._data
   }
 }
 
-namespace LocaleProvider {
-  export interface Config {
-    root?: string
-  }
+export const name = 'locales'
 
-  export const Config: Schema<Config> = Schema.object({
-    root: Schema.path({
-      filters: ['directory'],
-      allowCreate: true,
-    }).default('data/locales').description('存放本地化文件的根目录。'),
-  })
+export interface Config {
+  root?: string
 }
 
-export default LocaleProvider
+export const Config: Schema<Config> = Schema.object({
+  root: Schema.path({
+    filters: ['directory'],
+    allowCreate: true,
+  }).default('data/locales').description('存放本地化文件的根目录。'),
+})
+
+// cp() can only be used since node 16
+async function cp(src: string, dest: string) {
+  const dirents = await readdir(src, { withFileTypes: true })
+  for (const dirent of dirents) {
+    const srcFile = join(src, dirent.name)
+    const destFile = join(dest, dirent.name)
+    if (dirent.isFile()) {
+      await copyFile(srcFile, destFile)
+    } else if (dirent.isDirectory()) {
+      await mkdir(destFile)
+      await cp(srcFile, destFile)
+    }
+  }
+}
+
+export async function apply(ctx: Context, config: Config) {
+  const legacy = resolve(ctx.baseDir, 'locales')
+  const folder = resolve(ctx.baseDir, config.root)
+  await mkdir(folder, { recursive: true })
+  const stats: Stats = await stat(legacy).catch(() => null)
+  if (stats?.isDirectory()) {
+    logger.info('migrating to data directory')
+    await cp(legacy, folder)
+    await rm(legacy, { recursive: true, force: true })
+  }
+  const files = await readdir(folder)
+  for (const file of files) {
+    if (!file.endsWith('.yml')) continue
+    logger.debug('loading locale %s', file)
+    const content = await readFile(resolve(folder, file), 'utf8')
+    ctx.i18n.define('$' + file.split('.')[0], load(content) as any)
+  }
+
+  ctx.plugin(LocaleProvider, config)
+}
