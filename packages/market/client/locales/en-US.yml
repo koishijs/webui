@@ -17,7 +17,6 @@ sort:
 category:
   all: All
   other: Uncategorized
-  core: Core
   adapter: Adapters
   storage: Storage
   extension: Extension

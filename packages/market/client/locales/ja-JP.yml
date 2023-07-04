@@ -6,7 +6,7 @@ badge:
   installed: ダウンロード済
   verified: 公式認証
   insecure: 非推奨
-  preview: "開発中\n"
+  preview: 開発中
   newborn: 最近追加
 sort:
   default: 全般
@@ -17,7 +17,6 @@ sort:
 category:
   all: 利用可能なプラグイン
   other: カテゴリなし
-  core: 核心功能
   adapter: アダプター
   storage: 静的ストレージ
   extension: 拡張機能
