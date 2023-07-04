@@ -21,7 +21,7 @@ const configPlugin: vite.Plugin = {
         uiPath: '/',
         endpoint: 'https://registry.koishi.chat',
       })}</script>`,
-    ].map(line => '\n    ' + line)
+    ].map(line => '\n    ' + line).join('')
     return template.replace('</title>', '</title>' + headInjection)
   },
 }
@@ -45,7 +45,7 @@ const builtins = [
 
 const shims = {
   fs: '@koishijs/fs',
-  path: 'path-browserify',
+  path: '@koishijs/path',
 }
 
 function toExternal(name: string) {

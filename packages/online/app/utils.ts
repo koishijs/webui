@@ -46,7 +46,7 @@ provideStorage((key, version, fallback) => {
 
   watch(result, () => {
     storageData.value[key] = result.value
-    fs.writeFile(`${root}/${data.value.current}/storage/${key}.json`, JSON.stringify(result.value))
+    fs.writeFile(`${root}/${data.value.current}/data/storage/${key}.json`, JSON.stringify(result.value))
   }, { deep: true })
 
   return result
@@ -56,7 +56,7 @@ export const root = '/koishi/play/v1/instances'
 export const instances = ref<string[]>([])
 
 export async function remove(key: string) {
-  await fs.unlink(`${root}/${key}`)
+  await fs.rm(`${root}/${key}`, { recursive: true })
   instances.value = await fs.readdir(root)
 }
 
@@ -65,7 +65,7 @@ export async function activate(id?: string) {
   id ||= Math.random().toString(36).slice(2, 10)
   data.value.current = id
   const filename = `${root}/${id}/koishi.yml`
-  await fs.mkdir(`${root}/${id}/storage`, { recursive: true })
+  await fs.mkdir(`${root}/${id}/data/storage`, { recursive: true })
   try {
     await loader.init(`${root}/${id}`)
     await loader.readConfig()
@@ -76,6 +76,9 @@ export async function activate(id?: string) {
         'console': {},
         'database-sqlite': {},
         'dataview': {},
+        'explorer': {
+          ignored: ['data'],
+        },
         'help': {},
         'insight': {},
         'locales': {},
@@ -89,12 +92,12 @@ export async function activate(id?: string) {
     instances.value = await fs.readdir(root)
     await loader.init(`${root}/${id}`)
   }
-  const files = await fs.readdir(`${root}/${id}/storage`)
+  const files = await fs.readdir(`${root}/${id}/data/storage`)
   const storage = {}
   for (const file of files) {
     if (!file.endsWith('.json')) continue
     const key = file.slice(0, -5)
-    storage[key] = await fs.readFile(`${root}/${id}/storage/${file}`, 'utf8').then(JSON.parse)
+    storage[key] = await fs.readFile(`${root}/${id}/data/storage/${file}`, 'utf8').then(JSON.parse)
   }
   storageData.value = storage
   const app = await loader.createApp()
