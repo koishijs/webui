@@ -1,0 +1,11 @@
+{
+  "extends": "../../../tsconfig.client",
+  "compilerOptions": {
+    "rootDir": ".",
+    "emitDeclarationOnly": false,
+    "noEmit": true,
+  },
+  "include": [
+    ".",
+  ],
+}
