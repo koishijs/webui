@@ -1,5 +1,5 @@
 import { $, Context, Dict, Random, Schema, User } from 'koishi'
-import { DataService } from '@koishijs/plugin-console'
+import { Client, DataService } from '@koishijs/plugin-console'
 import { resolve } from 'path'
 import { SandboxBot } from './bot'
 import zhCN from './locales/zh-CN.yml'

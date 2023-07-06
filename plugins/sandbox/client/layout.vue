@@ -49,6 +49,7 @@
 <script lang="ts" setup>
 
 import { clone, message, send, Schema, ChatInput, VirtualList, deepEqual, useContext } from '@koishijs/client'
+import segment from '@satorijs/element'
 import { computed, ref, watch } from 'vue'
 import { Message } from '@koishijs/plugin-sandbox'
 import { api, channel, config, words, panelTypes } from './utils'
@@ -146,7 +147,7 @@ watch(model, async (value) => {
 
 function sendMessage(content: string) {
   offset.value = 0
-  send('sandbox/send-message', config.value.platform, config.value.user, channel.value, content, quote.value)
+  send('sandbox/send-message', config.value.platform, config.value.user, channel.value, segment.unescape(content), quote.value)
   quote.value = null
 }
 
