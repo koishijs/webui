@@ -46,8 +46,12 @@
       </el-scrollbar>
     </template>
 
-    <div ref="editor" v-if="files[active]?.type === 'file'" class="editor"></div>
-    <k-empty v-else>在左侧栏选择要查看的文件</k-empty>
+    <k-empty v-if="files[active]?.type !== 'file'">在左侧栏选择要查看的文件</k-empty>
+    <template v-else-if="files[active].mime">
+      <k-image-viewer v-if="files[active].mime.startsWith('image/')" :src="files[active].newValue" />
+      <div v-else>{{ files[active].mime }}</div>
+    </template>
+    <div ref="editor" v-else class="editor"></div>
   </k-layout>
 
   <el-dialog v-model="showRemoving" destroy-on-close>
@@ -299,7 +303,13 @@ function getLanguage(filename: string) {
 watch(() => files[active.value], async (entry) => {
   if (entry?.type !== 'file') return
   if (typeof entry.oldValue !== 'string') {
-    entry.oldValue = entry.newValue = await send('explorer/read', entry.filename)
+    const { base64, mime } = await send('explorer/read', entry.filename)
+    entry.mime = mime
+    if (mime) {
+      entry.oldValue = entry.newValue = `data:${mime};base64,${base64}`
+    } else {
+      entry.oldValue = entry.newValue = atob(base64)
+    }
   }
   model.setValue(entry.newValue)
   monaco.editor.setModelLanguage(model, getLanguage(entry.filename))
@@ -348,7 +358,7 @@ onActivated(async () => {
 })
 
 async function downloadFile(filename: string) {
-  const base64 = await send('explorer/read', filename, true)
+  const { base64 } = await send('explorer/read', filename)
   const blob = new Blob([base64ToArrayBuffer(base64)])
   const url = URL.createObjectURL(blob)
   const a = document.createElement("a")

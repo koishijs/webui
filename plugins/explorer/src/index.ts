@@ -3,6 +3,8 @@ import { DataService } from '@koishijs/plugin-console'
 import { join, relative, resolve } from 'path'
 import { mkdir, readdir, readFile, rename, rm, writeFile } from 'fs/promises'
 import { FSWatcher, watch } from 'chokidar'
+import { fromBuffer } from 'file-type'
+import { detect } from 'chardet'
 import anymatch, { Tester } from 'anymatch'
 
 declare module '@koishijs/plugin-console' {
@@ -13,13 +15,19 @@ declare module '@koishijs/plugin-console' {
   }
 
   interface Events {
-    'explorer/read'(filename: string, binary?: boolean): Promise<string>
+    'explorer/read'(filename: string, binary?: boolean): Promise<File>
     'explorer/write'(filename: string, content: string, binary?: boolean): Promise<void>
     'explorer/mkdir'(filename: string): Promise<void>
     'explorer/remove'(filename: string): Promise<void>
     'explorer/rename'(oldValue: string, newValue: string): Promise<void>
     'explorer/refresh'(): void
   }
+}
+
+export interface File {
+  base64: string
+  mime: string
+  encoding: string
 }
 
 export interface Entry {
@@ -59,11 +67,12 @@ class Explorer extends DataService<Entry[]> {
 
     ctx.console.addListener('explorer/read', async (filename, binary) => {
       filename = join(ctx.baseDir, filename)
-      if (binary) {
-        const buffer = await readFile(filename)
-        return buffer.toString('base64')
-      } else {
-        return readFile(filename, 'utf8')
+      const buffer = await readFile(filename)
+      const result = await fromBuffer(buffer)
+      return {
+        base64: buffer.toString('base64'),
+        mime: result?.mime,
+        encoding: detect(buffer),
       }
     }, { authority: 4 })
 
@@ -143,7 +152,7 @@ namespace Explorer {
     ignored: Schema
       .array(String)
       .role('table')
-      .default(['**/node_modules', '**/.*', 'accounts/*/data'])
+      .default(['**/node_modules', '**/.*', 'data/accounts/*/data', 'cache'])
       .description('要忽略的文件或目录。支持 [Glob Patterns](https://github.com/micromatch/micromatch) 语法。'),
   })
 }
