@@ -37,6 +37,7 @@ export interface Entry {
   children?: this[]
   oldValue?: string
   newValue?: string
+  loading?: Promise<File>
 }
 
 class Explorer extends DataService<Entry[]> {

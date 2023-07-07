@@ -47,9 +47,19 @@
     </template>
 
     <k-empty v-if="files[active]?.type !== 'file'">在左侧栏选择要查看的文件</k-empty>
+    <div v-if="files[active].loading">
+      <div class="el-loading-spinner">
+        <svg class="circular" viewBox="25 25 50 50">
+          <circle class="path" cx="50" cy="50" r="20" fill="none"></circle>
+        </svg>
+        <p class="el-loading-text">正在加载……</p>
+      </div>
+    </div>
     <template v-else-if="files[active].mime">
       <k-image-viewer v-if="files[active].mime.startsWith('image/')" :src="files[active].newValue" />
-      <div v-else>{{ files[active].mime }}</div>
+      <audio v-else-if="files[active].mime.startsWith('audio/')" :src="files[active].newValue" controls />
+      <video v-else-if="files[active].mime.startsWith('video/')" :src="files[active].newValue" controls />
+      <div v-else>不支持的文件格式：{{ files[active].mime }}</div>
     </template>
     <div ref="editor" v-else class="editor"></div>
   </k-layout>
@@ -303,7 +313,9 @@ function getLanguage(filename: string) {
 watch(() => files[active.value], async (entry) => {
   if (entry?.type !== 'file') return
   if (typeof entry.oldValue !== 'string') {
-    const { base64, mime } = await send('explorer/read', entry.filename)
+    entry.loading = send('explorer/read', entry.filename)
+    const { base64, mime } = await entry.loading
+    entry.loading = null
     entry.mime = mime
     if (mime) {
       entry.oldValue = entry.newValue = `data:${mime};base64,${base64}`
