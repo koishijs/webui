@@ -1,5 +1,6 @@
 <template>
-  <router-link
+  <component
+    :is="data.id ? 'router-link' : 'span'"
     class="activity-button"
     draggable="true"
     :to="target"
@@ -7,7 +8,7 @@
     @dragstart="handleDragStart"
     @dragend="handleDragEnd">
     <k-icon class="activity-button-icon" :name="data.icon"></k-icon>
-  </router-link>
+  </component>
 </template>
 
 <script lang="ts" setup>
@@ -77,6 +78,20 @@ function handleDragEnd(event: DragEvent) {
     font-size: 0.75rem;
     font-weight: bolder;
     transition: var(--color-transition);
+  }
+
+  &.is-group {
+    &::before {
+      content: "";
+      position: absolute;
+      right: 0;
+      bottom: 4px;
+      width: 0;
+      height: 0;
+      border: 4px solid;
+      border-color: transparent transparent transparent currentColor;
+      transition: var(--color-transition);
+    }
   }
 }
 
