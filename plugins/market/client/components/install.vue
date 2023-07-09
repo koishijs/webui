@@ -110,14 +110,19 @@ const selectVersion = computed({
   },
 })
 
-const unchanged = computed(() => version.value === store.dependencies?.[active.value]?.request)
+const unchanged = computed(() => {
+  return !data.value[version.value]
+    || version.value === store.dependencies?.[active.value]?.request
+})
+
 const current = computed(() => store.dependencies?.[active.value]?.resolved)
 const local = computed(() => store.packages?.[active.value])
 const versions = computed(() => store.registry?.[active.value])
 
-watch(active, (name) => {
+watch(active, async (name) => {
   if (name && !workspace.value && !versions.value) {
-    send('market/registry', name)
+    const data = await send('market/registry', name)
+    version.value = Object.keys(data)[0]
   }
 }, { immediate: true })
 
@@ -165,7 +170,7 @@ watch(() => active.value, (value) => {
   if (!value) return
   version.value = config.value.override[active.value]
     || store.dependencies?.[active.value]?.request
-    || store.market.data[value].package.version
+    || Object.keys(store.registry[value] || {})[0]
 }, { immediate: true })
 
 function* find(target: string, plugins: {}, prefix: string): IterableIterator<[string, boolean]> {
