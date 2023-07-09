@@ -6,9 +6,9 @@
       :href="object.package.links.homepage"
     >插件主页</a>
     <a class="el-button" target="_blank"
-      v-if="object.package.links.npm && data.local.version"
-      :href="object.package.links.npm + '/v/' + data.local.version"
-    >当前版本：{{ data.local.version }}</a>
+      v-if="object.package.links.npm && data.local.package.version"
+      :href="object.package.links.npm + '/v/' + data.local.package.version"
+    >当前版本：{{ data.local.package.version }}</a>
     <a class="el-button" target="_blank"
       v-if="object.package.links.repository"
       :href="object.package.links.repository"
@@ -20,7 +20,7 @@
   </div>
 
   <!-- latest -->
-  <k-comment v-if="hasUpdate && !global.static">
+  <k-comment v-if="hasUpdate(data.name) && !global.static">
     <p>当前的插件版本不是最新，<router-link to="/dependencies">点击前往依赖管理</router-link>。</p>
   </k-comment>
 
@@ -31,7 +31,7 @@
 
   <!-- external -->
   <k-comment type="warning" v-if="!data.local.workspace && store.dependencies && !store.dependencies[data.name]">
-    <p>尚未将当前插件列入依赖，<span class="link" @click="send('market/install', { [data.name]: data.local.version })">点击添加</span>。</p>
+    <p>尚未将当前插件列入依赖，<span class="link" @click="send('market/install', { [data.name]: data.local.package.version })">点击添加</span>。</p>
   </k-comment>
 </template>
 
@@ -39,7 +39,7 @@
 
 import { global, send, store } from '@koishijs/client'
 import { computed } from 'vue'
-import { gt } from 'semver'
+import { hasUpdate } from '../utils'
 import { SettingsData } from '@koishijs/plugin-config/client'
 
 const props = defineProps<{
@@ -47,15 +47,8 @@ const props = defineProps<{
 }>()
 
 const object = computed(() => store.market.data?.[props.data.name])
-const dep = computed(() => store.dependencies[props.data.name])
-const versions = computed(() => store.registry[props.data.name])
-
-const hasUpdate = computed(() => {
-  if (!versions.value || props.data.local.workspace) return
-  try {
-    return gt(object.value.package.version, props.data.local.version)
-  } catch {}
-})
+const dep = computed(() => store.dependencies?.[props.data.name])
+const versions = computed(() => store.registry?.[props.data.name])
 
 </script>
 

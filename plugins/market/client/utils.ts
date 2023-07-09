@@ -1,5 +1,6 @@
 import { computed, ref, watch } from 'vue'
 import { Dict, send, store, useStorage } from '@koishijs/client'
+import { gt } from 'semver'
 
 interface ManagerConfig {
   prefix: string
@@ -36,3 +37,12 @@ export const refresh = computed(() => ({
   type: !store.market || store.market.progress < store.market.total ? 'spin disabled' : '',
   action: () => send('market/refresh'),
 }))
+
+export function hasUpdate(name: string) {
+  const versions = store.registry?.[name]
+  const local = store.dependencies?.[name]
+  if (!versions || local?.workspace) return
+  try {
+    return gt(Object.keys(versions)[0], local.resolved)
+  } catch {}
+}
