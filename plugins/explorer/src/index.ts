@@ -33,6 +33,7 @@ export interface File {
 export interface Entry {
   type: 'file' | 'directory'
   name: string
+  mime?: string
   filename?: string
   children?: this[]
   oldValue?: string
