@@ -53,7 +53,7 @@ function renderLine(record: Logger.Record) {
   const space = ' '
   let indent = 3 + space.length, output = ''
   indent += showTime.length + space.length
-  output += renderColor(8, Time.template(showTime)) + space
+  output += renderColor(8, Time.template(showTime, new Date(record.timestamp))) + space
   const code = colorCode(record.name)
   const label = renderColor(code, record.name, ';1')
   const padLength = label.length - record.name.length
