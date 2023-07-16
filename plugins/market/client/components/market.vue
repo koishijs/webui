@@ -60,7 +60,9 @@ function installed(data: SearchObject) {
   }
 }
 
-provide(kConfig, { installed })
+provide(kConfig, {
+  installed: global.static ? undefined : installed,
+})
 
 const words = ref<string[]>([''])
 

@@ -1,7 +1,7 @@
 {
   "name": "@koishijs/plugin-market",
   "description": "Manage your bots and plugins with console",
-  "version": "2.2.6",
+  "version": "2.2.8",
   "main": "lib/node/index.js",
   "typings": "lib/index.d.ts",
   "exports": {
@@ -59,7 +59,7 @@
   },
   "devDependencies": {
     "@koishijs/client": "^5.11.9",
-    "@koishijs/market": "^4.0.1",
+    "@koishijs/market": "^4.1.1",
     "@koishijs/plugin-config": "^2.2.5",
     "@types/semver": "^7.5.0",
     "@types/throttle-debounce": "^2.1.0",

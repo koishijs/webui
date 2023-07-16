@@ -1,7 +1,7 @@
 {
   "name": "@koishijs/market",
   "description": "Market UI for Koishi",
-  "version": "4.0.1",
+  "version": "4.1.1",
   "main": "client/index.ts",
   "files": [
     "client"
