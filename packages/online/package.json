@@ -34,6 +34,6 @@
     "@koishijs/url": "^1.0.3"
   },
   "yakumo": {
-    "client": "./scripts/build"
+    "client": "./src/build"
   }
 }
