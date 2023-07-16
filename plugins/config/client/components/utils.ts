@@ -200,8 +200,13 @@ export function setPath(oldPath: string, newPath: string) {
   router.replace('/plugins/' + newPath)
 }
 
+// do not use lookbehind assertion for Safari compatibility
 export function splitPath(path: string) {
-  return path.split(/\/?(@[\w-]+\/[\w:-]+|[\w:-]+)\/?/).filter(Boolean)
+  return path
+    .replace(/@([^\/]+)\//g, '@$1\\')
+    .split('/')
+    .filter(Boolean)
+    .map(part => part.replace(/\\/g, '/'))
 }
 
 export function addItem(path: string, action: 'group' | 'unload', name: string) {

@@ -17,8 +17,13 @@ declare module '@koishijs/plugin-console' {
 
 const logger = new Logger('loader')
 
+// do not use lookbehind assertion for Safari compatibility
 export function splitPath(path: string) {
-  return path.split(/\/?(@[\w-]+\/[\w:-]+|[\w:-]+)\/?/).filter(Boolean)
+  return path
+    .replace(/@([^\/]+)\//g, '@$1\\')
+    .split('/')
+    .filter(Boolean)
+    .map(part => part.replace(/\\/g, '/'))
 }
 
 function insertKey(object: {}, temp: {}, rest: string[]) {
