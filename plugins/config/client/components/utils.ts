@@ -34,6 +34,11 @@ export const coreDeps = [
   '@koishijs/plugin-config',
 ]
 
+export function hasCoreDeps(tree: Tree) {
+  if (coreDeps.includes('@koishijs/plugin-' + tree.label)) return true
+  if (tree.children) return tree.children.some(hasCoreDeps)
+}
+
 function getEnvInfo(name: string) {
   function setService(name: string, required: boolean) {
     if (services.has(name)) return

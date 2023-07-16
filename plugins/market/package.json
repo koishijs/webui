@@ -60,7 +60,7 @@
   "devDependencies": {
     "@koishijs/client": "^5.11.9",
     "@koishijs/market": "^4.0.1",
-    "@koishijs/plugin-config": "^2.2.4",
+    "@koishijs/plugin-config": "^2.2.5",
     "@types/semver": "^7.5.0",
     "@types/throttle-debounce": "^2.1.0",
     "@types/which-pm-runs": "^1.0.0"

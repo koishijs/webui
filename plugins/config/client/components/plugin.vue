@@ -80,10 +80,9 @@
 
 <script lang="ts" setup>
 
-import { store, send, useContext, message } from '@koishijs/client'
+import { store, send } from '@koishijs/client'
 import { computed, provide, watch } from 'vue'
-import { useRouter } from 'vue-router'
-import { coreDeps, envMap, name, SettingsData, splitPath, Tree } from './utils'
+import { envMap, name, SettingsData, Tree } from './utils'
 import KModifier from './modifier.vue'
 
 const props = defineProps<{
@@ -118,44 +117,6 @@ const data = computed<SettingsData>(() => ({
   config: config.value,
   current: props.current,
 }))
-
-const router = useRouter()
-const ctx = useContext()
-
-ctx.action('config.save', {
-  disabled: () => !name.value,
-  action: async () => {
-    const { disabled } = props.current
-    try {
-      await execute(disabled ? 'unload' : 'reload')
-      message.success(disabled ? '配置已保存。' : '配置已重载。')
-    } catch (error) {
-      message.error('操作失败，请检查日志！')
-    }
-  },
-})
-
-ctx.action('config.toggle', {
-  disabled: () => !name.value || coreDeps.includes(name.value),
-  action: async () => {
-    const { disabled } = props.current
-    try {
-      await execute(disabled ? 'reload' : 'unload')
-      message.success(disabled ? '插件已启用。' : '插件已停用。')
-    } catch (error) {
-      message.error('操作失败，请检查日志！')
-    }
-  },
-})
-
-async function execute(event: 'unload' | 'reload') {
-  await send(`manager/${event}`, props.current.path, config.value, props.current.target)
-  if (props.current.target) {
-    const segments = splitPath(props.current.path)
-    segments[segments.length - 1] = props.current.target
-    router.replace('/plugins/' + segments.join('/'))
-  }
-}
 
 </script>
 
