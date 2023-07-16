@@ -3,8 +3,8 @@ import { DataService } from '@koishijs/plugin-console'
 import { join, relative, resolve } from 'path'
 import { mkdir, readdir, readFile, rename, rm, writeFile } from 'fs/promises'
 import { FSWatcher, watch } from 'chokidar'
-import { fromBuffer } from 'file-type'
 import { detect } from 'chardet'
+import FileType from 'file-type'
 import anymatch, { Tester } from 'anymatch'
 
 declare module '@koishijs/plugin-console' {
@@ -70,7 +70,7 @@ class Explorer extends DataService<Entry[]> {
     ctx.console.addListener('explorer/read', async (filename, binary) => {
       filename = join(ctx.baseDir, filename)
       const buffer = await readFile(filename)
-      const result = await fromBuffer(buffer)
+      const result = await FileType.fromBuffer(buffer)
       return {
         base64: buffer.toString('base64'),
         mime: result?.mime,
