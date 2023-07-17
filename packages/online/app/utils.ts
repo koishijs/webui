@@ -1,8 +1,8 @@
 import { ref, shallowRef, watch } from 'vue'
 import { useLocalStorage } from '@vueuse/core'
-import { dump } from 'js-yaml'
+import { dump, load } from 'js-yaml'
 import { promises as fs } from 'fs'
-import { Dict, provideStorage } from '@koishijs/client'
+import { Dict, global, provideStorage } from '@koishijs/client'
 import loader from './loader'
 
 globalThis.fs = fs
@@ -70,7 +70,7 @@ export async function remove(key: string) {
   await flush()
 }
 
-export async function activate(id?: string, event?: Event) {
+export async function activate(id?: string, event?: Event, config?: any) {
   (event?.target as HTMLElement)?.blur()
   await loader.app?.stop()
   id ||= Math.random().toString(36).slice(2, 10)
@@ -84,6 +84,7 @@ export async function activate(id?: string, event?: Event) {
     await flush()
   } catch {
     loader.config = {
+      ...config,
       plugins: {
         'config': {},
         'console': {},
@@ -101,8 +102,14 @@ export async function activate(id?: string, event?: Event) {
         'theme-vanilla': {},
       },
     }
+    for (const key in config?.plugins || {}) {
+      if (!key.startsWith('~') || !loader.config.plugins[key.slice(1)]) {
+        loader.config.plugins[key] = config.plugins[key]
+      }
+    }
+    delete loader.config.shared
     await fs.writeFile(filename, dump(loader.config))
-    instances.value[id] = { name: id, lastVisit: Date.now() }
+    instances.value[id] = { name: id, ...config?.share, lastVisit: Date.now() }
     await flush()
     await loader.init(`${root}/${id}`)
   }
@@ -140,6 +147,12 @@ async function getInstances() {
   return result
 }
 
+export async function shareLink(id: string) {
+  const config: any = load(await fs.readFile(`${root}/${id}/koishi.yml`, 'utf8'))
+  config.share = instances.value[id]
+  return location.origin + global.uiPath + '?share=' + btoa(JSON.stringify(config))
+}
+
 export async function initialize() {
   await fs.mkdir(root, { recursive: true })
   try {
@@ -150,5 +163,12 @@ export async function initialize() {
     await fs.rm(root, { recursive: true })
     await fs.mkdir(root, { recursive: true })
   }
-  await activate(data.value.current)
+  const share = new URLSearchParams(location.search).get('share')
+  if (share) {
+    const config = JSON.parse(atob(share))
+    location.replace(location.origin + location.pathname)
+    await activate(null, null, config)
+  } else {
+    await activate(data.value.current)
+  }
 }

@@ -19,7 +19,7 @@
           删除
         </el-button>
       </template>
-      <el-button>
+      <el-button @click="share(id)">
         <k-icon name="share"></k-icon>
         分享
       </el-button>
@@ -29,8 +29,9 @@
 
 <script lang="ts" setup>
 
-import { activate, data, instances, remove, Instance, flush } from '../utils'
+import { activate, data, instances, remove, Instance, flush, shareLink } from '../utils'
 import { computed } from 'vue'
+import { message } from '@koishijs/client'
 
 const props = defineProps<{ id: string } & Instance>()
 
@@ -41,6 +42,12 @@ const model = computed({
     flush()
   },
 })
+
+async function share(id: string) {
+  const link = await shareLink(id)
+  await navigator.clipboard.writeText(link)
+  message.success('已复制分享链接')
+}
 
 </script>
 
