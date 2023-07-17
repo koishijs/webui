@@ -164,11 +164,9 @@ function toggleQuery(item: Badge, event: MouseEvent) {
     &.verified, &.newborn {
       color: var(--k-color-success);
     }
-
-    &.preview {
+    &.preview, &.portable {
       color: var(--k-color-warning);
     }
-
     &.insecure {
       color: var(--k-color-danger);
     }
