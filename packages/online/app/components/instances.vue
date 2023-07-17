@@ -1,70 +1,84 @@
 <template>
-  <k-layout>
-    <k-content>
-      <k-card class="instances">
-        <template #header>
-          <span>实例管理</span>
-          <k-button class="right" @click="activate()">添加</k-button>
+  <k-layout class="page-instances">
+    <el-scrollbar>
+      <div class="container first">
+        <instance v-bind="instances[data.current]" :id="data.current"/>
+        <el-button class="k-card create" @click="activate(null, $event)">
+          <k-icon name="plus"></k-icon>
+        </el-button>
+      </div>
+      <div class="container second" v-if="inactive.length">
+        <template v-for="([key, value]) in inactive" :key="key">
+          <instance v-if="data.current !== key" v-bind="value" :id="key"/>
         </template>
-        <table>
-          <tr class="instance" v-for="({ name }, key) in instances" :key="key">
-            <td class="name">
-              {{ name }}
-              <template v-if="data.current === key">(运行中)</template>
-            </td>
-            <td class="actions">
-              <span>
-                <k-icon v-if="data.current !== key" name="start" @click="activate(key)"></k-icon>
-                <k-icon v-if="data.current !== key" name="delete" @click="remove(key)"></k-icon>
-              </span>
-            </td>
-          </tr>
-        </table>
-      </k-card>
-    </k-content>
+      </div>
+    </el-scrollbar>
   </k-layout>
 </template>
 
 <script lang="ts" setup>
 
-import { activate, data, instances, remove } from '../utils'
+import Instance from './instance.vue'
+import { computed } from 'vue'
+import { activate, data, instances } from '../utils'
+
+const inactive = computed(() => {
+  return Object.entries(instances.value)
+    .filter(([id]) => id !== data.value.current)
+    .sort(([, a], [, b]) => b.lastVisit - a.lastVisit)
+})
 
 </script>
 
 <style lang="scss">
 
-.k-card.instances {
-  margin: var(--card-margin);
+.page-instances .el-scrollbar__view {
+  padding: 3rem 0;
+  max-width: 64rem;
+  min-height: 100%;
+  margin: auto;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 
-  .right {
-    float: right;
+  .container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2rem;
+    align-items: center;
   }
 
-  .instance {
-    transition: var(--color-transition);
+  .container.first {
+    justify-content: center;
+  }
 
-    &:hover {
-      background-color: var(--k-hover-bg);
+  .container.second {
+    margin-top: 2rem;
+    border-top: 1px solid var(--k-color-border);
+    padding-top: 2rem;
+  }
+
+  .k-card.create {
+    border-radius: 8px;
+
+    .k-icon {
+      font-size: 4rem;
+      color: var(--k-color-border);
+      transition: 0.3s ease;
     }
 
-    .name {
-      text-align: left;
+    &:hover .k-icon {
+      color: var(--k-color-primary);
     }
+  }
 
-    .actions {
-      text-align: right;
-
-      span {
-        display: flex;
-        gap: 1rem;
-        align-items: center;
-        justify-content: flex-end;
-      }
-
-      .k-icon {
-        cursor: pointer;
-      }
-    }
+  .k-card {
+    width: 20rem;
+    height: 200px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
   }
 }
 

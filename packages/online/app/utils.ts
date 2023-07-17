@@ -52,7 +52,7 @@ provideStorage((key, version, fallback) => {
   return result
 })
 
-interface Instance {
+export interface Instance {
   name: string
   lastVisit: number
 }
@@ -60,13 +60,18 @@ interface Instance {
 export const root = '/koishi/play/v1/instances'
 export const instances = ref<Dict<Instance>>({})
 
-export async function remove(key: string) {
-  await fs.rm(`${root}/${key}`, { recursive: true })
-  delete instances.value[key]
+export async function flush() {
   await fs.writeFile(`${root}/index.json`, JSON.stringify(instances.value))
 }
 
-export async function activate(id?: string) {
+export async function remove(key: string) {
+  await fs.rm(`${root}/${key}`, { recursive: true })
+  delete instances.value[key]
+  await flush()
+}
+
+export async function activate(id?: string, event?: Event) {
+  (event?.target as HTMLElement)?.blur()
   await loader.app?.stop()
   id ||= Math.random().toString(36).slice(2, 10)
   data.value.current = id
@@ -75,6 +80,8 @@ export async function activate(id?: string) {
   try {
     await loader.init(`${root}/${id}`)
     await loader.readConfig()
+    instances.value[id].lastVisit = Date.now()
+    await flush()
   } catch {
     loader.config = {
       plugins: {
@@ -96,7 +103,7 @@ export async function activate(id?: string) {
     }
     await fs.writeFile(filename, dump(loader.config))
     instances.value[id] = { name: id, lastVisit: Date.now() }
-    await fs.writeFile(`${root}/index.json`, JSON.stringify(instances.value))
+    await flush()
     await loader.init(`${root}/${id}`)
   }
   const files = await fs.readdir(`${root}/${id}/data/storage`)
