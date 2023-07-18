@@ -1,7 +1,8 @@
-import { Context, Dict, EffectScope, Logger, Schema } from 'koishi'
+import { Context, Dict, EffectScope, Logger, Plugin, Schema } from 'koishi'
 import { DataService } from '@koishijs/plugin-console'
 import { PackageJson, SearchObject, SearchResult } from '@koishijs/registry'
 import { debounce } from 'throttle-debounce'
+import {} from '@koishijs/plugin-hmr'
 
 declare module '@koishijs/loader' {
   interface Loader {
@@ -19,29 +20,33 @@ const logger = new Logger('config')
 
 export abstract class PackageProvider extends DataService<Dict<PackageProvider.Data>> {
   cache: Dict<PackageProvider.RuntimeData> = {}
+  debouncedRefresh = debounce(0, this.refresh.bind(this, false))
 
-  constructor(ctx: Context) {
+  constructor(public ctx: Context) {
     super(ctx, 'packages', { authority: 4 })
 
-    const callback = debounce(0, this.update.bind(this))
-    ctx.on('internal/runtime', callback)
-    ctx.on('internal/fork', callback)
+    ctx.on('internal/runtime', scope => this.update(scope.runtime.plugin))
+    ctx.on('internal/fork', scope => this.update(scope.runtime.plugin))
+    ctx.on('hmr/reload', (reloads) => {
+      for (const [plugin] of reloads) {
+        this.update(plugin)
+      }
+    })
 
     ctx.console.addListener('config/request-runtime', async (name) => {
-      const shortname = name.replace(/(koishi-|^@koishijs\/)plugin-/, '')
-      this.cache[shortname] = await this.parseExports(name)
+      name = name.replace(/(koishi-|^@koishijs\/)plugin-/, '')
+      this.cache[name] = await this.parseExports(name)
       this.refresh(false)
     }, { authority: 4 })
   }
 
   abstract collect(forced: boolean): Promise<PackageProvider.Data[]>
-  abstract import(key: string): Promise<any>
 
-  update(state: EffectScope) {
-    const shortname = this.ctx.loader.keyFor(state.runtime.plugin)
-    if (!this.cache[shortname]) return
-    this.parseRuntime(state, this.cache[shortname])
-    this.refresh(false)
+  async update(plugin: Plugin) {
+    const name = this.ctx.loader.keyFor(plugin)
+    if (!this.cache[name]) return
+    this.cache[name] = await this.parseExports(name)
+    this.debouncedRefresh()
   }
 
   parseRuntime(state: EffectScope, result: PackageProvider.RuntimeData) {
@@ -70,7 +75,7 @@ export abstract class PackageProvider extends DataService<Dict<PackageProvider.D
 
   async parseExports(name: string) {
     try {
-      const exports = await this.import(name)
+      const exports = await this.ctx.loader.resolvePlugin(name)
       const result: PackageProvider.RuntimeData = {}
       result.schema = exports?.Config || exports?.schema
       result.usage = exports?.usage

@@ -53,6 +53,13 @@ export const badges: Dict<Badge> = {
     query: 'is:preview',
     negate: 'not:preview',
   },
+  portable: {
+    query: 'is:portable',
+    negate: 'not:portable',
+    hidden(config, type) {
+      return !config.portable || type === 'card'
+    },
+  },
   newborn: {
     query: `created:>${aWeekAgo}`,
     negate: `created:<${aWeekAgo}`,
@@ -129,6 +136,7 @@ export const categories = [
 
 export interface MarketConfig {
   installed?(data: SearchObject): boolean
+  portable?: boolean
 }
 
 interface ValidateConfig extends MarketConfig {
@@ -208,12 +216,14 @@ export function validate(data: SearchObject, word: string, config: ValidateConfi
   } else if (word.startsWith('is:')) {
     if (word === 'is:verified') return data.verified
     if (word === 'is:insecure') return data.insecure
+    if (word === 'is:portable') return data.portable
     if (word === 'is:preview') return !!data.manifest.preview
     if (word === 'is:installed') return !!config.installed?.(data)
     return false
   } else if (word.startsWith('not:')) {
     if (word === 'not:verified') return !data.verified
     if (word === 'not:insecure') return !data.insecure
+    if (word === 'not:portable') return !data.portable
     if (word === 'not:preview') return !data.manifest.preview
     if (word === 'not:installed') return !config.installed?.(data)
     return true

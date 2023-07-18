@@ -3,7 +3,10 @@ import { DataService } from '@koishijs/plugin-console'
 import { join, relative, resolve } from 'path'
 import { mkdir, readdir, readFile, rename, rm, writeFile } from 'fs/promises'
 import { FSWatcher, watch } from 'chokidar'
+import { detect } from 'chardet'
+import FileType from 'file-type'
 import anymatch, { Tester } from 'anymatch'
+import zhCN from './locales/zh-CN.yml'
 
 declare module '@koishijs/plugin-console' {
   namespace Console {
@@ -13,7 +16,7 @@ declare module '@koishijs/plugin-console' {
   }
 
   interface Events {
-    'explorer/read'(filename: string, binary?: boolean): Promise<string>
+    'explorer/read'(filename: string, binary?: boolean): Promise<File>
     'explorer/write'(filename: string, content: string, binary?: boolean): Promise<void>
     'explorer/mkdir'(filename: string): Promise<void>
     'explorer/remove'(filename: string): Promise<void>
@@ -22,13 +25,21 @@ declare module '@koishijs/plugin-console' {
   }
 }
 
+export interface File {
+  base64: string
+  mime: string
+  encoding: string
+}
+
 export interface Entry {
   type: 'file' | 'directory'
   name: string
+  mime?: string
   filename?: string
   children?: this[]
   oldValue?: string
   newValue?: string
+  loading?: Promise<File>
 }
 
 class Explorer extends DataService<Entry[]> {
@@ -52,18 +63,20 @@ class Explorer extends DataService<Entry[]> {
 
     this.globFilter = anymatch(config.ignored)
 
-    this.watcher = watch(ctx.baseDir, {
-      cwd: ctx.baseDir,
+    const cwd = resolve(ctx.baseDir, config.root)
+    this.watcher = watch(cwd, {
+      cwd,
       ignored: config.ignored,
     })
 
     ctx.console.addListener('explorer/read', async (filename, binary) => {
-      filename = join(ctx.baseDir, filename)
-      if (binary) {
-        const buffer = await readFile(filename)
-        return buffer.toString('base64')
-      } else {
-        return readFile(filename, 'utf8')
+      filename = join(cwd, filename)
+      const buffer = await readFile(filename)
+      const result = await FileType.fromBuffer(buffer)
+      return {
+        base64: buffer.toString('base64'),
+        mime: result?.mime,
+        encoding: detect(buffer),
       }
     }, { authority: 4 })
 
@@ -136,15 +149,18 @@ class Explorer extends DataService<Entry[]> {
 
 namespace Explorer {
   export interface Config {
+    root?: string
     ignored?: string[]
   }
 
   export const Config: Schema<Config> = Schema.object({
+    root: Schema.string().default(''),
     ignored: Schema
       .array(String)
       .role('table')
-      .default(['**/node_modules', '**/.*', 'accounts/*/data'])
-      .description('要忽略的文件或目录。支持 [Glob Patterns](https://github.com/micromatch/micromatch) 语法。'),
+      .default(['**/node_modules', '**/.*', 'data/accounts/*/data', 'cache']),
+  }).i18n({
+    'zh-CN': zhCN,
   })
 }
 

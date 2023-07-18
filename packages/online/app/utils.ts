@@ -1,8 +1,8 @@
 import { ref, shallowRef, watch } from 'vue'
 import { useLocalStorage } from '@vueuse/core'
-import { dump } from 'js-yaml'
+import { dump, load } from 'js-yaml'
 import { promises as fs } from 'fs'
-import { provideStorage } from '@koishijs/client'
+import { Dict, global, provideStorage } from '@koishijs/client'
 import loader from './loader'
 
 globalThis.fs = fs
@@ -52,15 +52,26 @@ provideStorage((key, version, fallback) => {
   return result
 })
 
+export interface Instance {
+  name: string
+  lastVisit: number
+}
+
 export const root = '/koishi/play/v1/instances'
-export const instances = ref<string[]>([])
+export const instances = ref<Dict<Instance>>({})
+
+export async function flush() {
+  await fs.writeFile(`${root}/index.json`, JSON.stringify(instances.value))
+}
 
 export async function remove(key: string) {
   await fs.rm(`${root}/${key}`, { recursive: true })
-  instances.value = await fs.readdir(root)
+  delete instances.value[key]
+  await flush()
 }
 
-export async function activate(id?: string) {
+export async function activate(id?: string, event?: Event, config?: any) {
+  (event?.target as HTMLElement)?.blur()
   await loader.app?.stop()
   id ||= Math.random().toString(36).slice(2, 10)
   data.value.current = id
@@ -69,8 +80,11 @@ export async function activate(id?: string) {
   try {
     await loader.init(`${root}/${id}`)
     await loader.readConfig()
+    instances.value[id].lastVisit = Date.now()
+    await flush()
   } catch {
     loader.config = {
+      ...config,
       plugins: {
         'config': {},
         'console': {},
@@ -88,8 +102,15 @@ export async function activate(id?: string) {
         'theme-vanilla': {},
       },
     }
+    for (const key in config?.plugins || {}) {
+      if (!key.startsWith('~') || !loader.config.plugins[key.slice(1)]) {
+        loader.config.plugins[key] = config.plugins[key]
+      }
+    }
+    delete loader.config.shared
     await fs.writeFile(filename, dump(loader.config))
-    instances.value = await fs.readdir(root)
+    instances.value[id] = { name: id, ...config?.share, lastVisit: Date.now() }
+    await flush()
     await loader.init(`${root}/${id}`)
   }
   const files = await fs.readdir(`${root}/${id}/data/storage`)
@@ -104,8 +125,50 @@ export async function activate(id?: string) {
   await app.start()
 }
 
+function isObject(value: any): value is Dict {
+  return value && typeof value === 'object' && !Array.isArray(value)
+}
+
+async function getInstances() {
+  const handle = await fs.open(`${root}/index.json`, 'w+')
+  const content = await handle.readFile('utf8')
+  const result: Dict<Instance> = content
+    ? JSON.parse(content)
+    : Object.fromEntries((await fs.readdir(root, { withFileTypes: true }))
+      .filter(dirent => dirent.isDirectory())
+      .map(dirent => [dirent.name, {}]))
+  if (!isObject(result)) {
+    throw new Error('invalid instance index')
+  }
+  for (const id in result) {
+    result[id].name ??= id
+    result[id].lastVisit ??= 0
+  }
+  return result
+}
+
+export async function shareLink(id: string) {
+  const config: any = load(await fs.readFile(`${root}/${id}/koishi.yml`, 'utf8'))
+  config.share = instances.value[id]
+  return location.origin + global.uiPath + '?share=' + btoa(JSON.stringify(config))
+}
+
 export async function initialize() {
   await fs.mkdir(root, { recursive: true })
-  instances.value = await fs.readdir(root)
-  await activate(data.value.current)
+  try {
+    instances.value = await getInstances()
+  } catch (e) {
+    console.warn(e)
+    instances.value = {}
+    await fs.rm(root, { recursive: true })
+    await fs.mkdir(root, { recursive: true })
+  }
+  const share = new URLSearchParams(location.search).get('share')
+  if (share) {
+    const config = JSON.parse(atob(share))
+    location.replace(location.origin + location.pathname)
+    await activate(null, null, config)
+  } else {
+    await activate(data.value.current)
+  }
 }

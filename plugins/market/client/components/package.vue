@@ -34,10 +34,9 @@
 <script lang="ts" setup>
 
 import { computed } from 'vue'
-import { store } from '@koishijs/client'
-import { active, config } from '../utils'
+import { store, isNullable } from '@koishijs/client'
+import { active, config, hasUpdate } from '../utils'
 import { analyzeVersions } from './utils'
-import { gt } from 'semver'
 
 const props = defineProps({
   name: String,
@@ -47,10 +46,9 @@ const local = computed(() => store.dependencies[props.name])
 const versions = computed(() => store.registry[props.name])
 
 const compare = computed(() => {
-  if (local.value.invalid) return
-  try {
-    return gt(local.value.latest, local.value.resolved) ? '可更新' : '最新'
-  } catch {}
+  const result = hasUpdate(props.name)
+  if (isNullable(result)) return
+  return result ? '可更新' : '最新'
 })
 
 const version = computed({

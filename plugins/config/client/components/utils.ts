@@ -34,6 +34,11 @@ export const coreDeps = [
   '@koishijs/plugin-config',
 ]
 
+export function hasCoreDeps(tree: Tree) {
+  if (coreDeps.includes('@koishijs/plugin-' + tree.label)) return true
+  if (tree.children) return tree.children.some(hasCoreDeps)
+}
+
 function getEnvInfo(name: string) {
   function setService(name: string, required: boolean) {
     if (services.has(name)) return
@@ -200,8 +205,13 @@ export function setPath(oldPath: string, newPath: string) {
   router.replace('/plugins/' + newPath)
 }
 
+// do not use lookbehind assertion for Safari compatibility
 export function splitPath(path: string) {
-  return path.split(/\/?(@[\w-]+\/[\w:-]+|[\w:-]+)\/?/).filter(Boolean)
+  return path
+    .replace(/@([^\/]+)\//g, '@$1\\')
+    .split('/')
+    .filter(Boolean)
+    .map(part => part.replace(/\\/g, '/'))
 }
 
 export function addItem(path: string, action: 'group' | 'unload', name: string) {

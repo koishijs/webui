@@ -1,6 +1,6 @@
 <template>
   <transition name="overlay">
-    <div class="image-viewer" v-if="shared.overlayImage" @click="setImage(null)">
+    <div class="overlay-image-viewer" v-if="shared.overlayImage" @click="setImage(null)">
       <span class="button left" :class="{ disabled: !siblings.prev }" @click.stop="setImage(siblings.prev)">
         <k-icon name="chevron-left"/>
       </span>
@@ -140,7 +140,7 @@ $buttonBg: #303133;
   opacity: 1;
 }
 
-.image-viewer {
+.overlay-image-viewer {
   position: fixed;
   left: 0;
   bottom: 0;

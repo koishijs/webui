@@ -36,7 +36,7 @@
 
 import { computed } from 'vue'
 import { store } from '@koishijs/client'
-import { config, refresh } from '../utils'
+import { config, refresh, hasUpdate } from '../utils'
 import { install } from './utils'
 import PackageView from './package.vue'
 
@@ -47,12 +47,7 @@ const names = computed(() => {
     .sort((a, b) => a > b ? 1 : -1)
 })
 
-const updates = computed(() => {
-  return names.value.filter(name => {
-    const local = store.dependencies[name]
-    return local.latest && local.latest !== local.resolved
-  })
-})
+const updates = computed(() => names.value.filter(hasUpdate))
 
 const menu = computed(() => [{
   icon: 'rocket',
@@ -60,8 +55,8 @@ const menu = computed(() => [{
   disabled: !updates.value.length,
   async action() {
     for (const name of updates.value) {
-      const local = store.dependencies[name]
-      config.value.override[name] = local.latest
+      const versions = store.registry[name]
+      config.value.override[name] = Object.keys(versions)[0]
     }
   },
 }, {

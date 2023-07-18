@@ -9,6 +9,7 @@ import HeartPulse from './heart-pulse.vue'
 import Insecure from './insecure.vue'
 import Installed from './installed.vue'
 import Newborn from './newborn.vue'
+import Portable from './portable.vue'
 import Preview from './preview.vue'
 import Search from './search.vue'
 import StarEmpty from './star-empty.vue'
@@ -29,6 +30,7 @@ export default {
   'insecure': Insecure,
   'installed': Installed,
   'newborn': Newborn,
+  'portable': Portable,
   'preview': Preview,
   'search': Search,
   'star-empty': StarEmpty,

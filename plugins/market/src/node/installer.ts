@@ -138,7 +138,7 @@ class Installer extends Service {
       }
 
       const versions = await this.getPackage(name)
-      result[name].latest = Object.keys(versions)[0]
+      if (versions) result[name].latest = Object.keys(versions)[0]
     }, { concurrency: 10 })
     return result
   }

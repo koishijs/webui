@@ -30,7 +30,7 @@
         </div>
         <h2>我可以在这里做什么？</h2>
         <p>在左侧的活动栏中前往「沙盒」，并在窗口底部的聊天框中输入「help」，即可开始你与 Koishi 的对话。</p>
-        <p>了解基础操作后，你可以体验更多插件的功能。由于 k-on! 还处于测试阶段，因此只有少数的插件进行了适配。你可以在「插件市场」中查看并配置这些插件。如果你是一名开发者，也可以参考<a href="https://koishi.chat/cookbook/online.html" rel="noopener noreferer" target="_blank">这篇文档</a>将你的插件是否部署到 k-on!。</p>
+        <p>了解基础操作后，你可以体验更多插件的功能。由于 k-on! 还处于测试阶段，因此只有少数的插件进行了适配。你可以在「插件市场」中查看并配置这些插件。如果你是一名开发者，也可以参考<a href="https://koishi.chat/cookbook/online.html" rel="noopener noreferer" target="_blank">这篇文档</a>将你的插件部署到 k-on!。</p>
         <div class="links">
           <router-link to="/sandbox">
             <k-card>

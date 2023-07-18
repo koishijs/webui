@@ -59,8 +59,8 @@
 
 import { computed, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { clone, store, useContext } from '@koishijs/client'
-import { Tree, addItem, current, plugins, removeItem, select } from './utils'
+import { clone, message, send, store, useContext } from '@koishijs/client'
+import { Tree, addItem, hasCoreDeps, current, name, plugins, removeItem, select, splitPath } from './utils'
 import GlobalSettings from './global.vue'
 import GroupSettings from './group.vue'
 import TreeView from './tree.vue'
@@ -128,6 +128,41 @@ ctx.action('config.tree.add-group', {
   disabled: ({ config }) => config.tree.path && !config.tree.children,
   action: ({ config }) => addItem(config.tree.path, 'group', 'group'),
 })
+
+ctx.action('config.save', {
+  disabled: () => !name.value && current.value.label !== 'group',
+  action: async () => {
+    const { disabled } = current.value
+    try {
+      await execute(disabled ? 'unload' : 'reload')
+      message.success(disabled ? '配置已保存。' : '配置已重载。')
+    } catch (error) {
+      message.error('操作失败，请检查日志！')
+    }
+  },
+})
+
+ctx.action('config.toggle', {
+  disabled: () => !name.value && current.value.label !== 'group' || hasCoreDeps(current.value),
+  action: async () => {
+    const { disabled, label } = current.value
+    try {
+      await execute(disabled ? 'reload' : 'unload')
+      message.success((label === 'group' ? '分组' : '插件') + (disabled ? '已启用。' : '已停用。'))
+    } catch (error) {
+      message.error('操作失败，请检查日志！')
+    }
+  },
+})
+
+async function execute(event: 'unload' | 'reload') {
+  await send(`manager/${event}`, current.value.path, config.value, current.value.target)
+  if (current.value.target) {
+    const segments = splitPath(current.value.path)
+    segments[segments.length - 1] = current.value.target
+    router.replace('/plugins/' + segments.join('/'))
+  }
+}
 
 </script>
 

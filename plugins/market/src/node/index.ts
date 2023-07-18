@@ -1,4 +1,5 @@
 import { Context, Dict, pick, Schema } from 'koishi'
+import { DependencyMetaKey, RemotePackage } from '@koishijs/registry'
 import { gt } from 'semver'
 import { resolve } from 'path'
 import { DependencyProvider, RegistryProvider } from './deps'
@@ -25,7 +26,7 @@ declare module '@koishijs/plugin-console' {
 
   interface Events {
     'market/install'(deps: Dict<string>): Promise<number>
-    'market/registry'(name: string): Promise<void>
+    'market/registry'(name: string): Promise<Dict<Pick<RemotePackage, DependencyMetaKey>>>
   }
 }
 
@@ -161,7 +162,7 @@ export function apply(ctx: Context, config: Config) {
     }, { authority: 4 })
 
     ctx.console.addListener('market/registry', async (name) => {
-      await ctx.installer.getPackage(name)
+      return ctx.installer.getPackage(name)
     }, { authority: 4 })
   })
 }

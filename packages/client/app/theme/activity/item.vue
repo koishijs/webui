@@ -23,7 +23,7 @@
           </div>
         </div>
       </template>
-      <activity-button :data="children[0]"></activity-button>
+      <activity-button :data="children[0]" :class="{ 'is-group': children.length > 1 }"></activity-button>
     </el-tooltip>
   </div>
 </template>
