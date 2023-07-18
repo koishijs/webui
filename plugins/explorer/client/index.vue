@@ -320,7 +320,7 @@ watch(() => files[active.value], async (entry) => {
     if (mime) {
       entry.oldValue = entry.newValue = `data:${mime};base64,${base64}`
     } else {
-      entry.oldValue = entry.newValue = atob(base64)
+      entry.oldValue = entry.newValue = new TextDecoder().decode(base64ToArrayBuffer(base64))
     }
   }
   model.setValue(entry.newValue)
