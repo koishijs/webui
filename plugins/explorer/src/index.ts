@@ -6,6 +6,7 @@ import { FSWatcher, watch } from 'chokidar'
 import { detect } from 'chardet'
 import FileType from 'file-type'
 import anymatch, { Tester } from 'anymatch'
+import zhCN from './locales/zh-CN.yml'
 
 declare module '@koishijs/plugin-console' {
   namespace Console {
@@ -62,13 +63,14 @@ class Explorer extends DataService<Entry[]> {
 
     this.globFilter = anymatch(config.ignored)
 
-    this.watcher = watch(ctx.baseDir, {
-      cwd: ctx.baseDir,
+    const cwd = resolve(ctx.baseDir, config.root)
+    this.watcher = watch(cwd, {
+      cwd,
       ignored: config.ignored,
     })
 
     ctx.console.addListener('explorer/read', async (filename, binary) => {
-      filename = join(ctx.baseDir, filename)
+      filename = join(cwd, filename)
       const buffer = await readFile(filename)
       const result = await FileType.fromBuffer(buffer)
       return {
@@ -147,15 +149,18 @@ class Explorer extends DataService<Entry[]> {
 
 namespace Explorer {
   export interface Config {
+    root?: string
     ignored?: string[]
   }
 
   export const Config: Schema<Config> = Schema.object({
+    root: Schema.string().default(''),
     ignored: Schema
       .array(String)
       .role('table')
-      .default(['**/node_modules', '**/.*', 'data/accounts/*/data', 'cache'])
-      .description('要忽略的文件或目录。支持 [Glob Patterns](https://github.com/micromatch/micromatch) 语法。'),
+      .default(['**/node_modules', '**/.*', 'data/accounts/*/data', 'cache']),
+  }).i18n({
+    'zh-CN': zhCN,
   })
 }
 
