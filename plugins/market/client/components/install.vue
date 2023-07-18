@@ -92,7 +92,7 @@ function installDep(version: string) {
     const path = target + ':' + Math.random().toString(36).slice(2, 8)
     await send('manager/unload', path, {})
     await router.push('/plugins/' + path)
-    location.reload()
+    window.location.reload()
   })
 }
 
