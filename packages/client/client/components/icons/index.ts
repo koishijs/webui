@@ -1,4 +1,4 @@
-import { App, Component, defineComponent, h } from 'vue'
+import { App, Component, defineComponent, h, markRaw, reactive } from 'vue'
 import { IconExternal, IconEye, IconEyeSlash } from '@koishijs/components'
 import Default from './activity/default.vue'
 import Ellipsis from './activity/ellipsis.vue'
@@ -41,7 +41,7 @@ import User from './svg/user.vue'
 
 import './style.scss'
 
-const registry: Record<string, Component> = {}
+const registry: Record<string, Component> = reactive({})
 
 register('activity:default', Default)
 register('activity:ellipsis', Ellipsis)
@@ -87,7 +87,7 @@ register('undo', Undo)
 register('user', User)
 
 export function register(name: string, component: Component) {
-  registry[name] = component
+  registry[name] = markRaw(component)
 }
 
 export function install(app: App) {
@@ -96,7 +96,8 @@ export function install(app: App) {
       name: String,
     },
     render(props) {
-      return props.name && h(registry[props.name])
+      const component = registry[props.name]
+      return component && h(component)
     },
   }))
 }
