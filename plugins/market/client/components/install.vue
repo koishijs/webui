@@ -170,7 +170,7 @@ watch(() => active.value, (value) => {
   if (!value) return
   version.value = config.value.override[active.value]
     || store.dependencies?.[active.value]?.request
-    || Object.keys(store.registry[value] || {})[0]
+    || Object.keys(store.registry?.[value] || {})[0]
 }, { immediate: true })
 
 function* find(target: string, plugins: {}, prefix: string): IterableIterator<[string, boolean]> {

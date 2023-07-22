@@ -42,8 +42,8 @@ const props = defineProps({
   name: String,
 })
 
-const local = computed(() => store.dependencies[props.name])
-const versions = computed(() => store.registry[props.name])
+const local = computed(() => store.dependencies?.[props.name])
+const versions = computed(() => store.registry?.[props.name])
 
 const compare = computed(() => {
   const result = hasUpdate(props.name)
