@@ -79,6 +79,7 @@ export abstract class PackageProvider extends DataService<Dict<PackageProvider.D
       const result: PackageProvider.RuntimeData = {}
       result.schema = exports?.Config || exports?.schema
       result.usage = exports?.usage
+      result.filter = exports?.filter
 
       // make sure that result can be serialized into json
       JSON.stringify(result)

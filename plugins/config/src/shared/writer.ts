@@ -55,12 +55,10 @@ function dropKey(plugins: {}, name: string) {
 
 export class ConfigWriter extends DataService<Context.Config> {
   protected loader: Loader
-  protected plugins: {}
 
   constructor(ctx: Context) {
     super(ctx, 'config', { authority: 4 })
     this.loader = ctx.loader
-    this.plugins = ctx.loader.config.plugins
 
     ctx.console.addListener('manager/app-reload', (config) => {
       return this.reloadApp(config)
@@ -104,8 +102,9 @@ export class ConfigWriter extends DataService<Context.Config> {
   }
 
   async reloadApp(config: any) {
+    const plugins = this.loader.config.plugins
     this.loader.config = config
-    this.loader.config.plugins = this.plugins
+    this.loader.config.plugins = plugins
     await this.loader.writeConfig()
     this.loader.fullReload()
   }
