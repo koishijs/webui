@@ -118,15 +118,17 @@ class ProfileProvider extends DataService<ProfileProvider.Payload> {
       this.refresh()
     })
 
-    ctx.command('status')
-      .action(async ({ session }) => {
-        const data = await this.get()
-        const output = Object.values(data.bots).map((bot) => {
-          return session.text('.bot', bot)
+    if (!config.disableCommand) {
+      ctx.command('status')
+        .action(async ({ session }) => {
+          const data = await this.get()
+          const output = Object.values(data.bots).map((bot) => {
+            return session.text('.bot', bot)
+          })
+          output.push(session.text('.epilog', data))
+          return output.join('\n')
         })
-        output.push(session.text('.epilog', data))
-        return output.join('\n')
-      })
+    }
   }
 
   async get(forced = false) {
@@ -150,10 +152,12 @@ class ProfileProvider extends DataService<ProfileProvider.Payload> {
 namespace ProfileProvider {
   export interface Config {
     tickInterval?: number
+    disableCommand?: boolean
   }
 
   export const Config: Schema<Config> = Schema.object({
     tickInterval: Schema.natural().role('ms').description('性能数据推送的时间间隔。').default(Time.second * 5),
+    disableCommand: Schema.boolean().description('是否禁用指令。').default(false)
   })
 
   export interface BotData extends Pick<Bot, 'platform' | 'selfId' | 'avatar' | 'username' | 'status'> {
