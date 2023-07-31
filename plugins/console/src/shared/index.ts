@@ -2,6 +2,7 @@ import { Awaitable, Context, Dict, makeArray, Random, Service } from 'koishi'
 import { DataService } from './service'
 import { AbstractWebSocket } from './types'
 import { SchemaProvider } from './schema'
+import { PermissionProvider } from './permission'
 import { Client } from './client'
 import NodeConsole from '../node'
 import { IncomingMessage } from 'http'
@@ -59,6 +60,7 @@ export abstract class Console extends Service {
     super(ctx, 'console', true)
     ctx.plugin(EntryProvider)
     ctx.plugin(SchemaProvider)
+    ctx.plugin(PermissionProvider)
     this.addListener('ping', () => 'pong')
   }
 
@@ -112,6 +114,7 @@ export namespace Console {
   export interface Services {
     entry: EntryProvider
     schema: SchemaProvider
+    permissions: PermissionProvider
   }
 }
 
