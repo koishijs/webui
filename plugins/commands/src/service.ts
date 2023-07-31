@@ -93,7 +93,7 @@ export default class CommandProvider extends DataService<CommandData[]> {
       create: this.manager.snapshots[command.name]?.create,
       initial: this.manager.snapshots[command.name]?.initial || { aliases: command._aliases, config: command.config, options: command._options },
       override: this.manager.snapshots[command.name]?.override || { aliases: command._aliases, config: null, options: {} },
-      paths: this.ctx.loader?.findAncestors(command.ctx.scope) || [],
+      paths: this.ctx.loader?.paths(command.ctx.scope) || [],
     })).sort((a, b) => a.name.localeCompare(b.name))
   }
 }

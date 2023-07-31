@@ -1,4 +1,5 @@
-import { App, defineComponent, h, resolveComponent } from 'vue'
+import { App, defineComponent, h } from 'vue'
+import { RouterLink } from 'vue-router'
 import { useContext } from '../context'
 
 const KActivityLink = defineComponent({
@@ -9,7 +10,7 @@ const KActivityLink = defineComponent({
     const ctx = useContext()
     return () => {
       const activity = ctx.internal.activities[props.id]
-      return h(resolveComponent('router-link') as any, {
+      return h(RouterLink, {
         to: ctx.internal.routeCache[activity?.id] || activity?.path.replace(/:.+/, ''),
       }, {
         default: () => slots.default?.() ?? activity?.name,

@@ -3,7 +3,7 @@
     :is="data.id ? 'k-activity-link' : 'span'"
     class="activity-button"
     draggable="true"
-    :to="data.id"
+    :id="data.id"
     :class="{ 'dragging': isDragging }"
     @dragstart="handleDragStart"
     @dragend="handleDragEnd">

@@ -82,7 +82,7 @@ export abstract class Console extends Service {
   async get() {
     return valueMap(this.entries, ([files, context], key) => ({
       files: this.resolveEntry(files, key),
-      paths: this.ctx.loader?.findAncestors(context.scope),
+      paths: this.ctx.loader?.paths(context.scope),
     }))
   }
 
