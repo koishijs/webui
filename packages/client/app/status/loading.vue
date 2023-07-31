@@ -8,6 +8,14 @@
 
 <script lang="ts" setup>
 
-import { store, progress } from '@koishijs/client'
+import { store, useContext } from '@koishijs/client'
+import { computed } from 'vue'
+
+const ctx = useContext()
+
+const progress = computed(() => {
+  const states = Object.values(ctx.internal.extensions)
+  return states.filter(state => state.done).length / states.length
+})
 
 </script>

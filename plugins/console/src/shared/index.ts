@@ -1,4 +1,4 @@
-import { Awaitable, Context, Dict, makeArray, Random, Service } from 'koishi'
+import { Awaitable, Context, Dict, Random, Service, valueMap } from 'koishi'
 import { DataService } from './service'
 import { AbstractWebSocket } from './types'
 import { SchemaProvider } from './schema'
@@ -37,7 +37,12 @@ export interface Entry {
   prod: string | string[]
 }
 
-export class EntryProvider extends DataService<string[]> {
+export interface EntryData {
+  files: string[]
+  paths?: string[]
+}
+
+export class EntryProvider extends DataService<Dict<EntryData>> {
   static using = []
 
   constructor(ctx: Context) {
@@ -52,7 +57,7 @@ export class EntryProvider extends DataService<string[]> {
 export abstract class Console extends Service {
   static filter = false
 
-  readonly entries: Dict<string[]> = Object.create(null)
+  readonly entries: Dict<[string | string[] | Entry, Context]> = Object.create(null)
   readonly listeners: Dict<Listener> = Object.create(null)
   readonly clients: Dict<Client> = Object.create(null)
 
@@ -75,19 +80,23 @@ export abstract class Console extends Service {
   }
 
   async get() {
-    return Object.values(this.entries).flat()
+    return valueMap(this.entries, ([files, context], key) => ({
+      files: this.resolveEntry(files, key),
+      paths: this.ctx.loader?.findAncestors(context.scope),
+    }))
   }
 
-  abstract resolveEntry(entry: string | string[] | Entry): string | string[]
+  protected abstract resolveEntry(entry: string | string[] | Entry, key: string): string[]
 
   addEntry(entry: string | string[] | Entry) {
     const caller = this.caller
     const key = 'extension-' + Random.id()
-    this.entries[key] = makeArray(this.resolveEntry(entry))
+    this.entries[key] = [entry, this.caller]
     this.entry.refresh()
-    caller?.on('dispose', () => {
-      delete this.entries[key]
+    caller?.collect('entry', () => {
+      const result = delete this.entries[key]
       this.entry?.refresh()
+      return result
     })
   }
 

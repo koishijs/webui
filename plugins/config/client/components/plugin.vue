@@ -47,6 +47,18 @@
         </template>
       </k-slot-item>
 
+      <!-- implements -->
+      <k-slot-item :order="300">
+        <template v-for="(activity, key) in activities" :key="key">
+          <k-comment type="success" v-if="activity.ctx.extension?.paths.includes(current.path) && !activity.disabled()">
+            <p>
+              <span>此插件提供了页面：</span>
+              <k-activity-link :id="activity.id" />
+            </p>
+          </k-comment>
+        </template>
+      </k-slot-item>
+
       <!-- usage -->
       <k-slot-item :order="-200" v-if="local.runtime?.usage">
         <k-markdown unsafe class="usage" :source="local.runtime?.usage"></k-markdown>
@@ -80,7 +92,7 @@
 
 <script lang="ts" setup>
 
-import { store, send } from '@koishijs/client'
+import { activities, store, send } from '@koishijs/client'
 import { computed, provide, watch } from 'vue'
 import { envMap, name, SettingsData, Tree } from './utils'
 import KModifier from './modifier.vue'

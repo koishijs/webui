@@ -1,4 +1,4 @@
-import { connect, Dict, global, root } from '@koishijs/client'
+import { connect, global, root } from '@koishijs/client'
 import home from './home'
 import layout from './layout'
 import settings from './settings'
@@ -7,13 +7,6 @@ import styles from './styles'
 import theme from './theme'
 
 import './index.scss'
-
-declare module '@koishijs/plugin-console' {
-  export interface ClientConfig {
-    messages?: Dict<string>
-    unsupported?: string[]
-  }
-}
 
 root.plugin(home)
 root.plugin(layout)

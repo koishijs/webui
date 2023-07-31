@@ -1,6 +1,6 @@
 import { Component, reactive } from 'vue'
 import { MaybeRefOrGetter, toValue } from '@vueuse/core'
-import { Dict, Disposable, Field, omit, root, router, store } from '.'
+import { Context, Dict, Disposable, Field, omit, root, router, store } from '.'
 
 declare module 'vue-router' {
   interface RouteMeta {
@@ -39,7 +39,7 @@ export class Activity {
   id: string
   _disposables: Disposable[] = []
 
-  constructor(public options: Activity.Options) {
+  constructor(public ctx: Context, public options: Activity.Options) {
     options.order ??= 0
     options.position ??= 'top'
     Object.assign(this, omit(options, ['icon', 'name', 'desc', 'disabled']))
@@ -90,9 +90,6 @@ export class Activity {
         query: { redirect: current.fullPath },
       })
     }
-    if (activities[this.id]) {
-      delete activities[this.id]
-      return true
-    }
+    return delete activities[this.id]
   }
 }

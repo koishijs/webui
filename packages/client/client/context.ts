@@ -5,9 +5,10 @@ import {
   App, Component, createApp, defineComponent, h, inject, markRaw, MaybeRefOrGetter,
   onBeforeUnmount, provide, reactive, resolveComponent, shallowReactive, toValue,
 } from 'vue'
-import { Activity } from './activity'
+import { activities, Activity } from './activity'
 import { SlotOptions } from './components'
 import { useColorMode, useConfig } from './config'
+import { extensions, LoadResult } from './loader'
 import { ActionContext } from '.'
 
 export type Plugin = cordis.Plugin<Context>
@@ -99,6 +100,9 @@ type Flatten<S extends {}> = Intersect<{
 }[keyof S]>
 
 class Internal {
+  extensions = extensions
+  activities = activities
+  routeCache = routeCache
   scope = shallowReactive<Store<ActionContext>>({})
   menus = reactive<Dict<MenuItem[]>>({})
   actions = reactive<Dict<ActionOptions>>({})
@@ -132,8 +136,11 @@ export function useMenu<K extends keyof ActionContext>(id: K) {
   }
 }
 
+export const routeCache = reactive<Record<keyof any, string>>({})
+
 export class Context extends cordis.Context {
   app: App
+  extension: LoadResult
   internal = new Internal()
 
   constructor() {
@@ -149,7 +156,7 @@ export class Context extends cordis.Context {
     this.app.provide('cordis', this)
   }
 
-  protected wrapComponent(component: Component) {
+  wrapComponent(component: Component) {
     if (!component) return
     const caller = this[Context.current] || this
     return defineComponent((props, { slots }) => {
@@ -179,7 +186,7 @@ export class Context extends cordis.Context {
 
   page(options: Activity.Options) {
     options.component = this.wrapComponent(options.component)
-    const activity = new Activity(options)
+    const activity = new Activity(this, options)
     return this.scope.collect('page', () => activity.dispose())
   }
 
@@ -238,3 +245,6 @@ export class Context extends cordis.Context {
     return this.scope.collect('view', () => delete this.internal.themes[options.id])
   }
 }
+
+markRaw(cordis.Context.prototype)
+markRaw(cordis.EffectScope.prototype)

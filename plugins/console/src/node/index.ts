@@ -1,4 +1,4 @@
-import { Context, noop, Schema, Time, WebSocketLayer } from 'koishi'
+import { Context, makeArray, noop, Schema, Time, WebSocketLayer } from 'koishi'
 import { Console, Entry } from '../shared'
 import { ViteDevServer } from 'vite'
 import { extname, resolve } from 'path'
@@ -64,26 +64,24 @@ class NodeConsole extends Console {
     }
   }
 
-  resolveEntry(entry: string | string[] | Entry) {
+  private getFiles(entry: string | string[] | Entry) {
     if (typeof entry === 'string' || Array.isArray(entry)) return entry
     if (!this.config.devMode) return entry.prod
     if (!existsSync(entry.dev)) return entry.prod
     return entry.dev
   }
 
-  async get() {
+  resolveEntry(entry: string | string[] | Entry, key: string) {
     const { devMode, uiPath } = this.config
     const filenames: string[] = []
-    for (const key in this.entries) {
-      for (const local of this.entries[key]) {
-        const filename = devMode ? '/vite/@fs/' + local : uiPath + '/' + key
-        if (extname(local)) {
-          filenames.push(filename)
-        } else {
-          filenames.push(filename + '/index.js')
-          if (existsSync(local + '/style.css')) {
-            filenames.push(filename + '/style.css')
-          }
+    for (const local of makeArray(this.getFiles(entry))) {
+      const filename = devMode ? '/vite/@fs/' + local : uiPath + '/' + key
+      if (extname(local)) {
+        filenames.push(filename)
+      } else {
+        filenames.push(filename + '/index.js')
+        if (existsSync(local + '/style.css')) {
+          filenames.push(filename + '/style.css')
         }
       }
     }

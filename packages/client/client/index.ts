@@ -1,12 +1,19 @@
 import { createRouter, createWebHistory, START_LOCATION } from 'vue-router'
 import { global } from './data'
-import install from './components'
+import install, { Dict } from './components'
 import Overlay from './components/chat/overlay.vue'
 import { config } from './config'
 import { initTask } from './loader'
-import { Context } from './context'
+import { Context, routeCache } from './context'
 import { createI18n } from 'vue-i18n'
 import { watchEffect } from 'vue'
+
+declare module '@koishijs/plugin-console' {
+  export interface ClientConfig {
+    messages?: Dict<string>
+    unsupported?: string[]
+  }
+}
 
 export * from './activity'
 export * from './components'
@@ -39,6 +46,14 @@ export const router = createRouter({
   history: createWebHistory(global.uiPath),
   linkActiveClass: 'active',
   routes: [],
+})
+
+router.afterEach((route) => {
+  const { name, fullPath } = router.currentRoute.value
+  routeCache[name] = fullPath
+  if (route.meta.activity) {
+    document.title = `${route.meta.activity.name} | ${global.messages?.title || 'Koishi 控制台'}`
+  }
 })
 
 export const i18n = createI18n({

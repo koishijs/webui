@@ -1,9 +1,9 @@
 <template>
   <component
-    :is="data.id ? 'router-link' : 'span'"
+    :is="data.id ? 'k-activity-link' : 'span'"
     class="activity-button"
     draggable="true"
-    :to="target"
+    :to="data.id"
     :class="{ 'dragging': isDragging }"
     @dragstart="handleDragStart"
     @dragend="handleDragEnd">
@@ -13,19 +13,14 @@
 
 <script lang="ts" setup>
 
-import { computed, ref } from 'vue'
+import { ref } from 'vue'
 import { Activity } from '@koishijs/client'
-import { routeCache } from './utils'
 
 const props = defineProps<{
   data: Activity
 }>()
 
 const isDragging = ref(false)
-
-const target = computed(() => {
-  return routeCache[props.data.id] || props.data.path?.replace(/:.+/, '')
-})
 
 function handleDragStart(event: DragEvent) {
   isDragging.value = true

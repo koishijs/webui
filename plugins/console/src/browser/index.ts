@@ -1,4 +1,4 @@
-import { Schema } from 'koishi'
+import { makeArray, Schema } from 'koishi'
 import { Console, Entry } from '../shared'
 import {} from '@koishijs/loader'
 
@@ -10,8 +10,8 @@ class BrowserConsole extends Console {
   }
 
   resolveEntry(entry: string | string[] | Entry) {
-    if (typeof entry === 'string' || Array.isArray(entry)) return entry
-    return entry.prod
+    if (typeof entry === 'string' || Array.isArray(entry)) return makeArray(entry)
+    return makeArray(entry.prod)
   }
 }
 
