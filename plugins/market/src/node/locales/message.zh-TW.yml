@@ -1,25 +1,25 @@
 commands.plugin:
-  description: 插件管理
+  description: 外掛程式管理
 commands.plugin.install:
-  description: 安装插件
+  description: 安裝外掛程式
   messages:
-    expect-name: 请输入插件名。
-    already-installed: 该插件已安装。
-    not-found: 未找到该插件。
-    success: 安装成功！
+    expect-name: 请输入外掛程式名。
+    already-installed: 該外掛程式已安裝。
+    not-found: 未找到該外掛程式。
+    success: 安裝成功！
 commands.plugin.uninstall:
-  description: 卸载插件
+  description: 卸載外掛程式
   messages:
-    expect-name: 请输入插件名。
-    not-installed: 该插件未安装。
-    success: 卸载成功！
+    expect-name: 请输入外掛程式名。
+    not-installed: 該外掛程式未安裝。
+    success: 卸載成功！
 commands.plugin.upgrade:
-  description: 升级插件
+  description: 升級外掛程式
   options:
-    self: 升级 Koishi 本体
+    self: 升級 Koishi 本體
   messages:
-    all-updated: 所有插件已是最新版本。
-    available: 有可用的依赖更新：
-    prompt: 输入「Y」升级全部依赖，输入「N」取消操作。
+    all-updated: 所有外掛程式已是最新版本。
+    available: 有可用的依賴更新：
+    prompt: 輸入「Y」升級全部依賴，輸入「N」取消操作。
     cancelled: 已取消操作。
-    success: 升级成功！
+    success: 升級成功！
