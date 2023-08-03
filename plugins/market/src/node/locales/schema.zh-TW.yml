@@ -1,9 +1,9 @@
 registry:
-  $description: 插件源设置
-  endpoint: 插件的下载源。默认跟随当前项目的 npm config。
-  timeout: 获取插件数据的超时时间。
+  $description: 外掛程式源設定
+  endpoint: 外掛程式的下載源。默認跟隨當前項目的 npm config。
+  timeout: 獲取外掛程式數據的超時時間。
 search:
-  $description: 搜索设置
-  endpoint: 用于搜索插件市场的网址。默认跟随插件源设置。
-  timeout: 搜索插件市场的超时时间。
-  proxyAgent: 用于搜索插件市场的代理。
+  $description: 搜尋設定
+  endpoint: 用於搜尋外掛程式市場的網址。默認跟隨外掛程式源設置。
+  timeout: 搜尋外掛程式市場的超時時間。
+  proxyAgent: 用於搜尋外掛程式市場的代理。
