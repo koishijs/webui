@@ -1,10 +1,10 @@
-root: 前端页面的根目录。
-uiPath: 前端页面呈现的路径。
-apiPath: 后端 API 服务的路径。
-selfUrl: Koishi 服务暴露在公网的地址。
-open: 在应用启动后自动在浏览器中打开控制台。
+root: 前端頁面的根目錄。
+uiPath: 前端頁面呈現的路徑。
+apiPath: 後端 API 服務的路徑。
+selfUrl: Koishi 服務暴露在公網的地址。
+open: 在應用啟動後自動在瀏覽器中打開控制台。
 heartbeat:
-  interval: 心跳发送间隔 (单位毫秒)。
-  timeout: 心跳超时时间 (单位毫秒)。
-devMode: 启用调试模式 (仅供开发者使用)。
-cacheDir: 调试服务器缓存目录。
+  interval: 心跳發送間隔 (單位毫秒)。
+  timeout: 心跳超時時間 (單位毫秒)。
+devMode: 啟用調試模式 (僅供開發者使用)。
+cacheDir: 調試服務器緩存目錄。
