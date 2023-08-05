@@ -115,7 +115,7 @@ class StatisticsProvider extends DataService<StatisticsProvider.Payload> {
       this.hourly[session.subtype] += 1
       this.longterm.message += 1
       this.addDaily('botSend', session.sid)
-      if (session.subtype === 'group') {
+      if (!session.isDirect) {
         this.addDaily('group', session.gid)
         const record = this.guilds[session.platform] ||= {}
         record[session.guildId] = (record[session.guildId] || 0) + 1

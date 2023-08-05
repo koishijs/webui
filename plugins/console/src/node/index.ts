@@ -106,8 +106,10 @@ class NodeConsole extends Console {
       }
       if (name.startsWith('extension-')) {
         const key = name.slice(0, 18)
-        // FIXME
-        if (this.entries[key]) return sendFile(this.entries[key][0] + name.slice(18))
+        if (this.entries[key]) {
+          const files = makeArray(this.getFiles(this.entries[key][0]))
+          return sendFile(files[0] + name.slice(18))
+        }
       }
       const filename = resolve(this.root, name)
       if (!filename.startsWith(this.root) && !filename.includes('node_modules')) {
