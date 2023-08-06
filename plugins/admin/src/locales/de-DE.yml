@@ -1,0 +1,30 @@
+commands:
+  user:
+    description: 用户管理
+  channel:
+    description: Kanalverwaltung
+  authorize:
+    description: 权限管理
+  assign:
+    description: Empfängerkonto
+  user.locale:
+    description: Spracheinstellung
+  channel.locale:
+    description: Spracheinstellung
+admin:
+  user-option: Zielbenutzer festlegen
+  user-not-found: Es wurden keine Zielbenutzer gefunden.
+  user-unchanged: Die Benutzerdaten wurden nicht geändert.
+  user-updated: 用户数据已修改。
+  channel-option: Zielkanal festlegen
+  channel-not-found: Es wurden keinen Zielkanal gefunden.
+  channel-unchanged: Kanaldaten wurden nicht verändert.
+  channel-updated: Kanaldaten wurden geändert.
+  not-in-group: Gegenwärtig befinden Sie sich nicht im Kontext einer Gilde. Verwenden Sie bitte den Parameter -c, um den Zielkanal anzugeben. 
+  user-expected: Zielbenutzer festlegen
+  channel-expected: Zielkanal festlegen
+  invalid-assignee-platform: Der Empfänger sollte sich auf derselben Plattform befinden wie der Zielkanal.
+  current-locale: 'Die aktuelle Sprachpräferenz ist: {0}.'
+  no-locale: Keine Sprachpräferenz festgelegt
+  options:
+    remove: Die Einstellungen zurücksetzen
