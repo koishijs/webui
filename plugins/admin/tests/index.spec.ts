@@ -1,6 +1,6 @@
 import { App } from 'koishi'
 import { expect, use } from 'chai'
-import * as admin from '@koishijs/plugin-admin'
+import admin from '@koishijs/plugin-admin'
 import memory from '@koishijs/plugin-database-memory'
 import mock from '@koishijs/plugin-mock'
 import promise from 'chai-as-promised'

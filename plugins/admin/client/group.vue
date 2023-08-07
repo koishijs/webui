@@ -13,9 +13,6 @@
     </template>
 
     <template #menu>
-      <!-- <span class="menu-item" :class="{ disabled: !command }" @click.stop.prevent="updateConfig">
-        <k-icon class="menu-icon" name="check"></k-icon>
-      </span> -->
       <span class="menu-item" :class="{ disabled: !active }" @click.stop.prevent="deleteGroup">
         <k-icon class="menu-icon" name="trash-can"></k-icon>
       </span>
@@ -40,8 +37,10 @@
 
     <k-content class="detail" v-if="active">
       <!-- nav: 前往本地化翻译 -->
-      <!-- 用户列表，添加用户？ -->
-      <h2>权限列表</h2>
+      <h2 class="k-schema-header">用户管理</h2>
+      <p>此用户组内当前共有 {{ store.groups[active].count }} 个用户。</p>
+      <el-button @click="showUserDialog = true">添加用户</el-button>
+      <h2 class="k-schema-header">权限列表</h2>
       <template v-if="store.groups[active].permissions.length">
         <ul>
           <li v-for="(permission, index) in store.groups[active].permissions">
@@ -72,19 +71,32 @@
       <el-button @click="createGroup">用户组</el-button>
     </el-button-group>
   </el-dialog>
+
+  <el-dialog v-model="showUserDialog" title="用户管理">
+    <el-input v-model="platform" placeholder="平台名"/>
+    <el-input v-model="account" placeholder="账号"/>
+    <template #footer>
+      <el-button @click="removeUser">从用户组移除</el-button>
+      <el-button @click="addUser">添加到用户组</el-button>
+    </template>
+  </el-dialog>
 </template>
 
 <script lang="ts" setup>
 
-import { send, store } from '@koishijs/client'
+import { message, send, store } from '@koishijs/client'
 import { useRoute, useRouter } from 'vue-router'
 import { computed, ref } from 'vue'
 import {} from '@koishijs/plugin-locales'
+import { debounce } from 'throttle-debounce'
 
 const route = useRoute()
 const router = useRouter()
 
 const showCreateDialog = ref(false)
+const showUserDialog = ref(false)
+const platform = ref('')
+const account = ref('')
 const keyword = ref('')
 const permission = ref<string>()
 const root = ref<{ $el: HTMLElement }>(null)
@@ -100,13 +112,17 @@ const active = computed<string>({
   },
 })
 
+const renameGroup = debounce(1000, (id: number, name: string) => {
+  send('admin/rename-group', id, name)
+})
+
 const name = computed<string>({
   get() {
     return store.groups[active.value].name
   },
   set(value) {
     store.groups[active.value].name = value
-    send('admin/rename-group', +active.value, value)
+    renameGroup(+active.value, value)
   },
 })
 
@@ -132,6 +148,28 @@ async function removePermission(index: number) {
   const { permissions } = store.groups[active.value]
   permissions.splice(index, 1)
   await send('admin/update-group', +active.value, permissions)
+}
+
+async function addUser() {
+  try {
+    await send('admin/add-user', +active.value, platform.value, account.value)
+    message.success('操作成功')
+  } catch (err) {
+    console.error(err)
+    message.error('操作失败')
+  }
+  showUserDialog.value = false
+}
+
+async function removeUser() {
+  try {
+    await send('admin/remove-user', +active.value, platform.value, account.value)
+    message.success('操作成功')
+  } catch (err) {
+    console.error(err)
+    message.error('操作失败')
+  }
+  showUserDialog.value = false
 }
 
 </script>

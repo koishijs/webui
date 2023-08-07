@@ -15,11 +15,13 @@ declare module '@koishijs/plugin-console' {
     'admin/rename-group'(id: number, name: string): Promise<void>
     'admin/delete-group'(id: number): Promise<void>
     'admin/update-group'(id: number, permissions: string[]): Promise<void>
+    'admin/add-user'(gid: number, platform: string, aid: string): Promise<void>
+    'admin/remove-user'(gid: number, platform: string, aid: string): Promise<void>
   }
 }
 
 export default class UserGroupService extends DataService<Dict<UserGroup>> {
-  static using = ['admin']
+  static using = ['admin', 'console']
 
   constructor(ctx: Context) {
     super(ctx, 'groups')
@@ -49,6 +51,14 @@ export default class UserGroupService extends DataService<Dict<UserGroup>> {
 
     ctx.console.addListener('admin/update-group', (id, permissions) => {
       return ctx.admin.updateGroup(id, permissions)
+    })
+
+    ctx.console.addListener('admin/add-user', (gid, platform, aid) => {
+      return ctx.admin.addUser(gid, platform, aid)
+    })
+
+    ctx.console.addListener('admin/remove-user', (gid, platform, aid) => {
+      return ctx.admin.removeUser(gid, platform, aid)
     })
   }
 

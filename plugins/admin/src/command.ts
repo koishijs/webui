@@ -16,9 +16,7 @@ declare module 'koishi' {
   }
 }
 
-export const name = 'admin-service'
-
-export function apply(ctx: Context) {
+export default function apply(ctx: Context) {
   function enableAdmin(command: Command) {
     if (!command.config.admin) return
     command[Context.current] = ctx
