@@ -1,7 +1,7 @@
 {
   "name": "@koishijs/plugin-admin",
   "description": "Permission Manager for Koishi",
-  "version": "1.0.0",
+  "version": "2.0.0-alpha.0",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
   "files": [
@@ -49,7 +49,7 @@
   },
   "peerDependencies": {
     "@koishijs/plugin-console": "^5.13.1",
-    "koishi": "^4.14.0"
+    "koishi": "^4.14.1"
   },
   "peerDependenciesMeta": {
     "@koishijs/plugin-console": {

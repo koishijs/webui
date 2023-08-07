@@ -1,7 +1,7 @@
 import { Context, Dict, I18n, Logger, Schema } from 'koishi'
 import { DataService } from '@koishijs/plugin-console'
-import { copyFile, mkdir, readdir, readFile, rm, stat, writeFile } from 'fs/promises'
-import { join, resolve } from 'path'
+import { cp, mkdir, readdir, readFile, rm, stat, writeFile } from 'fs/promises'
+import { resolve } from 'path'
 import { debounce } from 'throttle-debounce'
 import { dump, load } from 'js-yaml'
 import { Stats } from 'fs'
@@ -65,21 +65,6 @@ export const Config: Schema<Config> = Schema.object({
     allowCreate: true,
   }).default('data/locales').description('存放本地化文件的根目录。'),
 })
-
-// cp() can only be used since node 16
-async function cp(src: string, dest: string) {
-  const dirents = await readdir(src, { withFileTypes: true })
-  for (const dirent of dirents) {
-    const srcFile = join(src, dirent.name)
-    const destFile = join(dest, dirent.name)
-    if (dirent.isFile()) {
-      await copyFile(srcFile, destFile)
-    } else if (dirent.isDirectory()) {
-      await mkdir(destFile)
-      await cp(srcFile, destFile)
-    }
-  }
-}
 
 export async function apply(ctx: Context, config: Config) {
   const legacy = resolve(ctx.baseDir, 'locales')

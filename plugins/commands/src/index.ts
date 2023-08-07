@@ -1,7 +1,7 @@
 import { Argv, Command, Context, Dict, remove, Schema } from 'koishi'
-import CommandProvider from './service'
+import CommandProvider from './console'
 
-export * from './service'
+export * from './console'
 
 interface Override extends Partial<CommandState> {
   name?: string
