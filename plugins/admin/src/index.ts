@@ -17,6 +17,7 @@ declare module 'koishi' {
 
 export interface UserGroup {
   id: number
+  name: string
   permissions: string[]
 }
 
@@ -33,6 +34,7 @@ export class Admin extends Service {
 
     ctx.model.extend('group', {
       id: 'unsigned',
+      name: 'string',
       permissions: 'list',
     }, { autoInc: true })
 
@@ -46,6 +48,21 @@ export class Admin extends Service {
         this.ctx.permissions.inherit(`group.` + id, name)
       }
     }
+  }
+
+  async createGroup(name: string) {
+    const item = await this.ctx.database.create('group', { name })
+    this.data.push(item)
+    this.ctx.console?.groups?.refresh()
+    return item.id
+  }
+
+  async renameGroup(id: number, name: string) {
+    const item = this.data.find(group => group.id === id)
+    if (!item) return
+    item.name = name
+    await this.ctx.database.set('group', id, { name })
+    this.ctx.console?.groups?.refresh()
   }
 }
 

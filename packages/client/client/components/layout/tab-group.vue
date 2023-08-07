@@ -13,7 +13,7 @@ import { computed } from 'vue'
 
 const props = defineProps<{
   data: object
-  modelValue: string
+  modelValue?: string
   filter?: (item: any) => boolean
 }>()
 

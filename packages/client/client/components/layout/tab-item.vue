@@ -17,7 +17,7 @@ defineProps<{
 
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 
 .k-tab-item {
   line-height: 2.25rem;

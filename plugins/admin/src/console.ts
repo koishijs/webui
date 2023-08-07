@@ -9,6 +9,11 @@ declare module '@koishijs/plugin-console' {
       groups: UserGroupService
     }
   }
+
+  interface Events {
+    'admin/create-group'(name: string): Promise<number>
+    'admin/rename-group'(id: number, name: string): Promise<void>
+  }
 }
 
 export default class UserGroupService extends DataService<Dict<UserGroup>> {
@@ -26,6 +31,14 @@ export default class UserGroupService extends DataService<Dict<UserGroup>> {
     ] : {
       dev: resolve(__dirname, '../client/index.ts'),
       prod: resolve(__dirname, '../dist'),
+    })
+
+    ctx.console.addListener('admin/create-group', (name) => {
+      return ctx.admin.createGroup(name)
+    })
+
+    ctx.console.addListener('admin/rename-group', (id, name) => {
+      return ctx.admin.renameGroup(id, name)
     })
   }
 
