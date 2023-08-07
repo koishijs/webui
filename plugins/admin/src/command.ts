@@ -1,5 +1,4 @@
-import { Argv, Command, Context, difference, Extend, observe } from 'koishi'
-import { parsePlatform } from './utils'
+import { Argv, Channel, Command, Context, difference, Extend, observe, User } from 'koishi'
 
 declare module 'koishi' {
   namespace Command {
@@ -29,6 +28,51 @@ export function apply(ctx: Context) {
 
   ctx.$commander._commandList.forEach(enableAdmin)
   ctx.on('command-added', enableAdmin)
+
+  ctx.command('user', { authority: 3 })
+  ctx.command('channel', { authority: 3 })
+
+  ctx.command('user/authorize <value:natural>', { authority: 4, checkUnknown: true, admin: { user: true, upsert: true } })
+    .alias('auth')
+    .userFields(['authority'])
+    .action(async ({ options, session }, authority) => {
+      if (!options['user']) {
+        return session.text('admin.user-expected')
+      }
+      session.user.authority = authority
+    })
+
+  ctx.command('user.locale <lang>', { authority: 1, checkUnknown: true, admin: { user: true } })
+    .userFields(['locales'])
+    .use(adminLocale, 'user')
+
+  ctx.command('channel/assign [bot:user]', { authority: 4, checkUnknown: true, admin: { channel: true, upsert: true } })
+    .channelFields(['assignee'])
+    .option('remove', '-r', { descPath: 'admin.options.remove' })
+    .action(async ({ session, options }, value) => {
+      if (options.remove) {
+        session.channel.assignee = ''
+      } else if (!value) {
+        session.channel.assignee = session.selfId
+      } else {
+        const [platform, userId] = parsePlatform(value)
+        if (platform !== session.platform) {
+          return session.text('admin.invalid-assignee-platform')
+        }
+        session.channel.assignee = userId
+      }
+    })
+
+  ctx.command('channel.locale <lang>', { authority: 3, checkUnknown: true, admin: { channel: true } })
+    .channelFields(['locales'])
+    .use(adminLocale, 'channel')
+}
+
+function parsePlatform(target: string): [platform: string, id: string] {
+  const index = target.indexOf(':')
+  const platform = target.slice(0, index)
+  const id = target.slice(index + 1)
+  return [platform, id] as any
 }
 
 function adminUser(command: Command) {
@@ -153,4 +197,23 @@ function adminChannel(command: Command) {
         session.channel = channel
       }
     }, true)
+}
+
+type Key = 'user' | 'channel'
+
+function adminLocale<U extends User.Field, G extends Channel.Field, A extends any[], O extends {}>(cmd: Command<U, G, A, O>, key: Key) {
+  return cmd
+    .option('remove', '-r', { descPath: 'admin.options.remove' })
+    .action(async ({ session, options }, ...args) => {
+      const target = session[key] as { locales?: string[] }
+      if (options.remove) {
+        target.locales = []
+      } else if (args[0]) {
+        target.locales = [args[0]]
+      } else if (target.locales?.length) {
+        return session.text('admin.current-locale', [target.locales.join(', ')])
+      } else {
+        return session.text('admin.no-locale')
+      }
+    })
 }
