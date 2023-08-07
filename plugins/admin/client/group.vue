@@ -16,10 +16,10 @@
       <!-- <span class="menu-item" :class="{ disabled: !command }" @click.stop.prevent="updateConfig">
         <k-icon class="menu-icon" name="check"></k-icon>
       </span> -->
-      <!-- <span class="menu-item" :class="{ disabled: !command?.create }" @click.stop.prevent="removeCommand">
+      <span class="menu-item" :class="{ disabled: !active }" @click.stop.prevent="deleteGroup">
         <k-icon class="menu-icon" name="trash-can"></k-icon>
-      </span> -->
-      <span class="menu-item" @click.stop.prevent="showDialog = true">
+      </span>
+      <span class="menu-item" @click.stop.prevent="showCreateDialog = true">
         <k-icon class="menu-icon" name="plus"></k-icon>
       </span>
     </template>
@@ -42,12 +42,24 @@
       <!-- nav: 前往本地化翻译 -->
       <!-- 用户列表，添加用户？ -->
       <h2>权限列表</h2>
-      <p v-if="store.groups[active].permissions.length">
-        {{ store.groups[active].permissions }}
-      </p>
-      <p v-else>
-        该用户组没有权限。
-      </p>
+      <template v-if="store.groups[active].permissions.length">
+        <ul>
+          <li v-for="(permission, index) in store.groups[active].permissions">
+            {{ permission }}
+            <el-button @click="removePermission(index)">删除</el-button>
+          </li>
+        </ul>
+      </template>
+      <p v-else>该用户组没有权限。</p>
+      <el-select v-model="permission">
+        <el-option
+          v-for="item in store.permissions.filter(item => !store.groups[active].permissions.includes(item))"
+          :key="item"
+          :label="item"
+          :value="item"
+        />
+      </el-select>
+      <el-button :disabled="!permission" @click="addPermission">添加权限</el-button>
     </k-content>
 
     <k-empty v-else>
@@ -55,7 +67,7 @@
     </k-empty>
   </k-layout>
 
-  <el-dialog v-model="showDialog" title="选择要创建的类型">
+  <el-dialog v-model="showCreateDialog" title="选择要创建的类型">
     <el-button-group class="text-center">
       <el-button @click="createGroup">用户组</el-button>
     </el-button-group>
@@ -72,8 +84,9 @@ import {} from '@koishijs/plugin-locales'
 const route = useRoute()
 const router = useRouter()
 
-const showDialog = ref(false)
+const showCreateDialog = ref(false)
 const keyword = ref('')
+const permission = ref<string>()
 const root = ref<{ $el: HTMLElement }>(null)
 
 const active = computed<string>({
@@ -98,9 +111,27 @@ const name = computed<string>({
 })
 
 async function createGroup() {
-  showDialog.value = false
+  showCreateDialog.value = false
   const id = await send('admin/create-group')
   router.replace('/groups/' + id)
+}
+
+async function deleteGroup() {
+  await send('admin/delete-group', +active.value)
+  router.replace('/groups/')
+}
+
+async function addPermission() {
+  const { permissions } = store.groups[active.value]
+  permissions.push(permission.value)
+  permission.value = null
+  await send('admin/update-group', +active.value, permissions)
+}
+
+async function removePermission(index: number) {
+  const { permissions } = store.groups[active.value]
+  permissions.splice(index, 1)
+  await send('admin/update-group', +active.value, permissions)
 }
 
 </script>

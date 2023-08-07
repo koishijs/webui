@@ -50,7 +50,7 @@ export class Admin extends Service {
     }
   }
 
-  async createGroup(name: string) {
+  async createGroup(name?: string) {
     const item = await this.ctx.database.create('group', { name })
     this.data.push(item)
     this.ctx.console?.groups?.refresh()
@@ -62,6 +62,22 @@ export class Admin extends Service {
     if (!item) return
     item.name = name
     await this.ctx.database.set('group', id, { name })
+    this.ctx.console?.groups?.refresh()
+  }
+
+  async deleteGroup(id: number) {
+    const index = this.data.findIndex(group => group.id === id)
+    if (index < 0) return
+    this.data.splice(index, 1)
+    await this.ctx.database.remove('group', id)
+    this.ctx.console?.groups?.refresh()
+  }
+
+  async updateGroup(id: number, permissions: string[]) {
+    const item = this.data.find(group => group.id === id)
+    if (!item) return
+    item.permissions = permissions
+    await this.ctx.database.set('group', id, { permissions })
     this.ctx.console?.groups?.refresh()
   }
 }

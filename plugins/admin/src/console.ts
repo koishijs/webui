@@ -11,8 +11,10 @@ declare module '@koishijs/plugin-console' {
   }
 
   interface Events {
-    'admin/create-group'(name: string): Promise<number>
+    'admin/create-group'(name?: string): Promise<number>
     'admin/rename-group'(id: number, name: string): Promise<void>
+    'admin/delete-group'(id: number): Promise<void>
+    'admin/update-group'(id: number, permissions: string[]): Promise<void>
   }
 }
 
@@ -39,6 +41,14 @@ export default class UserGroupService extends DataService<Dict<UserGroup>> {
 
     ctx.console.addListener('admin/rename-group', (id, name) => {
       return ctx.admin.renameGroup(id, name)
+    })
+
+    ctx.console.addListener('admin/delete-group', (id) => {
+      return ctx.admin.deleteGroup(id)
+    })
+
+    ctx.console.addListener('admin/update-group', (id, permissions) => {
+      return ctx.admin.updateGroup(id, permissions)
     })
   }
 
