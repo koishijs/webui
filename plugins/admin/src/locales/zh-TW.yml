@@ -1,6 +1,6 @@
 commands:
   user:
-    description: 用户管理
+    description: 使用者管理
   channel:
     description: 頻道管理
   authorize:
@@ -15,7 +15,7 @@ admin:
   user-option: 指定目標使用者
   user-not-found: 未找到指定的使用者。
   user-unchanged: 使用者數據未改動。
-  user-updated: 用户数据已修改。
+  user-updated: 使用者資料已修改。
   channel-option: 指定目標頻道
   channel-not-found: 未找到指定的頻道。
   channel-unchanged: 頻道數據未改動。
