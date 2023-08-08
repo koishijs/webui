@@ -1,0 +1,30 @@
+commands:
+  user:
+    description: 用户管理
+  channel:
+    description: Gestion des canaux
+  authorize:
+    description: 权限管理
+  assign:
+    description: Compte du destinataire
+  user.locale:
+    description: Préférence Linguistique
+  channel.locale:
+    description: Préférence Linguistique
+admin:
+  user-option: Spécification de l'utilisateur cible
+  user-not-found: L'utilisateur spécifié n'a pas été trouvé.
+  user-unchanged: Les données de l'utilisateur n'ont pas été modifiées.
+  user-updated: 用户数据已修改。
+  channel-option: Spécification du canal cible
+  channel-not-found: Le canal spécifié n'a pas été trouvé.
+  channel-unchanged: Les données du canal n'ont pas été modifiées.
+  channel-updated: Les données du canal ont été modifiées.
+  not-in-group: À l'heure actuelle, ce n'êtes pas dans le contexte d'un « guilde ». Veuillez utiliser l'indicateur -c pour préciser le canal de destination.
+  user-expected: 请指定目标用户。
+  channel-expected: 请指定目标频道。
+  invalid-assignee-platform: 受理人应与目标频道属于同一平台。
+  current-locale: 当前语言偏好为：{0}。
+  no-locale: 未设置语言偏好。
+  options:
+    remove: 重置设置

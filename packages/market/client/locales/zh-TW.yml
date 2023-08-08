@@ -8,6 +8,7 @@ badge:
   insecure: 不安全
   preview: 開發中
   newborn: 近期新增
+  portable: 快速體驗
 sort:
   default: 綜合
   rating: 依評分
@@ -22,18 +23,18 @@ category:
   extension: 擴展功能
   console: 控制台
   manage: 管理工具
-  preset: 行为预设
-  image: 图片服务
-  media: 资讯服务
-  tool: 实用工具
-  ai: 人工智能
+  preset: 行為預設
+  image: 圖片服務
+  media: 資訊服務
+  tool: 實用工具
+  ai: 人工智慧
   meme: 趣味交互
-  game: 娱乐玩法
-  gametool: 游戏工具
+  game: 娛樂玩法
+  gametool: 遊戲輔助
 time:
-  just-now: 刚刚
-  minutes-ago: '{0} 分钟前'
-  hours-ago: '{0} 小时前'
+  just-now: 剛剛
+  minutes-ago: '{0} 分鐘前'
+  hours-ago: '{0} 小時前'
   days-ago: '{0} 天前'
 search:
-  placeholder: 输入想要查询的插件名
+  placeholder: 輸入想要查詢的外掛程式名

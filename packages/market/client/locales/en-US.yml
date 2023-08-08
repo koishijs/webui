@@ -6,8 +6,9 @@ badge:
   installed: Installed
   verified: Verified
   insecure: Insecure
-  preview: Preview
-  newborn: Newborn
+  preview: In Development
+  newborn: Recently Added
+  portable: Instant Preview
 sort:
   default: Overall
   rating: Rating

@@ -1,0 +1,30 @@
+commands:
+  user:
+    description: 使用者管理
+  channel:
+    description: 頻道管理
+  authorize:
+    description: 权限管理
+  assign:
+    description: 受理者賬號
+  user.locale:
+    description: 語言偏好
+  channel.locale:
+    description: 語言偏好
+admin:
+  user-option: 指定目標使用者
+  user-not-found: 未找到指定的使用者。
+  user-unchanged: 使用者數據未改動。
+  user-updated: 使用者資料已修改。
+  channel-option: 指定目標頻道
+  channel-not-found: 未找到指定的頻道。
+  channel-unchanged: 頻道數據未改動。
+  channel-updated: 頻道數據已修改。
+  not-in-group: 當前不在群組上下文中，請使用 -c 參數指定目標頻道。
+  user-expected: 请指定目标使用者。
+  channel-expected: 請指定目標頻道。
+  invalid-assignee-platform: 受理人應與目標頻道屬於同一平台。
+  current-locale: 當前語言偏好為：{0}。
+  no-locale: 未設定語言偏好。
+  options:
+    remove: 重置設定
