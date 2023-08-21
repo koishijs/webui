@@ -20,10 +20,4 @@ const config = computed({
   set: value => emit('update:modelValue', value),
 })
 
-const ctx = useContext()
-
-ctx.action('config.save', {
-  action: () => send('manager/app-reload', config.value),
-})
-
 </script>

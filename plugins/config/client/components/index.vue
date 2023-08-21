@@ -130,9 +130,10 @@ ctx.action('config.tree.add-group', {
 })
 
 ctx.action('config.save', {
-  disabled: () => !name.value && current.value.label !== 'group',
+  disabled: () => !name.value && current.value.label !== 'group' && !!current.value.path,
   action: async () => {
-    const { disabled } = current.value
+    const { disabled, path } = current.value
+    if (!path) return send('manager/app-reload', config.value)
     try {
       await execute(disabled ? 'unload' : 'reload')
       message.success(disabled ? '配置已保存。' : '配置已重载。')
