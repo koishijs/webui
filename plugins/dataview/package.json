@@ -3,11 +3,12 @@
   "description": "View Database in Koishi Console",
   "version": "2.3.1",
   "main": "lib/index.cjs",
-  "typings": "lib/index.d.ts",
+  "types": "lib/index.d.ts",
   "exports": {
     ".": {
       "import": "./lib/index.mjs",
-      "require": "./lib/index.cjs"
+      "require": "./lib/index.cjs",
+      "types": "./lib/index.d.ts"
     },
     "./package.json": "./package.json"
   },
@@ -52,10 +53,10 @@
     }
   },
   "peerDependencies": {
-    "@koishijs/plugin-console": "^5.13.1",
-    "koishi": "^4.14.1"
+    "@koishijs/plugin-console": "^5.13.2",
+    "koishi": "^4.14.2"
   },
   "devDependencies": {
-    "@koishijs/client": "^5.13.1"
+    "@koishijs/client": "^5.13.2"
   }
 }
