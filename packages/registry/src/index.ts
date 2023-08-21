@@ -74,8 +74,9 @@ export default class Scanner {
       await this.search(offset - margin, config)
     }
     this.objects = Object.values(this.cache).filter((object) => {
-      const { name } = object.package
-      return !object.ignored && !ignored.includes(name) && Scanner.isPlugin(name)
+      const { name, date } = object.package
+      // `date` can be `undefined` due to a bug in https://registry.npmjs.org
+      return date && !object.ignored && !ignored.includes(name) && Scanner.isPlugin(name)
     })
     this.total = this.objects.length
   }

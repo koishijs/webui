@@ -63,7 +63,7 @@
     "@types/throttle-debounce": "^2.1.0"
   },
   "dependencies": {
-    "@koishijs/registry": "^6.0.2",
+    "@koishijs/registry": "^6.0.3",
     "throttle-debounce": "^3.0.1"
   }
 }
