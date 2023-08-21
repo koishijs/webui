@@ -226,7 +226,6 @@ class AuthService extends Service {
       if (!client.auth) return true
       if (client.auth.expiredAt <= Date.now()) return true
       if (client.auth.authority < listener.authority) return true
-      await ctx.database.set('token', { token: client.auth.token }, { lastUsedAt: new Date() })
     })
 
     ctx.console.addListener('user/delete-token', async function (inc) {
