@@ -1,7 +1,7 @@
 {
   "name": "@koishijs/plugin-console",
   "description": "Web User Interface for Koishi",
-  "version": "5.13.2",
+  "version": "5.13.3",
   "main": "lib/node/index.js",
   "types": "lib/index.d.ts",
   "exports": {
@@ -54,10 +54,10 @@
     }
   },
   "peerDependencies": {
-    "koishi": "^4.14.2"
+    "koishi": "^4.14.3"
   },
   "devDependencies": {
-    "@koishijs/client": "^5.13.2",
+    "@koishijs/client": "^5.13.3",
     "@maikolib/vite-plugin-yaml": "^1.0.1",
     "@types/uuid": "^8.3.4",
     "@vitejs/plugin-vue": "^4.2.3",
