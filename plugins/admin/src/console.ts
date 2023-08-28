@@ -1,17 +1,20 @@
 import { Context, Dict } from 'koishi'
 import { DataService } from '@koishijs/plugin-console'
-import { UserGroup } from '.'
+import { UserGroup, UserTrack } from '.'
 import { resolve } from 'path'
 
 declare module '@koishijs/plugin-console' {
   namespace Console {
     interface Services {
-      groups: UserGroupService
+      admin: AdminDataService
     }
   }
 
   interface Events {
-    'admin/create-group'(name?: string): Promise<number>
+    'admin/create-track'(name: string): Promise<number>
+    'admin/rename-track'(id: number, name: string): Promise<void>
+    'admin/delete-track'(id: number): Promise<void>
+    'admin/create-group'(name: string): Promise<number>
     'admin/rename-group'(id: number, name: string): Promise<void>
     'admin/delete-group'(id: number): Promise<void>
     'admin/update-group'(id: number, permissions: string[]): Promise<void>
@@ -20,11 +23,11 @@ declare module '@koishijs/plugin-console' {
   }
 }
 
-export default class UserGroupService extends DataService<Dict<UserGroup>> {
+class AdminDataService extends DataService<AdminDataService.Data> {
   static using = ['admin', 'console']
 
   constructor(ctx: Context) {
-    super(ctx, 'groups')
+    super(ctx, 'admin')
 
     ctx.console.addEntry(process.env.KOISHI_BASE ? [
       process.env.KOISHI_BASE + '/dist/index.js',
@@ -35,6 +38,18 @@ export default class UserGroupService extends DataService<Dict<UserGroup>> {
     ] : {
       dev: resolve(__dirname, '../client/index.ts'),
       prod: resolve(__dirname, '../dist'),
+    })
+
+    ctx.console.addListener('admin/create-track', (name) => {
+      return ctx.admin.createTrack(name)
+    })
+
+    ctx.console.addListener('admin/rename-track', (id, name) => {
+      return ctx.admin.renameTrack(id, name)
+    })
+
+    ctx.console.addListener('admin/delete-track', (id) => {
+      return ctx.admin.deleteTrack(id)
     })
 
     ctx.console.addListener('admin/create-group', (name) => {
@@ -63,6 +78,18 @@ export default class UserGroupService extends DataService<Dict<UserGroup>> {
   }
 
   async get() {
-    return Object.fromEntries(this.ctx.admin.data.map(group => [group.id, group]))
+    return {
+      groups: Object.fromEntries(this.ctx.admin.groups.map(group => [group.id, group])),
+      tracks: Object.fromEntries(this.ctx.admin.tracks.map(track => [track.id, track])),
+    }
   }
 }
+
+namespace AdminDataService {
+  export interface Data {
+    groups: Dict<UserGroup>
+    tracks: Dict<UserTrack>
+  }
+}
+
+export default AdminDataService
