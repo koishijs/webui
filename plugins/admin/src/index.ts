@@ -12,12 +12,12 @@ declare module 'koishi' {
   }
 
   interface Tables {
-    group: UserGroup
-    perm_track: UserTrack
+    group: PermGroup
+    perm_track: PermTrack
   }
 }
 
-export interface UserGroup {
+export interface PermGroup {
   id: number
   name: string
   permissions: string[]
@@ -25,15 +25,16 @@ export interface UserGroup {
   dispose?: () => void
 }
 
-export interface UserTrack {
+export interface PermTrack {
   id: number
   name: string
   permissions: string[]
+  dispose?: () => void
 }
 
 export class Admin extends Service {
-  groups: UserGroup[]
-  tracks: UserTrack[]
+  groups: PermGroup[]
+  tracks: PermTrack[]
 
   constructor(ctx: Context, public config: Admin.Config) {
     super(ctx, 'admin')
@@ -64,10 +65,21 @@ export class Admin extends Service {
         .execute(row => $.count(row.id)) || 0
       item.dispose = this.ctx.permissions.define('group.' + item.id, item.permissions)
     }
+    for (const item of this.tracks) {
+      item.dispose = this.track(item.permissions)
+    }
+  }
+
+  private track(permissions: string[]) {
+    const disposables = permissions.slice(1).map((_, index) => {
+      return this.ctx.permissions.inherit(permissions[index + 1], permissions[index])
+    })
+    return () => disposables.forEach(fn => fn())
   }
 
   async createTrack(name: string) {
     const item = await this.ctx.database.create('perm_track', { name })
+    item.dispose = this.track(item.permissions)
     this.tracks.push(item)
     this.ctx.console?.admin?.refresh()
     return item.id
@@ -88,6 +100,16 @@ export class Admin extends Service {
     this.tracks.splice(index, 1)
     this.ctx.console?.admin?.refresh()
     await this.ctx.database.remove('perm_track', id)
+  }
+
+  async updateTrack(id: number, permissions: string[]) {
+    const item = this.tracks.find(group => group.id === id)
+    if (!item) throw new Error('track not found')
+    item.permissions = permissions
+    item.dispose!()
+    item.dispose = this.track(permissions)
+    await this.ctx.database.set('perm_track', id, { permissions })
+    this.ctx.console?.admin?.refresh()
   }
 
   async createGroup(name: string) {

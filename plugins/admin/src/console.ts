@@ -1,6 +1,6 @@
 import { Context, Dict } from 'koishi'
 import { DataService } from '@koishijs/plugin-console'
-import { UserGroup, UserTrack } from '.'
+import { PermGroup, PermTrack } from '.'
 import { resolve } from 'path'
 
 declare module '@koishijs/plugin-console' {
@@ -14,6 +14,7 @@ declare module '@koishijs/plugin-console' {
     'admin/create-track'(name: string): Promise<number>
     'admin/rename-track'(id: number, name: string): Promise<void>
     'admin/delete-track'(id: number): Promise<void>
+    'admin/update-track'(id: number, permissions: string[]): Promise<void>
     'admin/create-group'(name: string): Promise<number>
     'admin/rename-group'(id: number, name: string): Promise<void>
     'admin/delete-group'(id: number): Promise<void>
@@ -52,6 +53,10 @@ class AdminDataService extends DataService<AdminDataService.Data> {
       return ctx.admin.deleteTrack(id)
     })
 
+    ctx.console.addListener('admin/update-track', (id, permissions) => {
+      return ctx.admin.updateTrack(id, permissions)
+    })
+
     ctx.console.addListener('admin/create-group', (name) => {
       return ctx.admin.createGroup(name)
     })
@@ -79,16 +84,16 @@ class AdminDataService extends DataService<AdminDataService.Data> {
 
   async get() {
     return {
-      groups: Object.fromEntries(this.ctx.admin.groups.map(group => [group.id, group])),
-      tracks: Object.fromEntries(this.ctx.admin.tracks.map(track => [track.id, track])),
+      group: Object.fromEntries(this.ctx.admin.groups.map(group => [group.id, group])),
+      track: Object.fromEntries(this.ctx.admin.tracks.map(track => [track.id, track])),
     }
   }
 }
 
 namespace AdminDataService {
   export interface Data {
-    groups: Dict<UserGroup>
-    tracks: Dict<UserTrack>
+    group: Dict<PermGroup>
+    track: Dict<PermTrack>
   }
 }
 

@@ -4,7 +4,7 @@
       <template v-if="activeGroup">用户组</template>
       <template v-else-if="activeTrack">用户组路线</template>
       <template v-else>权限管理</template>
-      <template v-if="activeGroup || activeTrack">
+      <template v-if="active.type">
         -
         <input
           class="rename-input"
@@ -15,7 +15,7 @@
     </template>
 
     <template #menu>
-      <span class="menu-item" :class="{ disabled: !activeGroup && !activeTrack }" @click.stop.prevent="deleteItem">
+      <span class="menu-item" :class="{ disabled: !active.type }" @click.stop.prevent="deleteItem">
         <k-icon class="menu-icon" name="trash-can"></k-icon>
       </span>
       <span class="menu-item" @click.stop.prevent="showCreateDialog = true">
@@ -31,26 +31,29 @@
           </el-input>
         </div>
         <div class="k-tab-group-title">用户组</div>
-        <k-tab-group :data="store.admin.groups" v-model="activeGroup" #="{ id }">
-          {{ store.locales?.[`permission.${id}`] || store.admin.groups[id].name || '未命名' }}
+        <k-tab-group :data="store.admin.group" v-model="activeGroup" #="{ id }">
+          {{ store.locales?.[`permission.${id}`] || store.admin.group[id].name || '未命名' }}
         </k-tab-group>
         <div class="k-tab-group-title">用户组路线</div>
-        <k-tab-group :data="store.admin.tracks" v-model="activeTrack" #="{ id }">
-          {{ store.locales?.[`permission-track.${id}`] || store.admin.tracks[id].name || '未命名' }}
+        <k-tab-group :data="store.admin.track" v-model="activeTrack" #="{ id }">
+          {{ store.locales?.[`permission-track.${id}`] || store.admin.track[id].name || '未命名' }}
         </k-tab-group>
       </el-scrollbar>
     </template>
 
-    <k-content v-if="activeGroup">
-      <!-- nav: 前往本地化翻译 -->
-      <h2 class="k-schema-header">用户管理</h2>
-      <p>此用户组内当前共有 {{ store.admin.groups[activeGroup].count }} 个用户。</p>
-      <el-button @click="showUserDialog = true">添加用户</el-button>
+    <k-content v-if="activeGroup || activeTrack">
+      <template v-if="activeGroup">
+        <!-- nav: 前往本地化翻译 -->
+        <h2 class="k-schema-header">用户管理</h2>
+        <p>此用户组内当前共有 {{ store.admin.group[activeGroup].count }} 个用户。</p>
+        <el-button @click="showUserDialog = true">添加用户</el-button>
+      </template>
+
       <h2 class="k-schema-header">权限列表</h2>
-      <template v-if="store.admin.groups[activeGroup].permissions.length">
+      <template v-if="permissions.length">
         <ul>
-          <li v-for="(permission, index) in store.admin.groups[activeGroup].permissions">
-            {{ permission }}
+          <li v-for="(permission, index) in permissions">
+            <permission-name :id="permission" />
             <el-button @click="removePermission(index)">删除</el-button>
           </li>
         </ul>
@@ -58,25 +61,13 @@
       <p v-else>该用户组没有权限。</p>
       <el-select v-model="permission">
         <el-option
-          v-for="id in store.permissions.filter(item => !store.admin.groups[activeGroup].permissions.includes(item))"
+          v-for="id in store.permissions.filter(item => (active.type === 'track' ? item.startsWith('group.') : true) && !permissions.includes(item))"
           :key="id"
           :value="id">
-          <template v-if="id.startsWith('command.')">
-            指令：{{ id.slice(8) }}
-          </template>
-          <template v-else-if="id.startsWith('group.')">
-            用户组：{{ store.locales?.[`permission.${id}`] || store.admin.groups[id.slice(6)].name || '未命名' }}
-          </template>
-          <template v-else>
-            {{ store.locales?.[`permission.${id}`] || id }}
-          </template>
+          <permission-name :id="id" />
         </el-option>
       </el-select>
       <el-button :disabled="!permission" @click="addPermission">添加权限</el-button>
-    </k-content>
-
-    <k-content v-else-if="activeTrack">
-      <h2 class="k-schema-header">权限列表</h2>
     </k-content>
 
     <k-empty v-else>
@@ -113,6 +104,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { computed, ref } from 'vue'
 import {} from '@koishijs/plugin-locales'
 import { debounce } from 'throttle-debounce'
+import PermissionName from './name.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -128,54 +120,63 @@ const invalid = computed(() => !createInput.value)
 const permission = ref<string>()
 const root = ref<{ $el: HTMLElement }>(null)
 
+interface Active {
+  type?: 'group' | 'track'
+  id?: string
+}
+
+const active = computed<Active>(() => {
+  if (route.path.startsWith('/admin/group/')) {
+    const id = route.path.slice(13)
+    if (id in store.admin.group) {
+      return { type: 'group', id }
+    }
+  } else if (route.path.startsWith('/admin/track/')) {
+    const id = route.path.slice(13)
+    if (id in store.admin.track) {
+      return { type: 'track', id }
+    }
+  }
+  return {}
+})
+
 const activeGroup = computed<string>({
   get() {
-    if (!route.path.startsWith('/admin/group/')) return ''
-    const id = route.path.slice(13)
-    return id in store.admin.groups ? id : ''
+    if (active.value.type !== 'group') return ''
+    return active.value.id
   },
   set(id) {
-    if (!(id in store.admin.groups)) id = ''
+    if (!(id in store.admin.group)) id = ''
     router.replace('/admin/group/' + id)
   },
 })
 
 const activeTrack = computed<string>({
   get() {
-    if (!route.path.startsWith('/admin/track/')) return ''
-    const id = route.path.slice(13)
-    return id in store.admin.tracks ? id : ''
+    if (active.value.type !== 'track') return ''
+    return active.value.id
   },
   set(id) {
-    if (!(id in store.admin.tracks)) id = ''
+    if (!(id in store.admin.track)) id = ''
     router.replace('/admin/track/' + id)
   },
 })
 
-const renameGroup = debounce(1000, (id: number, name: string) => {
-  send('admin/rename-group', id, name)
+const permissions = computed(() => {
+  return store.admin[active.value.type][active.value.id].permissions
 })
 
-const renameTrack = debounce(1000, (id: number, name: string) => {
-  send('admin/rename-track', id, name)
+const renameItem = debounce(1000, (type: 'group' | 'track', id: number, name: string) => {
+  send(`admin/rename-${type}`, id, name)
 })
 
 const renameInput = computed<string>({
   get() {
-    if (activeGroup.value) {
-      return store.admin.groups[activeGroup.value].name
-    } else if (activeTrack.value) {
-      return store.admin.tracks[activeTrack.value].name
-    }
+    return store.admin[active.value.type][active.value.id].name
   },
   set(value) {
-    if (activeGroup.value) {
-      store.admin.groups[activeGroup.value].name = value
-      renameGroup(+activeGroup.value, value)
-    } else if (activeTrack.value) {
-      store.admin.tracks[activeTrack.value].name = value
-      renameTrack(+activeTrack.value, value)
-    }
+    store.admin[active.value.type][active.value.id].name = value
+    renameItem(active.value.type, +active.value.id, value)
   },
 })
 
@@ -187,26 +188,21 @@ async function createItem() {
 }
 
 async function deleteItem() {
-  if (activeTrack.value) {
-    await send('admin/delete-track', +activeTrack.value)
-    router.replace('/admin/')
-  } else {
-    await send('admin/delete-group', +activeGroup.value)
-    router.replace('/admin/')
-  }
+  await send(`admin/delete-${active.value.type}`, +active.value.id)
+  router.replace('/admin/')
 }
 
 async function addPermission() {
-  const { permissions } = store.admin.groups[activeGroup.value]
+  const { permissions } = store.admin[active.value.type][active.value.id]
   permissions.push(permission.value)
   permission.value = null
-  await send('admin/update-group', +activeGroup.value, permissions)
+  await send(`admin/update-${active.value.type}`, +active.value.id, permissions)
 }
 
 async function removePermission(index: number) {
-  const { permissions } = store.admin.groups[activeGroup.value]
+  const { permissions } = store.admin[active.value.type][active.value.id]
   permissions.splice(index, 1)
-  await send('admin/update-group', +activeGroup.value, permissions)
+  await send(`admin/update-${active.value.type}`, +active.value.id, permissions)
 }
 
 async function addUser() {
