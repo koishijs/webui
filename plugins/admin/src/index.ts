@@ -45,16 +45,16 @@ export class Admin extends Service {
     this.data = await this.ctx.database.get('group', {})
     for (const item of this.data) {
       item.count = await this.ctx.database
-        .select('user', { permissions: { $el: item.name } })
+        .select('user', { permissions: { $el: 'group.' + item.id } })
         .execute(row => $.count(row.id)) || 0
-      item.dispose = this.ctx.permissions.define(`group.` + item.id, item.permissions)
+      item.dispose = this.ctx.permissions.define('group.' + item.id, item.permissions)
     }
   }
 
   async createGroup(name?: string) {
     const item = await this.ctx.database.create('group', { name })
     item.count = 0
-    item.dispose = this.ctx.permissions.define(`group.` + item.id, [])
+    item.dispose = this.ctx.permissions.define('group.' + item.id, [])
     this.data.push(item)
     this.ctx.console?.groups?.refresh()
     return item.id
@@ -63,6 +63,7 @@ export class Admin extends Service {
   async renameGroup(id: number, name: string) {
     const item = this.data.find(group => group.id === id)
     if (!item) throw new Error('group not found')
+    if (item.name === name) return
     item.name = name
     await this.ctx.database.set('group', id, { name })
     this.ctx.console?.groups?.refresh()
@@ -73,11 +74,16 @@ export class Admin extends Service {
     if (index < 0) throw new Error('group not found')
     const item = this.data[index]!
     item.dispose!()
-    for (const user of await this.ctx.database.get('user', { permissions: { $el: item.name } }, ['id', 'permissions'])) {
-      remove(user.permissions, item.name)
-      await this.ctx.database.set('user', user.id, { permissions: user.permissions })
-    }
     this.data.splice(index, 1)
+    const users = await this.ctx.database.get('user', { permissions: { $el: 'group.' + id } }, ['id', 'permissions'])
+    for (const user of users) {
+      remove(user.permissions, 'group.' + id)
+    }
+    await this.ctx.database.upsert('user', users)
+    const updates = this.data.filter((group) => {
+      return remove(group.permissions, 'group.' + id)
+    })
+    await this.ctx.database.upsert('group', updates)
     await this.ctx.database.remove('group', id)
     this.ctx.console?.groups?.refresh()
   }
@@ -87,7 +93,7 @@ export class Admin extends Service {
     if (!item) throw new Error('group not found')
     item.permissions = permissions
     item.dispose!()
-    item.dispose = this.ctx.permissions.define(`group.` + item.id, permissions)
+    item.dispose = this.ctx.permissions.define('group.' + item.id, permissions)
     await this.ctx.database.set('group', id, { permissions })
     this.ctx.console?.groups?.refresh()
   }
@@ -97,8 +103,8 @@ export class Admin extends Service {
     if (!item) throw new Error('group not found')
     const data = await this.ctx.database.getUser(platform, aid, ['id', 'permissions'])
     if (!data) throw new Error('user not found')
-    if (!data.permissions.includes(item.name)) {
-      data.permissions.push(item.name)
+    if (!data.permissions.includes('group.' + item.id)) {
+      data.permissions.push('group.' + item.id)
       item.count!++
       await this.ctx.database.set('user', data.id, { permissions: data.permissions })
       this.ctx.console?.groups?.refresh()
@@ -110,7 +116,7 @@ export class Admin extends Service {
     if (!item) throw new Error('group not found')
     const data = await this.ctx.database.getUser(platform, aid, ['id', 'permissions'])
     if (!data) throw new Error('user not found')
-    if (remove(data.permissions, item.name)) {
+    if (remove(data.permissions, 'group.' + item.id)) {
       item.count!--
       await this.ctx.database.set('user', data.id, { permissions: data.permissions })
       this.ctx.console?.groups?.refresh()
