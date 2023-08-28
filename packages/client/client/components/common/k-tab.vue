@@ -23,7 +23,7 @@ defineEmits(['update:modelValue'])
 .k-horizontal-tab-item {
   cursor: pointer;
   position: relative;
-  color: var(--disabled);
+  color: var(--k-color-disabled);
   transition: color 0.3s ease;
 
   & + & {
@@ -31,7 +31,7 @@ defineEmits(['update:modelValue'])
 
     &::before {
       content: '|';
-      color: var(--disabled);
+      color: var(--k-color-disabled);
       left: -1rem;
       position: absolute;
       transition: color 0.3s ease;

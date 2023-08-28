@@ -71,7 +71,7 @@ function onClick(event: MouseEvent) {
   border: 1px solid var(--k-color-border);
   background-color: transparent;
   &.disabled {
-    color: var(--disabled);
+    color: var(--k-color-disabled);
     border-color: var(--k-color-border);
   }
   &:hover:not(.disabled) {
@@ -83,7 +83,7 @@ function onClick(event: MouseEvent) {
     color: #ffffff !important;
     border-color: transparent !important;
     &.disabled {
-      background-color: var(--disabled) !important;
+      background-color: var(--k-color-disabled) !important;
     }
     &:not(.disabled) {
       @include apply-color(primary);
@@ -112,7 +112,7 @@ function onClick(event: MouseEvent) {
       color: var(--el-color-success);
     }
     &.disabled {
-      color: var(--disabled);
+      color: var(--k-color-disabled);
     }
   }
 }

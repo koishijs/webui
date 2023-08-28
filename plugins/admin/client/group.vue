@@ -52,11 +52,19 @@
       <p v-else>该用户组没有权限。</p>
       <el-select v-model="permission">
         <el-option
-          v-for="item in store.permissions.filter(item => !store.groups[active].permissions.includes(item))"
-          :key="item"
-          :label="item"
-          :value="item"
-        />
+          v-for="id in store.permissions.filter(item => !store.groups[active].permissions.includes(item))"
+          :key="id"
+          :value="id">
+          <template v-if="id.startsWith('command.')">
+            指令：{{ id.slice(8) }}
+          </template>
+          <template v-else-if="id.startsWith('group.')">
+            用户组：{{ store.locales?.[`permission.${id}`] || store.groups[id.slice(6)].name || '未命名' }}
+          </template>
+          <template v-else>
+            {{ store.locales?.[`permission.${id}`] || id }}
+          </template>
+        </el-option>
       </el-select>
       <el-button :disabled="!permission" @click="addPermission">添加权限</el-button>
     </k-content>
@@ -66,13 +74,19 @@
     </k-empty>
   </k-layout>
 
-  <el-dialog v-model="showCreateDialog" title="选择要创建的类型">
-    <el-button-group class="text-center">
-      <el-button @click="createGroup">用户组</el-button>
-    </el-button-group>
+  <el-dialog class="create-dialog" v-model="showCreateDialog" destroy-on-close>
+    <template #header>
+      <span class="k-horizontal-tab-item" :class="{ active: type === 'group' }" @click="type = 'group'">创建用户组</span>
+      <span class="k-horizontal-tab-item" :class="{ active: type === 'track' }" @click="type = 'track'">创建用户组路线</span>
+    </template>
+    <el-input :class="{ invalid }" v-model="input" @keydown.enter.stop.prevent="onEnter" placeholder="请输入名称"></el-input>
+    <template #footer>
+      <el-button @click="showCreateDialog = false">取消</el-button>
+      <el-button type="primary" :disabled="invalid" @click="onEnter">确定</el-button>
+    </template>
   </el-dialog>
 
-  <el-dialog v-model="showUserDialog" title="用户管理">
+  <el-dialog v-model="showUserDialog" destroy-on-close title="用户管理">
     <el-input v-model="platform" placeholder="平台名"/>
     <el-input v-model="account" placeholder="账号"/>
     <template #footer>
@@ -98,6 +112,9 @@ const showUserDialog = ref(false)
 const platform = ref('')
 const account = ref('')
 const keyword = ref('')
+const type = ref('group')
+const input = ref('')
+const invalid = computed(() => !input.value)
 const permission = ref<string>()
 const root = ref<{ $el: HTMLElement }>(null)
 
@@ -126,9 +143,10 @@ const name = computed<string>({
   },
 })
 
-async function createGroup() {
+async function onEnter() {
   showCreateDialog.value = false
-  const id = await send('admin/create-group')
+  const id = await send('admin/create-group', input.value)
+  input.value = ''
   router.replace('/groups/' + id)
 }
 
@@ -202,6 +220,12 @@ async function removeUser() {
 .el-button-group.text-center {
   display: flex;
   justify-content: center;
+}
+
+.create-dialog {
+  .el-input.invalid .el-input__wrapper {
+    box-shadow: 0 0 0 1px var(--el-color-danger) inset;
+  }
 }
 
 </style>
