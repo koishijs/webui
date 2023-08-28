@@ -8,10 +8,15 @@
         <el-option v-if="isValid(key)" :label="name" :value="key"></el-option>
       </template>
     </el-select>
-    <el-select class="operator" :disabled="disabled" v-model="operator">
-      <el-option v-for="key in availableOps" :key="key" :label="operators[key]" :value="key"></el-option>
-    </el-select>
-    <el-input :disabled="disabled" :key="type" :type="type" class="value" v-model="value"></el-input>
+    <template v-if="entity === 'isDirect'">
+      <el-switch v-model="boolean"></el-switch>
+    </template>
+    <template v-else-if="entity">
+      <el-select class="operator" :disabled="disabled" v-model="operator">
+        <el-option v-for="key in availableOps" :key="key" :label="operators[key]" :value="key"></el-option>
+      </el-select>
+      <el-input :disabled="disabled" :key="type" :type="type" class="value" v-model="value"></el-input>
+    </template>
   </div>
 </template>
 
@@ -30,6 +35,7 @@ const emit = defineEmits(['update:modelValue'])
 const entity = ref<string>()
 const operator = ref<string>()
 const value = ref<any>()
+const boolean = ref<boolean>(false)
 
 function isValid(key: string) {
   if (key.startsWith('user.')) {
@@ -40,6 +46,7 @@ function isValid(key: string) {
 }
 
 const entities = {
+  'isDirect': '是否私聊',
   'userId': '用户 ID',
   'guildId': '群组 ID',
   'channelId': '频道 ID',
@@ -87,8 +94,14 @@ watch(entity, () => {
   }
 })
 
-watch([entity, operator, value], ([entity, operator, value]) => {
-  if (!entities[entity] || !operators[operator] || !value) return
+watch([entity, operator, value, boolean], ([entity, operator, value, boolean]) => {
+  if (!entities[entity]) return
+  if (entity === 'isDirect') {
+    return emit('update:modelValue', {
+      $eq: [{ $: entity }, boolean],
+    })
+  }
+  if (!operators[operator] || !value) return
   let result: any = value
   if (['$in', '$nin'].includes(operator)) {
     result = value.split(/\s*,\s*/g).filter(Boolean)
