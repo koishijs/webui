@@ -25,7 +25,7 @@
         <slot name="action"></slot>
       </div>
     </div>
-    <k-markdown inline class="desc" :source="tt(data.manifest.description)"></k-markdown>
+    <k-markdown inline class="desc" :source="data.manifest ? tt(data.manifest.description) : data.package.description ?? ''"></k-markdown>
     <div class="footer">
       <el-tooltip :content="timeAgo(data.updatedAt)" placement="top">
         <a class="shrink" target="_blank" :href="data.package.links.npm">
