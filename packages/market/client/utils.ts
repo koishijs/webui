@@ -80,7 +80,7 @@ function getSimilarity(data: SearchObject, word: string) {
   if (shortname.includes(word)) return 2
   return [
     ...data.package.keywords,
-    ...Object.values(data.manifest.description),
+    ...Object.values(data.manifest?.description ?? {}),
   ].some(keyword => keyword.includes(word)) ? 1 : 0
 }
 
@@ -147,7 +147,7 @@ export const kConfig = Symbol('market.config') as InjectionKey<MarketConfig>
 
 export function getSorted(market: SearchObject[], words: string[]) {
   return market?.slice().filter((data) => {
-    return !data.manifest.hidden || words.includes('show:hidden')
+    return !data.manifest?.hidden || words.includes('show:hidden')
   }).sort((a, b) => {
     for (let word of words) {
       if (!word.startsWith('sort:')) continue
@@ -192,43 +192,55 @@ export function validateWord(word: string) {
 }
 
 export function validate(data: SearchObject, word: string, config: ValidateConfig = {}) {
-  const { locales, service } = data.manifest
-  if (word.startsWith('impl:')) {
-    return service.implements.includes(word.slice(5))
-  } else if (word.startsWith('locale:')) {
-    return locales.includes(word.slice(7))
-  } else if (word.startsWith('using:')) {
-    const name = word.slice(6)
-    return service.required.includes(name) || service.optional.includes(name)
-  } else if (word.startsWith('category:')) {
-    return resolveCategory(data.category) === word.slice(9)
-  } else if (word.startsWith('email:')) {
-    const users = config.users ?? getUsers(data)
-    return users.some(({ email }) => email === word.slice(6))
-  } else if (word.startsWith('updated:<')) {
-    return data.updatedAt < word.slice(9)
-  } else if (word.startsWith('updated:>')) {
-    return data.updatedAt >= word.slice(9)
-  } else if (word.startsWith('created:<')) {
-    return data.createdAt < word.slice(9)
-  } else if (word.startsWith('created:>')) {
-    return data.createdAt >= word.slice(9)
-  } else if (word.startsWith('is:')) {
-    if (word === 'is:verified') return data.verified
-    if (word === 'is:insecure') return data.insecure
-    if (word === 'is:portable') return data.portable
-    if (word === 'is:preview') return !!data.manifest.preview
-    if (word === 'is:installed') return !!config.installed?.(data)
-    return false
-  } else if (word.startsWith('not:')) {
-    if (word === 'not:verified') return !data.verified
-    if (word === 'not:insecure') return !data.insecure
-    if (word === 'not:portable') return !data.portable
-    if (word === 'not:preview') return !data.manifest.preview
-    if (word === 'not:installed') return !config.installed?.(data)
-    return true
-  } else if (word.includes(':')) {
-    return true
+  if (data.manifest) {
+    const { locales, service } = data.manifest
+    if (word.startsWith('impl:')) {
+      return service.implements.includes(word.slice(5))
+    } else if (word.startsWith('locale:')) {
+      return locales.includes(word.slice(7))
+    } else if (word.startsWith('using:')) {
+      const name = word.slice(6)
+      return service.required.includes(name) || service.optional.includes(name)
+    } else if (word.startsWith('category:')) {
+      return resolveCategory(data.category) === word.slice(9)
+    } else if (word.startsWith('email:')) {
+      const users = config.users ?? getUsers(data)
+      return users.some(({ email }) => email === word.slice(6))
+    } else if (word.startsWith('updated:<')) {
+      return data.updatedAt < word.slice(9)
+    } else if (word.startsWith('updated:>')) {
+      return data.updatedAt >= word.slice(9)
+    } else if (word.startsWith('created:<')) {
+      return data.createdAt < word.slice(9)
+    } else if (word.startsWith('created:>')) {
+      return data.createdAt >= word.slice(9)
+    } else if (word.startsWith('is:')) {
+      if (word === 'is:verified') return data.verified
+      if (word === 'is:insecure') return data.insecure
+      if (word === 'is:portable') return data.portable
+      if (word === 'is:preview') return !!data.manifest.preview
+      if (word === 'is:installed') return !!config.installed?.(data)
+      return false
+    } else if (word.startsWith('not:')) {
+      if (word === 'not:verified') return !data.verified
+      if (word === 'not:insecure') return !data.insecure
+      if (word === 'not:portable') return !data.portable
+      if (word === 'not:preview') return !data.manifest.preview
+      if (word === 'not:installed') return !config.installed?.(data)
+      return true
+    } else if (word.includes(':')) {
+      return true
+    }
+  } else {
+    if (word.startsWith('is:')) {
+      if (word === 'is:installed') return !!config.installed?.(data)
+      return false
+    } else if (word.startsWith('not:')) {
+      if (word === 'not:installed') return !config.installed?.(data)
+      return true
+    } else if (word.includes(':')) {
+      return true
+    }
   }
 
   return getSimilarity(data, word) > 0
