@@ -80,7 +80,7 @@ function getSimilarity(data: SearchObject, word: string) {
   if (shortname.includes(word)) return 2
   return [
     ...data.package.keywords,
-    ...Object.values(data.manifest.description),
+    ...Object.values(data?.manifest?.description ?? {}),
   ].some(keyword => keyword.includes(word)) ? 1 : 0
 }
 
