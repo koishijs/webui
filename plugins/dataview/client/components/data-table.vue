@@ -148,6 +148,7 @@ const pageSizes = [30, 50, 100, 150, 200, 500, 1000]
 
 const props = defineProps<{
   name: string
+  filter: boolean
 }>()
 
 const table = computed(() => store.database.tables[props.name])
@@ -181,7 +182,18 @@ async function updateData() {
     sort: querySort,
   }
   // await new Promise((res) => setInterval(() => res(0), 1000))
-  tableData.value = await sendQuery('get', props.name as never, {}, modifier)
+  try {
+    const row = props.filter ? Object.keys(state.newRow).reduce((o, field) => {
+      if (state.newRow[field]) {
+        o[field] = state.newRow[field]
+        o[field] = fromModelValue(field, o[field])
+      }
+      return o
+    }, {}): {}
+    tableData.value = await sendQuery('get', props.name as never, row, modifier)
+  } catch (e) {
+    // Ignore invalid query
+  }
   await nextTick()
   state.loading = false
 }
@@ -335,6 +347,13 @@ function toModelValue(field: string, data) {
 function fromModelValue(field: string, data) {
   const fType = table.value.fields[field].type
   switch (fType) {
+    case 'unsigned':
+    case 'integer':
+    case 'float':
+    case 'double':
+      return +data
+    case 'boolean':
+    case 'list':
     case 'json':
       return JSON.parse(data)
   }

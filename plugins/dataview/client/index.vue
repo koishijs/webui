@@ -6,6 +6,9 @@
     </template>
 
     <template #menu>
+      <span class="menu-item" @click="filter = !filter">
+        <k-icon class="menu-icon" :name="filterIcon"></k-icon>
+      </span>
       <span class="menu-item" @click="table?.updateData()">
         <k-icon class="menu-icon" name="refresh"></k-icon>
       </span>
@@ -21,7 +24,7 @@
       <k-empty v-if="!current">
         <div>在左侧选择要访问的数据表</div>
       </k-empty>
-      <table-view v-else :key="current" :name="current" ref="table"></table-view>
+      <table-view v-else :key="current" :name="current" :filter="filter" ref="table"></table-view>
     </keep-alive>
   </k-layout>
 </template>
@@ -39,6 +42,9 @@ function join(source: string | string[]) {
 }
 
 const table = ref()
+
+const filter = ref(false)
+const filterIcon = computed(() => filter.value ? 'filter-off' : 'filter-on')
 
 const route = useRoute()
 
