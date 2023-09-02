@@ -21,10 +21,10 @@ admin:
   channel-unchanged: Channel data has not been changed.
   channel-updated: Channel data has been changed.
   not-in-group: 当前不在群组上下文中，请使用 -c 参数指定目标频道。
-  user-expected: 请指定目标用户。
-  channel-expected: 请指定目标频道。
+  user-expected: Please specific target user.
+  channel-expected: Please specific target channel.
   invalid-assignee-platform: 受理人应与目标频道属于同一平台。
   current-locale: 当前语言偏好为：{0}。
   no-locale: 未设置语言偏好。
   options:
-    remove: 重置设置
+    remove: Reset settings
