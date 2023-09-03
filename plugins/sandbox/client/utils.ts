@@ -71,13 +71,14 @@ export const api = {
     return { userId, username: userId }
   },
   getGuildMemberList({ guildId }) {
-    return Object
+    const data = Object
       .keys(config.value.messages)
       .filter(id => id.startsWith('@'))
       .map((key) => {
         const userId = key.slice(1)
         return { userId, username: userId }
       })
+    return { data }
   },
 }
 

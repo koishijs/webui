@@ -38,7 +38,7 @@ export function conclude(meta: PackageJson) {
     browser: Ensure.boolean(meta.koishi?.browser),
     category: Ensure.string(meta.koishi?.category),
     public: Ensure.array(meta.koishi?.public),
-    description: Ensure.dict(meta.koishi?.description) || Ensure.string(meta.description),
+    description: Ensure.dict(meta.koishi?.description) || Ensure.string(meta.description, ''),
     locales: Ensure.array(meta.koishi?.locales, []),
     service: {
       required: Ensure.array(meta.koishi?.service?.required, []),
