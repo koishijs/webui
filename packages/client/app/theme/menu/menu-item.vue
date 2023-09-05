@@ -38,25 +38,3 @@ function toValue<T>(getter: MaybeGetter<T>): T {
 }
 
 </script>
-
-<style lang="scss">
-
-.k-menu-item {
-  user-select: none;
-  margin: 0 var(--k-menu-padding-x);
-  padding: 0.375rem 1.25rem;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: var(--color-transition);
-
-  &.disabled {
-    color: var(--k-text-light);
-    pointer-events: none;
-  }
-
-  &:not(.disabled):hover {
-    background-color: var(--k-hover-bg);
-  }
-}
-
-</style>

@@ -19,32 +19,3 @@ defineProps<{
 const ctx = useContext()
 
 </script>
-
-<style lang="scss">
-
-.k-menu {
-  position: fixed;
-  z-index: 1000;
-  min-width: 12rem;
-  padding: var(--k-menu-padding-y) 0;
-  border-radius: 6px;
-  background-color: var(--k-menu-bg);
-  box-shadow: var(--k-menu-shadow);
-  transition: var(--color-transition);
-  font-size: 14px;
-
-  .k-menu-separator {
-    margin: var(--k-menu-padding-y) 0;
-    border-top: 1px solid var(--k-color-border);
-
-    &:first-child, &:last-child {
-      display: none;
-    }
-
-    & + & {
-      display: none;
-    }
-  }
-}
-
-</style>

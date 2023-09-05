@@ -7,64 +7,76 @@
     :disabled="disabled"
     :prefix="prefix"
     :initial="initial"
+    :collapsible="isSwitch ? { initial: false } : null"
   >
     <template #title><slot name="title"></slot></template>
     <template #desc>
       <k-markdown :source="schema.meta.description"></k-markdown>
     </template>
-    <template #prefix><slot name="prefix"></slot></template>
-    <template #suffix v-if="isSwitch">
-      <el-button @click="actions.add">添加分支</el-button>
+    <template #menu>
+      <div class="k-menu-separator"></div>
+      <div class="k-menu-item" @click="actions.add">
+        <span class="k-menu-icon"><icon-branch></icon-branch></span>
+        添加分支
+      </div>
     </template>
-    <template #suffix v-else>
-      <el-button class="ellipsis" @click="actions.add">
-        <icon-ellipsis></icon-ellipsis>
-      </el-button>
+    <template #prefix><slot name="prefix"></slot></template>
+    <template #suffix>
+      <el-button v-if="isSwitch" @click="actions.add">添加分支</el-button>
+    </template>
+    <template #collapse v-if="isSwitch">
+      <k-schema
+        v-for="(item, index) in modelValue.$switch.branches"
+        :modelValue="modelValue.$switch.branches[index].then"
+        @update:modelValue="actions.update(index, 'then', $event)"
+        :key="index"
+        :schema="{ ...schema.list[0], meta: { ...schema.meta, ...schema.list[0].meta, description: null } }"
+        :disabled="disabled"
+      >
+        <template #menu>
+          <div class="k-menu-separator"></div>
+          <div class="k-menu-item" :class="{ disabled: disabled || !index }" @click="actions.up(index)">
+            <span class="k-menu-icon"><icon-arrow-up></icon-arrow-up></span>
+            上移分支
+          </div>
+          <div class="k-menu-item" :class="{ disabled: disabled || index === modelValue.$switch.branches.length - 1 }" @click="actions.down(index)">
+            <span class="k-menu-icon"><icon-arrow-down></icon-arrow-down></span>
+            下移分支
+          </div>
+          <div class="k-menu-item" :class="{ disabled }" @click="actions.delete(index)">
+            <span class="k-menu-icon"><icon-delete></icon-delete></span>
+            删除分支
+          </div>
+        </template>
+        <template #title>
+          <span>当满足条件：</span>
+          <k-filter-button
+            :modelValue="modelValue.$switch.branches[index].case"
+            @update:modelValue="actions.update(index, 'case', $event)"
+            :options="schema.meta.extra"
+            :disabled="disabled"
+          ></k-filter-button>
+        </template>
+      </k-schema>
+      <k-schema
+        :modelValue="modelValue.$switch.default"
+        @update:modelValue="actions.default"
+        :schema="{ ...schema.list[0], meta: { ...schema.meta, ...schema.list[0].meta, description: null } }"
+        :disabled="disabled"
+        :initial="initial?.$switch ? initial.$switch.default : initial"
+        #title
+      >
+        <span>其他情况下</span>
+      </k-schema>
     </template>
   </k-schema>
-
-  <div class="k-schema-group" v-if="isSwitch">
-    <k-schema
-      v-for="(item, index) in modelValue.$switch.branches"
-      :modelValue="modelValue.$switch.branches[index].then"
-      @update:modelValue="actions.update(index, 'then', $event)"
-      :key="index"
-      :schema="{ ...schema.list[0], meta: { ...schema.meta, ...schema.list[0].meta, description: null } }"
-      :disabled="disabled"
-    >
-      <template #menu>
-        <el-dropdown-item divided :disabled="!index" @click="actions.up(index)">上移分支</el-dropdown-item>
-        <el-dropdown-item :disabled="index === modelValue.$switch.branches.length - 1" @click="actions.down(index)">下移分支</el-dropdown-item>
-        <el-dropdown-item @click="actions.delete(index)">删除分支</el-dropdown-item>
-      </template>
-      <template #title>
-        <span>当满足条件：</span>
-        <k-filter-button
-          :modelValue="modelValue.$switch.branches[index].case"
-          @update:modelValue="actions.update(index, 'case', $event)"
-          :options="schema.meta.extra"
-          :disabled="disabled"
-        ></k-filter-button>
-      </template>
-    </k-schema>
-    <k-schema
-      :modelValue="modelValue.$switch.default"
-      @update:modelValue="actions.default"
-      :schema="{ ...schema.list[0], meta: { ...schema.meta, ...schema.list[0].meta, description: null } }"
-      :disabled="disabled"
-      :initial="initial?.$switch ? initial.$switch.default : initial"
-      #title
-    >
-      <span>其他情况下</span>
-    </k-schema>
-  </div>
 </template>
 
 <script lang="ts" setup>
 
 import { computed, PropType } from 'vue'
 import { clone } from 'cosmokit'
-import { IconEllipsis, Schema } from 'schemastery-vue'
+import { Schema, IconArrowDown, IconArrowUp, IconBranch, IconDelete } from 'schemastery-vue'
 import KFilterButton from './k-filter-button.vue'
 
 const props = defineProps({
@@ -129,13 +141,5 @@ const actions = {
 </script>
 
 <style lang="scss">
-
-.el-button.ellipsis {
-  padding: 8px 10px;
-
-  .k-icon {
-    width: 12px;
-  }
-}
 
 </style>

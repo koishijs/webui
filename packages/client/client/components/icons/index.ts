@@ -1,5 +1,5 @@
 import { App, Component, defineComponent, h, markRaw, reactive } from 'vue'
-import { IconExternal, IconEye, IconEyeSlash } from '@koishijs/components'
+import * as components from '@koishijs/components'
 import Default from './activity/default.vue'
 import Ellipsis from './activity/ellipsis.vue'
 import Home from './activity/home.vue'
@@ -13,7 +13,6 @@ import ChevronLeft from './svg/chevron-left.vue'
 import ChevronRight from './svg/chevron-right.vue'
 import ChevronUp from './svg/chevron-up.vue'
 import ClipboardList from './svg/clipboard-list.vue'
-import Delete from './svg/delete.vue'
 import Edit from './svg/edit.vue'
 import ExclamationFull from './svg/exclamation-full.vue'
 import Expand from './svg/expand.vue'
@@ -50,6 +49,8 @@ register('activity:moon', Moon)
 register('activity:settings', Settings)
 register('activity:sun', Sun)
 
+register('arrow-up', components.IconArrowUp)
+register('arrow-down', components.IconArrowDown)
 register('box-open', BoxOpen)
 register('check-full', CheckFull)
 register('chevron-down', ChevronDown)
@@ -57,13 +58,14 @@ register('chevron-left', ChevronLeft)
 register('chevron-right', ChevronRight)
 register('chevron-up', ChevronUp)
 register('clipboard-list', ClipboardList)
-register('delete', Delete)
+register('close', components.IconClose)
+register('delete', components.IconDelete)
 register('edit', Edit)
 register('exclamation-full', ExclamationFull)
 register('expand', Expand)
-register('external', IconExternal)
-register('eye-slash', IconEyeSlash)
-register('eye', IconEye)
+register('external', components.IconExternal)
+register('eye-slash', components.IconEyeSlash)
+register('eye', components.IconEye)
 register('file-archive', FileArchive)
 register('filter', Filter)
 register('github', GitHub)
