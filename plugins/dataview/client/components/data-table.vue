@@ -191,7 +191,7 @@ async function updateData() {
       return o
     }, {}): {}
     tableData.value = await sendQuery('get', props.name as never, row, modifier)
-  } catch (e) {
+  } catch {
     // Ignore invalid query
   }
   await nextTick()
