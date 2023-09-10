@@ -122,7 +122,6 @@ export class CommandManager {
       remove(command.parent.children, command)
     }
     command.parent = parent
-    parent?.children.push(command)
   }
 
   teleport(command: Command, name: string, write = false) {

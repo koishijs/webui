@@ -207,7 +207,7 @@ class AuthService extends Service {
 
     ctx.middleware(async (session, next) => {
       const state = states[session.uid]
-      if (!state || state[0] !== session.content.trim()) {
+      if (!state || state[0] !== session.stripped.content) {
         return next()
       }
 
