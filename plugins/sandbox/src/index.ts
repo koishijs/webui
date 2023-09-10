@@ -101,9 +101,8 @@ export function apply(ctx: Context, config: Config) {
       type: 'sandbox/message',
       body: { id, content, user: userId, channel, platform, quote },
     })
-    bot.dispatch(bot.session({
+    const session = bot.session({
       ...templateSession(userId, channel),
-      content,
       messageId: id,
       type: 'message',
       quote: quote && {
@@ -111,7 +110,9 @@ export function apply(ctx: Context, config: Config) {
         content: quote.content,
         messageId: quote.id,
       },
-    }))
+    })
+    session.content = content
+    bot.dispatch(session)
   }, { authority: 4 })
 
   ctx.console.addListener('sandbox/delete-message', async function (platform, userId, channel, messageId) {
