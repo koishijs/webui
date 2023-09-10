@@ -59,13 +59,13 @@ export const api = {
     return { channelId: '#' }
   },
   getChannelList({ guildId }) {
-    return [{ channelId: '#' }]
+    return { data: { channelId: '#' } }
   },
   getGuild({ guildId }) {
     return { guildId: '#' }
   },
   getGuildList() {
-    return [{ guildId: '#' }]
+    return { data: { guildId: '#' } }
   },
   getGuildMember({ guildId, userId }) {
     return { userId, username: userId }

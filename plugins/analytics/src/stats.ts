@@ -243,19 +243,18 @@ class StatisticsProvider extends DataService<StatisticsProvider.Payload> {
 
     async function getGuildInfo(bot: Bot) {
       const { platform } = bot
-      const guilds = await bot.getGuildList()
-      for (const { guildId, guildName: name } of guilds) {
-        const id = `${platform}:${guildId}`
-        if (!messageMap[id] || !groupMap[id] || groupSet.has(id)) continue
-        groupSet.add(id)
-        const { name: oldName, assignee } = groupMap[id]
-        if (name !== oldName) updateList.push({ platform, id: guildId, name })
+      for await (const { id, name } of bot.getGuildIter()) {
+        const gid = `${platform}:${id}`
+        if (!messageMap[gid] || !groupMap[gid] || groupSet.has(gid)) continue
+        groupSet.add(gid)
+        const { name: oldName, assignee } = groupMap[gid]
+        if (name !== oldName) updateList.push({ platform, id, name })
         payload.guilds.push({
           name,
           platform,
           assignee,
-          value: messageMap[id],
-          last: data.daily[0].group[id] || 0,
+          value: messageMap[gid],
+          last: data.daily[0].group[gid] || 0,
         })
       }
     }
