@@ -15,7 +15,7 @@ admin:
   user-option: Target User Specification
   user-not-found: The specified user was not found.
   user-unchanged: User data has not been changed.
-  user-updated: 用户数据已修改。
+  user-updated: User data has been changed.
   channel-option: Target Channel Specification
   channel-not-found: The specified channel was not found.
   channel-unchanged: Channel data has not been changed.
