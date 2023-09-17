@@ -84,7 +84,7 @@
 
 import { computed, PropType } from 'vue'
 import { clone } from 'cosmokit'
-import { Schema, IconArrowDown, IconArrowUp, IconBranch, IconDelete } from 'schemastery-vue'
+import { Schema, IconArrowDown, IconArrowUp, IconBranch, IconDelete, IconInsertAfter, IconInsertBefore } from 'schemastery-vue'
 import KFilterButton from './k-filter-button.vue'
 
 const props = defineProps({

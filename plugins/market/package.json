@@ -55,12 +55,12 @@
     }
   },
   "peerDependencies": {
-    "@koishijs/plugin-console": "^5.14.2",
-    "koishi": "^4.14.5"
+    "@koishijs/plugin-console": "^5.14.3",
+    "koishi": "^4.14.6"
   },
   "devDependencies": {
-    "@koishijs/client": "^5.14.2",
-    "@koishijs/market": "^4.1.4",
+    "@koishijs/client": "^5.14.3",
+    "@koishijs/market": "^4.1.5",
     "@koishijs/plugin-config": "^2.3.1",
     "@types/semver": "^7.5.0",
     "@types/throttle-debounce": "^2.1.0",
