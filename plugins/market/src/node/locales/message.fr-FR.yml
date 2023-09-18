@@ -1,7 +1,7 @@
 commands.plugin:
   description: 插件管理
 commands.plugin.install:
-  description: 安装插件
+  description: Installation de plugins
   messages:
     expect-name: 请输入插件名。
     already-installed: 该插件已安装。
