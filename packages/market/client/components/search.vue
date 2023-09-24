@@ -10,6 +10,7 @@
       <input
         :placeholder="t('search.placeholder')"
         v-model="lastWord"
+        ref="input"
         @blur="onEnter"
         @keydown.escape="onEscape"
         @keydown.backspace="onBackspace"
@@ -39,6 +40,7 @@ const props = defineProps<{
 
 const emit = defineEmits(['update:modelValue'])
 
+const input = ref<HTMLInputElement>()
 const words = ref<string[]>()
 
 watch(() => props.modelValue, (value) => {
@@ -60,6 +62,7 @@ const lastWord = computed({
 function onClickWord(index: number) {
   words.value.splice(index, 1)
   emit('update:modelValue', words.value)
+  input.value?.focus()
 }
 
 function onEnter() {
