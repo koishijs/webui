@@ -1,5 +1,5 @@
 import { ref, shallowRef, watch } from 'vue'
-import { useLocalStorage } from '@vueuse/core'
+import { RemovableRef, useLocalStorage } from '@vueuse/core'
 import { dump, load } from 'js-yaml'
 import { promises as fs } from 'fs'
 import { Dict, global, provideStorage } from '@koishijs/client'
@@ -25,7 +25,7 @@ function createStorage(initial: StorageData) {
   return storage
 }
 
-export const data = createStorage({
+export const data: RemovableRef<StorageData> = createStorage({
   current: null,
 })
 

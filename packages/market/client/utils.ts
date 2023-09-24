@@ -174,8 +174,10 @@ export function getFiltered(market: SearchObject[], words: string[], config?: Ma
   })
 }
 
+const modifiers = ['show:', 'sort:', 'limit:']
+
 export function hasFilter(words: string[]) {
-  return words.filter(w => w && !w.startsWith('show:') && !w.startsWith('sort:')).length > 0
+  return words.filter(w => w && modifiers.every(prefix => !w.startsWith(prefix))).length > 0
 }
 
 export function resolveCategory(name?: string) {
@@ -183,7 +185,7 @@ export function resolveCategory(name?: string) {
   return 'other'
 }
 
-const operators = ['is', 'not', 'created', 'updated', 'impl', 'locale', 'using', 'category', 'email', 'show', 'sort']
+const operators = ['is', 'not', 'created', 'updated', 'impl', 'locale', 'using', 'category', 'email', 'show', 'sort', 'limit']
 
 export function validateWord(word: string) {
   if (!word.includes(':')) return true
