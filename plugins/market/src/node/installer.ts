@@ -189,7 +189,7 @@ class Installer extends Service {
       }
     }
     this.manifest.dependencies = Object.fromEntries(Object.entries(this.manifest.dependencies).sort((a, b) => a[0].localeCompare(b[0])))
-    await fsp.writeFile(filename, JSON.stringify(this.manifest, null, 2))
+    await fsp.writeFile(filename, JSON.stringify(this.manifest, null, 2) + '\n')
   }
 
   private _install() {
