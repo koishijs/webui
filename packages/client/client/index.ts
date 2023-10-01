@@ -15,6 +15,8 @@ declare module '@koishijs/plugin-console' {
   }
 }
 
+export * as Satori from '@satorijs/protocol'
+export * as Universal from '@satorijs/protocol'
 export * from './activity'
 export * from './components'
 export * from './config'

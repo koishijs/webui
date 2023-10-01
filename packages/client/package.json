@@ -36,6 +36,7 @@
   "dependencies": {
     "@koishijs/components": "1.4.4",
     "@maikolib/vite-plugin-yaml": "^1.0.1",
+    "@satorijs/protocol": "^1.0.0-alpha.0",
     "@vitejs/plugin-vue": "^4.2.3",
     "@vueuse/core": "^10.2.1",
     "cac": "^6.7.14",

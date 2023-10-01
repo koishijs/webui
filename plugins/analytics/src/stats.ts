@@ -1,4 +1,4 @@
-import { $, Bot, Channel, Context, Dict, Logger, Schema, Session, Time, valueMap } from 'koishi'
+import { $, Bot, Channel, Context, Dict, Logger, Schema, Session, Time, Universal, valueMap } from 'koishi'
 import { DataService } from '@koishijs/plugin-console'
 
 declare module 'koishi' {
@@ -260,7 +260,7 @@ class StatisticsProvider extends DataService<StatisticsProvider.Payload> {
     }
 
     await Promise.all(this.ctx.bots.map(async (bot) => {
-      if (bot.status !== 'online') return
+      if (bot.status !== Universal.Status.ONLINE) return
       await getGuildInfo(bot).catch(logger.warn)
     }))
 

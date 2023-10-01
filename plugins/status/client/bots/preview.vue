@@ -1,12 +1,12 @@
 <template>
   <div class="bot">
-    <div class="avatar" :style="{ backgroundImage: `url(${data.avatar})` }" @click="$emit('avatar-click')">
+    <div class="avatar" :style="{ backgroundImage: `url(${data.user.avatar})` }" @click="$emit('avatar-click')">
       <el-tooltip :content="statusNames[data.status]" placement="right">
-        <status-light :class="data.status"></status-light>
+        <status-light :class="getStatus(data.status)"></status-light>
       </el-tooltip>
     </div>
     <div class="info">
-      <div><k-icon name="robot"/>{{ data.username }}</div>
+      <div><k-icon name="robot"/>{{ data.user.name }}</div>
       <div><k-icon name="platform"/>{{ data.platform }}</div>
       <div class="cur-frequency">
         <span style="margin-right: 8px">
@@ -24,16 +24,17 @@
 
 <script lang="ts" setup>
 
-import type { Bot } from 'koishi'
+import { Universal } from '@koishijs/client'
 import type { ProfileProvider } from '@koishijs/plugin-status/src'
+import { getStatus } from './utils'
 import StatusLight from './light.vue'
 
-const statusNames: Record<Bot.Status, string> = {
-  online: '运行中',
-  offline: '离线',
-  connect: '正在连接',
-  reconnect: '正在重连',
-  disconnect: '正在断开',
+const statusNames: Record<Universal.Status, string> = {
+  [Universal.Status.ONLINE]: '运行中',
+  [Universal.Status.OFFLINE]: '离线',
+  [Universal.Status.CONNECT]: '正在连接',
+  [Universal.Status.RECONNECT]: '正在重连',
+  [Universal.Status.DISCONNECT]: '正在断开',
 }
 
 defineProps<{

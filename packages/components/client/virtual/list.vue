@@ -5,7 +5,7 @@
     </virtual-item>
     <component :is="tag" class="virtual-list-wrapper" :style="wrapperStyle">
       <virtual-item v-for="(item, index) in dataShown"
-        @resize="virtual.saveSize(item[keyName], $event)">
+        @resize="virtual.saveSize(getKey(item), $event)">
         <slot v-bind="item" :index="index + range.start"></slot>
       </virtual-item>
     </component>
@@ -72,8 +72,12 @@ const virtual = new Virtual({
 const range = virtual.range
 
 function getUids() {
-  const { keyName, data } = props
-  return data.map(item => item[keyName])
+  return props.data.map(getKey)
+}
+
+function getKey(item: string) {
+  const keys = props.keyName.split('.')
+  return keys.reduce((obj, key) => obj[key], item)
 }
 
 onMounted(() => {

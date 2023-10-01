@@ -1,6 +1,7 @@
-import { Bot, Context, Dict, pick, Schema, Time } from 'koishi'
+import { Bot, Context, Dict, Schema, Time, Universal } from 'koishi'
 import { cpus, freemem, totalmem } from 'os'
 import { DataService } from '@koishijs/plugin-console'
+import { debounce } from 'throttle-debounce'
 import zhCN from './locales/zh-CN.yml'
 
 declare module 'koishi' {
@@ -80,6 +81,8 @@ function updateCpuUsage() {
 class ProfileProvider extends DataService<ProfileProvider.Payload> {
   cached: ProfileProvider.Payload
 
+  update = debounce(0, async () => this.refresh())
+
   constructor(ctx: Context, private config: ProfileProvider.Config) {
     super(ctx, 'status')
 
@@ -103,19 +106,19 @@ class ProfileProvider extends DataService<ProfileProvider.Payload> {
 
     ctx.bots.forEach(bot => TickCounter.initialize(bot, ctx))
 
-    ctx.on('bot-added', (bot) => {
+    ctx.on('login-added', ({ bot }) => {
       TickCounter.initialize(bot, ctx)
-      process.nextTick(() => this.refresh())
+      this.update()
     })
 
-    ctx.on('bot-removed', (bot) => {
-      process.nextTick(() => this.refresh())
+    ctx.on('login-removed', ({ bot }) => {
       bot._messageSent.stop()
       bot._messageReceived.stop()
+      this.update()
     })
 
-    ctx.on('bot-status-updated', () => {
-      this.refresh()
+    ctx.on('login-updated', () => {
+      this.update()
     })
 
     ctx.command('status')
@@ -136,8 +139,8 @@ class ProfileProvider extends DataService<ProfileProvider.Payload> {
     const bots: Dict<ProfileProvider.BotData> = {}
     for (const bot of this.ctx.bots) {
       if (bot.hidden) continue
-      bots[bot.ctx.state.uid] = {
-        ...pick(bot, ['platform', 'selfId', 'avatar', 'username', 'status']),
+      bots[bot.ctx.scope.uid] = {
+        ...bot.toJSON(),
         error: bot.error?.message,
         messageSent: bot._messageSent.get(),
         messageReceived: bot._messageReceived.get(),
@@ -156,7 +159,7 @@ namespace ProfileProvider {
     tickInterval: Schema.natural().role('ms').description('性能数据推送的时间间隔。').default(Time.second * 5),
   })
 
-  export interface BotData extends Pick<Bot, 'platform' | 'selfId' | 'avatar' | 'username' | 'status'> {
+  export interface BotData extends Universal.Login {
     error?: string
     messageSent: number
     messageReceived: number

@@ -4,7 +4,7 @@
       <span v-if="!store.status.bots.length" class="el-popper__empty"></span>
       <bot-preview v-for="(bot, key) in store.status.bots" :key="key" :data="bot"></bot-preview>
     </template>
-    <status-light v-for="(bot, key) in store.status.bots" :key="key" :class="bot.status"></status-light>
+    <status-light v-for="(bot, key) in store.status.bots" :key="key" :class="getStatus(bot.status)"></status-light>
     <k-icon name="arrow-up"/>
     <span>{{ sent }}/min</span>
     <k-icon name="arrow-down"/>
@@ -16,6 +16,7 @@
 
 import { computed } from 'vue'
 import { store } from '@koishijs/client'
+import { getStatus } from './utils'
 import BotPreview from './preview.vue'
 import StatusLight from './light.vue'
 

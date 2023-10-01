@@ -40,16 +40,18 @@
     }
   },
   "peerDependencies": {
-    "@koishijs/plugin-console": "^5.14.3",
+    "@koishijs/plugin-console": "^5.14.4",
     "koishi": "^4.14.6"
   },
   "devDependencies": {
-    "@koishijs/client": "^5.14.3",
+    "@koishijs/client": "^5.14.4",
     "@types/envinfo": "^7.8.1",
+    "@types/throttle-debounce": "^2.1.0",
     "koishi": "^4.14.6"
   },
   "dependencies": {
     "envinfo": "^7.10.0",
+    "throttle-debounce": "^3.0.1",
     "which-pm-runs": "^1.1.0"
   }
 }
