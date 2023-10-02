@@ -1,5 +1,5 @@
-import { AbstractWebSocket, ClientConfig, Console, DataService, Events } from '@koishijs/plugin-console'
-import { Promisify } from 'koishi'
+import type { ClientConfig, Console, DataService, Events } from '@koishijs/plugin-console'
+import type { Promisify, Universal } from 'koishi'
 import { markRaw, reactive, ref } from 'vue'
 
 export type Store = {
@@ -10,7 +10,7 @@ declare const KOISHI_CONFIG: ClientConfig
 export const global = KOISHI_CONFIG
 export const store = reactive<Store>({})
 
-export const socket = ref<AbstractWebSocket>(null)
+export const socket = ref<Universal.WebSocket>(null)
 const listeners: Record<string, (data: any) => void> = {}
 const responseHooks: Record<string, [Function, Function]> = {}
 
@@ -56,7 +56,7 @@ receive('response', ({ id, value, error }) => {
   }
 })
 
-export function connect(callback: () => AbstractWebSocket) {
+export function connect(callback: () => Universal.WebSocket) {
   const value = callback()
 
   let sendTimer: number
@@ -93,7 +93,7 @@ export function connect(callback: () => AbstractWebSocket) {
 
   value.addEventListener('close', reconnect)
 
-  return new Promise<AbstractWebSocket.Event>((resolve, reject) => {
+  return new Promise<Universal.WebSocket.Event>((resolve, reject) => {
     value.addEventListener('open', (event) => {
       socket.value = markRaw(value)
       resolve(event)

@@ -1,12 +1,11 @@
-import type { AbstractWebSocket } from '@koishijs/plugin-console'
-import type { Context } from 'koishi'
+import type { Context, Universal } from 'koishi'
 import { Dict } from '@koishijs/client'
 import { initialize } from './utils'
 import loader from './loader'
 
-class StubWebSocket implements AbstractWebSocket {
+class StubWebSocket implements Universal.WebSocket {
   remote: StubWebSocket
-  listeners: Dict<Set<AbstractWebSocket.EventListener>> = {}
+  listeners: Dict<Set<Universal.WebSocket.EventListener>> = {}
 
   addEventListener(type: any, listener: (event: any) => void) {
     (this.listeners[type] ||= new Set()).add(listener)

@@ -1,6 +1,5 @@
-import { Awaitable, Context, Dict, Random, Service, valueMap } from 'koishi'
+import { Awaitable, Context, Dict, Random, Service, Universal, valueMap } from 'koishi'
 import { DataService } from './service'
-import { AbstractWebSocket } from './types'
 import { SchemaProvider } from './schema'
 import { PermissionProvider } from './permission'
 import { Client } from './client'
@@ -9,7 +8,6 @@ import { IncomingMessage } from 'http'
 
 export * from './client'
 export * from './service'
-export * from './types'
 
 type NestedServices = {
   [K in keyof Console.Services as `console.${K}`]: Console.Services[K]
@@ -69,7 +67,7 @@ export abstract class Console extends Service {
     this.addListener('ping', () => 'pong')
   }
 
-  protected accept(socket: AbstractWebSocket, request?: IncomingMessage) {
+  protected accept(socket: Universal.WebSocket, request?: IncomingMessage) {
     const client = new Client(this.ctx, socket, request)
     socket.addEventListener('close', () => {
       delete this.clients[client.id]

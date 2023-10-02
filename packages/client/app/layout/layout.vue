@@ -1,6 +1,6 @@
 <template>
   <div class="layout-container" :class="[container, styles]">
-    <aside class="layout-left" :class="left" v-if="$slots.left">
+    <aside class="layout-aside layout-left" :class="left" v-if="$slots.left">
       <slot name="left"></slot>
     </aside>
 
@@ -29,7 +29,7 @@
       </main>
     </div>
 
-    <aside class="layout-right" :class="right" v-if="$slots.right">
+    <aside class="layout-aside layout-right" :class="right" v-if="$slots.right">
       <slot name="right"></slot>
     </aside>
   </div>
@@ -82,16 +82,23 @@ const styles = computed(() => ({
   display: flex;
   flex-direction: row;
 
-  .layout-left {
+  .layout-aside {
     top: 0;
     bottom: 0;
     flex: 0 0 auto;
     position: relative;
     width: var(--aside-width);
-    border-right: var(--k-color-divider-dark) 1px solid;
     transition: var(--color-transition);
     background-color: var(--k-side-bg);
     box-sizing: border-box;
+  }
+
+  .layout-right {
+    border-left: var(--k-color-divider-dark) 1px solid;
+  }
+
+  .layout-left {
+    border-right: var(--k-color-divider-dark) 1px solid;
   }
 
   .main-container {

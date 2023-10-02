@@ -1,6 +1,5 @@
-import { coerce, Context, Logger, Random } from 'koishi'
+import { coerce, Context, Logger, Random, Universal } from 'koishi'
 import { DataService } from './service'
-import { AbstractWebSocket } from './types'
 import { IncomingMessage } from 'http'
 
 const logger = new Logger('console')
@@ -8,7 +7,7 @@ const logger = new Logger('console')
 export class Client {
   readonly id: string = Random.id()
 
-  constructor(readonly ctx: Context, public socket: AbstractWebSocket, public request?: IncomingMessage) {
+  constructor(readonly ctx: Context, public socket: Universal.WebSocket, public request?: IncomingMessage) {
     socket.addEventListener('message', this.receive)
     ctx.on('dispose', () => {
       socket.removeEventListener('message', this.receive)
@@ -20,7 +19,7 @@ export class Client {
     this.socket.send(JSON.stringify(payload))
   }
 
-  receive = async (data: AbstractWebSocket.MessageEvent) => {
+  receive = async (data: Universal.WebSocket.MessageEvent) => {
     const { type, args, id } = JSON.parse(data.data.toString())
     const listener = this.ctx.console.listeners[type]
     if (!listener) {
