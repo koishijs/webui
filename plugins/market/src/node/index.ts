@@ -108,6 +108,8 @@ export function apply(ctx: Context, config: Config) {
           return names
         }
 
+        // refresh dependencies
+        ctx.installer.refresh(true)
         const deps = await ctx.installer.getDeps()
         names = await getPackages(names)
         names = names.filter((name) => {
