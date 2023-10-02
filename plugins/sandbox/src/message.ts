@@ -21,7 +21,7 @@ export class SandboxMessenger extends Messenger<SandboxBot> {
   async flush() {
     if (!this.buffer.trim()) return
     const content = await h.transformAsync(this.buffer.trim(), this.rules)
-    const session = this.bot.session(this.session)
+    const session = this.bot.session(this.session.event)
     session.messageId = Random.id()
     for (const client of this.bot.clients) {
       client.send({
@@ -35,7 +35,7 @@ export class SandboxMessenger extends Messenger<SandboxBot> {
         },
       })
     }
-    this.results.push(session)
+    this.results.push(session.event.message)
     this.buffer = ''
   }
 

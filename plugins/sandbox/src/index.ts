@@ -1,4 +1,4 @@
-import { $, Context, Dict, Random, Schema, User } from 'koishi'
+import { $, Context, Dict, Random, Schema, Universal, User } from 'koishi'
 import { DataService } from '@koishijs/plugin-console'
 import { resolve } from 'path'
 import { SandboxBot } from './bot'
@@ -77,18 +77,15 @@ export function apply(ctx: Context, config: Config) {
 
   const bots: Dict<SandboxBot> = {}
 
-  const templateSession = (userId: string, channelId: string) => ({
-    userId,
-    channelId,
-    guildId: channelId === '@' + userId ? undefined : channelId,
-    subtype: channelId === '@' + userId ? 'private' : 'group',
-    isDirect: channelId === '@' + userId,
-    timestamp: Date.now(),
-    author: {
-      userId,
-      username: userId,
-    },
-  })
+  const createEvent = (userId: string, channelId: string) => {
+    const isDirect = channelId === '@' + userId
+    return {
+      user: { id: userId, name: userId },
+      channel: { id: channelId, type: isDirect ? Universal.Channel.Type.DIRECT : Universal.Channel.Type.TEXT },
+      guild: isDirect ? undefined : { id: channelId },
+      timestamp: Date.now(),
+    }
+  }
 
   ctx.console.addListener('sandbox/send-message', async function (platform, userId, channel, content, quote) {
     const bot = bots[platform] ||= new SandboxBot(ctx, {
@@ -101,16 +98,13 @@ export function apply(ctx: Context, config: Config) {
       type: 'sandbox/message',
       body: { id, content, user: userId, channel, platform, quote },
     })
-    const session = bot.session({
-      ...templateSession(userId, channel),
-      messageId: id,
-      type: 'message',
-      quote: quote && {
-        ...templateSession(quote.user, quote.channel),
-        content: quote.content,
-        messageId: quote.id,
-      },
-    })
+    const session = bot.session(createEvent(userId, channel))
+    session.type = 'message'
+    session.messageId = id
+    session.quote = quote && {
+      content: quote.content,
+      id: quote.id,
+    }
     session.content = content
     bot.dispatch(session)
   }, { authority: 4 })
@@ -121,11 +115,10 @@ export function apply(ctx: Context, config: Config) {
       selfId: 'koishi',
     })
     bot.clients.add(this)
-    bot.dispatch(bot.session({
-      ...templateSession(userId, channel),
-      messageId,
-      type: 'message-deleted',
-    }))
+    const session = bot.session(createEvent(userId, channel))
+    session.type = 'message-deleted'
+    session.messageId = messageId
+    bot.dispatch(session)
   }, { authority: 4 })
 
   ctx.console.addListener('sandbox/get-user', async function (platform, pid) {

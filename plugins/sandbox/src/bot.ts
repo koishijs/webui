@@ -1,15 +1,26 @@
 import { Client } from '@koishijs/plugin-console'
-import { Bot, Context, Fragment, SendOptions, Time } from 'koishi'
+import { Bot, Context, Time, Universal } from 'koishi'
 import { SandboxMessenger } from './message'
 
-export class SandboxBot extends Bot {
-  username = 'koishi'
+export namespace SandboxBot {
+  export interface Config {
+    selfId: string
+    platform: string
+  }
+}
+
+export class SandboxBot extends Bot<SandboxBot.Config> {
+  static MessageEncoder = SandboxMessenger
+
   hidden = true
   internal = {}
   clients = new Set<Client>()
 
-  constructor(ctx: Context, config: Bot.Config) {
+  constructor(ctx: Context, config: SandboxBot.Config) {
     super(ctx, config)
+    this.selfId = config.selfId
+    this.platform = config.platform
+    this.user.name = 'koishi'
   }
 
   async request<T = any>(method: string, data = {}) {
@@ -34,12 +45,8 @@ export class SandboxBot extends Bot {
     })
   }
 
-  async sendMessage(channelId: string, fragment: Fragment, guildId?: string, options?: SendOptions) {
-    return new SandboxMessenger(this, channelId, guildId, options).send(fragment)
-  }
-
-  async sendPrivateMessage(userId: string, fragment: Fragment, options?: SendOptions) {
-    return new SandboxMessenger(this, '@' + userId, undefined, options).send(fragment)
+  async createDirectChannel(userId: string): Promise<Universal.Channel> {
+    return { id: '@' + userId, type: Universal.Channel.Type.DIRECT }
   }
 
   async deleteMessage(channelId: string, messageId: string) {
