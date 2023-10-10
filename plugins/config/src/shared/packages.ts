@@ -1,5 +1,5 @@
 import { Context, Dict, EffectScope, Logger, Plugin, Schema } from 'koishi'
-import { DataService } from '@koishijs/plugin-console'
+import { DataService } from '@koishijs/console'
 import { PackageJson, SearchObject, SearchResult } from '@koishijs/registry'
 import { debounce } from 'throttle-debounce'
 import {} from '@koishijs/plugin-hmr'
@@ -10,7 +10,7 @@ declare module '@koishijs/loader' {
   }
 }
 
-declare module '@koishijs/plugin-console' {
+declare module '@koishijs/console' {
   interface Events {
     'config/request-runtime'(name: string): void
   }

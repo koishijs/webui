@@ -1,8 +1,8 @@
-import { DataService } from '@koishijs/plugin-console'
+import { DataService } from '@koishijs/console'
 import { Context, Logger, remove } from 'koishi'
 import { Loader } from '@koishijs/loader'
 
-declare module '@koishijs/plugin-console' {
+declare module '@koishijs/console' {
   interface Events {
     'manager/app-reload'(config: any): void
     'manager/teleport'(source: string, target: string, index: number): void

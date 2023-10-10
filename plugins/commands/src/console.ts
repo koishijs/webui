@@ -1,10 +1,10 @@
-import { DataService } from '@koishijs/plugin-console'
+import { DataService } from '@koishijs/console'
 import { debounce } from 'throttle-debounce'
 import { Command, Context } from 'koishi'
 import { resolve } from 'path'
 import { CommandManager, CommandState } from '.'
 
-declare module '@koishijs/plugin-console' {
+declare module '@koishijs/console' {
   namespace Console {
     interface Services {
       commands: CommandProvider

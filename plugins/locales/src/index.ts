@@ -1,12 +1,12 @@
 import { Context, Dict, I18n, Logger, Schema } from 'koishi'
-import { DataService } from '@koishijs/plugin-console'
+import { DataService } from '@koishijs/console'
 import { cp, mkdir, readdir, readFile, rm, stat, writeFile } from 'fs/promises'
 import { resolve } from 'path'
 import { debounce } from 'throttle-debounce'
 import { dump, load } from 'js-yaml'
 import { Stats } from 'fs'
 
-declare module '@koishijs/plugin-console' {
+declare module '@koishijs/console' {
   namespace Console {
     interface Services {
       locales: LocaleProvider

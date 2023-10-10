@@ -1,6 +1,6 @@
 import { Context, Schema } from 'koishi'
 import { resolve } from 'path'
-import {} from '@koishijs/plugin-console'
+import {} from '@koishijs/console'
 import MetaProvider from './meta'
 import StatisticsProvider from './stats'
 
@@ -13,7 +13,7 @@ declare module 'koishi' {
   }
 }
 
-declare module '@koishijs/plugin-console' {
+declare module '@koishijs/console' {
   namespace Console {
     interface Services {
       meta: MetaProvider

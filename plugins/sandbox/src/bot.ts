@@ -1,4 +1,4 @@
-import { Client } from '@koishijs/plugin-console'
+import { Client } from '@koishijs/console'
 import { Bot, Context, Time, Universal } from 'koishi'
 import { SandboxMessenger } from './message'
 

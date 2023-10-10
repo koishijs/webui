@@ -1,5 +1,5 @@
 import { $, Context, Dict, Random, Schema, Universal, User } from 'koishi'
-import { DataService } from '@koishijs/plugin-console'
+import { DataService } from '@koishijs/console'
 import { resolve } from 'path'
 import { SandboxBot } from './bot'
 import zhCN from './locales/zh-CN.yml'
@@ -10,7 +10,7 @@ declare module 'koishi' {
   }
 }
 
-declare module '@koishijs/plugin-console' {
+declare module '@koishijs/console' {
   namespace Console {
     interface Services {
       sandbox: SandboxService

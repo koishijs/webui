@@ -16,7 +16,7 @@ declare module 'koishi' {
   }
 }
 
-declare module '@koishijs/plugin-console' {
+declare module '@koishijs/console' {
   namespace Console {
     interface Services {
       dependencies: DependencyProvider

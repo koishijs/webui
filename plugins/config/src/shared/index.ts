@@ -2,7 +2,7 @@ import { PackageProvider } from './packages'
 import { ServiceProvider } from './services'
 import { ConfigWriter } from './writer'
 
-declare module '@koishijs/plugin-console' {
+declare module '@koishijs/console' {
   namespace Console {
     interface Services {
       packages: PackageProvider

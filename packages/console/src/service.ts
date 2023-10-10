@@ -27,8 +27,8 @@ export abstract class DataService<T = never> extends Service {
     })
   }
 
-  public get(forced?: boolean): Promise<T> {
-    return null
+  public async get(forced?: boolean): Promise<T> {
+    return null as T
   }
 
   constructor(protected ctx: Context, protected key: keyof Console.Services, public options: DataService.Options = {}) {

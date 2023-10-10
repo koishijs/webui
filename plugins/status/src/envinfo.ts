@@ -1,5 +1,5 @@
 import { Context, Dict, Schema, version } from 'koishi'
-import { DataService } from '@koishijs/plugin-console'
+import { DataService } from '@koishijs/console'
 import { helpers } from 'envinfo'
 import which from 'which-pm-runs'
 
@@ -28,7 +28,7 @@ class EnvInfoProvider extends DataService<Dict<Dict<string>>> {
     }
     const koishi = {
       Core: version,
-      Console: require('@koishijs/plugin-console/package.json').version,
+      Console: require('@koishijs/console/package.json').version,
     }
     if (process.env.KOISHI_AGENT) {
       const [name, version] = process.env.KOISHI_AGENT.split('/')

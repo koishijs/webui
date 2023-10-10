@@ -1,5 +1,5 @@
 import { Context, makeArray, noop, Schema, Time, WebSocketLayer } from 'koishi'
-import { Console, Entry } from '../shared'
+import { Console, Entry } from '@koishijs/console'
 import { ViteDevServer } from 'vite'
 import { extname, resolve } from 'path'
 import { createReadStream, existsSync, promises as fsp, Stats } from 'fs'
@@ -11,7 +11,7 @@ declare module 'koishi' {
   }
 }
 
-export * from '../shared'
+export * from '@koishijs/console'
 
 interface ClientConfig {
   devMode: boolean
@@ -132,7 +132,7 @@ class NodeConsole extends Console {
     } else {
       template = template.replace(/(href|src)="(?=\/)/g, (_, $1) => `${$1}="${uiPath}`)
     }
-    const headInjection = `<script>KOISHI_CONFIG = ${JSON.stringify(this.ctx.console.global)}</script>`
+    const headInjection = `<script>KOISHI_CONFIG = ${JSON.stringify(this.global)}</script>`
     return template.replace('</title>', '</title>' + headInjection)
   }
 

@@ -1,6 +1,6 @@
 import { Bot, Context, Dict, Schema, Time, Universal } from 'koishi'
 import { cpus, freemem, totalmem } from 'os'
-import { DataService } from '@koishijs/plugin-console'
+import { DataService } from '@koishijs/console'
 import { debounce } from 'throttle-debounce'
 import zhCN from './locales/zh-CN.yml'
 

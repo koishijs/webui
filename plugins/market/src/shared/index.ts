@@ -1,8 +1,8 @@
 import { Awaitable, Context, Dict, Logger, Time } from 'koishi'
-import { DataService } from '@koishijs/plugin-console'
+import { DataService } from '@koishijs/console'
 import { SearchObject, SearchResult } from '@koishijs/registry'
 
-declare module '@koishijs/plugin-console' {
+declare module '@koishijs/console' {
   interface Events {
     'market/refresh'(): void
   }

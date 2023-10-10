@@ -1,5 +1,5 @@
 import { Binding, Context, Logger, omit, Schema, Service, Time, User } from 'koishi'
-import { Client } from '@koishijs/plugin-console'
+import { Client } from '@koishijs/console'
 import { createHash } from 'crypto'
 import { resolve } from 'path'
 
@@ -18,7 +18,7 @@ declare module 'koishi' {
   }
 }
 
-declare module '@koishijs/plugin-console' {
+declare module '@koishijs/console' {
   interface Client {
     auth?: Auth
   }

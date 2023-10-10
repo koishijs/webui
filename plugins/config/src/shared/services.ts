@@ -1,4 +1,4 @@
-import { DataService } from '@koishijs/plugin-console'
+import { DataService } from '@koishijs/console'
 import { Context, Dict } from 'koishi'
 
 export class ServiceProvider extends DataService<Dict<number>> {

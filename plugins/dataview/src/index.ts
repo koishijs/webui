@@ -1,5 +1,5 @@
 import { clone, Context, Dict, Driver, Field, makeArray, Model, Schema } from 'koishi'
-import { DataService } from '@koishijs/plugin-console'
+import { DataService } from '@koishijs/console'
 import { resolve } from 'path'
 import { deserialize, serialize } from './utils'
 
@@ -11,7 +11,7 @@ export type DbEvents = {
   [M in Methods as `database/${M}`]: (...args: string[]) => Promise<string>
 }
 
-declare module '@koishijs/plugin-console' {
+declare module '@koishijs/console' {
   namespace Console {
     interface Services {
       database: DatabaseProvider

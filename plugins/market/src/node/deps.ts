@@ -1,5 +1,5 @@
 import { Context, Dict } from 'koishi'
-import { DataService } from '@koishijs/plugin-console'
+import { DataService } from '@koishijs/console'
 import { DependencyMetaKey, RemotePackage } from '@koishijs/registry'
 import { Dependency } from './installer'
 import { throttle } from 'throttle-debounce'

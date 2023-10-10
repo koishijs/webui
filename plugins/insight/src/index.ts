@@ -1,10 +1,10 @@
 import { camelize, capitalize, Context, EffectScope, ForkScope, Plugin, Schema, ScopeStatus } from 'koishi'
 import { debounce } from 'throttle-debounce'
-import { DataService } from '@koishijs/plugin-console'
+import { DataService } from '@koishijs/console'
 import { resolve } from 'path'
 import {} from '@koishijs/loader'
 
-declare module '@koishijs/plugin-console' {
+declare module '@koishijs/console' {
   namespace Console {
     interface Services {
       insight: Insight

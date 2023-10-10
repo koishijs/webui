@@ -1,5 +1,5 @@
 import { Context, Schema } from 'koishi'
-import { DataService } from '@koishijs/plugin-console'
+import { DataService } from '@koishijs/console'
 import { join, relative, resolve } from 'path'
 import { mkdir, readdir, readFile, rename, rm, writeFile } from 'fs/promises'
 import { FSWatcher, watch } from 'chokidar'
@@ -8,7 +8,7 @@ import FileType from 'file-type'
 import anymatch, { Tester } from 'anymatch'
 import zhCN from './locales/zh-CN.yml'
 
-declare module '@koishijs/plugin-console' {
+declare module '@koishijs/console' {
   namespace Console {
     interface Services {
       explorer: Explorer

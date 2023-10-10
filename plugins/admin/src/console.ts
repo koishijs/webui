@@ -1,9 +1,9 @@
 import { Context, Dict } from 'koishi'
-import { DataService } from '@koishijs/plugin-console'
+import { DataService } from '@koishijs/console'
 import { PermGroup, PermTrack } from '.'
 import { resolve } from 'path'
 
-declare module '@koishijs/plugin-console' {
+declare module '@koishijs/console' {
   namespace Console {
     interface Services {
       admin: AdminDataService

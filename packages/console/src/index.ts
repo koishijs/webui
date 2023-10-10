@@ -3,7 +3,6 @@ import { DataService } from './service'
 import { SchemaProvider } from './schema'
 import { PermissionProvider } from './permission'
 import { Client } from './client'
-import NodeConsole from '../node'
 import { IncomingMessage } from 'http'
 
 export * from './client'
@@ -15,7 +14,7 @@ type NestedServices = {
 
 declare module 'koishi' {
   interface Context extends NestedServices {
-    console: NodeConsole
+    console: Console
   }
 
   interface Events {

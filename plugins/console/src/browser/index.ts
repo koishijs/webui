@@ -1,8 +1,8 @@
 import { makeArray, Schema } from 'koishi'
-import { Console, Entry } from '../shared'
+import { Console, Entry } from '@koishijs/console'
 import {} from '@koishijs/loader'
 
-export * from '../shared'
+export * from '@koishijs/console'
 
 class BrowserConsole extends Console {
   start() {
