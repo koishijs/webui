@@ -15,6 +15,27 @@ declare module '@koishijs/plugin-console' {
 
 export const name = 'logger'
 
+class LogProvider extends DataService<Logger.Record[]> {
+  constructor(ctx: Context, private getWriter: () => FileWriter) {
+    super(ctx, 'logs', { authority: 4 })
+
+    ctx.console.addEntry(process.env.KOISHI_BASE ? [
+      process.env.KOISHI_BASE + '/dist/index.js',
+      process.env.KOISHI_BASE + '/dist/style.css',
+    ] : process.env.KOISHI_ENV === 'browser' ? [
+      // @ts-ignore
+      import.meta.url.replace(/\/src\/[^/]+$/, '/client/index.ts'),
+    ] : {
+      dev: resolve(__dirname, '../client/index.ts'),
+      prod: resolve(__dirname, '../dist'),
+    })
+  }
+
+  async get() {
+    return this.getWriter()?.read()
+  }
+}
+
 export interface Config {
   root?: string
   maxAge?: number
@@ -92,24 +113,5 @@ export async function apply(ctx: Context, config: Config) {
     target.record(record)
   }
 
-  ctx.plugin(class LogProvider extends DataService<Logger.Record[]> {
-    constructor(ctx: Context, private config: Config = {}) {
-      super(ctx, 'logs', { authority: 4 })
-
-      ctx.console.addEntry(process.env.KOISHI_BASE ? [
-        process.env.KOISHI_BASE + '/dist/index.js',
-        process.env.KOISHI_BASE + '/dist/style.css',
-      ] : process.env.KOISHI_ENV === 'browser' ? [
-        // @ts-ignore
-        import.meta.url.replace(/\/src\/[^/]+$/, '/client/index.ts'),
-      ] : {
-        dev: resolve(__dirname, '../client/index.ts'),
-        prod: resolve(__dirname, '../dist'),
-      })
-    }
-
-    async get() {
-      return writer?.read()
-    }
-  })
+  ctx.plugin(LogProvider, () => writer)
 }

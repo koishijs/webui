@@ -49,11 +49,11 @@ export function apply(ctx: Context, config: Config) {
     return ctx.logger('app').warn('@koishijs/plugin-market is only available for json/yaml config file')
   }
 
-  ctx.i18n.define('zh-CN', require('./locales/message.zh-CN'))
-
   ctx.plugin(Installer, config.registry)
 
   ctx.using(['installer'], (ctx) => {
+    ctx.i18n.define('zh-CN', require('./locales/message.zh-CN'))
+
     ctx.command('plugin.install <name>', { authority: 4 })
       .alias('.i')
       .action(async ({ session }, name) => {
