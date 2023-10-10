@@ -60,7 +60,7 @@
   "devDependencies": {
     "@koishijs/client": "^5.16.0",
     "@koishijs/plugin-console": "^5.16.0",
-    "@koishijs/plugin-locales": "^2.5.0",
+    "@koishijs/plugin-locales": "^2.5.1",
     "@koishijs/plugin-mock": "^2.6.0",
     "@types/throttle-debounce": "^2.1.0"
   },
