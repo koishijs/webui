@@ -34,6 +34,7 @@ const builtins = [
   '@satorijs/core',
   '@satorijs/elements',
   'cordis',
+  'dns',
   'fs',
   'js-yaml',
   'koishi',
@@ -44,6 +45,7 @@ const builtins = [
 ]
 
 const shims = {
+  dns: '@koishijs/dns',
   fs: '@koishijs/fs',
   path: '@koishijs/path',
 }

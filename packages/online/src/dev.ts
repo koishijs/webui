@@ -170,6 +170,8 @@ async function createVite() {
         } : {},
         '@koishijs/plugin-console': '@koishijs/plugin-console/src/browser/index.ts',
         'chokidar': '@koishijs/fs/src/index.ts',
+        'dns/promises': '@koishijs/dns/src/promises.ts',
+        'dns': '@koishijs/dns/src/index.ts',
         'fs/constants': '@koishijs/fs/src/constants.ts',
         'fs/promises': '@koishijs/fs/src/promises.ts',
         'fs': '@koishijs/fs/src/index.ts',

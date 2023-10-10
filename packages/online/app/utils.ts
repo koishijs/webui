@@ -86,6 +86,7 @@ export async function activate(id?: string, event?: Event, config?: any) {
     loader.config = {
       ...config,
       plugins: {
+        'browser': {},
         'config': {},
         'console': {},
         'database-sqlite': {},

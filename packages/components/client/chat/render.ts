@@ -21,6 +21,8 @@ const render: FunctionalComponent<segment[]> = (elements, ctx) => {
       return h('span', { class: 'spoiler' }, render(children, ctx))
     } else if (type === 'p' || type === 'message') {
       return h('p', render(children, ctx))
+    } else if (type === 'iframe') {
+      return h('iframe', { innerHTML: attrs.content })
     } else {
       return render(children, ctx)
     }
