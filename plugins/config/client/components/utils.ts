@@ -98,7 +98,6 @@ export const envMap = computed(() => {
 
 declare module '@koishijs/client' {
   interface ActionContext {
-    'config.current': Tree
     'config.tree': Tree
   }
 }

@@ -2,9 +2,10 @@
   <div
     class="k-menu-item"
     v-if="forced || !disabled"
-    :class="{ disabled }"
-    @click.prevent="action?.action(ctx.internal.createScope())"
+    :class="[type, { disabled }]"
+    @click.prevent="item?.action(ctx.internal.createScope())"
   >
+    <span v-if="icon" class="k-menu-icon"><k-icon :name="icon"/></span>
     {{ toValue(label) }}
   </div>
 </template>
@@ -20,17 +21,19 @@ const ctx = useContext()
 
 const forced = computed(() => props.id.startsWith('!'))
 
-const action = computed(() => {
+const item = computed(() => {
   let id = props.id.replace(/^!/, '')
   if (id.startsWith('.')) id = props.prefix + id
   return ctx.internal.actions[id]
 })
 
 const disabled = computed(() => {
-  if (!action.value) return true
-  if (!action.value.disabled) return false
-  return toValue(action.value.disabled)
+  if (!item.value) return true
+  if (!item.value.disabled) return false
+  return toValue(item.value.disabled)
 })
+
+const icon = computed(() => toValue(props.icon))
 
 function toValue<T>(getter: MaybeGetter<T>): T {
   if (typeof getter !== 'function') return getter

@@ -38,31 +38,30 @@ export default (ctx: Context) => {
     component: Settings,
   })
 
-  ctx.menu('config', [{
-    id: 'config.toggle',
-    type: ({ config }) => config.current?.disabled ? '' : type.value,
-    icon: ({ config }) => config.current?.disabled ? 'play' : 'stop',
-    label: ({ config }) => config.current?.disabled ? '启用插件' : '停用插件',
-  }, {
-    id: 'config.save',
-    icon: ({ config }) => config.current?.disabled ? 'save' : 'check',
-    label: ({ config }) => config.current?.disabled ? '保存配置' : '重载配置',
-  }, {
-    id: 'config.remove',
-    type: 'danger',
-    icon: 'trash-can',
-    label: ({ config }) => config.current?.children ? '移除分组' : '移除插件',
-  }, {
-    id: 'config.add-plugin',
-    icon: 'add-plugin',
-    label: '添加插件',
-  }, {
-    id: 'config.add-group',
-    icon: 'add-group',
-    label: '添加分组',
-  }])
-
   ctx.menu('config.tree', [{
+    id: '.toggle',
+    type: ({ config }) => config.tree?.disabled ? '' : type.value,
+    icon: ({ config }) => config.tree?.disabled ? 'play' : 'stop',
+    label: ({ config }) => (config.tree?.disabled ? '启用' : '停用')
+      + (config.tree?.name === 'group' ? '分组' : '插件'),
+  }, {
+    id: '.save',
+    icon: ({ config }) => config.tree?.disabled ? 'save' : 'check',
+    label: ({ config }) => config.tree?.disabled ? '保存配置' : '重载配置',
+  }, {
+    id: '@separator',
+  }, {
+    id: '.rename',
+    icon: 'edit',
+    label: '重命名',
+  }, {
+    id: '.remove',
+    type: 'danger',
+    icon: 'delete',
+    label: ({ config }) => config.tree?.children ? '移除分组' : '移除插件',
+  }, {
+    id: '@separator',
+  }, {
     id: '.add-plugin',
     icon: 'add-plugin',
     label: '添加插件',
@@ -70,15 +69,5 @@ export default (ctx: Context) => {
     id: '.add-group',
     icon: 'add-group',
     label: '添加分组',
-  }, {
-    id: '@separator',
-  }, {
-    id: '.rename',
-    label: '重命名',
-  }, {
-    id: '.remove',
-    type: 'danger',
-    icon: 'delete',
-    label: ({ config }) => config.tree?.children ? '移除分组' : '移除插件',
   }])
 }

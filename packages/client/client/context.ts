@@ -111,15 +111,15 @@ class Internal {
   settings = reactive<Dict<SettingOptions[]>>({})
   activeMenus = reactive<{ id: string; styles: Partial<CSSStyleDeclaration> }[]>([])
 
-  createScope(prefix = '') {
+  createScope(scope = this.scope, prefix = '') {
     return new Proxy({}, {
       get: (target, key) => {
         if (typeof key === 'symbol') return target[key]
         key = prefix + key
-        if (key in this.scope) return toValue(this.scope[key])
+        if (key in scope) return toValue(scope[key])
         const _prefix = key + '.'
-        if (Object.keys(this.scope).some(k => k.startsWith(_prefix))) {
-          return this.createScope(key + '.')
+        if (Object.keys(scope).some(k => k.startsWith(_prefix))) {
+          return this.createScope(scope, key + '.')
         }
       },
     })

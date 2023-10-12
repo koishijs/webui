@@ -13,10 +13,13 @@
         <template #right>
           <slot name="menu">
             <template v-if="typeof menu === 'string'">
-              <layout-menu-item
-                v-for="item in ctx.internal.menus[menu]"
-                v-bind="{ ...item, ...ctx.internal.actions[item.id] }"
-              ></layout-menu-item>
+              <template v-for="item in ctx.internal.menus[menu]" :key="menu">
+                <layout-menu-item
+                  v-if="item.id !== '@separator'"
+                  v-bind="{ ...item, ...ctx.internal.actions[item.id.startsWith('.') ? menu + item.id : item.id] }"
+                  :menu-key="menu" :menu-data="menuData"
+                />
+              </template>
             </template>
             <template v-else>
               <layout-menu-item v-for="item in menu" v-bind="item" />
@@ -49,6 +52,7 @@ defineProps<{
   right?: string
   container?: string
   menu?: string | LegacyMenuItem[]
+  menuData?: any
 }>()
 
 const slots = useSlots()
