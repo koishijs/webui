@@ -3,7 +3,7 @@
     <template #header>
       <!-- root -->
       <template v-if="!current.path">
-        {{ current.label }}
+        {{ current.name }}
       </template>
 
       <!-- group -->
@@ -13,7 +13,7 @@
 
       <!-- plugin -->
       <template v-else>
-        <template v-if="!current.label">
+        <template v-if="!current.name">
           <el-select v-model="current.target" filterable placeholder="插件选择">
             <el-option
               v-for="name in Object.values(store.packages).slice(1).map(value => value.shortname).sort()"
@@ -22,7 +22,7 @@
           </el-select>
         </template>
         <template v-else>
-          <span class="label">{{ current.label }}</span>
+          <span class="label">{{ current.name }}</span>
           <k-alias :current="current"></k-alias>
         </template>
       </template>
@@ -45,11 +45,26 @@
       @closed="remove = null"
     >
       <template v-if="remove">
-        确定要移除{{ remove.children ? `分组 ${remove.alias}` : `插件 ${remove.label}` }} 吗？此操作不可撤销！
+        确定要移除{{ remove.children ? `分组 ${remove.alias}` : `插件 ${remove.name}` }} 吗？此操作不可撤销！
       </template>
       <template #footer>
         <el-button @click="showRemove = false">取消</el-button>
         <el-button type="danger" @click="(showRemove = false, removeItem(remove.path))">确定</el-button>
+      </template>
+    </el-dialog>
+
+    <el-dialog
+      v-model="showRename"
+      title="重命名"
+      destroy-on-close
+      @closed="rename = null"
+    >
+      <template v-if="rename">
+        <el-input v-model="input" @keydown.enter.stop.prevent="renameItem(rename, input)"/>
+      </template>
+      <template #footer>
+        <el-button @click="showRename = false">取消</el-button>
+        <el-button type="danger" @click="renameItem(rename, input)">确定</el-button>
       </template>
     </el-dialog>
   </k-layout>
@@ -82,12 +97,19 @@ const path = computed<string>({
 })
 
 const config = ref()
+const input = ref('')
 
 const remove = ref<Tree>()
 const showRemove = ref(false)
+const rename = ref<Tree>()
+const showRename = ref(false)
 
 watch(remove, (value) => {
   if (value) showRemove.value = true
+})
+
+watch(rename, (value) => {
+  if (value) showRename.value = true
 })
 
 watch(() => plugins.value.paths[path.value], (value) => {
@@ -114,6 +136,14 @@ ctx.action('config.add-group', {
   action: () => addItem(current.value.path, 'group', 'group'),
 })
 
+ctx.action('config.tree.rename', {
+  disabled: ({ config }) => !config.tree.path,
+  action: ({ config }) => {
+    input.value = config.tree.label
+    rename.value = config.tree
+  },
+})
+
 ctx.action('config.tree.remove', {
   disabled: ({ config }) => !config.tree.path,
   action: ({ config }) => remove.value = config.tree,
@@ -130,7 +160,7 @@ ctx.action('config.tree.add-group', {
 })
 
 ctx.action('config.save', {
-  disabled: () => !name.value && current.value.label !== 'group' && !!current.value.path,
+  disabled: () => !name.value && current.value.name !== 'group' && !!current.value.path,
   action: async () => {
     const { disabled, path } = current.value
     if (!path) return send('manager/app-reload', config.value)
@@ -144,12 +174,12 @@ ctx.action('config.save', {
 })
 
 ctx.action('config.toggle', {
-  disabled: () => !name.value && current.value.label !== 'group' || hasCoreDeps(current.value),
+  disabled: () => !name.value && current.value.name !== 'group' || hasCoreDeps(current.value),
   action: async () => {
-    const { disabled, label } = current.value
+    const { disabled, name: name } = current.value
     try {
       await execute(disabled ? 'reload' : 'unload')
-      message.success((label === 'group' ? '分组' : '插件') + (disabled ? '已启用。' : '已停用。'))
+      message.success((name === 'group' ? '分组' : '插件') + (disabled ? '已启用。' : '已停用。'))
     } catch (error) {
       message.error('操作失败，请检查日志！')
     }
@@ -163,6 +193,12 @@ async function execute(event: 'unload' | 'reload') {
     segments[segments.length - 1] = current.value.target
     router.replace('/plugins/' + segments.join('/'))
   }
+}
+
+function renameItem(tree: Tree, name: string) {
+  showRename.value = false
+  tree.label = name
+  send('manager/meta', tree.path, { $label: name || null })
 }
 
 </script>

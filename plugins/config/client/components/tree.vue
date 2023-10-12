@@ -24,7 +24,14 @@
       @node-collapse="handleCollapse"
       #="{ node }">
       <div class="item">
-        <div class="label">{{ node.label === 'group' ? '分组：' + node.data.alias : node.label || '待添加' }}</div>
+        <div class="label">
+          <template v-if="node.data.name === 'group'">
+            {{ '分组：' + node.data.alias }}
+          </template>
+          <template v-else>
+            {{ node.label || node.data.name || '待添加' }}
+          </template>
+        </div>
         <div class="right"></div>
       </div>
     </el-tree>
@@ -51,7 +58,7 @@ const model = computed({
 })
 
 function filterNode(value: string, data: Tree) {
-  return data.label.toLowerCase().includes(keyword.value.toLowerCase())
+  return data.name.toLowerCase().includes(keyword.value.toLowerCase())
 }
 
 interface Node {

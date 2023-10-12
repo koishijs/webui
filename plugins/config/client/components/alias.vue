@@ -31,7 +31,7 @@ watch(() => props.current.alias, (value) => {
 
 const invalid = computed(() => {
   // group alias cannot be empty
-  if (!alias.value && props.current.label !== 'group') return false
+  if (!alias.value && props.current.name !== 'group') return false
 
   // check invalid characters
   if (alias.value.match(/[:~+#?@&*]/)) return true

@@ -35,7 +35,7 @@ export const coreDeps = [
 ]
 
 export function hasCoreDeps(tree: Tree) {
-  if (coreDeps.includes('@koishijs/plugin-' + tree.label)) return true
+  if (coreDeps.includes('@koishijs/plugin-' + tree.name)) return true
   if (tree.children) return tree.children.some(hasCoreDeps)
 }
 
@@ -106,8 +106,9 @@ declare module '@koishijs/client' {
 export interface Tree {
   id: string
   alias: string
-  label: string
+  name: string
   path: string
+  label?: string
   config?: any
   target?: string
   parent?: Tree
@@ -119,8 +120,8 @@ export const current = ref<Tree>()
 
 export const name = computed(() => {
   if (!current.value) return
-  const { label, target } = current.value
-  const shortname = target || label
+  const { name, target } = current.value
+  const shortname = target || name
   if (shortname.includes('/')) {
     const [left, right] = shortname.split('/')
     return [`${left}/koishi-plugin-${right}`].find(name => name in store.packages)
@@ -154,8 +155,9 @@ function getTree(parent: Tree, plugins: any): Tree[] {
       node.disabled = true
       key = key.slice(1)
     }
-    node.label = key.split(':', 1)[0]
-    node.alias = key.slice(node.label.length + 1)
+    node.name = key.split(':', 1)[0]
+    node.alias = key.slice(node.name.length + 1)
+    node.label = config?.$label
     node.id = node.path = parent.path + (parent.path ? '/' : '') + key
     if (key.startsWith('group:')) {
       node.children = getTree(node, config)
@@ -167,7 +169,7 @@ function getTree(parent: Tree, plugins: any): Tree[] {
 
 export const plugins = computed(() => {
   const root: Tree = {
-    label: '全局设置',
+    name: '全局设置',
     id: '',
     path: '',
     alias: '',

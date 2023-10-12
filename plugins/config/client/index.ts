@@ -64,15 +64,21 @@ export default (ctx: Context) => {
 
   ctx.menu('config.tree', [{
     id: '.add-plugin',
+    icon: 'add-plugin',
     label: '添加插件',
   }, {
     id: '.add-group',
+    icon: 'add-group',
     label: '添加分组',
   }, {
     id: '@separator',
   }, {
+    id: '.rename',
+    label: '重命名',
+  }, {
     id: '.remove',
     type: 'danger',
+    icon: 'delete',
     label: ({ config }) => config.tree?.children ? '移除分组' : '移除插件',
   }])
 }
