@@ -124,12 +124,13 @@ class AuthService extends Service {
   async start() {
     const { enabled, username, password } = this.config.admin
     if (!enabled) return
-    logger.debug('creating admin account')
+    logger.info('creating admin account')
     await this.ctx.database.upsert('user', [{
       id: 0,
       name: username,
       authority: 5,
       password: toHash(password),
+      createdAt: new Date(),
     }])
   }
 

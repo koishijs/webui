@@ -14,10 +14,10 @@
     <template v-else>
       <h1 v-if="store.user"><span>平台账户绑定</span></h1>
       <h1 v-else>
-        <k-tab :data="['平台账户登录', '用户密码登录']" v-model="shared.authType"></k-tab>
+        <k-tab :data="['用户密码登录', '平台账户登录']" v-model="shared.authType"></k-tab>
       </h1>
 
-      <template v-if="store.user || shared.authType === 0">
+      <template v-if="store.user || shared.authType === 1">
         <el-input placeholder="平台名" v-model="shared.platform" #prefix>
           <k-icon name="at"></k-icon>
         </el-input>
