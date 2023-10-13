@@ -49,6 +49,7 @@
 <script lang="ts" setup>
 
 import { clone, message, send, Schema, ChatInput, VirtualList, deepEqual, useContext } from '@koishijs/client'
+import segment from '@satorijs/element'
 import { computed, ref, watch } from 'vue'
 import { Message } from '@koishijs/plugin-sandbox'
 import { api, channel, config, words, panelTypes } from './utils'
@@ -114,14 +115,14 @@ function onKeydown(event: KeyboardEvent) {
     let index = list.length - offset.value
     if (list[index - 1]) {
       offset.value++
-      input.value = list[index - 1].content
+      input.value = segment.unescape(list[index - 1].content)
     }
   } else if (event.key === 'ArrowDown') {
     const list = config.value.messages[channel.value].filter(item => item.user === config.value.user)
     let index = list.length - offset.value
     if (list[index + 1]) {
       offset.value--
-      input.value = list[index + 1].content
+      input.value = segment.unescape(list[index + 1].content)
     } else if (offset.value) {
       offset.value = 0
       input.value = ''
