@@ -11,13 +11,18 @@ interface Override extends Partial<CommandState> {
 const Override: Schema<Override> = Schema.object({
   name: Schema.string(),
   create: Schema.boolean(),
-  aliases: Schema.any(),
+  aliases: Schema.union([
+    Schema.dict(null),
+    Schema.transform(Schema.array(String), (aliases) => {
+      return Object.fromEntries(aliases.map((name) => [name, {}]))
+    }),
+  ]),
   options: Schema.dict(null),
   config: Schema.any(),
 })
 
 export interface CommandState {
-  aliases: string[]
+  aliases: Dict<Command.Alias>
   config: Command.Config
   options: Dict<Argv.OptionDeclaration>
 }
@@ -35,7 +40,7 @@ interface Config extends Override {}
 
 const Config: Schema<string | Config, Config> = Schema.union([
   Override,
-  Schema.transform(String, (name) => ({ name, aliases: [], config: {}, options: {} })),
+  Schema.transform(String, (name) => ({ name, aliases: {}, config: {}, options: {} })),
 ])
 
 export class CommandManager {
@@ -86,9 +91,9 @@ export class CommandManager {
         command.config = initial.config
         command._aliases = initial.aliases
         Object.assign(command._options, initial.options)
-        for (const alias of override.aliases) {
-          if (initial.aliases.includes(alias)) continue
-          ctx.$commander._commands.delete(alias)
+        for (const name in override.aliases) {
+          if (initial.aliases[name]) continue
+          ctx.$commander._commands.delete(name)
         }
         this._teleport(command, parent)
       }
@@ -140,19 +145,19 @@ export class CommandManager {
     }
   }
 
-  alias(command: Command, aliases: string[], write = false) {
+  alias(command: Command, aliases: Dict<Command.Alias>, write = false) {
     const { initial, override } = this.snapshots[command.name]
     command._aliases = override.aliases = aliases
-    for (const alias of aliases) {
-      this.ctx.$commander._commands.set(alias, command)
+    for (const name in aliases) {
+      this.ctx.$commander.set(name, command)
     }
 
     if (write) {
       this.config[command.name] ||= {}
       this.config[command.name].name = `${command.parent?.name || ''}/${command.displayName}`
-      this.config[command.name].aliases = aliases.filter((name) => {
-        return command.displayName !== name && !initial.aliases.includes(name)
-      })
+      this.config[command.name].aliases = Object.fromEntries(Object.entries(aliases).filter(([name]) => {
+        return command.displayName !== name && !initial.aliases[name]
+      }))
       this.write(command)
     }
   }
@@ -215,12 +220,11 @@ export class CommandManager {
     }
 
     // extend aliases and display name
-    const aliases = [...new Set([
-      ...name ? [name] : [],
+    this.alias(target, {
+      [name]: {},
       ...target._aliases,
-      ...override.aliases || [],
-    ])]
-    this.alias(target, aliases)
+      ...override.aliases,
+    })
   }
 
   write(...commands: Command[]) {

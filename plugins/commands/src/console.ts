@@ -51,30 +51,30 @@ export default class CommandProvider extends DataService<CommandData[]> {
       prod: resolve(__dirname, '../dist'),
     })
 
-    ctx.console.addListener('command/update', (name: string, config: CommandState) => {
+    ctx.console.addListener('command/update', (name, config) => {
       const { command } = manager.ensure(name)
       manager.update(command, config, true)
       this.refresh()
     })
 
-    ctx.console.addListener('command/teleport', (name: string, parent: string) => {
+    ctx.console.addListener('command/teleport', (name, parent) => {
       const { command } = manager.ensure(name)
       manager.teleport(command, parent, true)
       this.refresh()
     })
 
-    ctx.console.addListener('command/aliases', (name: string, aliases: string[]) => {
+    ctx.console.addListener('command/aliases', (name, aliases) => {
       const { command } = manager.ensure(name)
-      manager.alias(command, aliases, true)
+      manager.alias(command, Object.fromEntries(aliases.map(name => [name, {}])), true)
       this.refresh()
     })
 
-    ctx.console.addListener('command/create', (name: string) => {
+    ctx.console.addListener('command/create', (name) => {
       manager.create(name)
       this.refresh()
     })
 
-    ctx.console.addListener('command/remove', (name: string) => {
+    ctx.console.addListener('command/remove', (name) => {
       manager.remove(name)
       this.refresh()
     })
