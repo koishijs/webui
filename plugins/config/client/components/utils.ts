@@ -117,10 +117,8 @@ export interface Tree {
 
 export const current = ref<Tree>()
 
-export const name = computed(() => {
-  if (!current.value) return
-  const { name, target } = current.value
-  const shortname = target || name
+export function getFullName(shortname: string) {
+  if (!shortname) return shortname
   if (shortname.includes('/')) {
     const [left, right] = shortname.split('/')
     return [`${left}/koishi-plugin-${right}`].find(name => name in store.packages)
@@ -129,6 +127,12 @@ export const name = computed(() => {
     `@koishijs/plugin-${shortname}`,
     `koishi-plugin-${shortname}`,
   ].find(name => name in store.packages)
+}
+
+export const name = computed(() => {
+  if (!current.value) return
+  const { name, target } = current.value
+  return getFullName(target || name)
 })
 
 export const type = computed(() => {
@@ -168,10 +172,11 @@ function getTree(parent: Tree, plugins: any): Tree[] {
 
 export const plugins = computed(() => {
   const root: Tree = {
-    name: '全局设置',
+    name: '',
     id: '',
     path: '',
     alias: '',
+    label: '全局设置',
     config: store.config,
     children: [],
   }

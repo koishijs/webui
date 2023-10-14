@@ -74,8 +74,8 @@
 
 import { computed, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { clone, message, send, store, useContext } from '@koishijs/client'
-import { Tree, addItem, hasCoreDeps, current, plugins, removeItem, select, splitPath } from './utils'
+import { clone, message, messageBox, send, store, useContext, Schema } from '@koishijs/client'
+import { Tree, getFullName, addItem, hasCoreDeps, current, plugins, removeItem, select, splitPath } from './utils'
 import GlobalSettings from './global.vue'
 import GroupSettings from './group.vue'
 import TreeView from './tree.vue'
@@ -134,7 +134,7 @@ ctx.action('config.tree.add-group', {
 ctx.action('config.tree.rename', {
   disabled: ({ config }) => !config.tree.path,
   action: ({ config }) => {
-    input.value = config.tree.label
+    input.value = config.tree.label || (config.tree.name === 'group' ? config.tree.alias : config.tree.name)
     rename.value = config.tree
   },
 })
@@ -154,9 +154,22 @@ ctx.action('config.tree.add-group', {
   action: ({ config }) => addItem(config.tree.path, 'group', 'group'),
 })
 
+function checkConfig(name: string) {
+  let schema = store.packages[getFullName(name)]?.runtime.schema
+  if (!schema) return true
+  try {
+    (new Schema(schema))(config.value)
+    return true
+  } catch {
+    message.error('当前配置项不满足约束，请检查配置！')
+    return false
+  }
+}
+
 ctx.action('config.tree.save', {
   action: async ({ config: { tree } }) => {
     const { disabled, path } = tree
+    if (!disabled && !checkConfig(tree.name)) return
     if (!path) return send('manager/app-reload', config.value)
     try {
       await execute(tree, disabled ? 'unload' : 'reload')
@@ -171,6 +184,7 @@ ctx.action('config.tree.toggle', {
   disabled: ({ config }) => !config.tree.path || hasCoreDeps(config.tree),
   action: async ({ config: { tree } }) => {
     const { disabled, name } = tree
+    if (disabled && !checkConfig(tree.name)) return
     try {
       await execute(tree, disabled ? 'reload' : 'unload')
       message.success((name === 'group' ? '分组' : '插件') + (disabled ? '已启用。' : '已停用。'))

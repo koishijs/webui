@@ -4,7 +4,7 @@
 
 <script lang="ts" setup>
 
-import { send, store, useContext } from '@koishijs/client'
+import { store } from '@koishijs/client'
 import { computed } from 'vue'
 import { Tree } from './utils'
 

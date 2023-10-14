@@ -26,7 +26,7 @@
       <div class="item">
         <div class="label">
           <template v-if="node.data.name === 'group'">
-            {{ '分组：' + node.data.alias }}
+            {{ '分组：' + (node.label || node.data.alias) }}
           </template>
           <template v-else>
             {{ node.label || node.data.name || '待添加' }}

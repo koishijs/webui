@@ -30,10 +30,6 @@
   background-color: var(--bg1);
 }
 
-.k-icon {
-  transition: color 0.3s ease, background-color 0.3s ease;
-}
-
 .el-dropdown-menu {
   background-color: var(--el-color-white);
 }
@@ -89,6 +85,10 @@ html .el-switch {
   --el-button-hover-bg-color: var(--k-button-hover-bg);
   --el-button-hover-border-color: var(--k-color-active);
   transition: var(--color-transition);
+}
+
+.el-button--primary {
+  --el-button-hover-text-color: var(--k-color-active);
 }
 
 .el-switch__core .el-switch__action,
