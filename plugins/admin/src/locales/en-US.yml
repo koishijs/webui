@@ -15,16 +15,16 @@ admin:
   user-option: Target User Specification
   user-not-found: The specified user was not found.
   user-unchanged: User data has not been changed.
-  user-updated: 用户数据已修改。
+  user-updated: User data has been changed.
   channel-option: Target Channel Specification
   channel-not-found: The specified channel was not found.
   channel-unchanged: Channel data has not been changed.
   channel-updated: Channel data has been changed.
-  not-in-group: 当前不在群组上下文中，请使用 -c 参数指定目标频道。
-  user-expected: 请指定目标用户。
-  channel-expected: 请指定目标频道。
-  invalid-assignee-platform: 受理人应与目标频道属于同一平台。
-  current-locale: 当前语言偏好为：{0}。
-  no-locale: 未设置语言偏好。
+  not-in-group: Currently not in a group context, please use '-c' option to set target channel.
+  user-expected: Please specific target user.
+  channel-expected: Please specific target channel.
+  invalid-assignee-platform: The assignee should be on the same platform as target channel.
+  current-locale: 'Current preferred language: {0}'
+  no-locale: No preferred language set.
   options:
-    remove: 重置设置
+    remove: Reset settings
