@@ -1,5 +1,6 @@
 import { Argv, Command, Context, Dict, remove, Schema } from 'koishi'
-import CommandProvider from './console'
+import ConsoleExtension from './console'
+import CommandExtension from './command'
 
 export * from './console'
 
@@ -99,7 +100,8 @@ export class CommandManager {
       }
     }, true)
 
-    ctx.plugin(CommandProvider, this)
+    ctx.plugin(ConsoleExtension, this)
+    ctx.plugin(CommandExtension, this)
   }
 
   ensure(name: string, create?: boolean) {
@@ -147,6 +149,10 @@ export class CommandManager {
 
   alias(command: Command, aliases: Dict<Command.Alias>, write = false) {
     const { initial, override } = this.snapshots[command.name]
+    for (const name in command._aliases) {
+      if (aliases[name]) continue
+      this.ctx.$commander._commands.delete(name)
+    }
     command._aliases = override.aliases = aliases
     for (const name in aliases) {
       this.ctx.$commander.set(name, command)
@@ -237,7 +243,7 @@ export class CommandManager {
       if (override.options && !Object.keys(override.options).length) {
         delete override.options
       }
-      if (override.aliases && !override.aliases.length) {
+      if (override.aliases && !Object.keys(override.aliases).length) {
         delete override.aliases
       }
       if (override.name) {

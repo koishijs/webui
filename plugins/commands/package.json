@@ -1,7 +1,7 @@
 {
   "name": "@koishijs/plugin-commands",
   "description": "Override Command Config for Koishi",
-  "version": "3.3.4",
+  "version": "3.4.0",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
   "files": [
