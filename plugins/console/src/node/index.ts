@@ -27,6 +27,7 @@ interface HeartbeatConfig {
 }
 
 class NodeConsole extends Console {
+  static using = ['router']
   private vite: ViteDevServer
   public root: string
   public global = {} as ClientConfig
