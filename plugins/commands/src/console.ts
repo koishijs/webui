@@ -1,6 +1,6 @@
 import { DataService } from '@koishijs/console'
 import { debounce } from 'throttle-debounce'
-import { Command, Context } from 'koishi'
+import { Command, Context, Dict } from 'koishi'
 import { resolve } from 'path'
 import { CommandManager, CommandState } from '.'
 
@@ -16,7 +16,7 @@ declare module '@koishijs/console' {
     'command/remove'(name: string): void
     'command/update'(name: string, config: Pick<CommandState, 'config' | 'options'>): void
     'command/teleport'(name: string, parent: string): void
-    'command/aliases'(name: string, aliases: string[]): void
+    'command/aliases'(name: string, aliases: Dict<Command.Alias>): void
   }
 }
 
@@ -65,7 +65,7 @@ export default class CommandProvider extends DataService<CommandData[]> {
 
     ctx.console.addListener('command/aliases', (name, aliases) => {
       const { command } = manager.ensure(name)
-      manager.alias(command, Object.fromEntries(aliases.map(name => [name, {}])), true)
+      manager.alias(command, aliases, true)
       this.refresh()
     })
 

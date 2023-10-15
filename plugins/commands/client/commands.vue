@@ -56,15 +56,15 @@
       <div class="aliases">
         <h2 class="k-schema-header">名称设置</h2>
         <ul>
-          <li v-for="(item, index) in current.aliases" :key="item">
-            <span>{{ item }}</span>
+          <li v-for="([name, item], index) in Object.entries(current.aliases)" :key="name">
+            <span>{{ name }}</span>
             <span class="button"
               v-if="index > 0"
-              @click.stop.prevent="setDefault(index)"
+              @click.stop.prevent="setDefault(name)"
             >设置为默认</span>
             <span class="button"
-              v-if="!command.initial.aliases.includes(item)"
-              @click.stop.prevent="deleteAlias(index)"
+              v-if="!command.initial.aliases[name]"
+              @click.stop.prevent="deleteAlias(name)"
             >删除别名</span>
           </li>
           <li>
@@ -133,7 +133,7 @@ const aliases = computed(() => {
 })
 
 const invalid = computed(() => {
-  return !alias.value || aliases.value.includes(alias.value)
+  return !alias.value || aliases.value[alias.value]
 })
 
 const dialog = computed({
@@ -209,8 +209,8 @@ function handleDrop(source: Node, target: Node, position: 'before' | 'after' | '
 async function onEnter() {
   if (title.value === '添加指令') {
     await send('command/create', alias.value)
-  } else if (alias.value && !current.value.aliases.includes(alias.value)) {
-    current.value.aliases.push(alias.value)
+  } else if (invalid.value) {
+    current.value.aliases[alias.value] = {}
     await send('command/aliases', command.value.name, current.value.aliases)
   }
   alias.value = ''
@@ -225,15 +225,17 @@ function removeCommand() {
   send('command/remove', command.value.name)
 }
 
-function setDefault(index: number) {
-  const item = current.value.aliases[index]
-  current.value.aliases.splice(index, 1)
-  current.value.aliases.unshift(item)
+function setDefault(name: string) {
+  const item = current.value.aliases[name]
+  current.value.aliases = {
+    [name]: item,
+    ...current.value.aliases,
+  }
   send('command/aliases', command.value.name, current.value.aliases)
 }
 
-function deleteAlias(index: number) {
-  current.value.aliases.splice(index, 1)
+function deleteAlias(name: string) {
+  delete current.value.aliases[name]
   send('command/aliases', command.value.name, current.value.aliases)
 }
 

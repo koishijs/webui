@@ -221,7 +221,7 @@ export class CommandManager {
 
     // extend aliases and display name
     this.alias(target, {
-      [name]: {},
+      ...name ? { [name]: {} } : {},
       ...target._aliases,
       ...override.aliases,
     })
