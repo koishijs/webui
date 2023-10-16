@@ -209,7 +209,7 @@ function handleDrop(source: Node, target: Node, position: 'before' | 'after' | '
 async function onEnter() {
   if (title.value === '添加指令') {
     await send('command/create', alias.value)
-  } else if (invalid.value) {
+  } else if (!invalid.value) {
     current.value.aliases[alias.value] = {}
     await send('command/aliases', command.value.name, current.value.aliases)
   }

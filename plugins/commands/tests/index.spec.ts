@@ -2,10 +2,7 @@ import { App } from 'koishi'
 import mock from '@koishijs/plugin-mock'
 import * as help from '@koishijs/plugin-help'
 import commands from '@koishijs/plugin-commands'
-import { expect, use } from 'chai'
-import shape from 'chai-shape'
-
-use(shape)
+import { expect } from 'chai'
 
 const app = new App()
 
@@ -47,7 +44,7 @@ describe('@koishijs/plugin-commands', () => {
     })
 
     it('dispose plugin', async () => {
-      app.plugin(commands, {
+      const fork = app.plugin(commands, {
         bar: 'baz',
       })
 
@@ -59,7 +56,7 @@ describe('@koishijs/plugin-commands', () => {
       await client.shouldReply('bar', 'test')
       await client.shouldReply('baz', 'test')
 
-      app.dispose(commands)
+      fork.dispose()
 
       await client.shouldReply('bar', 'test')
       await client.shouldNotReply('baz')
@@ -70,17 +67,18 @@ describe('@koishijs/plugin-commands', () => {
 
       const cmd = app.command('bar').action(() => 'test')
       await client.shouldNotReply('baz')
-      await client.shouldReply('command bar -a baz', '已修改指令配置。')
+      await client.shouldReply('command bar -a baz', '已更新指令配置。')
       await client.shouldReply('baz', 'test')
-      expect(fork.config).to.have.shape({
+      expect(fork.config).to.deep.equal({
         bar: {
           aliases: {
             baz: {},
           },
+          options: {},
         },
       })
 
-      await client.shouldReply('command bar -A baz', '已修改指令配置。')
+      await client.shouldReply('command bar -A baz', '已更新指令配置。')
       await client.shouldNotReply('baz')
     })
   })
@@ -91,7 +89,7 @@ describe('@koishijs/plugin-commands', () => {
       const bar = app.command('foo/bar').action(() => 'test')
       expect(foo.children).to.have.length(1)
 
-      app.plugin(commands, {
+      const fork = app.plugin(commands, {
         'bar': '/baz',
       })
 
@@ -99,13 +97,10 @@ describe('@koishijs/plugin-commands', () => {
       await client.shouldReply('bar', 'test')
       await client.shouldReply('baz', 'test')
 
-      app.dispose(commands)
+      fork.dispose()
       await client.shouldReply('bar', 'test')
       await client.shouldNotReply('baz')
       expect(foo.children).to.have.length(1)
-
-      foo.dispose()
-      bar.dispose()
     })
 
     it('root to leaf', async () => {
@@ -113,7 +108,7 @@ describe('@koishijs/plugin-commands', () => {
       const bar = app.command('bar').action(() => 'test')
       expect(foo.children).to.have.length(0)
 
-      app.plugin(commands, {
+      const fork = app.plugin(commands, {
         bar: 'foo/baz',
       })
 
@@ -121,13 +116,10 @@ describe('@koishijs/plugin-commands', () => {
       await client.shouldReply('bar', 'test')
       await client.shouldReply('baz', 'test')
 
-      app.dispose(commands)
+      fork.dispose()
       await client.shouldReply('bar', 'test')
       await client.shouldNotReply('baz')
       expect(foo.children).to.have.length(0)
-
-      foo.dispose()
-      bar.dispose()
     })
 
     it('leaf to leaf', async () => {
@@ -135,7 +127,7 @@ describe('@koishijs/plugin-commands', () => {
       const foo = app.command('bar/foo').action(() => 'test')
       expect(bar.children).to.have.length(1)
 
-      app.plugin(commands, {
+      const fork = app.plugin(commands, {
         foo: 'baz/foo',
       })
 
@@ -148,13 +140,10 @@ describe('@koishijs/plugin-commands', () => {
       baz.dispose()
       expect(bar.children).to.have.length(1)
 
-      app.dispose(commands)
+      fork.dispose(commands)
       await client.shouldReply('foo', 'test')
       expect(bar.children).to.have.length(1)
       expect(baz.children).to.have.length(0)
-
-      foo.dispose()
-      bar.dispose()
     })
   })
 
@@ -165,7 +154,7 @@ describe('@koishijs/plugin-commands', () => {
       expect(foo.children).to.have.length(1)
 
       const fork = app.plugin(commands)
-      await client.shouldReply('command bar -P -a baz', '已修改指令配置。')
+      await client.shouldReply('command bar -P -a baz', '已更新指令配置。')
       expect(foo.children).to.have.length(0)
       await client.shouldReply('bar', 'test')
       await client.shouldReply('baz', 'test')
@@ -182,7 +171,7 @@ describe('@koishijs/plugin-commands', () => {
       expect(foo.children).to.have.length(0)
 
       const fork = app.plugin(commands)
-      await client.shouldReply('command bar -p foo -a baz', '已修改指令配置。')
+      await client.shouldReply('command bar -p foo -a baz', '已更新指令配置。')
       expect(foo.children).to.have.length(1)
       await client.shouldReply('bar', 'test')
       await client.shouldReply('baz', 'test')
@@ -199,7 +188,7 @@ describe('@koishijs/plugin-commands', () => {
       expect(bar.children).to.have.length(1)
 
       const fork = app.plugin(commands)
-      await client.shouldReply('command foo -p baz', '已修改指令配置。')
+      await client.shouldReply('command foo -p baz', '已更新指令配置。')
       expect(bar.children).to.have.length(1)
       const baz = app.command('baz')
       expect(bar.children).to.have.length(0)
@@ -213,17 +202,14 @@ describe('@koishijs/plugin-commands', () => {
       await client.shouldReply('foo', 'test')
       expect(bar.children).to.have.length(1)
       expect(baz.children).to.have.length(0)
-
-      foo.dispose()
-      bar.dispose()
     })
   })
 
   describe('create', () => {
-    it('basic usage', async () => {
-      const bar = app.command('bar').action(() => 'test')
+    it('from config', async () => {
+      app.command('bar').action(() => 'test')
 
-      app.plugin(commands, {
+      const fork = app.plugin(commands, {
         foo: { create: true },
         bar: 'foo/baz',
       })
@@ -233,12 +219,29 @@ describe('@koishijs/plugin-commands', () => {
       await client.shouldReply('foo', /baz/)
       await client.shouldReply('baz', 'test')
 
-      app.dispose(commands)
+      fork.dispose()
       await client.shouldNotReply('foo')
       await client.shouldNotReply('baz')
       await client.shouldReply('bar', 'test')
+    })
 
-      bar.dispose()
+    it('from command', async () => {
+      app.command('bar').action(() => 'test')
+
+      const fork = app.plugin(commands)
+      await client.shouldReply('command bar -p foo -n baz', '已更新指令配置。')
+      await client.shouldReply('command foo', '指令不存在。')
+      await client.shouldReply('command foo -c', '已创建指令。')
+
+      const foo = app.command('foo')
+      expect(foo.children).to.have.length(1)
+      await client.shouldReply('foo', /baz/)
+      await client.shouldReply('baz', 'test')
+
+      fork.dispose()
+      await client.shouldNotReply('foo')
+      await client.shouldNotReply('baz')
+      await client.shouldReply('bar', 'test')
     })
   })
 })

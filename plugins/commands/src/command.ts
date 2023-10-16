@@ -1,37 +1,54 @@
 import { Context } from 'koishi'
 import CommandManager from '.'
+import zhCN from './locales/zh-CN.yml'
+
+export function remove<O, K extends keyof O>(object: O, key: K) {
+  const value = object[key]
+  delete object[key]
+  return value
+}
 
 export default function (ctx: Context, manager: CommandManager) {
-  ctx.command('command <name>', '修改指令配置', { authority: 4 })
-    // .option('option', '-o [key]  修改指令选项')
-    // .option('create', '-c  创建指令')
-    // .option('force', '-f  当指令不存在时延迟修改')
-    .option('alias', '-a [name]  添加指令别名')
-    .option('unalias', '-A [name]  移除指令别名')
-    .option('name', '-n [name]  修改指令显示名')
-    .option('parent', '-p [name]  修改指令父级')
-    .option('parent', '-P  移除指令父级', { value: '' })
-    .action(async ({ options }, name) => {
+  ctx.i18n.define('zh-CN', zhCN)
+
+  ctx.command('command <name>', { authority: 4, checkArgCount: true })
+    // .option('option', '-o [key]')
+    .option('create', '-c')
+    .option('alias', '-a [name]')
+    .option('unalias', '-A [name]')
+    .option('name', '-n [name]')
+    .option('parent', '-p [name]')
+    .option('parent', '-P, --no-parent', { value: '' })
+    .action(async ({ options, session }, name) => {
+      if (options.create) manager.create(name)
+      if (!ctx.$commander.resolve(name)) {
+        return session.text('.not-found')
+      }
+
       const snapshot = manager.ensure(name)
       const command = snapshot.command
-      if (options.alias) {
+      if (typeof options.alias === 'string') {
         const item = command._aliases[options.name] || {}
         const aliases = { ...command._aliases, [options.alias]: item }
         manager.alias(command, aliases, true)
+        delete options.alias
       }
-      if (options.unalias) {
+      if (typeof options.unalias === 'string') {
         const aliases = { ...command._aliases }
         delete aliases[options.unalias]
         manager.alias(command, aliases, true)
+        delete options.unalias
       }
-      if (options.name) {
+      if (typeof options.name === 'string') {
         const item = command._aliases[options.name] || {}
         const aliases = { [options.name]: item, ...command._aliases }
         manager.alias(command, aliases, true)
+        delete options.name
       }
       if (typeof options.parent === 'string') {
         manager.teleport(command, options.parent, true)
+        delete options.parent
       }
-      return '已修改指令配置。'
+      return options.create ? session.text('.created') : session.text('.updated')
     })
 }
