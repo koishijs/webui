@@ -1,0 +1,14 @@
+commands.command:
+  description: 指令管理
+  options:
+    create: 创建指令
+    alias: 添加指令别名
+    unalias: 删除指令别名
+    name: 修改显示名称
+    parent: 设置父指令
+    parent.: 移除父指令
+    option: 修改选项
+  messages:
+    not-found: 指令不存在。
+    created: 已创建指令。
+    updated: 已更新指令配置。
