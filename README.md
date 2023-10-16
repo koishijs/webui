@@ -20,7 +20,6 @@
 - @koishijs/plugin-commands
 - @koishijs/plugin-config
 - @koishijs/plugin-console
-- @koishijs/plugin-dataview
 - @koishijs/plugin-explorer
 - @koishijs/plugin-insight
 - @koishijs/plugin-locales

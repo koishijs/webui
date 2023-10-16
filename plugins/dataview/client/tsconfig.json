@@ -1,9 +1,0 @@
-{
-  "extends": "../../../tsconfig.client",
-  "compilerOptions": {
-    "rootDir": ".",
-  },
-  "include": [
-    ".",
-  ],
-}
