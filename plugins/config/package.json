@@ -1,7 +1,7 @@
 {
   "name": "@koishijs/plugin-config",
   "description": "Manage your bots and plugins with console",
-  "version": "2.4.1",
+  "version": "2.4.2",
   "main": "lib/node/index.js",
   "types": "lib/index.d.ts",
   "exports": {
@@ -55,16 +55,16 @@
     }
   },
   "peerDependencies": {
-    "@koishijs/plugin-console": "^5.16.1",
-    "koishi": "^4.15.1"
+    "@koishijs/plugin-console": "^5.17.0",
+    "koishi": "^4.15.2"
   },
   "devDependencies": {
-    "@koishijs/client": "^5.16.1",
+    "@koishijs/client": "^5.17.0",
     "@koishijs/plugin-hmr": "^1.2.2",
     "@types/throttle-debounce": "^2.1.0"
   },
   "dependencies": {
-    "@koishijs/console": "^5.16.1",
+    "@koishijs/console": "^5.17.0",
     "@koishijs/registry": "^6.0.4",
     "throttle-debounce": "^3.0.1"
   }
