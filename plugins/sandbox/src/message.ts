@@ -1,9 +1,9 @@
-import { Dict, h, Messenger, Random } from 'koishi'
+import { Context, Dict, h, MessageEncoder, Random } from 'koishi'
 import FileType from 'file-type'
 import {} from '@koishijs/assets'
 import { SandboxBot } from './bot'
 
-export class SandboxMessenger extends Messenger<SandboxBot> {
+export class SandboxMessenger<C extends Context = Context> extends MessageEncoder<C, SandboxBot<C>> {
   private buffer = ''
 
   private rules: Dict<h.Transformer> = Object.fromEntries(['image', 'audio', 'video', 'file'].map((type) => {

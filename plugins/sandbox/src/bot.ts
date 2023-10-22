@@ -9,14 +9,14 @@ export namespace SandboxBot {
   }
 }
 
-export class SandboxBot extends Bot<SandboxBot.Config> {
+export class SandboxBot<C extends Context = Context> extends Bot<C, SandboxBot.Config> {
   static MessageEncoder = SandboxMessenger
 
   hidden = true
   internal = {}
   clients = new Set<Client>()
 
-  constructor(ctx: Context, config: SandboxBot.Config) {
+  constructor(ctx: C, config: SandboxBot.Config) {
     super(ctx, config)
     this.selfId = config.selfId
     this.platform = config.platform

@@ -42,8 +42,10 @@ export class Client {
   }
 
   refresh() {
-    DataService.keys.forEach(async (key) => {
-      const service = this.ctx[`console.${key}`] as DataService
+    Object.keys(this.ctx.root[Context.internal]).forEach(async (name) => {
+      if (!name.startsWith('console.')) return
+      const key = name.slice(8)
+      const service = this.ctx[name] as DataService
       if (!service) return
       if (await this.ctx.serial('console/intercept', this, service.options)) {
         return this.send({ type: 'data', body: { key, value: null } })

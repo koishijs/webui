@@ -10,22 +10,7 @@ export namespace DataService {
 
 export abstract class DataService<T = never> extends Service {
   static filter = false
-  static keys = new Set<string>()
   static using = ['console']
-
-  static define(name: keyof Console.Services) {
-    this.keys.add(name)
-    if (Object.prototype.hasOwnProperty.call(Console.prototype, name)) return
-    const key = `console.${name}`
-    Object.defineProperty(Console.prototype, name, {
-      get(this: Console) {
-        return this.caller[key]
-      },
-      set(this: Console, value) {
-        this.caller[key] = value
-      },
-    })
-  }
 
   public async get(forced?: boolean): Promise<T> {
     return null as T
@@ -33,7 +18,6 @@ export abstract class DataService<T = never> extends Service {
 
   constructor(protected ctx: Context, protected key: keyof Console.Services, public options: DataService.Options = {}) {
     super(ctx, `console.${key}`, options.immediate)
-    DataService.define(key)
   }
 
   start() {

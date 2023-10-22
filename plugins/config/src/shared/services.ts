@@ -9,10 +9,7 @@ export class ServiceProvider extends DataService<Dict<number>> {
 
   async get() {
     const services = {} as Dict<number>
-    const descriptors = Object.getOwnPropertyDescriptors(Context.prototype)
-    for (const key in descriptors) {
-      const desc = descriptors[key]
-      if ('value' in desc) continue
+    for (const key in this.ctx.root[Context.internal]) {
       const ctx: Context = this.ctx[key]?.[Context.source]
       if (ctx?.scope.uid) {
         const name = key.replace(/^__/, '').replace(/__$/, '')
