@@ -59,9 +59,12 @@ class NodeConsole extends Console {
     if (this.config.devMode) await this.createVite()
     this.serveAssets()
 
+    const target = this.ctx.router.selfUrl + this.config.uiPath
     if (this.config.open && !this.ctx.envData.clientCount && !process.env.KOISHI_AGENT) {
-      open(this.ctx.router.selfUrl + this.config.uiPath)
+      open(target)
     }
+
+    this.logger.success('webui is available at %c', target)
   }
 
   private getFiles(entry: string | string[] | Entry) {
