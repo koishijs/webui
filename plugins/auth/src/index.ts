@@ -1,4 +1,4 @@
-import { Binding, Context, Logger, omit, Schema, Service, Time, User } from 'koishi'
+import { Binding, Context, omit, Schema, Service, Time, User } from 'koishi'
 import { Client } from '@koishijs/console'
 import { createHash } from 'crypto'
 import { resolve } from 'path'
@@ -63,8 +63,6 @@ interface AuthData extends Auth {
 
 type LoginType = 'platform' | 'password' | 'token'
 
-const logger = new Logger('auth')
-
 const letters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
 
 export function randomId(length = 40) {
@@ -83,7 +81,7 @@ function toHash(password: string) {
 }
 
 class AuthService extends Service {
-  static using = ['console', 'database'] as const
+  static inject = ['console', 'database'] as const
 
   constructor(ctx: Context, private config: AuthService.Config) {
     super(ctx, 'auth')
@@ -124,7 +122,7 @@ class AuthService extends Service {
   async start() {
     const { enabled, username, password } = this.config.admin
     if (!enabled) return
-    logger.info('creating admin account')
+    this.logger.info('creating admin account')
     await this.ctx.database.upsert('user', [{
       id: 0,
       name: username,

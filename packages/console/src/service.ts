@@ -10,7 +10,7 @@ export namespace DataService {
 
 export abstract class DataService<T = never> extends Service {
   static filter = false
-  static using = ['console']
+  static inject = ['console']
 
   public async get(forced?: boolean): Promise<T> {
     return null as T
@@ -25,14 +25,14 @@ export abstract class DataService<T = never> extends Service {
   }
 
   async refresh(forced = true) {
-    this.ctx.console?.broadcast('data', {
+    this.ctx.get('console')?.broadcast('data', {
       key: this.key,
       value: await this.get(forced),
     }, this.options)
   }
 
   patch(value: T) {
-    this.ctx.console?.broadcast('patch', {
+    this.ctx.get('console')?.broadcast('patch', {
       key: this.key,
       value,
     }, this.options)

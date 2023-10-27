@@ -27,6 +27,8 @@ interface HeartbeatConfig {
 }
 
 class NodeConsole extends Console {
+  static inject = ['router']
+
   private vite: ViteDevServer
   public root: string
   public global = {} as ClientConfig
@@ -47,7 +49,8 @@ class NodeConsole extends Console {
     })
 
     ctx.on('console/connection', () => {
-      ctx.envData.clientCount = this.layer.clients.size
+      if (!ctx.loader) return
+      ctx.loader.envData.clientCount = this.layer.clients.size
     })
 
     this.root = config.root || (config.devMode
@@ -60,11 +63,11 @@ class NodeConsole extends Console {
     this.serveAssets()
 
     const target = this.ctx.router.selfUrl + this.config.uiPath
-    if (this.config.open && !this.ctx.envData.clientCount && !process.env.KOISHI_AGENT) {
+    if (this.config.open && !this.ctx.loader?.envData.clientCount && !process.env.KOISHI_AGENT) {
       open(target)
     }
 
-    this.logger.success('webui is available at %c', target)
+    this.logger.info('WebUI is available at %c', target)
   }
 
   private getFiles(entry: string | string[] | Entry) {

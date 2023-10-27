@@ -21,7 +21,7 @@ export class Client {
 
   receive = async (data: Universal.WebSocket.MessageEvent) => {
     const { type, args, id } = JSON.parse(data.data.toString())
-    const listener = this.ctx.console.listeners[type]
+    const listener = this.ctx.get('console').listeners[type]
     if (!listener) {
       logger.info('unknown message:', type, ...args)
       return this.send({ type: 'response', body: { id, error: 'not implemented' } })
@@ -45,7 +45,7 @@ export class Client {
     Object.keys(this.ctx.root[Context.internal]).forEach(async (name) => {
       if (!name.startsWith('console.')) return
       const key = name.slice(8)
-      const service = this.ctx[name] as DataService
+      const service = this.ctx.get(name) as DataService
       if (!service) return
       if (await this.ctx.serial('console/intercept', this, service.options)) {
         return this.send({ type: 'data', body: { key, value: null } })

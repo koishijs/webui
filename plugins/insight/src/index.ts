@@ -65,11 +65,9 @@ class Insight extends DataService<Insight.Payload> {
     const edges: Insight.Link[] = []
 
     const services = {} as Record<number, string[]>
-    const descriptors = Object.getOwnPropertyDescriptors(Context.prototype)
-    for (const key in descriptors) {
-      const desc = descriptors[key]
-      if ('value' in desc || key.includes('.') || key.includes(':')) continue
-      const ctx: Context = this.ctx[key]?.[Context.source]
+    for (const [key, { type }] of Object.entries(this.ctx.root[Context.internal])) {
+      if (type !== 'service') continue
+      const ctx: Context = this.ctx.get(key)?.[Context.source]
       if (ctx?.scope.uid) {
         (services[ctx.scope.uid] ||= []).push(key)
       }

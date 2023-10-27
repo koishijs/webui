@@ -16,17 +16,17 @@ class MetaProvider extends DataService<MetaProvider.Payload> {
   constructor(ctx: Context, private config: MetaProvider.Config) {
     super(ctx, 'meta')
 
-    this.extend(async () => ctx.assets?.stats())
+    this.extend(async () => ctx.get('assets')?.stats())
 
     this.extend(async () => {
-      const activeUsers = await ctx.database?.eval('user', row => $.count(row.id), {
+      const activeUsers = await ctx.get('database')?.eval('user', row => $.count(row.id), {
         lastCall: { $gt: new Date(new Date().getTime() - Time.day) },
       })
       return { activeUsers }
     })
 
     this.extend(async () => {
-      const activeGuilds = await ctx.database?.eval('channel', row => $.count(row.id), {
+      const activeGuilds = await ctx.get('database')?.eval('channel', row => $.count(row.id), {
         assignee: { $ne: null },
       })
       return { activeGuilds }

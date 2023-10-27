@@ -8,7 +8,7 @@ export { MarketProvider }
 
 export const filter = false
 export const name = 'market'
-export const using = ['console'] as const
+export const inject = ['console'] as const
 
 export interface Config {}
 

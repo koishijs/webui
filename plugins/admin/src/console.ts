@@ -25,7 +25,7 @@ declare module '@koishijs/console' {
 }
 
 class AdminDataService extends DataService<AdminDataService.Data> {
-  static using = ['admin', 'console']
+  static inject = ['admin', 'console']
 
   constructor(ctx: Context) {
     super(ctx, 'admin')

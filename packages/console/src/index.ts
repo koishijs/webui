@@ -40,14 +40,14 @@ export interface EntryData {
 }
 
 export class EntryProvider extends DataService<Dict<EntryData>> {
-  static using = []
+  static inject = []
 
   constructor(ctx: Context) {
     super(ctx, 'entry', { immediate: true })
   }
 
   async get() {
-    return this.ctx.console.get()
+    return this.ctx.get('console').get()
   }
 }
 
@@ -67,7 +67,7 @@ export abstract class Console extends Service {
     return new Proxy(this, {
       get(target, key) {
         if (typeof key === 'symbol' || key in target) return Reflect.get(target, key)
-        if (ctx[Context.internal][`console.${key}`]) return Reflect.get(ctx, `console.${key}`)
+        if (ctx[Context.internal][`console.${key}`]) return ctx.get(`console.${key}`)
         return Reflect.get(target, key)
       },
       set(target, key, value) {

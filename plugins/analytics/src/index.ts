@@ -32,7 +32,7 @@ export * from './stats'
 
 export const filter = false
 export const name = 'status'
-export const using = ['console'] as const
+export const inject = ['console'] as const
 
 export interface Config extends MetaProvider.Config, StatisticsProvider.Config {}
 

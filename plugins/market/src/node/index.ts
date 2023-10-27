@@ -45,7 +45,7 @@ export const Config: Schema<Config> = Schema.object({
 })
 
 export function apply(ctx: Context, config: Config) {
-  if (!ctx.loader.writable) {
+  if (!ctx.loader?.writable) {
     return ctx.logger('app').warn('@koishijs/plugin-market is only available for json/yaml config file')
   }
 
@@ -70,12 +70,12 @@ export function apply(ctx: Context, config: Config) {
         if (!result) return session.text('.not-found')
 
         // set restart message
-        ctx.envData.message = {
+        ctx.loader.envData.message = {
           ...pick(session, ['sid', 'channelId', 'guildId', 'isDirect']),
           content: session.text('.success'),
         }
         await ctx.installer.install(result)
-        ctx.envData.message = null
+        ctx.loader.envData.message = null
         return session.text('.success')
       })
 

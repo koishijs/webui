@@ -37,14 +37,14 @@ export interface Message {
 
 export const filter = false
 export const name = 'sandbox'
-export const using = ['console']
+export const inject = ['console']
 
 export interface Config {}
 
 export const Config: Schema<Config> = Schema.object({})
 
 class SandboxService extends DataService<Dict<number>> {
-  static using = ['database']
+  static inject = ['database']
 
   constructor(ctx: Context) {
     super(ctx, 'sandbox')
