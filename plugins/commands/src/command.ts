@@ -16,7 +16,7 @@ export default function (ctx: Context, manager: CommandManager) {
     .option('create', '-c')
     .option('alias', '-a [name]')
     .option('unalias', '-A [name]')
-    .option('name', '-n [name]')
+    .option('rename', '-n [name]')
     .option('parent', '-p [name]')
     .option('parent', '-P, --no-parent', { value: '' })
     .action(async ({ options, session }, name) => {
@@ -28,7 +28,7 @@ export default function (ctx: Context, manager: CommandManager) {
       const snapshot = manager.ensure(name)
       const command = snapshot.command
       if (typeof options.alias === 'string') {
-        const item = command._aliases[options.name] || {}
+        const item = command._aliases[options.rename] || {}
         const aliases = { ...command._aliases, [options.alias]: item }
         manager.alias(command, aliases, true)
         delete options.alias
@@ -39,11 +39,11 @@ export default function (ctx: Context, manager: CommandManager) {
         manager.alias(command, aliases, true)
         delete options.unalias
       }
-      if (typeof options.name === 'string') {
-        const item = command._aliases[options.name] || {}
-        const aliases = { [options.name]: item, ...command._aliases }
+      if (typeof options.rename === 'string') {
+        const item = command._aliases[options.rename] || {}
+        const aliases = { [options.rename]: item, ...command._aliases }
         manager.alias(command, aliases, true)
-        delete options.name
+        delete options.rename
       }
       if (typeof options.parent === 'string') {
         manager.teleport(command, options.parent, true)
