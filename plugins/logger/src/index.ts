@@ -83,16 +83,24 @@ export async function apply(ctx: Context, config: Config) {
   const date = new Date().toISOString().slice(0, 10)
   createFile(date, files[date] ??= 1)
 
+  const loader = ctx.get('loader')
   const target: Logger.Target = {
     colors: 3,
     record: (record: Logger.Record) => {
+      record.meta ||= {}
+      const scope = record.meta[Context.current]?.scope
+      if (loader && scope) {
+        record.meta.paths = loader.paths(scope)
+      }
       const date = new Date(record.timestamp).toISOString().slice(0, 10)
       if (writer.date !== date) {
         writer.close()
         createFile(date, files[date] = 1)
       }
       writer.write(record)
-      ctx.console?.logs?.patch([record])
+      // Be very careful about accessing service in this callback,
+      // because undeclared service access may cause infinite loop.
+      ctx.get('console.logs')?.patch([record])
       if (writer.size >= config.maxSize) {
         writer.close()
         createFile(date, ++files[date])

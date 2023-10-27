@@ -55,7 +55,8 @@
   "devDependencies": {
     "@koishijs/client": "^5.17.0",
     "ansi_up": "^5.2.1",
-    "koishi": "^4.15.2"
+    "koishi": "^4.15.3",
+    "reggol": "^1.6.3"
   },
   "dependencies": {
     "@koishijs/console": "^5.17.0"

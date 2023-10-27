@@ -6,6 +6,8 @@ import Home from './activity/home.vue'
 import Moon from './activity/moon.vue'
 import Settings from './activity/settings.vue'
 import Sun from './activity/sun.vue'
+import ArrowLeft from './svg/arrow-left.vue'
+import ArrowRight from './svg/arrow-right.vue'
 import BoxOpen from './svg/box-open.vue'
 import CheckFull from './svg/check-full.vue'
 import ChevronDown from './svg/chevron-down.vue'
@@ -51,6 +53,8 @@ register('activity:sun', Sun)
 
 register('arrow-up', components.IconArrowUp)
 register('arrow-down', components.IconArrowDown)
+register('arrow-left', ArrowLeft)
+register('arrow-right', ArrowRight)
 register('box-open', BoxOpen)
 register('check-full', CheckFull)
 register('chevron-down', ChevronDown)

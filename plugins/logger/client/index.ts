@@ -1,6 +1,7 @@
 import { Context } from '@koishijs/client'
 import {} from '@koishijs/plugin-logger'
 import Logs from './index.vue'
+import Settings from './settings.vue'
 import './index.scss'
 import './icons'
 
@@ -13,5 +14,11 @@ export default (ctx: Context) => {
     authority: 4,
     fields: ['logs'],
     component: Logs,
+  })
+
+  ctx.slot({
+    type: 'plugin-details',
+    component: Settings,
+    order: -800,
   })
 }
