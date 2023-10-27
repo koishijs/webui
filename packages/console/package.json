@@ -1,13 +1,13 @@
 {
   "name": "@koishijs/console",
   "description": "Console Service for Koishi",
-  "version": "5.17.0",
+  "version": "5.17.1",
   "main": "lib/index.js",
   "module": "lib/index.mjs",
   "types": "lib/index.d.ts",
   "files": [
     "lib",
-    "dist"
+    "src"
   ],
   "author": "Shigma <shigma10826@gmail.com>",
   "license": "MIT",
@@ -31,6 +31,6 @@
     "service"
   ],
   "peerDependencies": {
-    "koishi": "^4.15.2"
+    "koishi": "^4.15.3"
   }
 }

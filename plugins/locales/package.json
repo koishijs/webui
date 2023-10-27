@@ -6,7 +6,8 @@
   "typings": "lib/index.d.ts",
   "files": [
     "lib",
-    "dist"
+    "dist",
+    "src"
   ],
   "author": "Shigma <shigma10826@gmail.com>",
   "license": "AGPL-3.0",
@@ -44,8 +45,8 @@
     }
   },
   "peerDependencies": {
-    "@koishijs/plugin-console": "^5.17.0",
-    "koishi": "^4.15.2"
+    "@koishijs/plugin-console": "^5.17.1",
+    "koishi": "^4.15.3"
   },
   "peerDependenciesMeta": {
     "@koishijs/plugin-console": {
@@ -53,14 +54,14 @@
     }
   },
   "devDependencies": {
-    "@koishijs/client": "^5.17.0",
-    "@koishijs/plugin-console": "^5.17.0",
-    "@koishijs/plugin-mock": "^2.6.1",
+    "@koishijs/client": "^5.17.1",
+    "@koishijs/plugin-console": "^5.17.1",
+    "@koishijs/plugin-mock": "^2.6.3",
     "@types/js-yaml": "^4.0.5",
     "@types/throttle-debounce": "^2.1.0"
   },
   "dependencies": {
-    "@koishijs/console": "^5.17.0",
+    "@koishijs/console": "^5.17.1",
     "js-yaml": "^4.1.0",
     "throttle-debounce": "^3.0.1"
   }

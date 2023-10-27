@@ -52,7 +52,7 @@ const customTag = Symbol('custom-send')
 Session.prototype.send[customTag] = send
 
 class StatisticsProvider extends DataService<StatisticsProvider.Payload> {
-  static inject = [['database', 'console']
+  static inject = ['database', 'console']
 
   lastUpdate = new Date()
   updateHour = this.lastUpdate.getHours()

@@ -1,7 +1,7 @@
 {
   "name": "@koishijs/plugin-console",
   "description": "Web User Interface for Koishi",
-  "version": "5.17.0",
+  "version": "5.17.1",
   "main": "lib/node/index.js",
   "types": "lib/index.d.ts",
   "exports": {
@@ -16,7 +16,8 @@
   "files": [
     "app",
     "lib",
-    "dist"
+    "dist",
+    "src"
   ],
   "author": "Shigma <shigma10826@gmail.com>",
   "license": "AGPL-3.0",
@@ -51,18 +52,18 @@
     }
   },
   "peerDependencies": {
-    "koishi": "^4.15.2"
+    "koishi": "^4.15.3"
   },
   "devDependencies": {
-    "@koishijs/client": "^5.17.0",
-    "@koishijs/loader": "^4.2.2",
+    "@koishijs/client": "^5.17.1",
+    "@koishijs/loader": "^4.2.3",
     "@maikolib/vite-plugin-yaml": "^1.0.1",
     "@types/uuid": "^8.3.4",
     "@vitejs/plugin-vue": "^4.2.3",
     "vite": "^4.4.4"
   },
   "dependencies": {
-    "@koishijs/console": "^5.17.0",
+    "@koishijs/console": "^5.17.1",
     "open": "^8.4.2",
     "uuid": "^8.3.2",
     "ws": "^8.14.2"

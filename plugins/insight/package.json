@@ -1,7 +1,7 @@
 {
   "name": "@koishijs/plugin-insight",
   "description": "Show plugin dependency graph for Koishi",
-  "version": "3.4.1",
+  "version": "3.4.2",
   "main": "lib/index.cjs",
   "types": "lib/index.d.ts",
   "exports": {
@@ -14,7 +14,8 @@
   },
   "files": [
     "lib",
-    "dist"
+    "dist",
+    "src"
   ],
   "author": "Shigma <shigma10826@gmail.com>",
   "license": "AGPL-3.0",
@@ -52,17 +53,17 @@
     }
   },
   "peerDependencies": {
-    "@koishijs/plugin-console": "^5.17.0",
-    "koishi": "^4.15.2"
+    "@koishijs/plugin-console": "^5.17.1",
+    "koishi": "^4.15.3"
   },
   "devDependencies": {
-    "@koishijs/client": "^5.17.0",
+    "@koishijs/client": "^5.17.1",
     "@types/d3-force": "^3.0.4",
     "@types/throttle-debounce": "^2.1.0",
     "d3-force": "^3.0.0"
   },
   "dependencies": {
-    "@koishijs/console": "^5.17.0",
+    "@koishijs/console": "^5.17.1",
     "throttle-debounce": "^3.0.1"
   }
 }

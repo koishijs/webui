@@ -6,7 +6,8 @@
   "typings": "lib/index.d.ts",
   "files": [
     "lib",
-    "dist"
+    "dist",
+    "src"
   ],
   "author": "Shigma <shigma10826@gmail.com>",
   "license": "AGPL-3.0",
@@ -40,17 +41,17 @@
     }
   },
   "peerDependencies": {
-    "@koishijs/plugin-console": "^5.17.0",
-    "koishi": "^4.15.2"
+    "@koishijs/plugin-console": "^5.17.1",
+    "koishi": "^4.15.3"
   },
   "devDependencies": {
-    "@koishijs/client": "^5.17.0",
+    "@koishijs/client": "^5.17.1",
     "@types/envinfo": "^7.8.1",
     "@types/throttle-debounce": "^2.1.0",
-    "koishi": "^4.15.2"
+    "koishi": "^4.15.3"
   },
   "dependencies": {
-    "@koishijs/console": "^5.17.0",
+    "@koishijs/console": "^5.17.1",
     "envinfo": "^7.10.0",
     "throttle-debounce": "^3.0.1",
     "which-pm-runs": "^1.1.0"

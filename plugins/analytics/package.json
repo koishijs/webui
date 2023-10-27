@@ -1,12 +1,13 @@
 {
   "name": "@koishijs/plugin-analytics",
   "description": "Show statistics for Koishi application",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
   "files": [
     "lib",
-    "dist"
+    "dist",
+    "src"
   ],
   "author": "Shigma <shigma10826@gmail.com>",
   "license": "AGPL-3.0",
@@ -48,17 +49,17 @@
     }
   },
   "peerDependencies": {
-    "@koishijs/plugin-console": "^5.17.0",
-    "koishi": "^4.15.2"
+    "@koishijs/plugin-console": "^5.17.1",
+    "koishi": "^4.15.3"
   },
   "devDependencies": {
-    "@koishijs/assets": "^1.0.2",
-    "@koishijs/client": "^5.17.0",
+    "@koishijs/assets": "^1.0.3",
+    "@koishijs/client": "^5.17.1",
     "echarts": "^5.4.3",
-    "koishi": "^4.15.2",
+    "koishi": "^4.15.3",
     "vue-echarts": "^6.6.0"
   },
   "dependencies": {
-    "@koishijs/console": "^5.17.0"
+    "@koishijs/console": "^5.17.1"
   }
 }
