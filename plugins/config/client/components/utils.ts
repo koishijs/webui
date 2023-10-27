@@ -104,6 +104,7 @@ declare module '@koishijs/client' {
 
 export interface Tree {
   id: string
+  uid?: number
   alias: string
   name: string
   path: string
@@ -148,7 +149,7 @@ export const type = computed(() => {
   }
 })
 
-function getTree(parent: Tree, plugins: any): Tree[] {
+function getTree(parent: Tree, plugins: any, paths: Dict<number>): Tree[] {
   const trees: Tree[] = []
   for (let key in plugins) {
     if (key.startsWith('$')) continue
@@ -162,8 +163,9 @@ function getTree(parent: Tree, plugins: any): Tree[] {
     node.alias = key.slice(node.name.length + 1)
     node.label = config?.$label
     node.id = node.path = parent.path + (parent.path ? '/' : '') + key
+    node.uid = paths['/' + node.path]
     if (key.startsWith('group:')) {
-      node.children = getTree(node, config)
+      node.children = getTree(node, config, paths)
     }
     trees.push(node)
   }
@@ -185,7 +187,7 @@ export const plugins = computed(() => {
   const paths: Dict<Tree> = {
     '': root,
   }
-  for (const node of getTree(root, store.config.plugins)) {
+  for (const node of getTree(root, store.config.plugins, store.config.$paths)) {
     data.push(node)
     traverse(node)
   }

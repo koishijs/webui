@@ -1,5 +1,5 @@
 import { DataService } from '@koishijs/console'
-import { Context, Logger, remove } from 'koishi'
+import { Context, Dict, Logger, remove } from 'koishi'
 import { Loader } from '@koishijs/loader'
 
 declare module '@koishijs/console' {
@@ -53,7 +53,7 @@ function dropKey(plugins: {}, name: string) {
   return { [name]: value }
 }
 
-export class ConfigWriter extends DataService<Context.Config> {
+export class ConfigWriter extends DataService<Context.Config & { $paths: Dict<number> }> {
   protected loader: Loader
 
   constructor(ctx: Context) {
@@ -78,7 +78,7 @@ export class ConfigWriter extends DataService<Context.Config> {
     ctx.on('config', () => this.refresh())
   }
 
-  getGroup(plugins: any, ctx: Context) {
+  getGroup(plugins: any, ctx: Context, paths: Dict<number> = {}, path = '/') {
     const result = { ...plugins }
     for (const key in plugins) {
       if (key.startsWith('$')) continue
@@ -86,18 +86,20 @@ export class ConfigWriter extends DataService<Context.Config> {
       const name = key.split(':', 1)[0].replace(/^~/, '')
 
       // handle plugin groups
+      const fork = ctx.scope[Loader.kRecord][key]
+      if (!fork) continue
       if (name === 'group') {
-        const fork = ctx.scope[Loader.kRecord][key]
-        if (!fork) continue
-        result[key] = this.getGroup(value, fork.ctx)
+        result[key] = this.getGroup(value, fork.ctx, paths, path + key + '/')
+      } else {
+        paths[path + key] = fork.uid
       }
     }
     return result
   }
 
   async get() {
-    const result = { ...this.loader.config }
-    result.plugins = this.getGroup(result.plugins, this.loader.entry)
+    const result: Context.Config & { $paths: Dict<number> } = { ...this.loader.config, $paths: {} }
+    result.plugins = this.getGroup(result.plugins, this.loader.entry, result.$paths)
     return result
   }
 

@@ -9,8 +9,9 @@ export class ServiceProvider extends DataService<Dict<number>> {
 
   async get() {
     const services = {} as Dict<number>
-    for (const key in this.ctx.root[Context.internal]) {
-      const ctx: Context = this.ctx[key]?.[Context.source]
+    for (const [key, { type }] of Object.entries(this.ctx.root[Context.internal])) {
+      if (type !== 'service') continue
+      const ctx: Context = this.ctx.get(key)?.[Context.source]
       if (ctx?.scope.uid) {
         const name = key.replace(/^__/, '').replace(/__$/, '')
         services[name] = ctx.scope.uid
