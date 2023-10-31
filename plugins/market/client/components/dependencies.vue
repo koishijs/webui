@@ -42,7 +42,10 @@ import PackageView from './package.vue'
 
 const names = computed(() => {
   return Object
-    .keys(store.dependencies)
+    .keys({
+      ...store.dependencies,
+      ...config.value.override,
+    })
     .filter(name => !store.dependencies[name].workspace)
     .sort((a, b) => a > b ? 1 : -1)
 })
@@ -52,7 +55,7 @@ const updates = computed(() => names.value.filter(hasUpdate))
 const menu = computed(() => [{
   icon: 'rocket',
   label: '全部更新',
-  disabled: !updates.value.length,
+  disabled: () => !updates.value.length,
   async action() {
     for (const name of updates.value) {
       const versions = store.registry[name]
@@ -62,7 +65,7 @@ const menu = computed(() => [{
 }, {
   icon: 'check',
   label: '应用更改',
-  disabled: !Object.keys(config.value.override).length,
+  disabled: () => !Object.keys(config.value.override).length,
   async action() {
     return install(config.value.override)
   },

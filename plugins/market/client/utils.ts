@@ -1,4 +1,4 @@
-import { computed, ref, watch } from 'vue'
+import { computed, ref, Ref, watch } from 'vue'
 import { Dict, send, store, useStorage } from '@koishijs/client'
 import { gt } from 'semver'
 
@@ -8,7 +8,7 @@ interface ManagerConfig {
   hideWorkspace?: boolean
 }
 
-export const config = useStorage<ManagerConfig>('manager', 2, () => ({
+export const config: Ref<ManagerConfig> = useStorage<ManagerConfig>('manager', 2, () => ({
   prefix: '^',
   override: {},
   hideWorkspace: true,
@@ -21,9 +21,13 @@ export const overrideCount = computed(() => {
 watch(() => store.dependencies, (value) => {
   if (!value) return
   for (const key in config.value.override) {
-    if (!config.value.override[key]) {
-      if (!value[key]) delete config.value.override[key]
+    if (value[key]?.workspace) {
+      delete config.value.override[key]
+    } else if (!config.value.override[key] && !value[key]) {
+      // package to be removed has been removed
+      delete config.value.override[key]
     } else if (value[key]?.request === config.value.override[key]) {
+      // package has been installed to the right version
       delete config.value.override[key]
     }
   }
