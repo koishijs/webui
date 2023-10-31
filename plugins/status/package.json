@@ -1,7 +1,7 @@
 {
   "name": "@koishijs/plugin-status",
   "description": "Status view for Koishi",
-  "version": "7.2.2",
+  "version": "7.2.3",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
   "files": [
@@ -46,7 +46,7 @@
   },
   "devDependencies": {
     "@koishijs/client": "^5.17.1",
-    "@types/envinfo": "^7.8.1",
+    "@types/envinfo": "^7.8.2",
     "@types/throttle-debounce": "^2.1.0",
     "koishi": "^4.15.3"
   },

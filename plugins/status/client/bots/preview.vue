@@ -73,6 +73,7 @@ div.bot {
     background-size: 100%;
     background-repeat: no-repeat;
     transition: 0.1s ease;
+    flex-shrink: 0;
 
     $borderWidth: 1px;
 
@@ -92,12 +93,19 @@ div.bot {
     display: flex;
     flex-direction: column;
     justify-content: space-around;
+    overflow: hidden;
 
     .k-icon {
       width: 20px;
       margin-right: 6px;
       text-align: center;
       vertical-align: -2px;
+    }
+
+    > div {
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      overflow: hidden;
     }
   }
 }
