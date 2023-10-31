@@ -1,9 +1,11 @@
 <template>
   <el-tooltip placement="top" effect="light" popper-class="k-status-tooltip">
     <template #content>
-      <slot name="tooltip">
-        <span class="el-popper__empty"></span>
-      </slot>
+      <el-scrollbar max-height="calc(100vh - 4rem)">
+        <slot name="tooltip">
+          <span class="el-popper__empty"></span>
+        </slot>
+      </el-scrollbar>
     </template>
     <div class="k-status" v-bind="$attrs">
       <slot></slot>
