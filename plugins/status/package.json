@@ -52,7 +52,7 @@
   },
   "dependencies": {
     "@koishijs/console": "^5.17.1",
-    "envinfo": "^7.10.0",
+    "envinfo": "^7.11.0",
     "throttle-debounce": "^3.0.1",
     "which-pm-runs": "^1.1.0"
   }
