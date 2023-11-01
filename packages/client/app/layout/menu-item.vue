@@ -1,6 +1,6 @@
 <template>
   <el-tooltip :disabled="disabled" :content="toValue(label)" placement="bottom">
-    <span class="menu-item" :class="[type, { disabled }]" @click="trigger">
+    <span class="menu-item" :class="[toValue(type), { disabled }]" @click="trigger">
       <k-icon class="menu-icon" :name="toValue(icon)"></k-icon>
     </span>
   </el-tooltip>

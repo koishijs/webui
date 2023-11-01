@@ -1,5 +1,5 @@
 <template>
-  <k-layout main="darker" class="page-market" :menu="menu">
+  <k-layout main="darker" class="page-market" menu="market">
     <template #left>
       <el-scrollbar>
         <market-filter v-model="words" :data="getSorted(data, words)"></market-filter>
@@ -48,7 +48,7 @@
 
 import { router, store, global } from '@koishijs/client'
 import { computed, provide, ref, watch } from 'vue'
-import { refresh, active } from '../utils'
+import { active } from '../utils'
 import { getSorted, kConfig, MarketFilter, MarketList, MarketSearch } from '@koishijs/market'
 import { SearchObject } from '@koishijs/registry'
 
@@ -91,8 +91,6 @@ watch(prompt, (value) => {
 function handleClick(data: SearchObject) {
   active.value = data.package.name
 }
-
-const menu = computed(() => [refresh.value])
 
 </script>
 

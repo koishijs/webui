@@ -1,5 +1,5 @@
 import { computed, ref, Ref, watch } from 'vue'
-import { Dict, send, store, useStorage } from '@koishijs/client'
+import { Dict, store, useStorage } from '@koishijs/client'
 import { gt } from 'semver'
 
 interface ManagerConfig {
@@ -34,13 +34,6 @@ watch(() => store.dependencies, (value) => {
 }, { immediate: true })
 
 export const active = ref('')
-
-export const refresh = computed(() => ({
-  icon: 'refresh',
-  label: '刷新',
-  type: !store.market || store.market.progress < store.market.total ? 'spin disabled' : '',
-  action: () => send('market/refresh'),
-}))
 
 export function hasUpdate(name: string) {
   const versions = store.registry?.[name]

@@ -2,7 +2,7 @@
   <div
     class="k-menu-item"
     v-if="forced || !disabled"
-    :class="[type, { disabled }]"
+    :class="[toValue(type), { disabled }]"
     @click.prevent="item?.action(ctx.internal.createScope())"
   >
     <span v-if="icon" class="k-menu-icon"><k-icon :name="icon"/></span>

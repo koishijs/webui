@@ -1,5 +1,5 @@
 <template>
-  <k-layout main="page-deps" :menu="menu">
+  <k-layout main="page-deps" menu="dependencies">
     <table class="table-head">
       <colgroup>
         <col width="auto">
@@ -35,8 +35,8 @@
 <script lang="ts" setup>
 
 import { computed } from 'vue'
-import { store } from '@koishijs/client'
-import { config, refresh, hasUpdate } from '../utils'
+import { store, useContext } from '@koishijs/client'
+import { config, hasUpdate } from '../utils'
 import { install } from './utils'
 import PackageView from './package.vue'
 
@@ -52,9 +52,9 @@ const names = computed(() => {
 
 const updates = computed(() => names.value.filter(hasUpdate))
 
-const menu = computed(() => [{
-  icon: 'rocket',
-  label: '全部更新',
+const ctx = useContext()
+
+ctx.action('dependencies.upgrade', {
   disabled: () => !updates.value.length,
   async action() {
     for (const name of updates.value) {
@@ -62,14 +62,14 @@ const menu = computed(() => [{
       config.value.override[name] = Object.keys(versions)[0]
     }
   },
-}, {
-  icon: 'check',
-  label: '应用更改',
+})
+
+ctx.action('dependencies.install', {
   disabled: () => !Object.keys(config.value.override).length,
   async action() {
     return install(config.value.override)
   },
-}, refresh.value])
+})
 
 </script>
 
@@ -96,7 +96,7 @@ const menu = computed(() => [{
     }
 
     tr:hover {
-      background-color: var(--k-hover-bg);
+      background-color: var(--k-side-bg);
     }
   }
 

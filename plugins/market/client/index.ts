@@ -1,5 +1,5 @@
 import { defineComponent, h } from 'vue'
-import { Context, global, receive, router, store } from '@koishijs/client'
+import { Context, global, receive, router, send, store } from '@koishijs/client'
 import type {} from '@koishijs/plugin-market'
 import extensions from './extensions'
 import Dependencies from './components/dependencies.vue'
@@ -71,4 +71,31 @@ export default (ctx: Context) => {
       component: Dependencies,
     })
   }
+
+  ctx.action('market.refresh', {
+    shortcut: 'ctrl+r',
+    action: (scope) => send('market/refresh'),
+  })
+
+  ctx.menu('market', [{
+    id: '.refresh',
+    icon: 'refresh',
+    label: '刷新',
+    type: () => !store.market || store.market.progress < store.market.total ? 'spin disabled' : '',
+  }])
+
+  ctx.menu('dependencies', [{
+    id: '.upgrade',
+    icon: 'rocket',
+    label: '全部更新',
+  }, {
+    id: '.install',
+    icon: 'check',
+    label: '应用更改',
+  }, {
+    id: 'market.refresh',
+    icon: 'refresh',
+    label: '刷新',
+    type: () => !store.market || store.market.progress < store.market.total ? 'spin disabled' : '',
+  }])
 }

@@ -11,19 +11,6 @@ import { useColorMode, useConfig } from './config'
 import { extensions, LoadResult } from './loader'
 import { ActionContext } from '.'
 
-export type Plugin = cordis.Plugin<Context>
-
-export namespace Plugin {
-  export type Function<T = any> = cordis.Plugin.Function<T, Context>
-  export type Constructor<T = any> = cordis.Plugin.Constructor<T, Context>
-  export type Object<S = any, T = any> = cordis.Plugin.Object<S, T, Context>
-}
-
-export type EffectScope = cordis.EffectScope<Context>
-export type ForkScope = cordis.ForkScope<Context>
-export type MainScope = cordis.MainScope<Context>
-export type Service = cordis.Service<Context>
-
 export const Service = cordis.Service<Context>
 
 const config = useConfig()
@@ -55,6 +42,7 @@ export function useContext() {
 }
 
 export interface ActionOptions {
+  shortcut?: string
   disabled?: (scope: Flatten<ActionContext>) => boolean
   action: (scope: Flatten<ActionContext>) => any
 }
@@ -154,6 +142,33 @@ export class Context extends cordis.Context {
       },
     }))
     this.app.provide('cordis', this)
+    window.addEventListener('keydown', (event) => {
+      for (const action of Object.values(this.internal.actions)) {
+        if (!action.shortcut) continue
+        const keys = action.shortcut.split('+').map(key => key.toLowerCase().trim())
+        let ctrlKey = false, shiftKey = false, metaKey = false, code: string
+        for (const key of keys) {
+          switch (key) {
+            case 'shift': shiftKey = true; continue
+            case 'ctrl':
+              if (navigator.platform.toLowerCase().includes('mac')) {
+                metaKey = true
+              } else {
+                ctrlKey = true
+              }
+              continue
+            default:
+              code = key
+          }
+        }
+        if (ctrlKey !== event.ctrlKey) continue
+        if (shiftKey !== event.shiftKey) continue
+        if (metaKey !== event.metaKey) continue
+        if (code !== event.key.toLowerCase()) continue
+        event.preventDefault()
+        action.action(this.internal.createScope())
+      }
+    })
   }
 
   wrapComponent(component: Component) {

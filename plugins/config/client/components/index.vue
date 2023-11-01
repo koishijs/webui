@@ -167,6 +167,7 @@ function checkConfig(name: string) {
 }
 
 ctx.action('config.tree.save', {
+  shortcut: 'ctrl+s',
   action: async ({ config: { tree } }) => {
     const { disabled, path } = tree
     if (!disabled && !checkConfig(tree.name)) return
