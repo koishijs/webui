@@ -1,7 +1,7 @@
 {
   "name": "@koishijs/client",
   "description": "Koishi Console Client",
-  "version": "5.17.2",
+  "version": "5.18.0",
   "main": "client/index.ts",
   "files": [
     "app",
@@ -38,19 +38,19 @@
     "@koishijs/components": "1.4.8",
     "@maikolib/vite-plugin-yaml": "^1.0.1",
     "@satorijs/protocol": "^1.1.1",
-    "@vitejs/plugin-vue": "^4.2.3",
-    "@vueuse/core": "^10.2.1",
+    "@vitejs/plugin-vue": "^4.4.0",
+    "@vueuse/core": "^10.5.0",
     "cac": "^6.7.14",
-    "cordis": "^3.1.1",
+    "cordis": "^3.1.2",
     "cosmokit": "^1.5.1",
     "element-plus": "2.4.0",
     "marked-vue": "^1.2.3",
     "ns-require": "^1.1.4",
-    "sass": "^1.63.6",
-    "vite": "^4.4.4",
-    "vue": "^3.3.4",
-    "vue-i18n": "^9.2.2",
-    "vue-router": "^4.2.4"
+    "sass": "^1.69.5",
+    "vite": "^4.5.0",
+    "vue": "^3.3.7",
+    "vue-i18n": "^9.6.2",
+    "vue-router": "^4.2.5"
   },
   "yakumo": {
     "client": "./scripts/client"
