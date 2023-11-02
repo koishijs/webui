@@ -1,5 +1,5 @@
 <template>
-  <el-scrollbar class="container">
+  <el-scrollbar class="container" :max-height="maxHeight">
     <div ref="root" class="logs">
       <div
         v-for="(record, index) in logs"
@@ -8,7 +8,7 @@
         <code v-html="renderLine(record)"></code>
         <router-link
           class="log-link"
-          v-if="store.config && store.packages && record.meta?.paths?.length"
+          v-if="showLink && store.config && store.packages && record.meta?.paths?.length"
           :to="'/plugins/' + record.meta.paths[0].replace(/\./, '/')"
         >
           <k-icon name="arrow-right"/>
@@ -27,7 +27,9 @@ import Logger from 'reggol'
 import ansi from 'ansi_up'
 
 const props = defineProps<{
-  logs: Logger.Record[]
+  logs: Logger.Record[],
+  showLink?: boolean,
+  maxHeight?: string,
 }>()
 
 const root = ref<HTMLElement>()

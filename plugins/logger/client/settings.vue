@@ -3,7 +3,7 @@
     <h2 class="k-schema-header">
       运行日志
     </h2>
-    <logs class="settings-logger" :logs="logs"/>
+    <logs class="settings-logger" :logs="logs" max-height="216px"/>
   </template>
 </template>
 
@@ -36,9 +36,6 @@ const logs = computed(() => {
   border-radius: 8px;
   :deep(.logs) {
     padding: 0.5rem 0.5rem;
-  }
-  :deep(.log-link) {
-    display: none;
   }
 }
 

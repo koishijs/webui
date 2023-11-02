@@ -1,6 +1,6 @@
 <template>
   <k-layout>
-    <logs class="layout-logger" :logs="store.logs"></logs>
+    <logs class="layout-logger" :logs="store.logs" show-link></logs>
   </k-layout>
 </template>
 
