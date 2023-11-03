@@ -1,6 +1,6 @@
 commands:
   status:
-    description: 查看运行状态
+    description: Vérifier l'état d'exécution
     messages:
       status:
         1: 运行中
