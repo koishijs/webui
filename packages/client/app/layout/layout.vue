@@ -113,6 +113,7 @@ const styles = computed(() => ({
     min-height: 100%;
     display: flex;
     flex-flow: column;
+    overflow: hidden;
 
     &.darker {
       background-color: var(--k-side-bg);
