@@ -93,6 +93,10 @@ export default (ctx: Context) => {
     icon: 'check',
     label: '应用更改',
   }, {
+    id: '.manual',
+    icon: 'add',
+    label: '手动添加',
+  }, {
     id: 'market.refresh',
     icon: 'refresh',
     label: '刷新',

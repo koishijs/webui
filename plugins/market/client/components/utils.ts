@@ -1,14 +1,23 @@
 import { Awaitable, Dict, loading, message, send, socket, store, valueMap } from '@koishijs/client'
 import { satisfies } from 'semver'
-import { ref, watch } from 'vue'
+import { reactive, ref, watch } from 'vue'
 
-export function analyzeVersions(name: string) {
+interface AnalyzeResult {
+  peers: Dict<{
+    request: string
+    resolved: string
+    result: 'success' | 'warning' | 'danger' | 'primary'
+  }>
+  result: 'success' | 'warning' | 'danger' | 'primary'
+}
+
+export function analyzeVersions(name: string): Dict<AnalyzeResult> {
   const versions = store.registry?.[name]
   if (!versions) return
   return valueMap(versions, (item) => {
     const peers = valueMap({ ...item.peerDependencies }, (request, name) => {
       const resolved = store.dependencies[name]?.resolved || store.packages?.[name]?.package.version
-      const result = !resolved
+      const result: 'success' | 'warning' | 'danger' | 'primary' = !resolved
         ? item.peerDependenciesMeta?.[name]?.optional ? 'primary' : 'warning'
         : satisfies(resolved, request, { includePrerelease: true }) ? 'success' : 'danger'
       return { request, resolved, result }
@@ -28,7 +37,10 @@ export function analyzeVersions(name: string) {
   })
 }
 
-export const showDialog = ref(false)
+export const manualDeps = reactive<Dict<Dict<AnalyzeResult>>>({})
+
+export const showInstall = ref(false)
+export const showManual = ref(false)
 
 export async function install(override: Dict<string>, callback?: () => Awaitable<void>) {
   const instance = loading({
@@ -40,7 +52,7 @@ export async function install(override: Dict<string>, callback?: () => Awaitable
     instance.close()
   })
   try {
-    showDialog.value = false
+    showInstall.value = false
     const code = await send('market/install', override)
     if (code) {
       message.error('安装失败！')

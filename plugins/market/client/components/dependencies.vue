@@ -30,14 +30,16 @@
       </table>
     </el-scrollbar>
   </k-layout>
+  <manual-install/>
 </template>
 
 <script lang="ts" setup>
 
-import { computed } from 'vue'
-import { store, useContext } from '@koishijs/client'
+import { computed, watch } from 'vue'
+import { store, useContext, mapValues } from '@koishijs/client'
 import { config, hasUpdate } from '../utils'
-import { install } from './utils'
+import { install, manualDeps, showManual } from './utils'
+import ManualInstall from './manual.vue'
 import PackageView from './package.vue'
 
 const names = computed(() => {
@@ -46,9 +48,18 @@ const names = computed(() => {
       ...store.dependencies,
       ...config.value.override,
     })
-    .filter(name => !store.dependencies[name].workspace)
+    .filter(name => !store.dependencies[name]?.workspace)
     .sort((a, b) => a > b ? 1 : -1)
 })
+
+watch(() => config.value.override, (object) => {
+  Object.keys(object).forEach(async (name) => {
+    if (store.dependencies[name]) return
+    const response = await fetch(`${store.market.registry}/${name}`)
+    const data = await response.json()
+    manualDeps[name] = mapValues(data.versions, () => ({ peers: {}, result: 'success' }))
+  })
+}, { immediate: true })
 
 const updates = computed(() => names.value.filter(hasUpdate))
 
@@ -68,6 +79,12 @@ ctx.action('dependencies.install', {
   disabled: () => !Object.keys(config.value.override).length,
   async action() {
     return install(config.value.override)
+  },
+})
+
+ctx.action('dependencies.manual', {
+  action() {
+    showManual.value = true
   },
 })
 

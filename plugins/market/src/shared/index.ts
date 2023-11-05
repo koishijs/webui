@@ -52,6 +52,7 @@ export abstract class MarketProvider extends DataService<MarketProvider.Payload>
 
 export namespace MarketProvider {
   export interface Payload {
+    registry?: string
     data: Dict<SearchObject>
     total: number
     failed: number
