@@ -4,7 +4,7 @@
       <div class="container first">
         <instance v-bind="instances[data.current]" :id="data.current"/>
         <el-button class="k-card create" @click="activate(null, $event)">
-          <k-icon name="plus"></k-icon>
+          <k-icon name="add"></k-icon>
         </el-button>
       </div>
       <div class="container second" v-if="inactive.length">

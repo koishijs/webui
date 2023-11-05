@@ -12,7 +12,7 @@
         <k-icon class="menu-icon" name="trash-can"></k-icon>
       </span>
       <span class="menu-item" @click.stop.prevent="title = '添加指令'">
-        <k-icon class="menu-icon" name="plus"></k-icon>
+        <k-icon class="menu-icon" name="add"></k-icon>
       </span>
     </template>
 

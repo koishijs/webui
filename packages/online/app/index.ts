@@ -2,7 +2,6 @@ import { connect, global, icons, root } from '@koishijs/client'
 import IconDocs from './icons/docs.vue'
 import IconForum from './icons/forum.vue'
 import IconInstances from './icons/instances.vue'
-import IconPlus from './icons/plus.vue'
 import IconShare from './icons/share.vue'
 import Home from './components/home.vue'
 import Instances from './components/instances.vue'
@@ -12,7 +11,6 @@ import '@koishijs/client/app'
 icons.register('activity:docs', IconDocs)
 icons.register('activity:forum', IconForum)
 icons.register('activity:instances', IconInstances)
-icons.register('plus', IconPlus)
 icons.register('share', IconShare)
 
 root.page({

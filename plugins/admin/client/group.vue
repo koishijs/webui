@@ -19,7 +19,7 @@
         <k-icon class="menu-icon" name="trash-can"></k-icon>
       </span>
       <span class="menu-item" @click.stop.prevent="showCreateDialog = true">
-        <k-icon class="menu-icon" name="plus"></k-icon>
+        <k-icon class="menu-icon" name="add"></k-icon>
       </span>
     </template>
 
