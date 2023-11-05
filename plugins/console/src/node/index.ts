@@ -67,7 +67,7 @@ class NodeConsole extends Console {
       if (this.config.open && !this.ctx.loader?.envData.clientCount && !process.env.KOISHI_AGENT) {
         open(target)
       }
-      this.logger.info('WebUI is available at %c', target)
+      this.logger.info('webui is available at %c', target)
     })
   }
 

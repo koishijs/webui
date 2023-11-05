@@ -92,7 +92,7 @@ watch(() => store.insight, (value) => {
   simulation.alpha(0.3).restart()
 })
 
-const ticks = 1000
+const ticks = 500
 const alphaMin = 0.001
 
 onMounted(() => {

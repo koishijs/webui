@@ -98,9 +98,9 @@ export abstract class Console extends Service {
   protected abstract resolveEntry(entry: string | string[] | Entry, key: string): string[]
 
   addEntry(entry: string | string[] | Entry) {
-    const caller = this.caller
+    const caller = this[Context.current]
     const key = 'extension-' + Random.id()
-    this.entries[key] = [entry, this.caller]
+    this.entries[key] = [entry, this[Context.current]]
     this.entry.refresh()
     caller?.collect('entry', () => {
       const result = delete this.entries[key]
