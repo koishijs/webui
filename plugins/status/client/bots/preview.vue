@@ -6,8 +6,8 @@
       </el-tooltip>
     </div>
     <div class="info">
-      <div><k-icon name="robot"/>{{ data.user.name }}</div>
-      <div><k-icon name="platform"/>{{ data.platform }}</div>
+      <div :title="data.user.name"><k-icon name="robot"/>{{ data.user.name }}</div>
+      <div :title="data.platform"><k-icon name="platform"/>{{ data.platform }}</div>
       <div class="cur-frequency">
         <span style="margin-right: 8px">
           <k-icon name="arrow-up"/>

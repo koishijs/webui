@@ -24,13 +24,8 @@
       @node-collapse="handleCollapse"
       #="{ node }">
       <div class="item">
-        <div class="label">
-          <template v-if="node.data.name === 'group'">
-            {{ '分组：' + (node.label || node.data.alias) }}
-          </template>
-          <template v-else>
-            {{ node.label || node.data.name || '待添加' }}
-          </template>
+        <div class="label" :title="getLabel(node)">
+          {{ getLabel(node) }}
         </div>
         <div class="right"></div>
       </div>
@@ -63,10 +58,19 @@ function filterNode(value: string, data: Tree) {
 
 interface Node {
   data: Tree
+  label?: string
   parent: Node
   expanded: boolean
   isLeaf: boolean
   childNodes: Node[]
+}
+
+function getLabel(node: Node) {
+  if (node.data.name === 'group') {
+    return '分组：' + (node.label || node.data.alias)
+  } else {
+    return node.label || node.data.name || '待添加'
+  }
 }
 
 function allowDrag(node: Node) {

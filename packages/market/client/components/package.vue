@@ -6,7 +6,7 @@
       </div>
       <div class="main">
         <h2 class="top">
-          <span class="title">{{ data.shortname }}</span>
+          <span class="title" :title="data.shortname">{{ data.shortname }}</span>
           <el-tooltip v-if="badge" placement="right" :content="t(`badge.${badge.type}`)">
             <span :class="['icon', badge.type]" @click.stop.prevent="$emit('query', badge.query)">
               <market-icon :name="badge.type"></market-icon>
@@ -25,7 +25,7 @@
         <slot name="action"></slot>
       </div>
     </div>
-    <k-markdown inline class="desc" :source="data.manifest ? tt(data.manifest.description) : data.package.description ?? ''"></k-markdown>
+    <k-markdown inline class="desc" :source="tt(data.manifest?.description) ?? ''"></k-markdown>
     <div class="footer">
       <el-tooltip :content="timeAgo(data.updatedAt)" placement="top">
         <a class="shrink" target="_blank" :href="data.package.links.npm">

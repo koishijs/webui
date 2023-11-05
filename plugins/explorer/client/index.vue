@@ -28,7 +28,7 @@
           @node-drop="handleDrop"
           #="{ node }">
           <div class="item">
-            <div class="label">
+            <div class="label" :title="node.data.name">
               <input
                 v-focus
                 v-if="node.data.filename === renaming"
