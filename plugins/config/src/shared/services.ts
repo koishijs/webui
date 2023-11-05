@@ -9,14 +9,19 @@ export class ServiceProvider extends DataService<Dict<number>> {
 
   async get() {
     const services = {} as Dict<number>
-    for (const [key, { type }] of Object.entries(this.ctx.root[Context.internal])) {
-      if (type !== 'service') continue
-      const ctx: Context = this.ctx.get(key)?.[Context.source]
-      if (ctx?.scope.uid) {
-        const name = key.replace(/^__/, '').replace(/__$/, '')
-        services[name] = ctx.scope.uid
+    const attach = (internal: Context[typeof Context.internal]) => {
+      if (!internal) return
+      attach(Object.getPrototypeOf(internal))
+      for (const [key, { type }] of Object.entries(internal)) {
+        if (type !== 'service') continue
+        const ctx: Context = this.ctx.get(key)?.[Context.source]
+        if (ctx) {
+          const name = key.replace(/^__/, '').replace(/__$/, '')
+          services[name] = ctx.scope.uid
+        }
       }
     }
+    attach(this.ctx.root[Context.internal])
     return services
   }
 }

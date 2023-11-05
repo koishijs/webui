@@ -7,17 +7,17 @@
     </p>
   </k-comment>
   <k-comment
-    v-for="({ required }, service) in data.env.using" :key="service"
-    :type="store.services[service] ? 'success' : required ? 'warning' : 'primary'">
+    v-for="({ required }, name) in data.env.using" :key="name"
+    :type="name in store.services ? 'success' : required ? 'warning' : 'primary'">
     <p>
-      {{ required ? '必需' : '可选' }}服务：{{ service }}
-      <span v-if="store.services[service]">(已加载)</span>
-      <span v-else-if="available[service].length">(未加载，启用下列任一插件可实现此服务)</span>
+      {{ required ? '必需' : '可选' }}服务：{{ name }}
+      <span v-if="name in store.services">(已加载)</span>
+      <span v-else-if="available[name].length">(未加载，启用下列任一插件可实现此服务)</span>
       <span v-else>(未加载)</span>
     </p>
-    <ul v-if="!store.services[service] && available[service].length">
-      <li v-for="name in available[service]">
-        <k-dep-link :name="name"></k-dep-link>
+    <ul v-if="!(name in store.services) && available[name].length">
+      <li v-for="shortname in available[name]">
+        <k-dep-link :name="shortname"></k-dep-link>
       </li>
     </ul>
   </k-comment>

@@ -80,6 +80,14 @@ export abstract class PackageProvider extends DataService<Dict<PackageProvider.D
       result.schema = exports?.Config || exports?.schema
       result.usage = exports?.usage
       result.filter = exports?.filter
+      const inject = exports?.using || exports?.inject || []
+      if (Array.isArray(inject)) {
+        result.required = inject
+        result.optional = []
+      } else {
+        result.required = inject.required || []
+        result.optional = inject.optional || []
+      }
 
       // make sure that result can be serialized into json
       JSON.stringify(result)
@@ -108,6 +116,8 @@ export namespace PackageProvider {
     forkable?: boolean
     schema?: Schema
     usage?: string
+    required?: string[]
+    optional?: string[]
     failed?: boolean
   }
 }

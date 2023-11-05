@@ -69,11 +69,11 @@ function getEnvInfo(name: string) {
   }
 
   // check services
-  for (const name of local.manifest.service.required) {
+  for (const name of local.runtime?.required ?? []) {
     setService(name, true)
   }
-  for (const name of local.manifest.service.optional) {
-    setService(name, false)
+  for (const name of local.runtime?.optional ?? []) {
+    setService(name, true)
   }
 
   // check reusability
@@ -141,7 +141,7 @@ export const type = computed(() => {
   if (!env) return
   if (env.warning && current.value.disabled) return 'warning'
   for (const name in env.using) {
-    if (store.services?.[name]) {
+    if (name in store.services || {}) {
       if (env.impl.includes(name)) return 'warning'
     } else {
       if (env.using[name].required) return 'warning'

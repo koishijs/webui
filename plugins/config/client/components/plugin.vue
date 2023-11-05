@@ -27,9 +27,9 @@
           </k-comment>
           <k-comment
             v-for="({ required }, name) in env.using" :key="name"
-            :type="store.services[name] ? 'success' : required ? 'warning' : 'primary'">
+            :type="name in store.services ? 'success' : required ? 'warning' : 'primary'">
             <p>
-              {{ required ? '必需' : '可选' }}服务：{{ name }} ({{ store.services[name] ? '已加载' : '未加载' }})
+              {{ required ? '必需' : '可选' }}服务：{{ name }} ({{ name in store.services ? '已加载' : '未加载' }})
             </p>
           </k-comment>
         </k-slot>
@@ -38,7 +38,7 @@
       <!-- implements -->
       <k-slot-item :order="400">
         <template v-for="name in env.impl" :key="name">
-          <k-comment v-if="store.services[name] && data.current.disabled" type="warning">
+          <k-comment v-if="name in store.services && data.current.disabled" type="warning">
             <p>此插件将会提供 {{ name }} 服务，但此服务已被其他插件实现。</p>
           </k-comment>
           <k-comment v-else :type="data.current.disabled ? 'primary' : 'success'">
