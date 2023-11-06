@@ -57,6 +57,7 @@
   "devDependencies": {
     "@koishijs/client": "^5.18.3",
     "@koishijs/loader": "^4.2.4",
+    "@koishijs/plugin-router-proxy": "^1.0.0",
     "@maikolib/vite-plugin-yaml": "^1.0.1",
     "@types/uuid": "^8.3.4",
     "@vitejs/plugin-vue": "^4.4.0",

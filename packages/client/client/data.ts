@@ -10,6 +10,10 @@ declare const KOISHI_CONFIG: ClientConfig
 export const global = KOISHI_CONFIG
 export const store = reactive<Store>({})
 
+export function withProxy(url: string) {
+  return (global.proxyBase || '') + url
+}
+
 export const socket = ref<Universal.WebSocket>(null)
 const listeners: Record<string, (data: any) => void> = {}
 const responseHooks: Record<string, [Function, Function]> = {}

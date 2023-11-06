@@ -1,6 +1,6 @@
 <template>
   <div class="bot">
-    <div class="avatar" :style="{ backgroundImage: `url(${data.user.avatar})` }" @click="$emit('avatar-click')">
+    <div class="avatar" :style="{ backgroundImage: `url(${withProxy(data.user.avatar)})` }" @click="$emit('avatar-click')">
       <el-tooltip :content="statusNames[data.status]" placement="right">
         <status-light :class="getStatus(data.status)"></status-light>
       </el-tooltip>
@@ -24,7 +24,7 @@
 
 <script lang="ts" setup>
 
-import { Universal } from '@koishijs/client'
+import { Universal, withProxy } from '@koishijs/client'
 import type { ProfileProvider } from '@koishijs/plugin-status/src'
 import { getStatus } from './utils'
 import StatusLight from './light.vue'

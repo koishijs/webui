@@ -3,6 +3,7 @@ import { Console, Entry } from '@koishijs/console'
 import { ViteDevServer } from 'vite'
 import { extname, resolve } from 'path'
 import { createReadStream, existsSync, promises as fsp, Stats } from 'fs'
+import {} from '@koishijs/plugin-router-proxy'
 import open from 'open'
 
 declare module 'koishi' {
@@ -19,6 +20,7 @@ interface ClientConfig {
   endpoint: string
   static?: boolean
   heartbeat?: HeartbeatConfig
+  proxyBase?: string
 }
 
 interface HeartbeatConfig {
@@ -31,17 +33,10 @@ class NodeConsole extends Console {
 
   private vite: ViteDevServer
   public root: string
-  public global = {} as ClientConfig
   readonly layer: WebSocketLayer
 
   constructor(public ctx: Context, public config: NodeConsole.Config) {
     super(ctx)
-
-    const { devMode, uiPath, apiPath, selfUrl, heartbeat } = config
-    this.global.devMode = devMode
-    this.global.uiPath = uiPath
-    this.global.heartbeat = heartbeat
-    this.global.endpoint = selfUrl + apiPath
 
     this.layer = ctx.router.ws(config.apiPath, (socket, request) => {
       // @types/ws does not provide typings for `dispatchEvent`
@@ -56,6 +51,18 @@ class NodeConsole extends Console {
     this.root = config.root || (config.devMode
       ? resolve(require.resolve('@koishijs/client/package.json'), '../app')
       : resolve(__dirname, '../../dist'))
+  }
+
+  createGlobal() {
+    const global = {} as ClientConfig
+    const { devMode, uiPath, apiPath, selfUrl, heartbeat } = this.config
+    global.devMode = devMode
+    global.uiPath = uiPath
+    global.heartbeat = heartbeat
+    global.endpoint = selfUrl + apiPath
+    const proxy = this.ctx.get('router.proxy')
+    if (proxy) global.proxyBase = proxy.config.path + '/'
+    return global
   }
 
   async start() {
@@ -139,7 +146,7 @@ class NodeConsole extends Console {
     } else {
       template = template.replace(/(href|src)="(?=\/)/g, (_, $1) => `${$1}="${uiPath}`)
     }
-    const headInjection = `<script>KOISHI_CONFIG = ${JSON.stringify(this.global)}</script>`
+    const headInjection = `<script>KOISHI_CONFIG = ${JSON.stringify(this.createGlobal())}</script>`
     return template.replace('</title>', '</title>' + headInjection)
   }
 
