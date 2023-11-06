@@ -46,6 +46,7 @@ class Explorer extends DataService<Entry[]> {
   task: Promise<Entry[]>
   watcher: FSWatcher
   globFilter: Tester
+  root: string
 
   constructor(ctx: Context, config: Explorer.Config) {
     super(ctx, 'explorer', { authority: 4 })
@@ -62,15 +63,14 @@ class Explorer extends DataService<Entry[]> {
     })
 
     this.globFilter = anymatch(config.ignored)
-
-    const cwd = resolve(ctx.baseDir, config.root)
-    this.watcher = watch(cwd, {
-      cwd,
+    this.root = resolve(ctx.baseDir, config.root)
+    this.watcher = watch(this.root, {
+      cwd: this.root,
       ignored: config.ignored,
     })
 
     ctx.console.addListener('explorer/read', async (filename, binary) => {
-      filename = join(cwd, filename)
+      filename = join(this.root, filename)
       const buffer = await readFile(filename)
       const result = await FileType.fromBuffer(buffer)
       return {
@@ -81,7 +81,7 @@ class Explorer extends DataService<Entry[]> {
     }, { authority: 4 })
 
     ctx.console.addListener('explorer/write', async (filename, content, binary) => {
-      filename = join(ctx.baseDir, filename)
+      filename = join(this.root, filename)
       if (binary) {
         const buffer = Buffer.from(content, 'base64')
         await writeFile(filename, buffer)
@@ -92,20 +92,20 @@ class Explorer extends DataService<Entry[]> {
     }, { authority: 4 })
 
     ctx.console.addListener('explorer/mkdir', async (filename) => {
-      filename = join(ctx.baseDir, filename)
+      filename = join(this.root, filename)
       await mkdir(filename)
       this.refresh()
     }, { authority: 4 })
 
     ctx.console.addListener('explorer/remove', async (filename) => {
-      filename = join(ctx.baseDir, filename)
+      filename = join(this.root, filename)
       await rm(filename, { recursive: true })
       this.refresh()
     }, { authority: 4 })
 
     ctx.console.addListener('explorer/rename', async (oldValue, newValue) => {
-      oldValue = join(ctx.baseDir, oldValue)
-      newValue = join(ctx.baseDir, newValue)
+      oldValue = join(this.root, oldValue)
+      newValue = join(this.root, newValue)
       await rename(oldValue, newValue)
       this.refresh()
     }, { authority: 4 })
@@ -123,7 +123,7 @@ class Explorer extends DataService<Entry[]> {
     const dirents = await readdir(root, { withFileTypes: true })
     return Promise.all(dirents.map<Promise<Entry>>(async (dirent) => {
       const filename = join(root, dirent.name)
-      if (this.globFilter(relative(this.ctx.baseDir, filename))) return
+      if (this.globFilter(relative(this.root, filename))) return
       if (dirent.isFile()) {
         return { type: 'file', name: dirent.name }
       } else if (dirent.isDirectory()) {
@@ -138,7 +138,7 @@ class Explorer extends DataService<Entry[]> {
   }
 
   private async _get() {
-    return this.traverse(this.ctx.baseDir)
+    return this.traverse(this.root)
   }
 
   async get(forced = false) {
