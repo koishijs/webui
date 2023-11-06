@@ -88,7 +88,7 @@ const entries = computed(() => {
   const { filters } = options.value
   return children.filter((entry) => {
     if (entry.type === 'directory') return true
-    if (entry.type === 'file') {
+    if (entry.type === 'file' || entry.type === 'symlink') {
       if (filters.includes('file')) return true
       return filters.some((filter) => {
         const index = entry.name.lastIndexOf('.')

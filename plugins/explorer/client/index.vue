@@ -46,7 +46,7 @@
       </el-scrollbar>
     </template>
 
-    <k-empty v-if="files[active]?.type !== 'file'">在左侧栏选择要查看的文件</k-empty>
+    <k-empty v-if="!files[active] || files[active].type === 'directory'">在左侧栏选择要查看的文件</k-empty>
     <div v-else-if="files[active]?.loading">
       <div class="el-loading-spinner">
         <svg class="circular" viewBox="25 25 50 50">
@@ -130,7 +130,7 @@ ctx.action('explorer.tree.upload', {
 })
 
 ctx.action('explorer.tree.download', {
-  disabled: ({ explorer }) => explorer.tree.type !== 'file',
+  disabled: ({ explorer }) => explorer.tree.type === 'directory',
   action: ({ explorer }) => downloadFile(explorer.tree.filename),
 })
 
@@ -224,7 +224,7 @@ function filterNode(value: string, data: TreeEntry) {
   return data.name.toLowerCase().includes(keyword.value.toLowerCase())
 }
 
-function createEntry(entry: TreeEntry, type: 'file' | 'directory') {
+function createEntry(entry: TreeEntry, type: 'file' | 'symlink' | 'directory') {
   cancelRename()
   renaming.value = entry.filename + '/'
   files[renaming.value] = {
@@ -311,7 +311,7 @@ function getLanguage(filename: string) {
 }
 
 watch(() => files[active.value], async (entry) => {
-  if (entry?.type !== 'file') return
+  if (!entry || entry.type === 'directory') return
   if (typeof entry.oldValue !== 'string') {
     entry.loading = send('explorer/read', entry.filename)
     const { base64, mime } = await entry.loading
@@ -334,7 +334,7 @@ model.onDidChangeContent((e) => {
 })
 
 async function handleClick(data: TreeEntry) {
-  if (data.type !== 'file') return
+  if (data.type === 'directory') return
   active.value = data.filename
 }
 

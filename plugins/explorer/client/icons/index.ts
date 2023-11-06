@@ -4,9 +4,11 @@ import Directory from './directory.vue'
 import File from './file.vue'
 import Refresh from './refresh.vue'
 import Save from './save.vue'
+import Symlink from './symlink.vue'
 
 icons.register('activity:explorer', Activity)
 icons.register('directory', Directory)
 icons.register('file', File)
 icons.register('refresh', Refresh)
 icons.register('save', Save)
+icons.register('symlink', Symlink)

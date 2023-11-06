@@ -1,7 +1,7 @@
 import { Context, Schema } from 'koishi'
 import { DataService } from '@koishijs/console'
 import { join, relative, resolve } from 'path'
-import { mkdir, readdir, readFile, rename, rm, writeFile } from 'fs/promises'
+import { mkdir, readdir, readFile, readlink, rename, rm, writeFile } from 'fs/promises'
 import { FSWatcher, watch } from 'chokidar'
 import { detect } from 'chardet'
 import FileType from 'file-type'
@@ -32,9 +32,10 @@ export interface File {
 }
 
 export interface Entry {
-  type: 'file' | 'directory'
+  type: 'file' | 'directory' | 'symlink'
   name: string
   mime?: string
+  target?: string
   filename?: string
   children?: this[]
   oldValue?: string
@@ -128,6 +129,8 @@ class Explorer extends DataService<Entry[]> {
         return { type: 'file', name: dirent.name }
       } else if (dirent.isDirectory()) {
         return { type: 'directory', name: dirent.name, children: await this.traverse(filename) }
+      } else if (dirent.isSymbolicLink()) {
+        return { type: 'symlink', name: dirent.name, target: await readlink(filename) }
       }
     })).then((entries) => entries
       .filter(Boolean)
@@ -158,7 +161,7 @@ namespace Explorer {
     ignored: Schema
       .array(String)
       .role('table')
-      .default(['**/node_modules', '**/.*', 'data/accounts/*/data', 'cache']),
+      .default(['**/node_modules', '**/.*', 'cache']),
   }).i18n({
     'zh-CN': zhCN,
   })
