@@ -102,6 +102,7 @@ const removing = ref<string>(null)
 const trigger = useMenu('explorer.tree')
 
 ctx.action('explorer.save', {
+  shortcut: 'ctrl+s',
   disabled: () => files[active.value]?.newValue === files[active.value]?.oldValue,
   action: async () => {
     const content = files[active.value].newValue
@@ -111,6 +112,7 @@ ctx.action('explorer.save', {
 })
 
 ctx.action('explorer.refresh', {
+  shortcut: 'ctrl+r',
   action: () => send('explorer/refresh'),
 })
 

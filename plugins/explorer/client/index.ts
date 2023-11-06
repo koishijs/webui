@@ -48,23 +48,30 @@ export default (ctx: Context) => {
 
   ctx.menu('explorer.tree', [{
     id: '.create-file',
+    icon: 'file-create',
     label: '新建文件',
   }, {
     id: '.create-directory',
+    icon: 'directory-create',
     label: '新建文件夹',
   }, {
     id: '.upload',
+    icon: 'upload',
     label: '上传文件',
   }, {
     id: '.download',
+    icon: 'download',
     label: '下载文件',
   }, {
     id: '@separator',
   }, {
     id: '.rename',
+    icon: 'edit',
     label: '重命名',
   }, {
     id: '.remove',
+    icon: 'delete',
+    type: 'danger',
     label: '删除',
   }])
 }
