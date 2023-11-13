@@ -1,7 +1,7 @@
 {
   "name": "@koishijs/console",
   "description": "Console Service for Koishi",
-  "version": "5.18.3",
+  "version": "5.18.6",
   "main": "lib/index.js",
   "module": "lib/index.mjs",
   "types": "lib/index.d.ts",
@@ -31,6 +31,6 @@
     "service"
   ],
   "peerDependencies": {
-    "koishi": "^4.15.4"
+    "koishi": "^4.15.5"
   }
 }

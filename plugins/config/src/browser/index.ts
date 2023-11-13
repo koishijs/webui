@@ -5,7 +5,7 @@ import { ConfigWriter, ServiceProvider } from '../shared'
 export * from '../shared'
 
 export const name = 'config'
-export const inject = ['console', 'loader'] as const
+export const inject = ['console', 'loader']
 
 export interface Config {}
 

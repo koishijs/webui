@@ -27,7 +27,7 @@
   },
   "devDependencies": {
     "@koishijs/eslint-config": "^1.0.4",
-    "@koishijs/plugin-database-memory": "^2.3.6",
+    "@koishijs/plugin-database-memory": "^2.4.0",
     "@koishijs/plugin-help": "^2.3.3",
     "@koishijs/plugin-mock": "^2.6.4",
     "@rollup/plugin-yaml": "^3.1.0",
@@ -45,7 +45,7 @@
     "eslint": "^8.52.0",
     "eslint-plugin-mocha": "^10.2.0",
     "jest-mock": "^28.1.3",
-    "koishi": "^4.15.4",
+    "koishi": "^4.15.5",
     "mocha": "^9.2.2",
     "rollup-plugin-node-polyfills": "^0.2.1",
     "shx": "^0.3.4",

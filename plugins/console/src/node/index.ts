@@ -3,7 +3,7 @@ import { Console, Entry } from '@koishijs/console'
 import { ViteDevServer } from 'vite'
 import { extname, resolve } from 'path'
 import { createReadStream, existsSync, promises as fsp, Stats } from 'fs'
-import {} from '@koishijs/plugin-router-proxy'
+import {} from '@koishijs/plugin-server-proxy'
 import open from 'open'
 
 declare module 'koishi' {
@@ -60,7 +60,7 @@ class NodeConsole extends Console {
     global.uiPath = uiPath
     global.heartbeat = heartbeat
     global.endpoint = selfUrl + apiPath
-    const proxy = this.ctx.get('router.proxy')
+    const proxy = this.ctx.get('server.proxy')
     if (proxy) global.proxyBase = proxy.config.path + '/'
     return global
   }

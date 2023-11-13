@@ -1,6 +1,6 @@
 <template>
   <el-scrollbar class="container" :max-height="maxHeight">
-    <div ref="root" class="logs">
+    <div ref="root" class="logs k-text-selectable">
       <div
         v-for="(record, index) in logs"
         :key="record.id"

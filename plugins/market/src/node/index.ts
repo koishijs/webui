@@ -51,7 +51,7 @@ export function apply(ctx: Context, config: Config) {
 
   ctx.plugin(Installer, config.registry)
 
-  ctx.using(['installer'], (ctx) => {
+  ctx.inject(['installer'], (ctx) => {
     ctx.i18n.define('zh-CN', require('./locales/message.zh-CN'))
 
     ctx.command('plugin.install <name>', { authority: 4 })
@@ -132,7 +132,7 @@ export function apply(ctx: Context, config: Config) {
           return session.text('.cancelled')
         }
 
-        ctx.envData.message = {
+        ctx.loader.envData.message = {
           ...pick(session, ['sid', 'channelId', 'guildId', 'isDirect']),
           content: session.text('.success'),
         }
@@ -140,12 +140,12 @@ export function apply(ctx: Context, config: Config) {
           result[name] = deps[name].latest
           return result
         }, {}))
-        ctx.envData.message = null
+        ctx.loader.envData.message = null
         return session.text('.success')
       })
   })
 
-  ctx.using(['console', 'installer'], (ctx) => {
+  ctx.inject(['console', 'installer'], (ctx) => {
     ctx.plugin(DependencyProvider)
     ctx.plugin(RegistryProvider)
     ctx.plugin(MarketProvider, config.search)

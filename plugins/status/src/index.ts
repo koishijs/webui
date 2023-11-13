@@ -31,7 +31,7 @@ export * from './envinfo'
 export * from './profile'
 
 export const name = 'status'
-export const inject = ['console'] as const
+export const inject = ['console']
 
 export interface Config extends ProfileProvider.Config, EnvInfoProvider.Config {}
 

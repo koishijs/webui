@@ -81,7 +81,7 @@ function toHash(password: string) {
 }
 
 class AuthService extends Service {
-  static inject = ['console', 'database'] as const
+  static inject = ['console', 'database']
 
   constructor(ctx: Context, private config: AuthService.Config) {
     super(ctx, 'auth')

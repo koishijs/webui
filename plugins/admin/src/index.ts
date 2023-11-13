@@ -186,7 +186,7 @@ export class Admin extends Service {
 }
 
 export namespace Admin {
-  export const inject = ['database'] as const
+  export const inject = ['database']
 
   export interface Config {}
 
