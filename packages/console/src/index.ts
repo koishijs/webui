@@ -18,6 +18,7 @@ declare module 'koishi' {
   }
 
   interface Events {
+    'router/ready'(): Awaitable<void>
     'console/connection'(client: Client): void
     'console/intercept'(client: Client, listener: DataService.Options): Awaitable<boolean>
   }
