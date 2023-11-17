@@ -29,7 +29,7 @@
     "@koishijs/eslint-config": "^1.0.4",
     "@koishijs/plugin-database-memory": "^2.4.0",
     "@koishijs/plugin-help": "^2.3.3",
-    "@koishijs/plugin-mock": "^2.6.4",
+    "@koishijs/plugin-mock": "^2.6.5",
     "@rollup/plugin-yaml": "^3.1.0",
     "@sinonjs/fake-timers": "^6.0.1",
     "@types/chai": "^4.3.9",

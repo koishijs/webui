@@ -59,7 +59,7 @@
     }
   },
   "peerDependencies": {
-    "@koishijs/plugin-console": "^5.18.6",
+    "@koishijs/plugin-console": "^5.19.1",
     "koishi": "^4.15.5"
   },
   "peerDependenciesMeta": {
@@ -68,7 +68,7 @@
     }
   },
   "devDependencies": {
-    "@koishijs/client": "^5.18.6",
+    "@koishijs/client": "^5.19.1",
     "@koishijs/market": "^4.1.7",
     "@koishijs/plugin-config": "^2.4.5",
     "@types/semver": "^7.5.4",
@@ -76,7 +76,7 @@
     "@types/which-pm-runs": "^1.0.1"
   },
   "dependencies": {
-    "@koishijs/console": "^5.18.6",
+    "@koishijs/console": "^5.19.1",
     "@koishijs/registry": "^6.0.4",
     "execa": "^5.1.1",
     "get-registry": "^1.1.0",
