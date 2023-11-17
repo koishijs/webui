@@ -1,6 +1,6 @@
 import { Context, makeArray, noop, Schema, Time, WebSocketLayer } from 'koishi'
 import { Console, Entry } from '@koishijs/console'
-import { ViteDevServer } from 'vite'
+import { FileSystemServeOptions, ViteDevServer } from 'vite'
 import { extname, resolve } from 'path'
 import { createReadStream, existsSync, promises as fsp, Stats } from 'fs'
 import {} from '@koishijs/plugin-server-proxy'
@@ -31,9 +31,9 @@ interface HeartbeatConfig {
 class NodeConsole extends Console {
   static inject = ['router']
 
-  private vite: ViteDevServer
+  public vite: ViteDevServer
   public root: string
-  readonly layer: WebSocketLayer
+  public layer: WebSocketLayer
 
   constructor(public ctx: Context, public config: NodeConsole.Config) {
     super(ctx)
@@ -151,7 +151,7 @@ class NodeConsole extends Console {
   }
 
   private async createVite() {
-    const { cacheDir } = this.config
+    const { cacheDir, dev } = this.config
     const { createServer } = require('vite') as typeof import('vite')
     const { default: vue } = require('@vitejs/plugin-vue') as typeof import('@vitejs/plugin-vue')
     const { default: yaml } = require('@maikolib/vite-plugin-yaml') as typeof import('@maikolib/vite-plugin-yaml')
@@ -162,9 +162,7 @@ class NodeConsole extends Console {
       cacheDir: resolve(this.ctx.baseDir, cacheDir),
       server: {
         middlewareMode: true,
-        fs: {
-          strict: false,
-        },
+        fs: dev.fs,
       },
       plugins: [
         vue(),
@@ -210,6 +208,18 @@ class NodeConsole extends Console {
 }
 
 namespace NodeConsole {
+  export interface Dev {
+    fs: FileSystemServeOptions
+  }
+
+  export const Dev: Schema<Dev> = Schema.object({
+    fs: Schema.object({
+      strict: Schema.boolean().default(true),
+      allow: Schema.array(String).default(null),
+      deny: Schema.array(String).default(null),
+    }).hidden(),
+  })
+
   export interface Config {
     root?: string
     uiPath?: string
@@ -219,21 +229,25 @@ namespace NodeConsole {
     selfUrl?: string
     apiPath?: string
     heartbeat?: HeartbeatConfig
+    dev?: Dev
   }
 
-  export const Config: Schema<Config> = Schema.object({
-    root: Schema.string().hidden(),
-    uiPath: Schema.string().default(''),
-    apiPath: Schema.string().default('/status'),
-    selfUrl: Schema.string().role('link').default(''),
-    open: Schema.boolean(),
-    heartbeat: Schema.object({
-      interval: Schema.number().default(Time.second * 30),
-      timeout: Schema.number().default(Time.minute),
+  export const Config: Schema<Config> = Schema.intersect([
+    Schema.object({
+      root: Schema.string().hidden(),
+      uiPath: Schema.string().default(''),
+      apiPath: Schema.string().default('/status'),
+      selfUrl: Schema.string().role('link').default(''),
+      open: Schema.boolean(),
+      heartbeat: Schema.object({
+        interval: Schema.number().default(Time.second * 30),
+        timeout: Schema.number().default(Time.minute),
+      }),
+      devMode: Schema.boolean().default(process.env.NODE_ENV === 'development').hidden(),
+      cacheDir: Schema.string().default('cache/vite').hidden(),
+      dev: Dev,
     }),
-    devMode: Schema.boolean().default(process.env.NODE_ENV === 'development').hidden(),
-    cacheDir: Schema.string().default('cache/vite').hidden(),
-  }).i18n({
+  ]).i18n({
     'zh-CN': require('./locales/zh-CN'),
   })
 }
