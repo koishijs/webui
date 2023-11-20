@@ -2,9 +2,7 @@
   <k-layout menu="config.tree" :menu-data="current">
     <template #header>
       <!-- root -->
-      <template v-if="!current.path">
-        {{ current.name }}
-      </template>
+      <template v-if="!current.path">全局设置</template>
 
       <!-- group -->
       <template v-else-if="current.children">

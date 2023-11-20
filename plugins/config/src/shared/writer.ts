@@ -85,6 +85,13 @@ export class ConfigWriter extends DataService<Context.Config & { $paths: Dict<nu
       const value = plugins[key]
       const name = key.split(':', 1)[0].replace(/^~/, '')
 
+      if (!this.loader.isTruthyLike(value?.$if)) {
+        // $if-disabled plugins should not be displayed
+        // https://github.com/koishijs/webui/issues/249
+        delete result[key]
+        continue
+      }
+
       // handle plugin groups
       const fork = ctx.scope[Loader.kRecord][key]
       if (!fork) continue
@@ -104,6 +111,7 @@ export class ConfigWriter extends DataService<Context.Config & { $paths: Dict<nu
   }
 
   async reloadApp(config: any) {
+    delete config.$paths
     const plugins = this.loader.config.plugins
     this.loader.config = config
     this.loader.config.plugins = plugins
