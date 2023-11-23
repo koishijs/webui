@@ -1,5 +1,5 @@
 <template>
-  <el-scrollbar ref="root" @scroll="onScroll">
+  <el-scrollbar ref="root" @scroll="onScroll" :max-height="maxHeight">
     <virtual-item v-if="$slots.header" @resize="virtual.saveSize('header', $event)">
       <div><slot name="header"></slot></div>
     </virtual-item>
@@ -34,6 +34,7 @@ const props = defineProps({
   pinned: Boolean,
   activeKey: { default: '' },
   threshold: { default: 0 },
+  maxHeight: String,
 })
 
 const dataShown = computed<any[]>(() => props.data.slice(range.start, range.end))

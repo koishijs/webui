@@ -1,10 +1,7 @@
 <template>
-  <el-scrollbar class="container" :max-height="maxHeight">
-    <div ref="root" class="logs k-text-selectable">
-      <div
-        v-for="(record, index) in logs"
-        :key="record.id"
-        class="line" :class="{ start: index && logs[index - 1].id > record.id && record.name === 'app' }">
+  <virtual-list class="log-list k-text-selectable" :data="logs" :count="300" :max-height="maxHeight">
+    <template #="record">
+      <div :class="{ line: true, start: isStart(record) }">
         <code v-html="renderLine(record)"></code>
         <router-link
           class="log-link"
@@ -14,14 +11,13 @@
           <k-icon name="arrow-right"/>
         </router-link>
       </div>
-    </div>
-  </el-scrollbar>
+    </template>
+  </virtual-list>
 </template>
 
 <script lang="ts" setup>
 
-import { ref, onActivated, watch, nextTick } from 'vue'
-import { Time, store } from '@koishijs/client'
+import { Time, store, VirtualList } from '@koishijs/client'
 import {} from '@koishijs/plugin-config'
 import Logger from 'reggol'
 import ansi from 'ansi_up'
@@ -32,8 +28,6 @@ const props = defineProps<{
   maxHeight?: string,
 }>()
 
-const root = ref<HTMLElement>()
-
 // this package does not have consistent exports in different environments
 const converter = new (ansi['default'] || ansi)()
 
@@ -42,6 +36,10 @@ function renderColor(code: number, value: any, decoration = '') {
 }
 
 const showTime = 'yyyy-MM-dd hh:mm:ss'
+
+function isStart(record: Logger.Record & { index: number }) {
+  return record.index && props.logs[record.index - 1].id > record.id && record.name === 'app'
+}
 
 function renderLine(record: Logger.Record) {
   const prefix = `[${record.type[0].toUpperCase()}]`
@@ -57,33 +55,19 @@ function renderLine(record: Logger.Record) {
   return converter.ansi_to_html(output)
 }
 
-onActivated(() => {
-  const wrapper = root.value.parentElement.parentElement
-  wrapper.scrollTop = wrapper.scrollHeight
-})
-
-watch(() => props.logs.length, async () => {
-  const wrapper = root.value.parentElement.parentElement
-  const { scrollTop, clientHeight, scrollHeight } = wrapper
-  if (Math.abs(scrollTop + clientHeight - scrollHeight) < 1) {
-    await nextTick()
-    wrapper.scrollTop = scrollHeight
-  }
-})
-
 </script>
 
 <style lang="scss" scoped>
 
-.container {
+.log-list {
   color: var(--terminal-fg);
   background-color: var(--terminal-bg);
 
-  .logs {
+  :deep(.el-scrollbar__view) {
     padding: 1rem 1rem;
   }
 
-  .logs .line.start {
+  .line.start {
     margin-top: 1rem;
 
     &::before {
@@ -96,7 +80,7 @@ watch(() => props.logs.length, async () => {
     }
   }
 
-  .logs:first-child .line:first-child {
+  .line:first-child {
     margin-top: 0;
 
     &::before {
