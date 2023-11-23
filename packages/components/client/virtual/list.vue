@@ -18,7 +18,7 @@
 
 <script lang="ts" setup>
 
-import { ref, computed, watch, nextTick, onActivated, onMounted } from 'vue'
+import { ref, computed, watch, nextTick, onActivated, onMounted, PropType } from 'vue'
 import type { ElScrollbar } from 'element-plus'
 import Virtual from './virtual'
 import VirtualItem from './item'
@@ -35,6 +35,10 @@ const props = defineProps({
   activeKey: { default: '' },
   threshold: { default: 0 },
   maxHeight: String,
+  activate: {
+    type: String as PropType<'top' | 'bottom' | 'current'>,
+    default: 'bottom',
+  },
 })
 
 const dataShown = computed<any[]>(() => props.data.slice(range.start, range.end))
@@ -124,7 +128,11 @@ function scrollToBottom() {
 let scrollTop = 0
 
 onActivated(() => {
-  root.value.setScrollTop(scrollTop)
+  if (props.activate === 'bottom') {
+    scrollToBottom()
+  } else if (props.activate === 'current') {
+    root.value.setScrollTop(scrollTop)
+  }
 })
 
 function onScroll(ev: MouseEvent) {
