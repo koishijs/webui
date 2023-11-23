@@ -1,6 +1,15 @@
 <template>
-  <div class="market-list">
+  <div class="market-list" ref="root">
     <slot name="header" v-bind="{ all, packages, hasFilter: hasFilter(modelValue) }"></slot>
+    <el-pagination
+      class="pagination"
+      background
+      v-model:current-page="page"
+      :pager-count="5"
+      :page-size="limit"
+      :total="packages.length"
+      layout="prev, pager, next"
+    />
     <div class="market-container">
       <market-package
         v-for="data in pages[page - 1]"
@@ -28,7 +37,7 @@
 
 <script lang="ts" setup>
 
-import { computed, inject, ref } from 'vue'
+import { computed, inject, ref, watch } from 'vue'
 import { SearchObject } from '@koishijs/registry'
 import { getSorted, getFiltered, hasFilter, kConfig } from '../utils'
 import MarketPackage from './package.vue'
@@ -40,7 +49,7 @@ const props = defineProps<{
   gravatar?: string,
 }>()
 
-const emit = defineEmits(['update:modelValue'])
+const emit = defineEmits(['update:modelValue', 'update:page'])
 
 const config = inject(kConfig, {})
 
@@ -59,6 +68,8 @@ const limit = computed(() => {
 })
 
 const page = ref(1)
+
+watch(page, (page) => emit('update:page', page))
 
 const pages = computed(() => {
   const result: SearchObject[][] = []

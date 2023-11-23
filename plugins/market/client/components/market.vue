@@ -15,11 +15,12 @@
       </div>
     </div>
 
-    <el-scrollbar v-else-if="store.market.total">
+    <el-scrollbar ref="root" v-else-if="store.market.total">
       <market-list
         v-model="words"
         :data="data"
-        :gravatar="store.market.gravatar">
+        :gravatar="store.market.gravatar"
+        @update:page="scrollToTop">
         <template #header="{ hasFilter, all, packages }">
           <market-search v-model="words"></market-search>
           <div class="market-hint">
@@ -64,6 +65,8 @@ provide(kConfig, {
   installed: global.static ? undefined : installed,
 })
 
+const root = ref()
+
 const words = ref<string[]>([''])
 
 const prompt = computed(() => words.value.filter(w => w).join(' '))
@@ -90,6 +93,10 @@ watch(prompt, (value) => {
 
 function handleClick(data: SearchObject) {
   active.value = data.package.name
+}
+
+function scrollToTop() {
+  root.value?.scrollTo(0, 0)
 }
 
 </script>
