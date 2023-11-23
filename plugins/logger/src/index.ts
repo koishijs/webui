@@ -57,11 +57,12 @@ export async function apply(ctx: Context, config: Config) {
   const root = resolve(ctx.baseDir, config.root)
   await mkdir(root, { recursive: true })
 
-  const files: Dict<number> = {}
+  const files: Dict<number[]> = {}
   for (const filename of await readdir(root)) {
     const capture = /^(\d{4}-\d{2}-\d{2})-(\d+)\.log$/.exec(filename)
     if (!capture) continue
-    files[capture[1]] = Math.max(files[capture[1]] ?? 0, +capture[2])
+    files[capture[1]] ??= []
+    files[capture[1]].push(+capture[2])
   }
 
   let writer: FileWriter
@@ -72,16 +73,19 @@ export async function apply(ctx: Context, config: Config) {
     if (!maxAge) return
 
     const now = Date.now()
-    for (const date in files) {
+    for (const date of Object.keys(files)) {
       if (now - +new Date(date) < maxAge * Time.day) continue
-      for (let index = 1; index <= files[date]; ++index) {
-        await rm(`${root}/${date}-${index}.log`)
+      for (const index of files[date]) {
+        await rm(`${root}/${date}-${index}.log`).catch((error) => {
+          ctx.logger('logger').warn(error)
+        })
       }
+      delete files[date]
     }
   }
 
   const date = new Date().toISOString().slice(0, 10)
-  createFile(date, files[date] ??= 1)
+  createFile(date, Math.max(...files[date] ?? [0]) + 1)
 
   const loader = ctx.get('loader')
   const target: Logger.Target = {
@@ -95,7 +99,8 @@ export async function apply(ctx: Context, config: Config) {
       const date = new Date(record.timestamp).toISOString().slice(0, 10)
       if (writer.date !== date) {
         writer.close()
-        createFile(date, files[date] = 1)
+        files[date] = [1]
+        createFile(date, 1)
       }
       writer.write(record)
       // Be very careful about accessing service in this callback,
@@ -103,7 +108,9 @@ export async function apply(ctx: Context, config: Config) {
       ctx.get('console.logs')?.patch([record])
       if (writer.size >= config.maxSize) {
         writer.close()
-        createFile(date, ++files[date])
+        const index = Math.max(...files[date]) + 1
+        files[date].push(index)
+        createFile(date, index)
       }
     },
   }
