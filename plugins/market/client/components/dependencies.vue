@@ -30,6 +30,7 @@
       </table>
     </el-scrollbar>
   </k-layout>
+  <confirm-install/>
   <manual-install/>
 </template>
 
@@ -38,7 +39,8 @@
 import { computed, watch } from 'vue'
 import { store, useContext, mapValues } from '@koishijs/client'
 import { config, hasUpdate } from '../utils'
-import { install, manualDeps, showManual } from './utils'
+import { manualDeps, showConfirm, showManual } from './utils'
+import ConfirmInstall from './confirm.vue'
 import ManualInstall from './manual.vue'
 import PackageView from './package.vue'
 
@@ -77,8 +79,8 @@ ctx.action('dependencies.upgrade', {
 
 ctx.action('dependencies.install', {
   disabled: () => !Object.keys(config.value.override).length,
-  async action() {
-    return install(config.value.override)
+  action() {
+    showConfirm.value = true
   },
 })
 
