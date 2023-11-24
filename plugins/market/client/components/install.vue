@@ -1,5 +1,9 @@
 <template>
-  <el-dialog v-model="showInstall" class="install-panel" @closed="active = ''" destroy-on-close>
+  <el-dialog
+    :model-value="!!active"
+    @update:model-value="active = ''"
+    class="install-panel"
+    destroy-on-close>
     <template v-if="active" #header="{ titleId, titleClass }">
       <span :id="titleId" :class="[titleClass, '']">
         {{ active.replace(/(koishi-|^@koishijs\/)plugin-/, '') + (workspace ? ' (工作区)' : '') }}
@@ -61,7 +65,7 @@
     <template v-if="active && !global.static" #footer>
       <div class="left"></div>
       <div class="right">
-        <el-button @click="showInstall = false">取消</el-button>
+        <el-button @click="active = ''">取消</el-button>
         <template v-if="workspace">
           <el-button v-if="current" @click="installDep('')">移除</el-button>
           <el-button v-else @click="installDep(version)" :disabled="unchanged">添加</el-button>
@@ -81,7 +85,7 @@
 
 import { computed, ref, watch } from 'vue'
 import { global, router, send, store } from '@koishijs/client'
-import { analyzeVersions, showInstall, install } from './utils'
+import { analyzeVersions, install } from './utils'
 import { active, config } from '../utils'
 import { parse } from 'semver'
 
@@ -165,8 +169,7 @@ const result = computed(() => {
   return result
 })
 
-watch(() => active.value, (value) => {
-  showInstall.value = !!value
+watch(active, (value) => {
   if (!value) return
   version.value = config.value.override[active.value]
     || store.dependencies?.[active.value]?.request
@@ -201,7 +204,7 @@ function getPaths(target: string) {
 }
 
 function configure(path: string | true) {
-  showInstall.value = false
+  active.value = ''
   if (path === true) {
     path = shortname.value + ':' + Math.random().toString(36).slice(2, 8)
     send('manager/unload', path, {})

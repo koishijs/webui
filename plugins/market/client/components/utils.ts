@@ -1,6 +1,7 @@
 import { Awaitable, Dict, loading, message, send, socket, store, valueMap } from '@koishijs/client'
 import { satisfies } from 'semver'
 import { reactive, ref, watch } from 'vue'
+import { active } from '../utils'
 
 interface AnalyzeResult {
   peers: Dict<{
@@ -39,7 +40,6 @@ export function analyzeVersions(name: string): Dict<AnalyzeResult> {
 
 export const manualDeps = reactive<Dict<Dict<AnalyzeResult>>>({})
 
-export const showInstall = ref(false)
 export const showManual = ref(false)
 export const showConfirm = ref(false)
 
@@ -53,7 +53,7 @@ export async function install(override: Dict<string>, callback?: () => Awaitable
     instance.close()
   })
   try {
-    showInstall.value = false
+    active.value = ''
     const code = await send('market/install', override)
     if (code) {
       message.error('安装失败！')

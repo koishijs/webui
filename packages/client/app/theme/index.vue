@@ -8,7 +8,6 @@
   <div class="loading" v-else v-loading="true" element-loading-text="正在加载数据……"></div>
   <status-bar></status-bar>
   <menu-list></menu-list>
-  <k-slot name="global"></k-slot>
 </template>
 
 <script lang="ts" setup>
