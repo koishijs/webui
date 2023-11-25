@@ -261,7 +261,7 @@ class StatisticsProvider extends DataService<StatisticsProvider.Payload> {
 
     await Promise.all(this.ctx.bots.map(async (bot) => {
       if (bot.status !== Universal.Status.ONLINE) return
-      await getGuildInfo(bot).catch(logger.warn)
+      await getGuildInfo(bot).catch(logger.debug)
     }))
 
     for (const key in messageMap) {
