@@ -139,7 +139,7 @@ class ProfileProvider extends DataService<ProfileProvider.Payload> {
     const bots: Dict<ProfileProvider.BotData> = {}
     for (const bot of this.ctx.bots) {
       if (bot.hidden) continue
-      bots[bot.ctx.scope.uid] = {
+      bots[bot.sid] = {
         ...bot.toJSON(),
         error: bot.error?.message,
         messageSent: bot._messageSent.get(),

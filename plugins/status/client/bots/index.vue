@@ -1,7 +1,7 @@
 <template>
   <k-status v-if="store.status">
     <template #tooltip>
-      <span v-if="!store.status.bots.length" class="el-popper__empty"></span>
+      <span v-if="!Object.values(store.status.bots).length" class="el-popper__empty"></span>
       <bot-preview v-for="(bot, key) in store.status.bots" :key="key" :data="bot"></bot-preview>
     </template>
     <status-light v-for="(bot, key) in store.status.bots" :key="key" :class="getStatus(bot.status)"></status-light>
