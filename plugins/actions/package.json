@@ -1,7 +1,7 @@
 {
   "name": "@koishijs/plugin-actions",
   "description": "App-Level Action Commands for Koishi",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "main": "lib/index.cjs",
   "types": "lib/index.d.ts",
   "exports": {
@@ -53,13 +53,13 @@
     }
   },
   "peerDependencies": {
-    "@koishijs/plugin-console": "^5.19.1",
-    "koishi": "^4.15.5"
+    "@koishijs/plugin-console": "^5.19.5",
+    "koishi": "^4.15.7"
   },
   "devDependencies": {
-    "@koishijs/client": "^5.19.1"
+    "@koishijs/client": "^5.19.5"
   },
   "dependencies": {
-    "@koishijs/console": "^5.19.1"
+    "@koishijs/console": "^5.19.5"
   }
 }

@@ -15,6 +15,8 @@
 
 ### Official plugins
 
+- @koishijs/plugin-actions
+- @koishijs/plugin-admin
 - @koishijs/plugin-analytics
 - @koishijs/plugin-auth
 - @koishijs/plugin-commands
@@ -25,6 +27,7 @@
 - @koishijs/plugin-locales
 - @koishijs/plugin-logger
 - @koishijs/plugin-market
+- @koishijs/plugin-oobe
 - @koishijs/plugin-sandbox
 - @koishijs/plugin-status
 

@@ -73,7 +73,7 @@ function getEnvInfo(name: string) {
     setService(name, true)
   }
   for (const name of local.runtime?.optional ?? []) {
-    setService(name, true)
+    setService(name, false)
   }
 
   // check reusability

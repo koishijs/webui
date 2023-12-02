@@ -81,7 +81,7 @@ export class Admin extends Service {
     const item = await this.ctx.database.create('perm_track', { name })
     item.dispose = this.track(item.permissions)
     this.tracks.push(item)
-    this.ctx.console?.admin?.refresh()
+    this.ctx.get('console.admin')?.refresh()
     return item.id
   }
 
@@ -91,14 +91,14 @@ export class Admin extends Service {
     if (item.name === name) return
     item.name = name
     await this.ctx.database.set('perm_track', id, { name })
-    this.ctx.console?.admin?.refresh()
+    this.ctx.get('console.admin')?.refresh()
   }
 
   async deleteTrack(id: number) {
     const index = this.tracks.findIndex(track => track.id === id)
     if (index < 0) throw new Error('track not found')
     this.tracks.splice(index, 1)
-    this.ctx.console?.admin?.refresh()
+    this.ctx.get('console.admin')?.refresh()
     await this.ctx.database.remove('perm_track', id)
   }
 
@@ -109,7 +109,7 @@ export class Admin extends Service {
     item.dispose!()
     item.dispose = this.track(permissions)
     await this.ctx.database.set('perm_track', id, { permissions })
-    this.ctx.console?.admin?.refresh()
+    this.ctx.get('console.admin')?.refresh()
   }
 
   async createGroup(name: string) {
@@ -117,7 +117,7 @@ export class Admin extends Service {
     item.count = 0
     item.dispose = this.ctx.permissions.define('group.' + item.id, [])
     this.groups.push(item)
-    this.ctx.console?.admin?.refresh()
+    this.ctx.get('console.admin')?.refresh()
     return item.id
   }
 
@@ -127,7 +127,7 @@ export class Admin extends Service {
     if (item.name === name) return
     item.name = name
     await this.ctx.database.set('group', id, { name })
-    this.ctx.console?.admin?.refresh()
+    this.ctx.get('console.admin')?.refresh()
   }
 
   async deleteGroup(id: number) {
@@ -146,7 +146,7 @@ export class Admin extends Service {
     })
     await this.ctx.database.upsert('group', updates)
     await this.ctx.database.remove('group', id)
-    this.ctx.console?.admin?.refresh()
+    this.ctx.get('console.admin')?.refresh()
   }
 
   async updateGroup(id: number, permissions: string[]) {
@@ -156,7 +156,7 @@ export class Admin extends Service {
     item.dispose!()
     item.dispose = this.ctx.permissions.define('group.' + item.id, permissions)
     await this.ctx.database.set('group', id, { permissions })
-    this.ctx.console?.admin?.refresh()
+    this.ctx.get('console.admin')?.refresh()
   }
 
   async addUser(id: number, platform: string, aid: string) {
@@ -168,7 +168,7 @@ export class Admin extends Service {
       data.permissions.push('group.' + item.id)
       item.count!++
       await this.ctx.database.set('user', data.id, { permissions: data.permissions })
-      this.ctx.console?.admin?.refresh()
+      this.ctx.get('console.admin')?.refresh()
     }
   }
 
@@ -180,7 +180,7 @@ export class Admin extends Service {
     if (remove(data.permissions, 'group.' + item.id)) {
       item.count!--
       await this.ctx.database.set('user', data.id, { permissions: data.permissions })
-      this.ctx.console?.admin?.refresh()
+      this.ctx.get('console.admin')?.refresh()
     }
   }
 }
