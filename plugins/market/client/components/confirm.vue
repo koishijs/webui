@@ -20,6 +20,7 @@ import { showConfirm, install } from './utils'
 import { config } from '../utils'
 
 function onEnter() {
+  showConfirm.value = false
   return install(config.value.override)
 }
 
