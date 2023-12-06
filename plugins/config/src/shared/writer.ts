@@ -5,26 +5,15 @@ import { Loader } from '@koishijs/loader'
 declare module '@koishijs/console' {
   interface Events {
     'manager/app-reload'(config: any): void
-    'manager/teleport'(source: string, target: string, index: number): void
-    'manager/reload'(path: string, config: any, key?: string): void
-    'manager/unload'(path: string, config: any, key?: string): void
-    'manager/remove'(path: string): void
-    'manager/group'(path: string): void
-    'manager/alias'(path: string, alias: string): void
-    'manager/meta'(path: string, config: any): void
+    'manager/teleport'(source: string, key: string, target: string, index: number): void
+    'manager/reload'(parent: string, key: string, config: any): void
+    'manager/unload'(parent: string, key: string, config: any): void
+    'manager/remove'(parent: string, key: string): void
+    'manager/meta'(ident: string, config: any): void
   }
 }
 
 const logger = new Logger('loader')
-
-// do not use lookbehind assertion for Safari compatibility
-export function splitPath(path: string) {
-  return path
-    .replace(/@([^\/]+)\//g, '@$1\\')
-    .split('/')
-    .filter(Boolean)
-    .map(part => part.replace(/\\/g, '/'))
-}
 
 function insertKey(object: {}, temp: {}, rest: string[]) {
   for (const key of rest) {
@@ -53,7 +42,7 @@ function dropKey(plugins: {}, name: string) {
   return { [name]: value }
 }
 
-export class ConfigWriter extends DataService<Context.Config & { $paths: Dict<number> }> {
+export class ConfigWriter extends DataService<Context.Config> {
   protected loader: Loader
 
   constructor(ctx: Context) {
@@ -64,7 +53,7 @@ export class ConfigWriter extends DataService<Context.Config & { $paths: Dict<nu
       return this.reloadApp(config)
     }, { authority: 4 })
 
-    for (const key of ['teleport', 'reload', 'unload', 'remove', 'group', 'meta', 'alias'] as const) {
+    for (const key of ['teleport', 'reload', 'unload', 'remove', 'meta'] as const) {
       ctx.console.addListener(`manager/${key}`, async (...args: any[]) => {
         try {
           await this[key].apply(this, args)
@@ -78,7 +67,7 @@ export class ConfigWriter extends DataService<Context.Config & { $paths: Dict<nu
     ctx.on('config', () => this.refresh())
   }
 
-  getGroup(plugins: any, ctx: Context, paths: Dict<number> = {}, path = '/') {
+  getGroup(plugins: any, ctx: Context) {
     const result = { ...plugins }
     for (const key in plugins) {
       if (key.startsWith('$')) continue
@@ -96,17 +85,15 @@ export class ConfigWriter extends DataService<Context.Config & { $paths: Dict<nu
       const fork = ctx.scope[Loader.kRecord][key]
       if (!fork) continue
       if (name === 'group') {
-        result[key] = this.getGroup(value, fork.ctx, paths, path + key + '/')
-      } else {
-        paths[path + key] = fork.uid
+        result[key] = this.getGroup(value, fork.ctx)
       }
     }
     return result
   }
 
   async get() {
-    const result: Context.Config & { $paths: Dict<number> } = { ...this.loader.config, $paths: {} }
-    result.plugins = this.getGroup(result.plugins, this.loader.entry, result.$paths)
+    const result: Context.Config = { ...this.loader.config }
+    result.plugins = this.getGroup(result.plugins, this.loader.entry)
     return result
   }
 
@@ -119,41 +106,28 @@ export class ConfigWriter extends DataService<Context.Config & { $paths: Dict<nu
     this.loader.fullReload()
   }
 
-  private resolve(path: string) {
-    const segments = splitPath(path)
-    if (path.endsWith('/')) segments.push('')
-    let ctx = this.loader.entry
-    let name = segments.shift()
-    while (segments.length) {
-      ctx = ctx.scope[Loader.kRecord][name].ctx
-      name = segments.shift()
+  private resolveFork(ident: string) {
+    for (const main of this.ctx.registry.values()) {
+      for (const fork of main.children) {
+        if (fork.key === ident) return fork
+      }
     }
-    return [ctx.scope, name] as const
   }
 
-  async alias(path: string, alias: string) {
-    const [parent, oldKey] = this.resolve(path)
-    let config: any
-    let newKey = oldKey.split(':', 1)[0] + (alias ? ':' : '') + alias
-    const record = parent[Loader.kRecord]
-    const fork = record[oldKey]
-    if (fork) {
-      delete record[oldKey]
-      record[newKey] = fork
-      fork.alias = alias
-      fork.ctx.emit('internal/fork', fork)
-      config = parent.config[oldKey]
-    } else {
-      newKey = '~' + newKey
-      config = parent.config['~' + oldKey]
+  private resolveConfig(ident: string, config = this.loader.config.plugins): [any, string] {
+    for (const key in config) {
+      const [name] = key.split(':', 1)
+      if (key.slice(name.length + 1) === ident) return [config, key]
+      if (name === 'group' || name === '~group') {
+        return this.resolveConfig(ident, config[key])
+      }
     }
-    rename(parent.config, oldKey, newKey, config)
-    await this.loader.writeConfig()
+    throw new Error('plugin not found')
   }
 
-  async meta(path: string, config: any) {
-    const [parent, name] = this.resolve(path)
-    const target = path ? parent.config[name] : parent.config
+  async meta(ident: string, config: any) {
+    const [parent, key] = this.resolveConfig(ident)
+    const target = parent[key]
     for (const key of Object.keys(config)) {
       delete target[key]
       if (config[key] === null) {
@@ -164,47 +138,38 @@ export class ConfigWriter extends DataService<Context.Config & { $paths: Dict<nu
     await this.loader.writeConfig(true)
   }
 
-  async reload(path: string, config: any, newKey?: string) {
-    const [parent, oldKey] = this.resolve(path)
-    if (newKey) {
-      this.loader.unloadPlugin(parent.ctx, oldKey)
-    }
-    await this.loader.reloadPlugin(parent.ctx, newKey || oldKey, config)
-    rename(parent.config, oldKey, newKey || oldKey, config)
+  async reload(parent: string, key: string, config: any) {
+    const scope = this.resolveFork(parent)
+    await this.loader.reload(scope.ctx, key, config)
+    rename(scope.config, key, key, config)
     await this.loader.writeConfig()
   }
 
-  async unload(path: string, config = {}, newKey?: string) {
-    const [parent, oldKey] = this.resolve(path)
-    this.loader.unloadPlugin(parent.ctx, oldKey)
-    rename(parent.config, oldKey, '~' + (newKey || oldKey), config)
+  async unload(parent: string, key: string, config = {}) {
+    const scope = this.resolveFork(parent)
+    this.loader.unload(scope.ctx, key)
+    rename(scope.config, key, '~' + key, config)
+    console.log(scope.config)
     await this.loader.writeConfig()
   }
 
-  async remove(path: string) {
-    const [parent, key] = this.resolve(path)
-    this.loader.unloadPlugin(parent.ctx, key)
-    delete parent.config[key]
-    delete parent.config['~' + key]
+  async remove(parent: string, key: string) {
+    const scope = this.resolveFork(parent)
+    this.loader.unload(scope.ctx, key)
+    delete scope.config[key]
+    delete scope.config['~' + key]
     await this.loader.writeConfig()
   }
 
-  async group(path: string) {
-    const [parent, oldKey] = this.resolve(path)
-    const config = parent.config[oldKey] = {}
-    await this.loader.reloadPlugin(parent.ctx, oldKey, config)
-    await this.loader.writeConfig()
-  }
-
-  async teleport(source: string, target: string, index: number) {
-    const [parentS, oldKey] = this.resolve(source)
-    const [parentT] = this.resolve(target ? target + '/' : '')
+  async teleport(source: string, key: string, target: string, index: number) {
+    const parentS = this.resolveFork(source)
+    const parentT = this.resolveFork(target)
 
     // teleport fork
-    const fork = parentS[Loader.kRecord][oldKey]
+    const fork = parentS?.[Loader.kRecord]?.[key]
     if (fork && parentS !== parentT) {
-      delete parentS[Loader.kRecord][oldKey]
-      parentT[Loader.kRecord][oldKey] = fork
+      delete parentS[Loader.kRecord][key]
+      parentT[Loader.kRecord][key] = fork
       remove(parentS.disposables, fork.dispose)
       parentT.disposables.push(fork.dispose)
       fork.parent = parentT.ctx
@@ -216,7 +181,7 @@ export class ConfigWriter extends DataService<Context.Config & { $paths: Dict<nu
     }
 
     // teleport config
-    const temp = dropKey(parentS.config, oldKey)
+    const temp = dropKey(parentS.config, key)
     const rest = Object.keys(parentT.config).slice(index)
     insertKey(parentT.config, temp, rest)
     await this.loader.writeConfig()

@@ -37,7 +37,7 @@
 
 import { ref, computed, onActivated, nextTick, watch } from 'vue'
 import { send, useMenu } from '@koishijs/client'
-import { Tree, plugins, setPath, splitPath } from './utils'
+import { Tree, plugins } from './utils'
 
 const props = defineProps<{
   modelValue: string
@@ -81,8 +81,7 @@ function allowDrop(source: Node, target: Node, type: 'inner' | 'prev' | 'next') 
   if (type !== 'inner') {
     return target.data.path !== '' || type === 'next'
   }
-  const segments = splitPath(target.data.path)
-  return segments[segments.length - 1]?.startsWith('group:')
+  return target.data.id.startsWith('group:')
 }
 
 function handleClick(tree: Tree) {
@@ -99,14 +98,8 @@ function handleCollapse(data: Tree, target: Node, instance) {
 
 function handleDrop(source: Node, target: Node, position: 'before' | 'after' | 'inner', event: DragEvent) {
   const parent = position === 'inner' ? target : target.parent
-  const oldPath = source.data.path
-  const ctxPath = parent.data.path
-  const index = parent.childNodes.findIndex(node => node.data.path === oldPath)
-  send('manager/teleport', oldPath, ctxPath, index)
-  const segments1 = splitPath(oldPath)
-  const segments2 = ctxPath ? splitPath(ctxPath) : []
-  segments2.push(segments1.pop())
-  setPath(oldPath, segments2.join('/'))
+  const index = parent.childNodes.findIndex(node => node.data.path === source.data.path)
+  send('manager/teleport', source.data.parent?.path ?? '', source.data.id, parent.data.path, index)
 }
 
 function getClass(tree: Tree) {

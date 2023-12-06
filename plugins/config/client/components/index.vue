@@ -6,23 +6,12 @@
 
       <!-- group -->
       <template v-else-if="current.children">
-        分组 <k-alias :current="current"></k-alias>
+        分组：{{ current.label || current.id }}
       </template>
 
       <!-- plugin -->
       <template v-else>
-        <template v-if="!current.name">
-          <el-select v-model="current.target" filterable placeholder="插件选择">
-            <el-option
-              v-for="name in Object.values(store.packages).slice(1).map(value => value.shortname).sort()"
-              :key="name" :label="name" :value="name"
-            ></el-option>
-          </el-select>
-        </template>
-        <template v-else>
-          <span class="label">{{ current.name }}</span>
-          <k-alias :current="current"></k-alias>
-        </template>
+        {{ current.name }}
       </template>
     </template>
 
@@ -47,7 +36,7 @@
       </template>
       <template #footer>
         <el-button @click="showRemove = false">取消</el-button>
-        <el-button type="danger" @click="(showRemove = false, removeItem(remove.path))">确定</el-button>
+        <el-button type="danger" @click="(showRemove = false, removeItem(remove))">确定</el-button>
       </template>
     </el-dialog>
 
@@ -72,13 +61,12 @@
 
 import { computed, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { clone, message, messageBox, send, store, useContext, Schema } from '@koishijs/client'
-import { Tree, getFullName, addItem, hasCoreDeps, current, plugins, removeItem, select, splitPath } from './utils'
+import { clone, message, send, store, useContext, Schema } from '@koishijs/client'
+import { Tree, getFullName, addItem, hasCoreDeps, current, plugins, removeItem, select } from './utils'
 import GlobalSettings from './global.vue'
 import GroupSettings from './group.vue'
 import TreeView from './tree.vue'
 import PluginSettings from './plugin.vue'
-import KAlias from './alias.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -126,7 +114,7 @@ ctx.action('config.tree.add-plugin', {
 
 ctx.action('config.tree.add-group', {
   disabled: ({ config }) => config.tree.path && !config.tree.children,
-  action: ({ config }) => addItem(config.tree.path, 'group', 'group'),
+  action: ({ config }) => addItem(config.tree.path, 'reload', 'group'),
 })
 
 ctx.action('config.tree.rename', {
@@ -140,16 +128,6 @@ ctx.action('config.tree.rename', {
 ctx.action('config.tree.remove', {
   disabled: ({ config }) => !config.tree.path,
   action: ({ config }) => remove.value = config.tree,
-})
-
-ctx.action('config.tree.add-plugin', {
-  disabled: ({ config }) => config.tree.path && !config.tree.children,
-  action: ({ config }) => select.value = config.tree,
-})
-
-ctx.action('config.tree.add-group', {
-  disabled: ({ config }) => config.tree.path && !config.tree.children,
-  action: ({ config }) => addItem(config.tree.path, 'group', 'group'),
 })
 
 function checkConfig(name: string) {
@@ -194,12 +172,7 @@ ctx.action('config.tree.toggle', {
 })
 
 async function execute(tree: Tree, event: 'unload' | 'reload') {
-  await send(`manager/${event}`, tree.path, config.value, tree.target)
-  if (tree.target) {
-    const segments = splitPath(tree.path)
-    segments[segments.length - 1] = tree.target
-    router.replace('/plugins/' + segments.join('/'))
-  }
+  await send(`manager/${event}`, tree.parent?.path ?? '', tree.id, config.value)
 }
 
 function renameItem(tree: Tree, name: string) {

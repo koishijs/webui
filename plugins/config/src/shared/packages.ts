@@ -75,7 +75,7 @@ export abstract class PackageProvider extends DataService<Dict<PackageProvider.D
 
   async parseExports(name: string) {
     try {
-      const exports = await this.ctx.loader.resolvePlugin(name)
+      const exports = await this.ctx.loader.resolve(name)
       const result: PackageProvider.RuntimeData = {}
       result.schema = exports?.Config || exports?.schema
       result.usage = exports?.usage

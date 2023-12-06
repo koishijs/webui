@@ -104,13 +104,11 @@ declare module '@koishijs/client' {
 
 export interface Tree {
   id: string
-  uid?: number
   alias: string
   name: string
   path: string
   label?: string
   config?: any
-  target?: string
   parent?: Tree
   disabled?: boolean
   children?: Tree[]
@@ -132,8 +130,7 @@ export function getFullName(shortname: string) {
 
 export const name = computed(() => {
   if (!current.value) return
-  const { name, target } = current.value
-  return getFullName(target || name)
+  return getFullName(current.value.name)
 })
 
 export const type = computed(() => {
@@ -149,7 +146,7 @@ export const type = computed(() => {
   }
 })
 
-function getTree(parent: Tree, plugins: any, paths: Dict<number>): Tree[] {
+function getTree(parent: Tree, plugins: any): Tree[] {
   const trees: Tree[] = []
   for (let key in plugins) {
     if (key.startsWith('$')) continue
@@ -160,12 +157,11 @@ function getTree(parent: Tree, plugins: any, paths: Dict<number>): Tree[] {
       key = key.slice(1)
     }
     node.name = key.split(':', 1)[0]
-    node.alias = key.slice(node.name.length + 1)
+    node.id = key
+    node.path = node.alias = key.slice(node.name.length + 1)
     node.label = config?.$label
-    node.id = node.path = parent.path + (parent.path ? '/' : '') + key
-    node.uid = paths['/' + node.path]
     if (key.startsWith('group:')) {
-      node.children = getTree(node, config, paths)
+      node.children = getTree(node, config)
     }
     trees.push(node)
   }
@@ -187,7 +183,7 @@ export const plugins = computed(() => {
   const paths: Dict<Tree> = {
     '': root,
   }
-  for (const node of getTree(root, store.config.plugins, store.config.$paths)) {
+  for (const node of getTree(root, store.config.plugins)) {
     data.push(node)
     traverse(node)
   }
@@ -201,38 +197,13 @@ export const plugins = computed(() => {
   return { data, paths, expanded }
 })
 
-export function setPath(oldPath: string, newPath: string) {
-  if (oldPath === newPath) return
-  for (const key of Object.keys(plugins.value.paths)) {
-    if (key !== oldPath && !key.startsWith(oldPath + '/')) continue
-    const tree = plugins.value.paths[key]
-    tree.path = newPath + key.slice(oldPath.length)
-    plugins.value.paths[tree.path] = tree
-    delete plugins.value.paths[key]
-  }
-  router.replace('/plugins/' + newPath)
+export function addItem(path: string, action: 'reload' | 'unload', name: string) {
+  const ident = Math.random().toString(36).slice(2, 8)
+  send(`manager/${action}`, path, `${name}:${ident}`, {})
+  router.replace('/plugins/' + ident)
 }
 
-// do not use lookbehind assertion for Safari compatibility
-export function splitPath(path: string) {
-  return path
-    .replace(/@([^\/]+)\//g, '@$1\\')
-    .split('/')
-    .filter(Boolean)
-    .map(part => part.replace(/\\/g, '/'))
-}
-
-export function addItem(path: string, action: 'group' | 'unload', name: string) {
-  const id = Math.random().toString(36).slice(2, 8)
-  if (path) path += '/'
-  path += name + ':' + id
-  send(`manager/${action}`, path)
-  router.replace('/plugins/' + path)
-}
-
-export function removeItem(path: string) {
-  send('manager/remove', path)
-  const segments = splitPath(path)
-  segments.pop()
-  router.replace('/plugins/' + segments.join('/'))
+export function removeItem(tree: Tree) {
+  send('manager/remove', tree.parent?.path ?? '', tree.id)
+  router.replace('/plugins/' + tree.parent!.path)
 }
