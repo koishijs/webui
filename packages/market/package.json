@@ -28,14 +28,14 @@
   ],
   "devDependencies": {
     "@koishijs/registry": "^6.0.4",
-    "@types/spark-md5": "^3.0.3"
+    "@types/spark-md5": "^3.0.4"
   },
   "peerDependencies": {
     "vue": "^3",
     "vue-i18n": "^9"
   },
   "dependencies": {
-    "@koishijs/components": "^1.4.16",
+    "@koishijs/components": "^1.4.17",
     "cosmokit": "^1.5.1",
     "spark-md5": "^3.0.2"
   }
