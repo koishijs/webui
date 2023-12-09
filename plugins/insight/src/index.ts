@@ -97,12 +97,12 @@ class Insight extends DataService<Insight.Payload> {
       const name = getName(runtime.plugin)
 
       function addNode(state: EffectScope) {
-        const { uid, alias, disposables, status } = state
+        const { uid, key, disposables, status } = state
         const weight = disposables.length
         const isGroup = name === 'Group'
         const isRoot = uid === 0
         const node = { uid, name, weight, status, isGroup, isRoot, services: services[uid] }
-        if (alias) node.name += ` <${format(alias)}>`
+        if (key) node.name += ` <${key}>`
         nodes.push(node)
       }
 

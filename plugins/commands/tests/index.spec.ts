@@ -19,7 +19,7 @@ afterEach(() => {
     if (command.name === 'help') continue
     command.dispose()
   }
-  app.dispose(commands)
+  app.registry.delete(commands)
 })
 
 describe('@koishijs/plugin-commands', () => {
@@ -140,7 +140,7 @@ describe('@koishijs/plugin-commands', () => {
       baz.dispose()
       expect(bar.children).to.have.length(1)
 
-      fork.dispose(commands)
+      fork.dispose()
       await client.shouldReply('foo', 'test')
       expect(bar.children).to.have.length(1)
       expect(baz.children).to.have.length(0)
