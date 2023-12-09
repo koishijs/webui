@@ -1,4 +1,5 @@
-import { Context, makeArray, noop, Schema, Time, WebSocketLayer } from 'koishi'
+import { Context, makeArray, noop, Schema, Time } from 'koishi'
+import { WebSocketLayer } from '@koishijs/plugin-server'
 import { Console, Entry } from '@koishijs/console'
 import { FileSystemServeOptions, ViteDevServer } from 'vite'
 import { extname, resolve } from 'path'
@@ -29,7 +30,7 @@ interface HeartbeatConfig {
 }
 
 class NodeConsole extends Console {
-  static inject = ['router']
+  static inject = ['server']
 
   public vite: ViteDevServer
   public root: string
@@ -38,7 +39,7 @@ class NodeConsole extends Console {
   constructor(public ctx: Context, public config: NodeConsole.Config) {
     super(ctx)
 
-    this.layer = ctx.router.ws(config.apiPath, (socket, request) => {
+    this.layer = ctx.server.ws(config.apiPath, (socket, request) => {
       // @types/ws does not provide typings for `dispatchEvent`
       this.accept(socket as any, request)
     })
@@ -69,8 +70,8 @@ class NodeConsole extends Console {
     if (this.config.devMode) await this.createVite()
     this.serveAssets()
 
-    this.ctx.on('router/ready', () => {
-      const target = this.ctx.router.selfUrl + this.config.uiPath
+    this.ctx.on('server/ready', () => {
+      const target = this.ctx.server.selfUrl + this.config.uiPath
       if (this.config.open && !this.ctx.loader?.envData.clientCount && !process.env.KOISHI_AGENT) {
         open(target)
       }
@@ -105,7 +106,7 @@ class NodeConsole extends Console {
   private serveAssets() {
     const { uiPath } = this.config
 
-    this.ctx.router.get(uiPath + '(/.+)*', async (ctx, next) => {
+    this.ctx.server.get(uiPath + '(/.+)*', async (ctx, next) => {
       await next()
       if (ctx.body || ctx.response.body) return
 
@@ -195,7 +196,7 @@ class NodeConsole extends Console {
       },
     })
 
-    this.ctx.router.all('/vite(/.+)*', (ctx) => new Promise((resolve) => {
+    this.ctx.server.all('/vite(/.+)*', (ctx) => new Promise((resolve) => {
       this.vite.middlewares(ctx.req, ctx.res, resolve)
     }))
 

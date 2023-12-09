@@ -100,7 +100,7 @@ class AuthService extends Service {
       id: 'unsigned',
       type: 'string(255)',
       token: 'string(255)',
-      expiredAt: 'unsigned(20)',
+      expiredAt: 'unsigned(8)',
       createdAt: 'timestamp',
       lastUsedAt: 'timestamp',
       userAgent: 'string(255)',
