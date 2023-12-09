@@ -7,6 +7,8 @@
 .status-light {
   border-radius: 100%;
   transition: var(--color-transition);
+  width: 0.625rem;
+  height: 0.625rem;
 
   &.online {
     background-color: var(--k-color-success);
@@ -19,6 +21,9 @@
   }
   &.offline {
     background-color: var(--k-color-disabled);
+  }
+  & + & {
+    margin-left: 4px;
   }
 }
 

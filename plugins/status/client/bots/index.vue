@@ -40,15 +40,6 @@ const received = computed(() => {
   * + .k-icon {
     margin-left: 6px;
   }
-
-  .status-light {
-    width: 0.625rem;
-    height: 0.625rem;
-  }
-
-  .status-light + .status-light {
-    margin-left: 4px;
-  }
 }
 
 </style>

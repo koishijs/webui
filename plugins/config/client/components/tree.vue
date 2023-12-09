@@ -27,7 +27,9 @@
         <div class="label" :title="getLabel(node)">
           {{ getLabel(node) }}
         </div>
-        <div class="right"></div>
+        <div class="right">
+          <span class="status" :class="getStatus(node)"></span>
+        </div>
       </div>
     </el-tree>
   </el-scrollbar>
@@ -36,8 +38,9 @@
 <script lang="ts" setup>
 
 import { ref, computed, onActivated, nextTick, watch } from 'vue'
-import { send, useMenu } from '@koishijs/client'
-import { Tree, plugins } from './utils'
+import { send, store, useMenu } from '@koishijs/client'
+import { ScopeStatus } from 'cordis'
+import { Tree, getFullName, plugins } from './utils'
 
 const props = defineProps<{
   modelValue: string
@@ -70,6 +73,16 @@ function getLabel(node: Node) {
     return '分组：' + (node.label || node.data.alias)
   } else {
     return node.label || node.data.name || '待添加'
+  }
+}
+
+function getStatus(node: Node) {
+  switch (store.packages?.[getFullName(node.data.name)]?.runtime?.forks?.[node.data.path]?.status) {
+    case ScopeStatus.PENDING: return 'pending'
+    case ScopeStatus.LOADING: return 'loading'
+    case ScopeStatus.ACTIVE: return 'active'
+    case ScopeStatus.FAILED: return 'failed'
+    case ScopeStatus.DISPOSED: return 'disposed'
   }
 }
 
@@ -172,24 +185,39 @@ onActivated(async () => {
 
     .right {
       height: 100%;
-      margin: 0 0.75rem 0 0.5rem;
+      margin: 0 1.5rem 0 0.5rem;
 
-      > span.button {
-        display: inline-flex;
-        height: 100%;
-        width: 1.5rem;
-        justify-content: center;
-        align-items: center;
-        opacity: 0.75;
-        color: var(--k-text-light);
+      > span.status {
+        display: inline-block;
+        width: 0.625rem;
+        height: 0.625rem;
+        border-radius: 100%;
         transition: var(--color-transition);
 
-        &:hover {
-          color: var(--k-text-dark);
-          opacity: 1 !important;
+        &.active {
+          background-color: var(--k-color-success);
+        }
+        &.pending {
+          background-color: var(--k-color-warning);
+        }
+        &.loading {
+          animation: status-flash 1s infinite;
+          background-color: var(--k-color-warning);
+        }
+        &.failed {
+          background-color: var(--k-color-danger);
         }
       }
     }
+  }
+}
+
+@keyframes status-flash {
+  0%, 100% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
   }
 }
 

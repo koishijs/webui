@@ -1,4 +1,5 @@
-import { Context, Dict, EffectScope, Logger, Plugin, Schema } from 'koishi'
+import { Context, Dict, Logger, MainScope, Plugin, Schema } from 'koishi'
+import { ScopeStatus } from 'cordis'
 import { DataService } from '@koishijs/console'
 import { PackageJson, SearchObject, SearchResult } from '@koishijs/registry'
 import { debounce } from 'throttle-debounce'
@@ -27,6 +28,7 @@ export abstract class PackageProvider extends DataService<Dict<PackageProvider.D
 
     ctx.on('internal/runtime', scope => this.update(scope.runtime.plugin))
     ctx.on('internal/fork', scope => this.update(scope.runtime.plugin))
+    ctx.on('internal/status', scope => this.update(scope.runtime.plugin))
     ctx.on('hmr/reload', (reloads) => {
       for (const [plugin] of reloads) {
         this.update(plugin)
@@ -49,9 +51,12 @@ export abstract class PackageProvider extends DataService<Dict<PackageProvider.D
     this.debouncedRefresh()
   }
 
-  parseRuntime(state: EffectScope, result: PackageProvider.RuntimeData) {
+  parseRuntime(state: MainScope, result: PackageProvider.RuntimeData) {
     result.id = state.runtime.uid
     result.forkable = state.runtime.isForkable
+    result.forks = Object.fromEntries(state.children
+      .filter(fork => fork.key)
+      .map(fork => [fork.key, { status: fork.status }]))
   }
 
   async get(forced = false) {
@@ -119,5 +124,8 @@ export namespace PackageProvider {
     required?: string[]
     optional?: string[]
     failed?: boolean
+    forks?: Dict<{
+      status?: ScopeStatus
+    }>
   }
 }
