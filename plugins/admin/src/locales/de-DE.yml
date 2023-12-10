@@ -1,6 +1,6 @@
 commands:
   user:
-    description: 用户管理
+    description: Benutzerverwaltung
   channel:
     description: Kanalverwaltung
   authorize:
@@ -15,7 +15,7 @@ admin:
   user-option: Zielbenutzer festlegen
   user-not-found: Es wurden keine Zielbenutzer gefunden.
   user-unchanged: Die Benutzerdaten wurden nicht geändert.
-  user-updated: 用户数据已修改。
+  user-updated: Die Benutzerdaten wurden geändert.
   channel-option: Zielkanal festlegen
   channel-not-found: Es wurden keinen Zielkanal gefunden.
   channel-unchanged: Kanaldaten wurden nicht verändert.
