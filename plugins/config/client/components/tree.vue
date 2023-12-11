@@ -111,7 +111,8 @@ function handleCollapse(data: Tree, target: Node, instance) {
 
 function handleDrop(source: Node, target: Node, position: 'before' | 'after' | 'inner', event: DragEvent) {
   const parent = position === 'inner' ? target : target.parent
-  const index = parent.childNodes.findIndex(node => node.data.path === source.data.path)
+  let index = parent.childNodes.findIndex(node => node.data.path === source.data.path)
+  if (!parent.data.path) index -= 1 // global config
   send('manager/teleport', source.data.parent?.path ?? '', source.data.id, parent.data.path, index)
 }
 

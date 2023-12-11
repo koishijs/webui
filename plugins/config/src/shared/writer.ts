@@ -120,7 +120,9 @@ export class ConfigWriter extends DataService<Context.Config> {
       const [name] = key.split(':', 1)
       if (key.slice(name.length + 1) === ident) return [config, key]
       if (name === 'group' || name === '~group') {
-        return this.resolveConfig(ident, config[key])
+        try {
+          return this.resolveConfig(ident, config[key])
+        } catch {}
       }
     }
     throw new Error('plugin not found')
