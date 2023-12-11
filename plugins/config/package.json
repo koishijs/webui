@@ -1,7 +1,7 @@
 {
   "name": "@koishijs/plugin-config",
   "description": "Manage your bots and plugins with console",
-  "version": "2.5.0",
+  "version": "2.5.1",
   "main": "lib/node/index.js",
   "types": "lib/index.d.ts",
   "exports": {
