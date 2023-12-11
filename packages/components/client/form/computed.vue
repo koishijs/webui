@@ -127,7 +127,7 @@ const actions = {
     branches[index] = { ...branches[index], [key]: value }
     emit('update:modelValue', { $switch: { ...props.modelValue.$switch, branches } })
   },
-  insert(index: number = props.modelValue?.$switch.branches.length) {
+  insert(index: number = props.modelValue?.$switch?.branches.length) {
     if (props.modelValue?.$switch) {
       const branches = props.modelValue.$switch.branches.slice()
       branches.splice(index, 0, { case: null, then: null })
