@@ -1,5 +1,5 @@
 import { DataService } from '@koishijs/console'
-import { Context, Dict, Logger, remove } from 'koishi'
+import { Context, Logger, remove } from 'koishi'
 import { Loader } from '@koishijs/loader'
 
 declare module '@koishijs/console' {
@@ -107,6 +107,7 @@ export class ConfigWriter extends DataService<Context.Config> {
   }
 
   private resolveFork(ident: string) {
+    if (!ident) return this.loader.entry.scope
     for (const main of this.ctx.registry.values()) {
       for (const fork of main.children) {
         if (fork.key === ident) return fork
@@ -149,7 +150,6 @@ export class ConfigWriter extends DataService<Context.Config> {
     const scope = this.resolveFork(parent)
     this.loader.unload(scope.ctx, key)
     rename(scope.config, key, '~' + key, config)
-    console.log(scope.config)
     await this.loader.writeConfig()
   }
 
