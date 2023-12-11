@@ -4,7 +4,7 @@ commands:
   channel:
     description: Kanalverwaltung
   authorize:
-    description: 权限管理
+    description: Berechtigungsverwaltung
   assign:
     description: Empfängerkonto
   user.locale:
