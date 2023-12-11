@@ -4,7 +4,7 @@ commands:
   channel:
     description: Gestion des canaux
   authorize:
-    description: 权限管理
+    description: Gestion des permissions
   assign:
     description: Compte du destinataire
   user.locale:
