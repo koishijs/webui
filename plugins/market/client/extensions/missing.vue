@@ -14,7 +14,7 @@ const router = useRouter()
 const current = inject<WritableComputedRef<any>>('manager.settings.current')
 
 function gotoMarket() {
-  router.push('/market?keyword=' + current.value.label)
+  router.push('/market?keyword=' + current.value.name)
 }
 
 </script>

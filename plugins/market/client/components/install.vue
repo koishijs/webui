@@ -49,8 +49,8 @@
     <div v-if="local && paths.length">
       点击以前往配置页面：
       <ul>
-        <li v-for="([path, active]) of paths" :key="path">
-          <span class="link" @click.stop="configure(path)">{{ path }}</span>
+        <li v-for="([path, key, active]) of paths" :key="key">
+          <span class="link" @click.stop="configure(key)">{{ path }}</span>
           ({{ active ? '运行中' : '闲置' }})
         </li>
         <li v-if="!local.runtime?.id">
@@ -100,9 +100,9 @@ function installDep(version: string) {
   }
   install({ [active.value]: version }, async () => {
     if (!version || !target || !store.config || getPaths(target).length) return
-    const path = target + ':' + Math.random().toString(36).slice(2, 8)
-    await send('manager/unload', path, {})
-    await router.push('/plugins/' + path)
+    const key = Math.random().toString(36).slice(2, 8)
+    await send('manager/unload', '', target + ':' + key, {})
+    await router.push('/plugins/' + key)
   })
 }
 
@@ -130,18 +130,18 @@ const current = computed(() => store.dependencies?.[active.value]?.resolved)
 const local = computed(() => store.packages?.[active.value])
 const versions = computed(() => store.registry?.[active.value])
 
+const workspace = computed(() => {
+  // workspace plugins:     dependencies ? packages √
+  // workspace non-plugins: dependencies √ packages ×
+  return store.dependencies?.[active.value]?.workspace || local.value?.workspace
+})
+
 watch(active, async (name) => {
   if (name && !workspace.value && !versions.value) {
     const data = await send('market/registry', name)
     version.value = Object.keys(data)[0]
   }
 }, { immediate: true })
-
-const workspace = computed(() => {
-  // workspace plugins:     dependencies ? packages √
-  // workspace non-plugins: dependencies √ packages ×
-  return store.dependencies?.[active.value]?.workspace || local.value?.workspace
-})
 
 const data = computed(() => {
   if (!active.value || workspace.value) return
@@ -183,15 +183,15 @@ watch(active, (value) => {
     || Object.keys(store.registry?.[value] || {})[0]
 }, { immediate: true })
 
-function* find(target: string, plugins: {}, prefix: string): IterableIterator<[string, boolean]> {
+function* find(target: string, plugins: {}, prefix: string): IterableIterator<[string, string, boolean]> {
   for (let key in plugins) {
     const config = plugins[key]
     const active = !key.startsWith('~')
     if (!active) key = key.slice(1)
     const request = key.split(':')[0]
-    if (request === target) yield [prefix + key, active]
+    if (request === target) yield [prefix + key, key.slice(request.length + 1), active]
     if (request === 'group') {
-      yield* find(target, config, prefix + key + '/')
+      yield* find(target, config, prefix + key + ' > ')
     }
   }
 }
@@ -210,13 +210,14 @@ function getPaths(target: string) {
   return [...find(target, store.config.plugins, '')]
 }
 
-function configure(path: string | true) {
+function configure(key: string | true) {
+  const target = shortname.value
   active.value = ''
-  if (path === true) {
-    path = shortname.value + ':' + Math.random().toString(36).slice(2, 8)
-    send('manager/unload', path, {})
+  if (key === true) {
+    key = Math.random().toString(36).slice(2, 8)
+    send('manager/unload', '', target + ':' + key, {})
   }
-  router.push('/plugins/' + path)
+  router.push('/plugins/' + key)
 }
 
 </script>
