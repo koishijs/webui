@@ -28,9 +28,12 @@
           </div>
         </template>
         <template #action="data">
-          <k-button v-if="global.static" solid @click.stop="handleClick(data)">配置</k-button>
-          <k-button v-else-if="installed(data)" type="success" solid @click.stop="handleClick(data)">修改</k-button>
-          <k-button v-else solid @click.stop="handleClick(data)">添加</k-button>
+          <el-button
+            solid
+            :type="getType(data)"
+            @click.stop.prevent="active = data.package.name">
+            {{ getText(data) }}
+          </el-button>
         </template>
       </market-list>
     </el-scrollbar>
@@ -49,7 +52,7 @@
 
 import { router, store, global } from '@koishijs/client'
 import { computed, provide, ref, watch } from 'vue'
-import { active } from '../utils'
+import { active, config } from '../utils'
 import { getSorted, kConfig, MarketFilter, MarketList, MarketSearch } from '@koishijs/market'
 import { SearchObject } from '@koishijs/registry'
 
@@ -91,8 +94,28 @@ watch(prompt, (value) => {
   }
 }, { deep: true })
 
-function handleClick(data: SearchObject) {
-  active.value = data.package.name
+function getType(data: SearchObject) {
+  if (global.static) return 'primary'
+  const version = config.value.override[data.package.name]
+  if (installed(data)) {
+    if (version === '') return 'danger'
+    if (version) return 'warning'
+    return 'success'
+  }
+  if (version) return 'warning'
+  return 'primary'
+}
+
+function getText(data: SearchObject) {
+  if (global.static) return '配置'
+  const version = config.value.override[data.package.name]
+  if (installed(data)) {
+    if (version === '') return '等待移除'
+    if (version) return '等待更新'
+    return '修改'
+  }
+  if (version) return '等待添加'
+  return '添加'
 }
 
 function scrollToTop() {

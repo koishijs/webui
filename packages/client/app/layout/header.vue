@@ -111,6 +111,10 @@ const route = useRoute()
     cursor: pointer;
     transition: var(--color-transition);
 
+    &.active {
+      color: var(--k-color-primary);
+    }
+
     &.spin {
       animation: spin 1s linear infinite;
     }

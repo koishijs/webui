@@ -4,12 +4,14 @@ import { gt } from 'semver'
 
 interface ManagerConfig {
   prefix: string
+  bulk?: boolean
   override: Dict<string>
   hideWorkspace?: boolean
 }
 
 export const config: Ref<ManagerConfig> = useStorage<ManagerConfig>('manager', 2, () => ({
   prefix: '^',
+  bulk: false,
   override: {},
   hideWorkspace: true,
 }))

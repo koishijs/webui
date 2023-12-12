@@ -63,15 +63,17 @@
     </div>
 
     <template v-if="active && !global.static" #footer>
-      <div class="left"></div>
+      <div class="left">
+        <el-checkbox v-model="config.bulk">批量操作模式</el-checkbox>
+      </div>
       <div class="right">
         <el-button @click="active = ''">取消</el-button>
         <template v-if="workspace">
-          <el-button v-if="current" @click="installDep('')">移除</el-button>
+          <el-button v-if="current || config.bulk && config.override[active]" @click="installDep('')">移除</el-button>
           <el-button v-else @click="installDep(version)" :disabled="unchanged">添加</el-button>
         </template>
         <template v-else-if="data">
-          <el-button v-if="current" @click="installDep('')">移除</el-button>
+          <el-button v-if="current || config.bulk && config.override[active]" @click="installDep('')" type="danger">移除</el-button>
           <el-button :type="result" @click="installDep(version)" :disabled="unchanged">
             {{ current ? '更新' : '安装' }}
           </el-button>
@@ -91,6 +93,11 @@ import { parse } from 'semver'
 
 function installDep(version: string) {
   const target = shortname.value
+  if (config.value.bulk) {
+    config.value.override[active.value] = version
+    active.value = ''
+    return
+  }
   install({ [active.value]: version }, async () => {
     if (!version || !target || !store.config || getPaths(target).length) return
     const path = target + ':' + Math.random().toString(36).slice(2, 8)

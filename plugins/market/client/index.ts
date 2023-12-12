@@ -1,9 +1,12 @@
 import { defineComponent, h } from 'vue'
 import { Context, global, receive, router, send, store } from '@koishijs/client'
 import type {} from '@koishijs/plugin-market'
+import { config } from './utils'
+import { showConfirm, showManual } from './components/utils'
 import extensions from './extensions'
 import Dependencies from './components/dependencies.vue'
 import Install from './components/install.vue'
+import Confirm from './components/confirm.vue'
 import Market from './components/market.vue'
 import Progress from './components/progress.vue'
 import './icons'
@@ -44,6 +47,11 @@ export default (ctx: Context) => {
     component: Install,
   })
 
+  ctx.slot({
+    type: 'global',
+    component: Confirm,
+  })
+
   ctx.page({
     id: 'market',
     path: '/market',
@@ -77,7 +85,24 @@ export default (ctx: Context) => {
     action: (scope) => send('market/refresh'),
   })
 
+  ctx.action('market.install', {
+    disabled: () => !Object.keys(config.value.override).length,
+    action() {
+      showConfirm.value = true
+    },
+  })
+
+  ctx.action('dependencies.manual', {
+    action() {
+      showManual.value = true
+    },
+  })
+
   ctx.menu('market', [{
+    id: '.install',
+    icon: 'check',
+    label: '应用更改',
+  }, {
     id: '.refresh',
     icon: 'refresh',
     label: '刷新',
@@ -89,7 +114,7 @@ export default (ctx: Context) => {
     icon: 'rocket',
     label: '全部更新',
   }, {
-    id: '.install',
+    id: 'market.install',
     icon: 'check',
     label: '应用更改',
   }, {
