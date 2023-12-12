@@ -1,5 +1,5 @@
 <template>
-  <el-dialog v-if="store.market.registry" v-model="showConfirm" class="confirm-panel" destroy-on-close>
+  <el-dialog v-if="store.market?.registry" v-model="showConfirm" class="confirm-panel" destroy-on-close>
     <template #header>确认安装</template>
     <table>
       <thead>

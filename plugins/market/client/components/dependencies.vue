@@ -35,7 +35,7 @@
 
 <script lang="ts" setup>
 
-import { computed, watch } from 'vue'
+import { computed, watch, WatchStopHandle } from 'vue'
 import { store, useContext, mapValues } from '@koishijs/client'
 import { config, hasUpdate } from '../utils'
 import { manualDeps } from './utils'
@@ -52,13 +52,18 @@ const names = computed(() => {
     .sort((a, b) => a > b ? 1 : -1)
 })
 
-watch(() => config.value.override, (object) => {
-  Object.keys(object).forEach(async (name) => {
-    if (store.dependencies[name]) return
-    const response = await fetch(`${store.market.registry}/${name}`)
-    const data = await response.json()
-    manualDeps[name] = mapValues(data.versions, () => ({ peers: {}, result: 'success' }))
-  })
+let dispose: WatchStopHandle
+watch(() => store.market?.registry, (registry) => {
+  dispose?.()
+  if (!registry) return
+  dispose = watch(() => config.value.override, (object) => {
+    Object.keys(object).forEach(async (name) => {
+      if (store.dependencies[name]) return
+      const response = await fetch(`${registry}/${name}`)
+      const data = await response.json()
+      manualDeps[name] = mapValues(data.versions, () => ({ peers: {}, result: 'success' }))
+    })
+  }, { immediate: true })
 }, { immediate: true })
 
 const updates = computed(() => names.value.filter(hasUpdate))

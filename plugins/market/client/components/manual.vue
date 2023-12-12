@@ -1,5 +1,5 @@
 <template>
-  <el-dialog v-if="store.market.registry" v-model="showManual" class="manual-panel" destroy-on-close>
+  <el-dialog v-if="store.market?.registry" v-model="showManual" class="manual-panel" destroy-on-close>
     <template #header>高级：手动添加依赖</template>
     <k-comment type="warning">
       <p>提示：如果你想要安装插件，请前往<router-link to="/market">插件市场</router-link>页面。</p>

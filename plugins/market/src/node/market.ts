@@ -81,14 +81,14 @@ class MarketProvider extends BaseMarketProvider {
     await this.prepare()
     if (this._error) return { data: {}, failed: 0, total: 0, progress: 0 }
     return this.scanner.version ? {
-      registry: this.ctx.installer.config.endpoint,
+      registry: this.ctx.installer.endpoint,
       data: Object.fromEntries(this.scanner.objects.map(item => [item.package.name, item])),
       failed: 0,
       total: this.scanner.total,
       progress: this.scanner.total,
       gravatar: process.env.GRAVATAR_MIRROR,
     } : {
-      registry: this.ctx.installer.config.endpoint,
+      registry: this.ctx.installer.endpoint,
       data: this.fullCache,
       failed: this.failed.length,
       total: this.scanner.total,
