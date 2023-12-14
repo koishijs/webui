@@ -11,9 +11,9 @@ export default defineExtension((ctx) => {
     component: Card.numeric({
       title: '近期消息频率',
       icon: 'history',
-      fields: ['stats'],
-      content({ stats }) {
-        return Object.values(stats.botSend).reduce((sum, value) => sum + value, 0).toFixed(1) + ' / d'
+      fields: ['analytics'],
+      content({ analytics }) {
+        return Object.values(analytics.botSend).reduce((sum, value) => sum + value, 0).toFixed(1) + ' / d'
       },
     }),
   })

@@ -1,12 +1,6 @@
-import { $, Argv, Context, noop, Schema, Time } from 'koishi'
+import { $, Context, noop, Schema, Time } from 'koishi'
 import { DataService } from '@koishijs/console'
 import type Assets from '@koishijs/assets'
-
-declare module 'koishi' {
-  interface User {
-    lastCall: Date
-  }
-}
 
 class MetaProvider extends DataService<MetaProvider.Payload> {
   timestamp = 0
@@ -30,15 +24,6 @@ class MetaProvider extends DataService<MetaProvider.Payload> {
         assignee: { $ne: null },
       })
       return { activeGuilds }
-    })
-
-    ctx.model.extend('user', {
-      lastCall: 'timestamp',
-    })
-
-    ctx.any().before('command/execute', ({ session }: Argv<'lastCall'>) => {
-      if (!ctx.database) return
-      session.user.lastCall = new Date()
     })
   }
 

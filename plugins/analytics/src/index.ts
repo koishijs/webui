@@ -2,7 +2,7 @@ import { Context, Schema } from 'koishi'
 import { resolve } from 'path'
 import {} from '@koishijs/console'
 import MetaProvider from './meta'
-import StatisticsProvider from './stats'
+import Analytics from './stats'
 
 export type Activity = Record<number, number>
 
@@ -17,14 +17,14 @@ declare module '@koishijs/console' {
   namespace Console {
     interface Services {
       meta: MetaProvider
-      stats: StatisticsProvider
+      analytics: Analytics
     }
   }
 }
 
 export {
   MetaProvider,
-  StatisticsProvider,
+  Analytics as StatisticsProvider,
 }
 
 export * from './meta'
@@ -34,11 +34,11 @@ export const filter = false
 export const name = 'status'
 export const inject = ['console']
 
-export interface Config extends MetaProvider.Config, StatisticsProvider.Config {}
+export interface Config extends MetaProvider.Config, Analytics.Config {}
 
 export const Config: Schema<Config> = Schema.intersect([
   MetaProvider.Config,
-  StatisticsProvider.Config,
+  Analytics.Config,
 ])
 
 export function apply(ctx: Context, config: Config) {
@@ -48,5 +48,5 @@ export function apply(ctx: Context, config: Config) {
   })
 
   ctx.plugin(MetaProvider, config)
-  ctx.plugin(StatisticsProvider, config)
+  ctx.plugin(Analytics, config)
 }

@@ -1,19 +1,23 @@
-import { $, Bot, Channel, Context, Dict, Logger, Schema, Session, Time, Universal, valueMap } from 'koishi'
+import { $, Argv, Bot, Channel, Context, Dict, Logger, Schema, Time, Universal, valueMap } from 'koishi'
 import { DataService } from '@koishijs/console'
 
 declare module 'koishi' {
-  interface Session {
-    _sendType?: 'command' | 'dialogue'
+  interface User {
+    lastCall: Date
+  }
+
+  interface Channel {
+    lastCall: Date
   }
 
   interface Tables {
-    stats_daily: Record<StatisticsProvider.DailyField, Dict<number>> & { time: Date }
-    stats_hourly: Record<StatisticsProvider.HourlyField, number> & { time: Date }
-    stats_longterm: Record<StatisticsProvider.LongtermField, number> & { time: Date }
+    stats_daily: Record<Analytics.DailyField, Dict<number>> & { time: Date }
+    stats_hourly: Record<Analytics.HourlyField, number> & { time: Date }
+    stats_longterm: Record<Analytics.LongtermField, number> & { time: Date }
   }
 }
 
-const logger = new Logger('stats')
+const logger = new Logger('analytics')
 
 export const RECENT_LENGTH = 5
 
@@ -40,36 +44,33 @@ export interface GuildData {
   last: number
 }
 
-const send = Session.prototype.send
-Session.prototype.send = function (this: Session, ...args) {
-  if (args[0] && this._sendType && this.app.console) {
-    this.app.console.stats.hourly[this._sendType] += 1
-  }
-  return send.apply(this, args)
-}
-
-const customTag = Symbol('custom-send')
-Session.prototype.send[customTag] = send
-
-class StatisticsProvider extends DataService<StatisticsProvider.Payload> {
+class Analytics extends DataService<Analytics.Payload> {
   static inject = ['database', 'console']
 
   lastUpdate = new Date()
   updateHour = this.lastUpdate.getHours()
-  callbacks: StatisticsProvider.Extension[] = []
+  callbacks: Analytics.Extension[] = []
   cachedDate: number
-  cachedData: Promise<StatisticsProvider.Payload>
+  cachedData: Promise<Analytics.Payload>
   average = average
 
   guilds: Dict<Dict<number>>
-  daily: Record<StatisticsProvider.DailyField, Dict<number>>
-  hourly: Record<StatisticsProvider.HourlyField, number>
-  longterm: Record<StatisticsProvider.LongtermField, number>
+  daily: Record<Analytics.DailyField, Dict<number>>
+  hourly: Record<Analytics.HourlyField, number>
+  longterm: Record<Analytics.LongtermField, number>
 
-  constructor(ctx: Context, private config: StatisticsProvider.Config = {}) {
-    super(ctx, 'stats')
+  constructor(ctx: Context, private config: Analytics.Config = {}) {
+    super(ctx, 'analytics')
 
     this.clear()
+
+    ctx.model.extend('user', {
+      lastCall: 'timestamp',
+    })
+
+    ctx.model.extend('channel', {
+      lastCall: 'timestamp',
+    })
 
     ctx.model.extend('channel', {
       name: 'string(50)',
@@ -78,57 +79,51 @@ class StatisticsProvider extends DataService<StatisticsProvider.Payload> {
 
     ctx.model.extend('stats_daily', {
       time: 'date',
-      ...Object.fromEntries(StatisticsProvider.dailyFields.map((key) => [key, 'json'])),
+      ...Object.fromEntries(Analytics.dailyFields.map((key) => [key, 'json'])),
     }, { primary: 'time' })
 
     ctx.model.extend('stats_hourly', {
       time: 'timestamp',
-      ...Object.fromEntries(StatisticsProvider.hourlyFields.map((key) => [key, { type: 'integer', initial: 0 }])),
+      ...Object.fromEntries(Analytics.hourlyFields.map((key) => [key, { type: 'integer', initial: 0 }])),
     }, { primary: 'time' })
 
     ctx.model.extend('stats_longterm', {
       time: 'date',
-      ...Object.fromEntries(StatisticsProvider.longtermFields.map((key) => [key, { type: 'integer', initial: 0 }])),
+      ...Object.fromEntries(Analytics.longtermFields.map((key) => [key, { type: 'integer', initial: 0 }])),
     }, { primary: 'time' })
 
     ctx.on('exit', () => this.upload(true))
 
     ctx.on('dispose', async () => {
-      // rollback to default implementation to prevent infinite call stack
-      if (Session.prototype.send[customTag]) {
-        Session.prototype.send = Session.prototype.send[customTag]
-      }
       await this.upload(true)
     })
 
-    ctx.before('command/execute', ({ command, session }) => {
-      if (command.parent?.name !== 'test') {
-        const [name] = command.name.split('.', 1)
-        this.addDaily('command', name)
-        this.upload()
-      }
-      session._sendType = 'command'
+    ctx.any().before('command/execute', ({ session }: Argv<'lastCall', 'lastCall'>) => {
+      if (!ctx.database) return
+      session.user.lastCall = new Date()
+      session.channel.lastCall = new Date()
     })
 
-    const updateSendStats = async (session: Session) => {
+    ctx.any().before('command/execute', ({ command, session }) => {
+      const [name] = command.name.split('.', 1)
+      this.addDaily('command', name)
+      this.upload()
+    })
+
+    ctx.on('message', (session) => {
+      this.hourly.receive += 1
+      this.addDaily('botReceive', session.sid)
+      this.upload()
+    })
+
+    ctx.on('send', (session) => {
       this.hourly.total += 1
-      this.hourly[session.subtype] += 1
       this.longterm.message += 1
       this.addDaily('botSend', session.sid)
       if (!session.isDirect) {
         this.addDaily('group', session.gid)
-        const record = this.guilds[session.platform] ||= {}
-        record[session.guildId] = (record[session.guildId] || 0) + 1
       }
       this.upload()
-    }
-
-    ctx.on('message', (session) => {
-      this.addDaily('botReceive', session.sid)
-    })
-
-    ctx.on('before-send', (session) => {
-      updateSendStats(session)
     })
 
     this.extend(this.extendBasic)
@@ -136,13 +131,12 @@ class StatisticsProvider extends DataService<StatisticsProvider.Payload> {
   }
 
   private clear() {
-    this.daily = Object.fromEntries(StatisticsProvider.dailyFields.map(i => [i, {}])) as any
-    this.hourly = Object.fromEntries(StatisticsProvider.hourlyFields.map(i => [i, 0])) as any
-    this.longterm = Object.fromEntries(StatisticsProvider.longtermFields.map(i => [i, 0])) as any
-    this.guilds = {}
+    this.daily = Object.fromEntries(Analytics.dailyFields.map(i => [i, {}])) as any
+    this.hourly = Object.fromEntries(Analytics.hourlyFields.map(i => [i, 0])) as any
+    this.longterm = Object.fromEntries(Analytics.longtermFields.map(i => [i, 0])) as any
   }
 
-  addDaily(field: StatisticsProvider.DailyField, key: string | number) {
+  addDaily(field: Analytics.DailyField, key: string | number) {
     const stat: Record<string, number> = this.daily[field] ||= {}
     stat[key] = (stat[key] || 0) + 1
   }
@@ -208,15 +202,15 @@ class StatisticsProvider extends DataService<StatisticsProvider.Payload> {
         this._uploadGuilds(date),
       ])
       this.clear()
-      logger.debug('stats updated')
+      logger.debug('analytics updated')
     }
   }
 
-  extend(callback: StatisticsProvider.Extension) {
+  extend(callback: Analytics.Extension) {
     this.callbacks.push(callback)
   }
 
-  private extendBasic: StatisticsProvider.Extension = async (payload, data) => {
+  private extendBasic: Analytics.Extension = async (payload, data) => {
     // history
     payload.history = {}
     data.longterm.forEach((stat) => {
@@ -234,7 +228,7 @@ class StatisticsProvider extends DataService<StatisticsProvider.Payload> {
     })
   }
 
-  private extendGuilds: StatisticsProvider.Extension = async (payload, data) => {
+  private extendGuilds: Analytics.Extension = async (payload, data) => {
     const groupSet = new Set<string>()
     payload.guilds = []
     const groupMap = Object.fromEntries(data.guilds.map(g => [`${g.platform}:${g.id}`, g]))
@@ -290,7 +284,7 @@ class StatisticsProvider extends DataService<StatisticsProvider.Payload> {
       this.ctx.database.get('channel', row => $.eq(row.id, row.guildId), ['platform', 'id', 'name', 'assignee']),
     ])
     const data = { daily, hourly, longterm, guilds }
-    const payload = {} as StatisticsProvider.Payload
+    const payload = {} as Analytics.Payload
     await Promise.all(this.callbacks.map(cb => cb(payload, data)))
     return payload
   }
@@ -306,7 +300,7 @@ class StatisticsProvider extends DataService<StatisticsProvider.Payload> {
   }
 }
 
-namespace StatisticsProvider {
+namespace Analytics {
   export type DailyField = typeof dailyFields[number]
   export const dailyFields = [
     'command', 'dialogue', 'botSend', 'botReceive', 'group',
@@ -314,7 +308,7 @@ namespace StatisticsProvider {
 
   export type HourlyField = typeof hourlyFields[number]
   export const hourlyFields = [
-    'total', 'group', 'private', 'command', 'dialogue',
+    'total', 'receive',
   ] as const
 
   export type LongtermField = typeof longtermFields[number]
@@ -323,7 +317,7 @@ namespace StatisticsProvider {
   ] as const
 
   export interface Data {
-    extension?: StatisticsProvider.Payload
+    extension?: Analytics.Payload
     guilds: Pick<Channel, 'id' | 'platform' | 'name' | 'assignee'>[]
     daily: Record<DailyField, Dict<number>>[]
     hourly: ({ time: Date } & Record<HourlyField, number>)[]
@@ -347,7 +341,7 @@ namespace StatisticsProvider {
     statsInternal: Schema.natural().role('ms').description('统计数据推送的时间间隔。').default(Time.minute * 10),
   })
 
-  export type Extension = (payload: Payload, data: StatisticsProvider.Data) => Promise<void>
+  export type Extension = (payload: Payload, data: Analytics.Data) => Promise<void>
 }
 
-export default StatisticsProvider
+export default Analytics
