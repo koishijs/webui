@@ -19,7 +19,7 @@ export default (ctx: Context) => {
           }),
           xAxis: {
             type: 'category',
-            data: Object.keys(analytics.messageByDate).reverse(),
+            data: Object.keys(analytics.messageByDate),
           },
           yAxis: {
             type: 'value',
@@ -27,7 +27,7 @@ export default (ctx: Context) => {
           series: {
             type: 'line',
             smooth: true,
-            data: Object.values(analytics.messageByDate).map(stats => stats.send).reverse(),
+            data: Object.values(analytics.messageByDate).map(stats => stats.send),
           },
         }
       },

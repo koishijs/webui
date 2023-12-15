@@ -24,6 +24,7 @@ export function createChart({ title, fields, options }: ChartOptions) {
 interface CommonData {
   name: string
   value: number
+  children?: CommonData
 }
 
 export namespace Tooltip {

@@ -1,4 +1,4 @@
-import { $, Context, deepEqual, Dict, Logger, Row, Schema, Session, Time } from 'koishi'
+import { $, Context, deepEqual, Dict, Logger, pick, Row, Schema, Session, Time, Universal } from 'koishi'
 import { DataService } from '@koishijs/console'
 import { resolve } from 'path'
 
@@ -54,7 +54,7 @@ class Analytics extends DataService<Analytics.Payload> {
       hour: 'integer',
       name: 'string',
       selfId: 'string',
-      userId: 'string',
+      userId: 'integer',
       channelId: 'string',
       platform: 'string',
       count: 'integer',
@@ -111,8 +111,8 @@ class Analytics extends DataService<Analytics.Payload> {
     }
   }
 
-  private addAudit<T extends Analytics.Message | Analytics.Command>(buffer: T[], index: Omit<T, 'count'>) {
-    const audit = buffer.find(data => deepEqual(data, index))
+  private addAudit<T extends Analytics.Audit>(buffer: T[], index: Omit<T, 'count'>) {
+    const audit = buffer.find(data => deepEqual(pick(data, Object.keys(index) as (keyof T)[]), index))
     if (audit) {
       audit.count += 1
     } else {
@@ -182,9 +182,13 @@ class Analytics extends DataService<Analytics.Payload> {
         count: row => $.sum(row.count),
       })
       .execute()
-    const result = {} as Dict<Dict<MessageStats>>
+    const result = {} as Dict<Dict<MessageStats & Universal.User>>
     data.forEach((stat) => {
-      const entry = (result[stat.platform] ||= {})[stat.selfId] ||= { send: 0, receive: 0 }
+      const entry = (result[stat.platform] ||= {})[stat.selfId] ||= {
+        ...this.ctx.bots[`${stat.platform}:${stat.selfId}`]?.user,
+        send: 0,
+        receive: 0,
+      }
       entry[stat.type] = stat.count / 7
     })
     return result
@@ -296,7 +300,7 @@ namespace Analytics {
 
   export interface Command extends Index {
     name: string
-    userId: string
+    userId: number
     channelId: string
     count: number
   }
@@ -308,7 +312,7 @@ namespace Analytics {
     guildIncrement: number
     dauHistory: Dict<number>
     commandRate: Dict<number>
-    messageByBot: Dict<Dict<MessageStats>>
+    messageByBot: Dict<Dict<MessageStats & Universal.User>>
     messageByDate: Dict<MessageStats>
     messageByHour: MessageStats[]
   }
