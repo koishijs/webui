@@ -1,0 +1,23 @@
+.analytics-card {
+  header {
+    display: flex;
+    justify-content: space-between;
+
+    .right {
+      font-size: 1rem;
+      font-weight: normal;
+      display: flex;
+      gap: 1rem;
+    }
+
+    .tab-item {
+      padding: 0 4px;
+      cursor: pointer;
+    }
+
+    .tab-item.active {
+      color: var(--primary);
+      border-bottom: 2px solid var(--primary);
+    }
+  }
+}

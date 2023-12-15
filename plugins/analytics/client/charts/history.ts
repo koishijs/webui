@@ -7,15 +7,16 @@ export default (ctx: Context) => {
   ctx.slot({
     type: 'chart',
     component: createChart({
-      title: '历史发言数量',
+      title: '历史消息数量',
       fields: ['analytics'],
-      options({ analytics }) {
+      showTab: true,
+      options({ analytics }, tab) {
         if (!Object.keys(analytics.messageByDate).length) return
 
         return {
           tooltip: Tooltip.axis(([{ name, value }]) => {
             const day = new Date(name).getDay()
-            return `${name} 星期${week[day]}<br>发言数量：${value}`
+            return `${name} 星期${week[day]}<br>消息数量：${value}`
           }),
           xAxis: {
             type: 'category',
@@ -27,7 +28,7 @@ export default (ctx: Context) => {
           series: {
             type: 'line',
             smooth: true,
-            data: Object.values(analytics.messageByDate).map(stats => stats.send),
+            data: Object.values(analytics.messageByDate).map(stats => stats[tab]),
           },
         }
       },

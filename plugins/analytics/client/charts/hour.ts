@@ -7,16 +7,17 @@ export default (ctx: Context) => {
   ctx.slot({
     type: 'chart',
     component: createChart({
-      title: '每小时发言数量',
+      title: '每小时消息数量',
       fields: ['analytics'],
-      options({ analytics }) {
+      showTab: true,
+      options({ analytics }, tab) {
         return {
           tooltip: Tooltip.axis<number[]>((params) => {
             const [{ data: [x], dataIndex }] = params
             const source = analytics.messageByHour[dataIndex]
             const output = [
               `${formatHour(x)}`,
-              `消息总量：${+(source.send || 0).toFixed(1)}`,
+              `日均消息数量：${+(source[tab] || 0).toFixed(1)}`,
             ]
             return output.join('<br>')
           }),
@@ -40,7 +41,7 @@ export default (ctx: Context) => {
           },
           series: [{
             name: '其他',
-            data: analytics.messageByHour.map((val, index) => [index + 0.5, val.send || 0]),
+            data: analytics.messageByHour.map((val, index) => [index + 0.5, val[tab] || 0]),
             type: 'bar',
             stack: '1',
           }],

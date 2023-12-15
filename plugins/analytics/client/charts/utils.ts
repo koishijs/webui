@@ -1,24 +1,45 @@
-import { defineAsyncComponent, h, resolveComponent } from 'vue'
-import { Console } from '@koishijs/plugin-console'
-import { Card, Store, store } from '@koishijs/client'
+import { defineAsyncComponent, defineComponent, h, ref, resolveComponent } from 'vue'
+import { Field, Store, store } from '@koishijs/client'
 import type * as echarts from 'echarts'
+import './index.scss'
 
 const VChart = defineAsyncComponent(() => import('./echarts'))
 
 export interface ChartOptions {
   title: string
-  fields?: (keyof Console.Services)[]
-  options: (store: Store) => echarts.EChartsOption
+  fields?: Field[]
+  showTab?: boolean
+  options: (store: Store, tab: 'send' | 'receive') => echarts.EChartsOption
 }
 
-export function createChart({ title, fields, options }: ChartOptions) {
-  return Card.create(() => {
-    const option = options(store)
-    if (!option) return
-    return h(resolveComponent('k-card'), { class: 'frameless', title }, () => {
-      return h(VChart, { option, autoresize: true })
-    })
-  }, fields)
+const tabValue = ref<'send' | 'receive'>('send')
+
+export function createChart({ title, fields, showTab, options }: ChartOptions) {
+  return defineComponent({
+    render: () => {
+      if (!fields.every(key => store[key])) return null
+      const option = options(store, tabValue.value)
+      if (!option) return
+      return h(resolveComponent('k-card'), { class: 'frameless analytics-card' }, {
+        header: () => [
+          h('span', { class: 'left' }, [title]),
+          ...showTab ? [h('span', { class: 'right' }, [
+            h('span', {
+              class: 'tab-item' + (tabValue.value === 'send' ? ' active' : ''),
+              onClick: () => tabValue.value = 'send',
+            }, ['发送']),
+            h('span', {
+              class: 'tab-item' + (tabValue.value === 'receive' ? ' active' : ''),
+              onClick: () => tabValue.value = 'receive',
+            }, ['接收']),
+          ])] : [],
+        ],
+        default: () => {
+          return h(VChart, { option, autoresize: true })
+        },
+      })
+    },
+  })
 }
 
 interface CommonData {

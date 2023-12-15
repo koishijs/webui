@@ -5,9 +5,10 @@ export default (ctx: Context) => {
   ctx.slot({
     type: 'chart',
     component: createChart({
-      title: '各平台占比',
+      title: '各平台消息占比',
       fields: ['analytics'],
-      options({ analytics }) {
+      showTab: true,
+      options({ analytics }, tab) {
         if (!Object.keys(analytics.messageByBot).length) return
         const data = Object
           .entries(analytics.messageByBot)
@@ -17,13 +18,13 @@ export default (ctx: Context) => {
               .entries(value)
               .map(([key, value]) => ({
                 name: value.name || key,
-                value: value.send,
+                value: value[tab],
               })),
           }))
 
         return {
           tooltip: Tooltip.item(({ data }) => {
-            return `${data.children ? '平台' : '昵称'}：${data.name}<br>消息数量：${data.value.toFixed(2)}`
+            return `${data.children ? '平台' : '昵称'}：${data.name}<br>日均消息数量：${data.value.toFixed(2)}`
           }),
           series: [{
             type: 'sunburst',
