@@ -32,6 +32,16 @@ export default defineExtension((ctx) => {
   ctx.slot({
     type: 'numeric',
     component: Card.numeric({
+      title: '今日 DAU',
+      icon: 'heart',
+      fields: ['analytics'],
+      content: ({ analytics }) => analytics.dauHistory[0],
+    }),
+  })
+
+  ctx.slot({
+    type: 'numeric',
+    component: Card.numeric({
       title: '昨日用户增量',
       icon: 'heart',
       fields: ['analytics'],
@@ -46,6 +56,16 @@ export default defineExtension((ctx) => {
       icon: 'users',
       fields: ['analytics'],
       content: ({ analytics }) => analytics.guildIncrement,
+    }),
+  })
+
+  ctx.slot({
+    type: 'numeric',
+    component: Card.numeric({
+      title: '上周 DAU',
+      icon: 'heart',
+      fields: ['analytics'],
+      content: ({ analytics }) => (analytics.dauHistory.slice(1).reduce((a, b) => a + b, 0) / 7).toFixed(1),
     }),
   })
 })

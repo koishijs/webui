@@ -24,7 +24,7 @@ export default (ctx: Context) => {
 
         return {
           tooltip: Tooltip.item(({ data }) => {
-            return `${data.children ? '平台' : '昵称'}：${data.name}<br>日均消息数量：${data.value.toFixed(2)}`
+            return `${data.children ? '平台' : '昵称'}：${data.name}<br>日均消息数量：${data.value.toFixed(1)}`
           }),
           series: [{
             type: 'sunburst',

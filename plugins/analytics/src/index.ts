@@ -146,7 +146,7 @@ class Analytics extends DataService<Analytics.Payload> {
   private async getCommandRate() {
     const data = await this.ctx.database
       .select('analytics.command', {
-        date: { $gt: Time.getDateNumber() - 7 },
+        date: { $gte: Time.getDateNumber() - this.config.recentDayCount },
       })
       .groupBy(['name'], {
         count: row => $.sum(row.count),
@@ -154,21 +154,24 @@ class Analytics extends DataService<Analytics.Payload> {
       .execute()
     const result = {} as Dict<number>
     data.forEach((stat) => {
-      result[stat.name] = stat.count / 7
+      result[stat.name] = stat.count / this.config.recentDayCount
     })
     return result
   }
 
   private async getDauHistory() {
     const data = await this.ctx.database
-      .select('analytics.command')
+      .select('analytics.command', {
+        date: { $gte: Time.getDateNumber() - 7 },
+      })
       .groupBy(['date'], {
         count: row => $.count(row.userId),
       })
       .execute()
-    const result = {} as Dict<number>
+    const result: number[] = new Array(8).fill(0)
+    const today = Time.getDateNumber()
     data.forEach((stat) => {
-      result[Time.fromDateNumber(stat.date).toLocaleDateString('zh-CN')] = stat.count
+      result[today - stat.date] = stat.count
     })
     return result
   }
@@ -176,7 +179,7 @@ class Analytics extends DataService<Analytics.Payload> {
   private async getMessageByBot() {
     const data = await this.ctx.database
       .select('analytics.message', {
-        date: { $gt: Time.getDateNumber() - 7 },
+        date: { $gte: Time.getDateNumber() - this.config.recentDayCount },
       })
       .groupBy(['type', 'platform', 'selfId'], {
         count: row => $.sum(row.count),
@@ -189,7 +192,7 @@ class Analytics extends DataService<Analytics.Payload> {
         send: 0,
         receive: 0,
       }
-      entry[stat.type] = stat.count / 7
+      entry[stat.type] = stat.count / this.config.recentDayCount
     })
     return result
   }
@@ -200,6 +203,7 @@ class Analytics extends DataService<Analytics.Payload> {
       .groupBy(['type', 'date'], {
         count: row => $.sum(row.count),
       })
+      .orderBy('date')
       .execute()
     const result = {} as Dict<MessageStats>
     data.forEach((stat) => {
@@ -212,7 +216,7 @@ class Analytics extends DataService<Analytics.Payload> {
   private async getMessageByHour() {
     const data = await this.ctx.database
       .select('analytics.message', {
-        date: { $gt: Time.getDateNumber() - 7 },
+        date: { $gte: Time.getDateNumber() - this.config.recentDayCount },
       })
       .groupBy(['type', 'hour'], {
         count: row => $.sum(row.count),
@@ -220,7 +224,7 @@ class Analytics extends DataService<Analytics.Payload> {
       .execute()
     const result = new Array(24).fill(null).map(() => ({ send: 0, receive: 0 }))
     data.forEach((stat) => {
-      result[stat.hour][stat.type] = stat.count / 7
+      result[stat.hour][stat.type] = stat.count / this.config.recentDayCount
     })
     return result
   }
@@ -310,7 +314,7 @@ namespace Analytics {
     userIncrement: number
     guildCount: number
     guildIncrement: number
-    dauHistory: Dict<number>
+    dauHistory: number[]
     commandRate: Dict<number>
     messageByBot: Dict<Dict<MessageStats & Universal.User>>
     messageByDate: Dict<MessageStats>
@@ -319,10 +323,12 @@ namespace Analytics {
 
   export interface Config {
     statsInternal?: number
+    recentDayCount?: number
   }
 
   export const Config: Schema<Config> = Schema.object({
     statsInternal: Schema.natural().role('ms').description('统计数据推送的时间间隔。').default(Time.minute * 10),
+    recentDayCount: Schema.natural().description('统计最近几天的数据。').default(7),
   })
 }
 
