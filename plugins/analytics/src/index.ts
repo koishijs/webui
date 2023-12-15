@@ -17,6 +17,11 @@ declare module '@koishijs/console' {
   }
 }
 
+export interface MessageStats {
+  send: number
+  receive: number
+}
+
 const logger = new Logger('analytics')
 
 class Analytics extends DataService<Analytics.Payload> {
@@ -177,7 +182,7 @@ class Analytics extends DataService<Analytics.Payload> {
         count: row => $.sum(row.count),
       })
       .execute()
-    const result = {} as Dict<Dict<Dict<number, 'send' | 'receive'>>>
+    const result = {} as Dict<Dict<MessageStats>>
     data.forEach((stat) => {
       const entry = (result[stat.platform] ||= {})[stat.selfId] ||= { send: 0, receive: 0 }
       entry[stat.type] = stat.count / 7
@@ -192,7 +197,7 @@ class Analytics extends DataService<Analytics.Payload> {
         count: row => $.sum(row.count),
       })
       .execute()
-    const result = {} as Dict<Dict<number, 'send' | 'receive'>>
+    const result = {} as Dict<MessageStats>
     data.forEach((stat) => {
       const entry = result[Time.fromDateNumber(stat.date).toLocaleDateString('zh-CN')] ||= { send: 0, receive: 0 }
       entry[stat.type] = stat.count
@@ -220,6 +225,8 @@ class Analytics extends DataService<Analytics.Payload> {
     const [
       userCount,
       userIncrement,
+      guildCount,
+      guildIncrement,
       commandRate,
       dauHistory,
       messageByBot,
@@ -229,10 +236,16 @@ class Analytics extends DataService<Analytics.Payload> {
       this.ctx.database.eval('user', row => $.count(row.id)),
       this.ctx.database.eval('user', row => $.count(row.id), {
         createdAt: {
-          $gt: Time.fromDateNumber(Time.getDateNumber() - 1),
+          $gte: Time.fromDateNumber(Time.getDateNumber() - 1),
           $lt: Time.fromDateNumber(Time.getDateNumber()),
         },
       }),
+      this.ctx.database.eval('channel', row => $.sum(1), row => $.eq(row.id, row.guildId)),
+      this.ctx.database.eval('channel', row => $.sum(1), row => $.and(
+        $.eq(row.id, row.guildId),
+        $.gte(row.createdAt, Time.fromDateNumber(Time.getDateNumber() - 1)),
+        $.lt(row.createdAt, Time.fromDateNumber(Time.getDateNumber())),
+      )),
       this.getCommandRate(),
       this.getDauHistory(),
       this.getMessageByBot(),
@@ -242,6 +255,8 @@ class Analytics extends DataService<Analytics.Payload> {
     return {
       userCount,
       userIncrement,
+      guildCount,
+      guildIncrement,
       commandRate,
       dauHistory,
       messageByBot,
@@ -289,11 +304,13 @@ namespace Analytics {
   export interface Payload {
     userCount: number
     userIncrement: number
+    guildCount: number
+    guildIncrement: number
     dauHistory: Dict<number>
     commandRate: Dict<number>
-    messageByBot: Dict<Dict<Dict<number, 'send' | 'receive'>>>
-    messageByDate: Dict<Dict<number, 'send' | 'receive'>>
-    messageByHour: Dict<number, 'send' | 'receive'>[]
+    messageByBot: Dict<Dict<MessageStats>>
+    messageByDate: Dict<MessageStats>
+    messageByHour: MessageStats[]
   }
 
   export interface Config {

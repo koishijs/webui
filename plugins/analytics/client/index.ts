@@ -6,46 +6,46 @@ import './icons'
 export default defineExtension((ctx) => {
   ctx.plugin(Charts)
 
-  ctx.slot({
-    type: 'numeric',
-    component: Card.numeric({
-      title: '近期消息频率',
-      icon: 'history',
-      fields: ['analytics'],
-      content({ analytics }) {
-        return Object.values(analytics.botSend).reduce((sum, value) => sum + value, 0).toFixed(1) + ' / d'
-      },
-    }),
-  })
+  // 用户数量 群组数量 周均 DAU 当前 QPS
+  // 昨日新增用户 昨日新增群组 昨日 DAU 昨日 QPS
 
   ctx.slot({
     type: 'numeric',
     component: Card.numeric({
-      title: '资源服务器',
-      icon: 'storage',
-      type: 'size',
-      fields: ['meta'],
-      content: ({ meta }) => meta.assetSize,
-    }),
-  })
-
-  ctx.slot({
-    type: 'numeric',
-    component: Card.numeric({
-      title: '活跃用户数量',
+      title: '用户数量',
       icon: 'heart',
-      fields: ['meta'],
-      content: ({ meta }) => meta.activeUsers,
+      fields: ['analytics'],
+      content: ({ analytics }) => analytics.userCount,
     }),
   })
 
   ctx.slot({
     type: 'numeric',
     component: Card.numeric({
-      title: '活跃群组数量',
+      title: '群组数量',
       icon: 'users',
-      fields: ['meta'],
-      content: ({ meta }) => meta.activeGuilds,
+      fields: ['analytics'],
+      content: ({ analytics }) => analytics.guildCount,
+    }),
+  })
+
+  ctx.slot({
+    type: 'numeric',
+    component: Card.numeric({
+      title: '昨日用户增量',
+      icon: 'heart',
+      fields: ['analytics'],
+      content: ({ analytics }) => analytics.userIncrement,
+    }),
+  })
+
+  ctx.slot({
+    type: 'numeric',
+    component: Card.numeric({
+      title: '昨日群组增量',
+      icon: 'users',
+      fields: ['analytics'],
+      content: ({ analytics }) => analytics.guildIncrement,
     }),
   })
 })

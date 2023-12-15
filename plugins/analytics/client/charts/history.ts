@@ -8,9 +8,9 @@ export default (ctx: Context) => {
     type: 'chart',
     component: createChart({
       title: '历史发言数量',
-      fields: ['stats'],
-      options({ stats }) {
-        if (!Object.keys(stats.history).length) return
+      fields: ['analytics'],
+      options({ analytics }) {
+        if (!Object.keys(analytics.messageByDate).length) return
 
         return {
           tooltip: Tooltip.axis(([{ name, value }]) => {
@@ -19,7 +19,7 @@ export default (ctx: Context) => {
           }),
           xAxis: {
             type: 'category',
-            data: Object.keys(stats.history).reverse(),
+            data: Object.keys(analytics.messageByDate).reverse(),
           },
           yAxis: {
             type: 'value',
@@ -27,7 +27,7 @@ export default (ctx: Context) => {
           series: {
             type: 'line',
             smooth: true,
-            data: Object.values(stats.history).reverse(),
+            data: Object.values(analytics.messageByDate).map(stats => stats.send).reverse(),
           },
         }
       },

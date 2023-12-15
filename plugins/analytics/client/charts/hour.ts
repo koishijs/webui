@@ -8,23 +8,16 @@ export default (ctx: Context) => {
     type: 'chart',
     component: createChart({
       title: '每小时发言数量',
-      fields: ['stats'],
-      options({ stats }) {
+      fields: ['analytics'],
+      options({ analytics }) {
         return {
           tooltip: Tooltip.axis<number[]>((params) => {
             const [{ data: [x], dataIndex }] = params
-            const source = stats.hours[dataIndex]
+            const source = analytics.messageByHour[dataIndex]
             const output = [
               `${formatHour(x)}`,
-              `消息总量：${+(source.total || 0).toFixed(1)}`,
+              `消息总量：${+(source.send || 0).toFixed(1)}`,
             ]
-            params.reverse().forEach(({ seriesName, marker }, index) => {
-              const value = index === 0 ? source.command
-                : index === 1 ? source.dialogue
-                  : Math.max(0, source.total - source.command - source.dialogue)
-              if (!value) return
-              output.push(`${marker}${seriesName}：${+value.toFixed(1)}`)
-            })
             return output.join('<br>')
           }),
           xAxis: {
@@ -47,28 +40,9 @@ export default (ctx: Context) => {
           },
           series: [{
             name: '其他',
-            data: stats.hours.map((val, index) => [index + 0.5, val.total || 0]),
+            data: analytics.messageByHour.map((val, index) => [index + 0.5, val.send || 0]),
             type: 'bar',
             stack: '1',
-            itemStyle: {
-              color: 'rgb(255,219,92)',
-            },
-          }, {
-            name: '教学',
-            data: stats.hours.map((val, index) => [index + 0.5, (val.command || 0) + (val.dialogue || 0)]),
-            type: 'bar',
-            stack: '1',
-            itemStyle: {
-              color: 'rgb(103,224,227)',
-            },
-          }, {
-            name: '指令',
-            data: stats.hours.map((val, index) => [index + 0.5, val.command || 0]),
-            type: 'bar',
-            stack: '1',
-            itemStyle: {
-              color: 'rgb(55,162,218)',
-            },
           }],
         }
       },
