@@ -1,7 +1,7 @@
 {
   "name": "@koishijs/plugin-analytics",
   "description": "Show statistics for Koishi application",
-  "version": "1.0.8",
+  "version": "2.0.0",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
   "files": [
@@ -49,17 +49,17 @@
     }
   },
   "peerDependencies": {
-    "@koishijs/plugin-console": "^5.20.0",
-    "koishi": "^4.16.0"
+    "@koishijs/plugin-console": "^5.20.1",
+    "koishi": "^4.16.1"
   },
   "devDependencies": {
     "@koishijs/assets": "^1.0.3",
-    "@koishijs/client": "^5.20.0",
+    "@koishijs/client": "^5.20.1",
     "echarts": "^5.4.3",
-    "koishi": "^4.16.0",
+    "koishi": "^4.16.1",
     "vue-echarts": "^6.6.1"
   },
   "dependencies": {
-    "@koishijs/console": "^5.20.0"
+    "@koishijs/console": "^5.20.1"
   }
 }
