@@ -15,8 +15,6 @@ root.plugin(status)
 root.plugin(styles)
 root.plugin(theme)
 
-root.app.provide('ecTheme', 'dark-blue')
-
 root.app.mount('#app')
 
 if (!global.static) {

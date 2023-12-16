@@ -23,7 +23,6 @@ export * from './config'
 export * from './context'
 export * from './loader'
 export * from './data'
-export * from './utils'
 
 export default install
 
