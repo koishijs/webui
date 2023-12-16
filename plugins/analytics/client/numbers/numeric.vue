@@ -1,10 +1,14 @@
 <template>
-  <k-card class="k-card-numeric">
+  <k-card class="k-analytic-number">
     <k-icon :name="icon"/>
     <div class="content">
       <p class="title">{{ title }}</p>
       <p class="value"><slot>-</slot></p>
     </div>
+    <template #footer v-if="$slots['footer-left']">
+      <span class="left"><slot name="footer-left"></slot></span>
+      <span class="right"><slot name="footer-right">-</slot></span>
+    </template>
   </k-card>
 </template>
 
@@ -19,10 +23,11 @@ defineProps<{
 
 <style lang="scss">
 
-.k-card-numeric .k-card-body {
+.k-analytic-number .k-card-body {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  margin: 1rem 0;
 
   .k-icon {
     height: 2.5rem;
@@ -52,6 +57,15 @@ defineProps<{
   .value {
     font-size: 1rem;
   }
+}
+
+.k-analytic-number footer {
+  font-size: 0.9em;
+  border-top: 1px solid var(--k-card-border);
+  padding-top: 0.75rem;
+  margin-bottom: 0.75rem;
+  display: flex;
+  justify-content: space-between;
 }
 
 </style>

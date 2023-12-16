@@ -1,9 +1,12 @@
 <template>
-  <div class="card-grid profile-grid"><k-slot name="numeric"></k-slot></div>
+  <number-grid></number-grid>
   <div class="card-grid chart-grid"><k-slot name="chart"></k-slot></div>
 </template>
 
 <script lang="ts" setup>
+
+import NumberGrid from './numbers/index.vue'
+
 </script>
 
 <style lang="scss">
@@ -14,25 +17,13 @@
   grid-gap: var(--card-margin);
 }
 
-.profile-grid {
-  grid-template-columns: repeat(3, 1fr);
-
-  @media screen and (min-width: 1440px) {
-    grid-template-columns: repeat(4, 1fr);
-  }
-
-  @media screen and (max-width: 1024px) {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
 .chart-grid {
   .echarts {
     max-width: 100%;
     margin: 0 auto;
   }
 
-  @media (min-width: 1024px) {
+  @media (min-width: 1280px) {
     grid-template-columns: repeat(2, 1fr);
 
     @media (min-width: 1600px) {
@@ -52,7 +43,7 @@
     }
   }
 
-  @media (max-width: 1024px) {
+  @media (max-width: 1280px) {
     grid-template-columns: 1fr;
 
     @media (min-width: 768px) {
