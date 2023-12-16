@@ -1,5 +1,5 @@
 import { defineAsyncComponent, defineComponent, h, ref, resolveComponent } from 'vue'
-import { Field, Store, store } from '@koishijs/client'
+import { Store, store } from '@koishijs/client'
 import type * as echarts from 'echarts'
 import './index.scss'
 
@@ -7,7 +7,7 @@ const VChart = defineAsyncComponent(() => import('./echarts'))
 
 export interface ChartOptions {
   title: string
-  fields?: Field[]
+  fields?: (keyof Store)[]
   showTab?: boolean
   options: (store: Store, tab: 'send' | 'receive') => echarts.EChartsOption
 }
@@ -20,7 +20,7 @@ export function createChart({ title, fields, showTab, options }: ChartOptions) {
       if (!fields.every(key => store[key])) return null
       const option = options(store, tabValue.value)
       if (!option) return
-      return h(resolveComponent('k-card'), { class: 'frameless analytics-card' }, {
+      return h(resolveComponent('k-card'), { class: 'frameless analytic-chart' }, {
         header: () => [
           h('span', { class: 'left' }, [title]),
           ...showTab ? [h('span', { class: 'right' }, [

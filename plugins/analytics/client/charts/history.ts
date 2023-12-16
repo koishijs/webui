@@ -5,13 +5,14 @@ const week = '日一二三四五六'
 
 export default (ctx: Context) => {
   ctx.slot({
-    type: 'chart',
+    type: 'analytic-chart',
     component: createChart({
       title: '历史消息数量',
       fields: ['analytics'],
       showTab: true,
       options({ analytics }, tab) {
-        if (!Object.keys(analytics.messageByDate).length) return
+        if (!analytics.messageByDate.length) return
+        const data = analytics.messageByDate.slice(1)
 
         return {
           tooltip: Tooltip.axis(([{ name, value }]) => {
@@ -20,7 +21,7 @@ export default (ctx: Context) => {
           }),
           xAxis: {
             type: 'category',
-            data: Object.keys(analytics.messageByDate),
+            data: data.map((_, index) => new Date(Date.now() - (index + 1) * 86400000).toLocaleDateString('zh-CN')).reverse(),
           },
           yAxis: {
             type: 'value',
@@ -28,7 +29,7 @@ export default (ctx: Context) => {
           series: {
             type: 'line',
             smooth: true,
-            data: Object.values(analytics.messageByDate).map(stats => stats[tab]),
+            data: data.map(stats => stats[tab]).reverse(),
           },
         }
       },

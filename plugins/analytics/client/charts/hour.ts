@@ -5,12 +5,13 @@ const formatHour = (value: number) => `${(value - 0.5).toFixed()}:00-${(value + 
 
 export default (ctx: Context) => {
   ctx.slot({
-    type: 'chart',
+    type: 'analytic-chart',
     component: createChart({
       title: '每小时消息数量',
       fields: ['analytics'],
       showTab: true,
       options({ analytics }, tab) {
+        if (analytics.messageByHour.every(val => !val[tab])) return
         return {
           tooltip: Tooltip.axis<number[]>((params) => {
             const [{ data: [x], dataIndex }] = params

@@ -3,7 +3,7 @@ import { createChart, Tooltip } from './utils'
 
 export default (ctx: Context) => {
   ctx.slot({
-    type: 'chart',
+    type: 'analytic-chart',
     component: createChart({
       title: '各平台消息占比',
       fields: ['analytics'],
@@ -24,7 +24,7 @@ export default (ctx: Context) => {
 
         return {
           tooltip: Tooltip.item(({ data }) => {
-            return `${data.children ? '平台' : '昵称'}：${data.name}<br>日均消息数量：${data.value.toFixed(1)}`
+            return `${data.children ? '平台' : '昵称'}：${data.name}<br>日均消息数量：${+data.value.toFixed(1)}`
           }),
           series: [{
             type: 'sunburst',

@@ -1,6 +1,6 @@
 <template>
   <number-grid></number-grid>
-  <div class="card-grid chart-grid"><k-slot name="chart"></k-slot></div>
+  <div class="card-grid chart-grid"><k-slot name="analytic-chart"></k-slot></div>
 </template>
 
 <script lang="ts" setup>

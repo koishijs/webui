@@ -1,4 +1,4 @@
-import { $, Context, deepEqual, Dict, Logger, pick, Row, Schema, Session, Time, Universal } from 'koishi'
+import { $, Context, deepEqual, Dict, Logger, pick, Query, Row, Schema, Session, Time, Universal } from 'koishi'
 import { DataService } from '@koishijs/console'
 import { resolve } from 'path'
 
@@ -143,10 +143,17 @@ class Analytics extends DataService<Analytics.Payload> {
     }
   }
 
+  private queryRecent(): Query.FieldQuery<number> {
+    return {
+      $gte: Time.getDateNumber() - this.config.recentDayCount,
+      $lt: Time.getDateNumber(),
+    }
+  }
+
   private async getCommandRate() {
     const data = await this.ctx.database
       .select('analytics.command', {
-        date: { $gte: Time.getDateNumber() - this.config.recentDayCount },
+        date: this.queryRecent(),
       })
       .groupBy(['name'], {
         count: row => $.sum(row.count),
@@ -179,7 +186,7 @@ class Analytics extends DataService<Analytics.Payload> {
   private async getMessageByBot() {
     const data = await this.ctx.database
       .select('analytics.message', {
-        date: { $gte: Time.getDateNumber() - this.config.recentDayCount },
+        date: this.queryRecent(),
       })
       .groupBy(['type', 'platform', 'selfId'], {
         count: row => $.sum(row.count),
@@ -203,11 +210,12 @@ class Analytics extends DataService<Analytics.Payload> {
       .groupBy(['type', 'date'], {
         count: row => $.sum(row.count),
       })
-      .orderBy('date')
+      .orderBy('date', 'desc')
       .execute()
-    const result = {} as Dict<MessageStats>
+    const today = Time.getDateNumber()
+    const result: MessageStats[] = []
     data.forEach((stat) => {
-      const entry = result[Time.fromDateNumber(stat.date).toLocaleDateString('zh-CN')] ||= { send: 0, receive: 0 }
+      const entry = result[today - stat.date] ||= { send: 0, receive: 0 }
       entry[stat.type] = stat.count
     })
     return result
@@ -216,7 +224,7 @@ class Analytics extends DataService<Analytics.Payload> {
   private async getMessageByHour() {
     const data = await this.ctx.database
       .select('analytics.message', {
-        date: { $gte: Time.getDateNumber() - this.config.recentDayCount },
+        date: this.queryRecent(),
       })
       .groupBy(['type', 'hour'], {
         count: row => $.sum(row.count),
@@ -317,7 +325,7 @@ namespace Analytics {
     dauHistory: number[]
     commandRate: Dict<number>
     messageByBot: Dict<Dict<MessageStats & Universal.User>>
-    messageByDate: Dict<MessageStats>
+    messageByDate: MessageStats[]
     messageByHour: MessageStats[]
   }
 
