@@ -3,6 +3,7 @@ import { DataService } from '@koishijs/plugin-console'
 import { resolve } from 'path'
 import { mkdir, readdir, rm } from 'fs/promises'
 import { FileWriter } from './file'
+import { throttle } from 'throttle-debounce'
 import zhCN from './locales/zh-CN.yml'
 
 declare module '@koishijs/plugin-console' {
@@ -87,6 +88,14 @@ export async function apply(ctx: Context, config: Config) {
   const date = new Date().toISOString().slice(0, 10)
   createFile(date, Math.max(...files[date] ?? [0]) + 1)
 
+  let buffer: Logger.Record[] = []
+  const update = throttle(100, () => {
+    // Be very careful about accessing service in this callback,
+    // because undeclared service access may cause infinite loop.
+    ctx.get('console.logs')?.patch(buffer)
+    buffer = []
+  })
+
   const loader = ctx.get('loader')
   const target: Logger.Target = {
     colors: 3,
@@ -103,12 +112,11 @@ export async function apply(ctx: Context, config: Config) {
         createFile(date, 1)
       }
       writer.write(record)
-      // Be very careful about accessing service in this callback,
-      // because undeclared service access may cause infinite loop.
-      ctx.get('console.logs')?.patch([record])
+      buffer.push(record)
+      update()
       if (writer.size >= config.maxSize) {
         writer.close()
-        const index = Math.max(...files[date]) + 1
+        const index = Math.max(...files[date] ?? [0]) + 1
         files[date].push(index)
         createFile(date, index)
       }
