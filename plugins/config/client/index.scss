@@ -1,0 +1,36 @@
+
+.dialog-config-fork, .plugin-tree {
+  .status-light {
+    display: inline-block;
+    width: 0.625rem;
+    height: 0.625rem;
+    border-radius: 100%;
+    transition: var(--color-transition);
+
+    &.active {
+      background-color: var(--k-color-success);
+    }
+    &.pending {
+      background-color: var(--k-color-warning);
+    }
+    &.loading {
+      animation: status-flash 1s infinite;
+      background-color: var(--k-color-warning);
+    }
+    &.failed {
+      background-color: var(--k-color-danger);
+    }
+    &.disabled:not(.ignore-disabled) {
+      background-color: var(--k-color-disabled);
+    }
+  }
+}
+
+@keyframes status-flash {
+  0%, 100% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+}

@@ -32,7 +32,7 @@
       @closed="remove = null"
     >
       <template v-if="remove">
-        确定要移除{{ remove.children ? `分组 ${remove.alias}` : `插件 ${remove.name}` }} 吗？此操作不可撤销！
+        确定要移除{{ remove.children ? `分组 ${remove.label || remove.path}` : `插件 ${remove.label || remove.name}` }} 吗？此操作不可撤销！
       </template>
       <template #footer>
         <el-button @click="showRemove = false">取消</el-button>
@@ -62,7 +62,7 @@
 import { computed, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { clone, message, send, store, useContext, Schema } from '@koishijs/client'
-import { Tree, getFullName, addItem, hasCoreDeps, current, plugins, removeItem, select } from './utils'
+import { Tree, getFullName, addItem, hasCoreDeps, current, plugins, removeItem, dialogSelect } from './utils'
 import GlobalSettings from './global.vue'
 import GroupSettings from './group.vue'
 import TreeView from './tree.vue'
@@ -109,7 +109,7 @@ ctx.define('config.tree', current)
 
 ctx.action('config.tree.add-plugin', {
   disabled: ({ config }) => config.tree.path && !config.tree.children,
-  action: ({ config }) => select.value = config.tree,
+  action: ({ config }) => dialogSelect.value = config.tree,
 })
 
 ctx.action('config.tree.add-group', {
@@ -120,7 +120,7 @@ ctx.action('config.tree.add-group', {
 ctx.action('config.tree.rename', {
   disabled: ({ config }) => !config.tree.path,
   action: ({ config }) => {
-    input.value = config.tree.label || (config.tree.name === 'group' ? config.tree.alias : config.tree.name)
+    input.value = config.tree.label || (config.tree.name === 'group' ? config.tree.path : config.tree.name)
     rename.value = config.tree
   },
 })

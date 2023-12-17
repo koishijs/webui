@@ -1,8 +1,8 @@
 <template>
   <el-dialog
     v-if="store.packages"
-    :modelValue="!!select"
-    @update:modelValue="select = null"
+    :modelValue="!!dialogSelect"
+    @update:modelValue="dialogSelect = null"
     class="plugin-select"
   >
     <template #header>
@@ -30,7 +30,7 @@
 import { router, send, store, useI18nText } from '@koishijs/client'
 import { computed, inject, nextTick, ref, watch } from 'vue'
 import { PackageProvider } from '@koishijs/plugin-config'
-import { select } from './utils'
+import { dialogSelect } from './utils'
 
 const tt = useI18nText()
 
@@ -44,14 +44,14 @@ const packages = computed(() => Object.values(store.packages).filter(({ name, sh
 }))
 
 function configure(shortname: string) {
-  const path = select.value.path
+  const path = dialogSelect.value.path
   const ident = Math.random().toString(36).slice(2, 8)
-  select.value = null
+  dialogSelect.value = null
   send('manager/unload', path, shortname + ':' + ident, {})
   router.push('/plugins/' + ident)
 }
 
-watch(select, async (value) => {
+watch(dialogSelect, async (value) => {
   if (!value) return
   await nextTick()
   await input.value.focus()

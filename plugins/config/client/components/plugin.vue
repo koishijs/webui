@@ -8,15 +8,8 @@
     </k-comment>
 
     <k-slot v-else name="plugin-details" :data="data">
-      <!-- reusability -->
-      <k-slot-item :order="800">
-        <k-comment v-if="local.runtime.id && !local.runtime.forkable && current.disabled" type="warning">
-          <p>此插件已在运行且不可重用，启用可能会导致非预期的问题。</p>
-        </k-comment>
-      </k-slot-item>
-
       <!-- dependency -->
-      <k-slot-item :order="600">
+      <k-slot-item :order="800">
         <k-slot name="plugin-dependency" single :data="data">
           <k-comment
             v-for="({ required, active }, name) in env.peer" :key="name"
@@ -36,7 +29,7 @@
       </k-slot-item>
 
       <!-- implements -->
-      <k-slot-item :order="400">
+      <k-slot-item :order="600">
         <template v-for="name in env.impl" :key="name">
           <k-comment v-if="name in store.services && data.current.disabled" type="warning">
             <p>此插件将会提供 {{ name }} 服务，但此服务已被其他插件实现。</p>
@@ -45,6 +38,16 @@
             <p>此插件{{ data.current.disabled ? '启用后将会提供' : '提供了' }} {{ name }} 服务。</p>
           </k-comment>
         </template>
+      </k-slot-item>
+
+      <!-- reusability -->
+      <k-slot-item :order="400">
+        <k-comment v-if="local.runtime.id && !local.runtime.forkable && current.disabled" type="warning">
+          <p>此插件已在运行且不可重用，启用可能会导致非预期的问题。</p>
+        </k-comment>
+        <k-comment v-if="plugins.forks[shortname]?.length > 1" type="primary">
+          <p>此插件存在多份配置，<span class="k-link" @click.stop="dialogFork = name">点击前往管理</span>。</p>
+        </k-comment>
       </k-slot-item>
 
       <!-- implements -->
@@ -94,7 +97,7 @@
 
 import { activities, store, send } from '@koishijs/client'
 import { computed, provide, watch } from 'vue'
-import { envMap, name, SettingsData, Tree } from './utils'
+import { envMap, name, plugins, SettingsData, dialogFork, Tree } from './utils'
 import KModifier from './modifier.vue'
 
 const props = defineProps<{
@@ -108,6 +111,8 @@ const config = computed({
   get: () => props.modelValue,
   set: value => emit('update:modelValue', value),
 })
+
+const shortname = computed(() => name.value.replace(/(koishi-|^@koishijs\/)plugin-/, ''))
 
 const env = computed(() => envMap.value[name.value])
 const local = computed(() => store.packages[name.value])

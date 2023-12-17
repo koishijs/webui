@@ -1,5 +1,6 @@
 import { Dict } from 'koishi'
 import { computed, ref } from 'vue'
+import { ScopeStatus } from 'cordis'
 import { router, send, store } from '@koishijs/client'
 import { PackageProvider } from '@koishijs/plugin-config'
 
@@ -27,7 +28,8 @@ export interface EnvInfo {
   warning?: boolean
 }
 
-export const select = ref<Tree>()
+export const dialogFork = ref<string>()
+export const dialogSelect = ref<Tree>()
 
 export const coreDeps = [
   '@koishijs/plugin-console',
@@ -104,7 +106,6 @@ declare module '@koishijs/client' {
 
 export interface Tree {
   id: string
-  alias: string
   name: string
   path: string
   label?: string
@@ -158,7 +159,7 @@ function getTree(parent: Tree, plugins: any): Tree[] {
     }
     node.name = key.split(':', 1)[0]
     node.id = key
-    node.path = node.alias = key.slice(node.name.length + 1)
+    node.path = key.slice(node.name.length + 1)
     node.label = config?.$label
     if (key.startsWith('group:')) {
       node.children = getTree(node, config)
@@ -173,13 +174,13 @@ export const plugins = computed(() => {
     name: '',
     id: '',
     path: '',
-    alias: '',
     label: '全局设置',
     config: store.config,
     children: [],
   }
   const data = [root]
   const expanded: string[] = []
+  const forks: Dict<string[]> = {}
   const paths: Dict<Tree> = {
     '': root,
   }
@@ -191,11 +192,24 @@ export const plugins = computed(() => {
     if (!tree.config?.$collapsed && tree.children) {
       expanded.push(tree.id)
     }
+    forks[tree.name] ||= []
+    forks[tree.name].push(tree.path)
     paths[tree.path] = tree
     tree.children?.forEach(traverse)
   }
-  return { data, paths, expanded }
+  return { data, forks, paths, expanded }
 })
+
+export function getStatus(tree: Tree) {
+  switch (store.packages?.[getFullName(tree.name)]?.runtime?.forks?.[tree.path]?.status) {
+    case ScopeStatus.PENDING: return 'pending'
+    case ScopeStatus.LOADING: return 'loading'
+    case ScopeStatus.ACTIVE: return 'active'
+    case ScopeStatus.FAILED: return 'failed'
+    case ScopeStatus.DISPOSED: return 'disposed'
+    default: return 'disabled'
+  }
+}
 
 export function addItem(path: string, action: 'reload' | 'unload', name: string) {
   const ident = Math.random().toString(36).slice(2, 8)

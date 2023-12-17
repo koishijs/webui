@@ -28,7 +28,7 @@
           {{ getLabel(node) }}
         </div>
         <div class="right">
-          <span class="status" :class="getStatus(node)"></span>
+          <span class="status-light ignore-disabled" :class="getStatus(node.data)"></span>
         </div>
       </div>
     </el-tree>
@@ -38,9 +38,8 @@
 <script lang="ts" setup>
 
 import { ref, computed, onActivated, nextTick, watch } from 'vue'
-import { send, store, useMenu } from '@koishijs/client'
-import { ScopeStatus } from 'cordis'
-import { Tree, getFullName, plugins } from './utils'
+import { send, useMenu } from '@koishijs/client'
+import { Tree, getStatus, plugins } from './utils'
 
 const props = defineProps<{
   modelValue: string
@@ -70,19 +69,9 @@ interface Node {
 
 function getLabel(node: Node) {
   if (node.data.name === 'group') {
-    return '分组：' + (node.label || node.data.alias)
+    return '分组：' + (node.label || node.data.path)
   } else {
     return node.label || node.data.name || '待添加'
-  }
-}
-
-function getStatus(node: Node) {
-  switch (store.packages?.[getFullName(node.data.name)]?.runtime?.forks?.[node.data.path]?.status) {
-    case ScopeStatus.PENDING: return 'pending'
-    case ScopeStatus.LOADING: return 'loading'
-    case ScopeStatus.ACTIVE: return 'active'
-    case ScopeStatus.FAILED: return 'failed'
-    case ScopeStatus.DISPOSED: return 'disposed'
   }
 }
 
@@ -187,38 +176,7 @@ onActivated(async () => {
     .right {
       height: 100%;
       margin: 0 1.5rem 0 0.5rem;
-
-      > span.status {
-        display: inline-block;
-        width: 0.625rem;
-        height: 0.625rem;
-        border-radius: 100%;
-        transition: var(--color-transition);
-
-        &.active {
-          background-color: var(--k-color-success);
-        }
-        &.pending {
-          background-color: var(--k-color-warning);
-        }
-        &.loading {
-          animation: status-flash 1s infinite;
-          background-color: var(--k-color-warning);
-        }
-        &.failed {
-          background-color: var(--k-color-danger);
-        }
-      }
     }
-  }
-}
-
-@keyframes status-flash {
-  0%, 100% {
-    opacity: 0;
-  }
-  50% {
-    opacity: 1;
   }
 }
 

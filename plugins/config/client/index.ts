@@ -3,7 +3,10 @@ import { defineComponent, h, resolveComponent } from 'vue'
 import type {} from '@koishijs/plugin-config'
 import { type } from './components/utils'
 import Settings from './components/index.vue'
+import Forks from './components/forks.vue'
 import Select from './components/select.vue'
+
+import './index.scss'
 import './icons'
 
 export * from './components/utils'
@@ -26,6 +29,11 @@ export default (ctx: Context) => {
     type: 'plugin-select',
     component: Select,
     order: -1000,
+  })
+
+  ctx.slot({
+    type: 'global',
+    component: Forks,
   })
 
   ctx.page({
