@@ -4,6 +4,8 @@ import virtual from './virtual'
 import Comment from './k-comment.vue'
 import ImageViewer from './image-viewer.vue'
 
+import './index.scss'
+
 export * from 'cosmokit'
 export * from './chat'
 export * from './form'

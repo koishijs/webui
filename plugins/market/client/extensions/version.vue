@@ -31,7 +31,7 @@
 
   <!-- external -->
   <k-comment type="warning" v-if="!data.local.workspace && store.dependencies && !store.dependencies[data.name]">
-    <p>尚未将当前插件列入依赖，<span class="link" @click="send('market/install', { [data.name]: data.local.package.version })">点击添加</span>。</p>
+    <p>尚未将当前插件列入依赖，<span class="k-link" @click="send('market/install', { [data.name]: data.local.package.version })">点击添加</span>。</p>
   </k-comment>
 </template>
 
@@ -53,13 +53,6 @@ const versions = computed(() => store.registry?.[props.data.name])
 </script>
 
 <style lang="scss" scoped>
-
-.link {
-  &:hover {
-    cursor: pointer;
-    text-decoration: underline;
-  }
-}
 
 .navigation {
   margin-bottom: 2rem;

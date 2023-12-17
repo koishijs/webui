@@ -1,5 +1,5 @@
 <template>
-  <span class="link" @click.stop="active = name">
+  <span class="k-link" @click.stop="active = name">
     {{ name }}
   </span>
   <span v-if="store.packages[name]?.runtime?.id"> (已加载)</span>
@@ -17,14 +17,3 @@ defineProps<{
 }>()
 
 </script>
-
-<style scoped lang="scss">
-
-.link {
-  &:hover {
-    cursor: pointer;
-    text-decoration: underline;
-  }
-}
-
-</style>

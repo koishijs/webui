@@ -1,0 +1,8 @@
+.k-link {
+  cursor: pointer;
+  text-decoration: underline dotted;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}

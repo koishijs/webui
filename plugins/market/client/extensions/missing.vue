@@ -1,6 +1,6 @@
 <template>
   <k-comment type="danger">
-    <p>此插件尚未安装，<span class="link" @click="gotoMarket">点击前往插件市场</span>。</p>
+    <p>此插件尚未安装，<span class="k-link" @click="gotoMarket">点击前往插件市场</span>。</p>
   </k-comment>
 </template>
 
@@ -18,14 +18,3 @@ function gotoMarket() {
 }
 
 </script>
-
-<style lang="scss" scoped>
-
-.link {
-  &:hover {
-    cursor: pointer;
-    text-decoration: underline;
-  }
-}
-
-</style>
