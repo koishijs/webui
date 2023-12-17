@@ -24,7 +24,17 @@
       </tr>
     </table>
     <template #footer>
-      <el-button @click.stop="configure()">添加新配置</el-button>
+      <div class="left">
+        <template v-if="plugins.forks[shortname]?.length">
+          此插件目前存在 {{ plugins.forks[shortname]?.length }} 份配置。
+        </template>
+        <template v-else>
+          此插件尚未被配置。
+        </template>
+      </div>
+      <div class="right">
+        <el-button @click.stop="configure()">添加新配置</el-button>
+      </div>
     </template>
   </el-dialog>
 </template>
@@ -36,7 +46,7 @@ import { store, send, router } from '@koishijs/client'
 import { dialogFork, plugins, getStatus, removeItem, Tree } from './utils'
 
 const shortname = computed(() => dialogFork.value?.replace(/(koishi-|^@koishijs\/)plugin-/, ''))
-const local = computed(() => store.packages[dialogFork.value])
+const local = computed(() => store.packages?.[dialogFork.value])
 
 function getLabel(tree: Tree) {
   return `${tree.label ? `${tree.label} ` : ''}[${tree.path}]`
@@ -107,7 +117,10 @@ async function configure(key?: string) {
   }
 
   .el-dialog__footer {
-    text-align: left;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.9em;
   }
 }
 

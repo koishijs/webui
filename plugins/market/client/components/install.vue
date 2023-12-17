@@ -5,8 +5,8 @@
     class="install-panel"
     destroy-on-close>
     <template v-if="active" #header="{ titleId, titleClass }">
-      <span :id="titleId" :class="[titleClass, '']">
-        {{ active.replace(/(koishi-|^@koishijs\/)plugin-/, '') + (workspace ? ' (工作区)' : '') }}
+      <span :id="titleId" :class="titleClass">
+        {{ active + (workspace ? ' (工作区)' : '') }}
       </span>
       <el-select v-if="data" :disabled="workspace" v-model="selectVersion">
         <el-option v-for="({ result }, version) in data" :key="version" :value="version">
@@ -46,28 +46,13 @@
       </table>
     </el-scrollbar>
 
-    <div v-if="local && paths.length">
-      点击以前往配置页面：
-      <ul>
-        <li v-for="([path, key, active]) of paths" :key="key">
-          <span class="link" @click.stop="configure(key)">{{ path }}</span>
-          ({{ active ? '运行中' : '闲置' }})
-        </li>
-        <li v-if="!local.runtime?.id">
-          <span class="link" @click.stop="configure(true)">添加新配置</span>
-        </li>
-      </ul>
-    </div>
-    <div v-else-if="local">
-      <span class="link" @click.stop="configure(true)">你尚未配置此插件，点击立即配置。</span>
-    </div>
-
     <template v-if="active && !global.static" #footer>
       <div class="left">
         <el-checkbox v-model="config.bulk">批量操作模式</el-checkbox>
       </div>
       <div class="right">
         <el-button @click="active = ''">取消</el-button>
+        <el-button v-if="local" type="primary" @click="configure()">配置</el-button>
         <template v-if="workspace">
           <el-button v-if="current || config.bulk && config.override[active]" @click="installDep('')">移除</el-button>
           <el-button v-else @click="installDep(version)" :disabled="unchanged">添加</el-button>
@@ -86,10 +71,12 @@
 <script lang="ts" setup>
 
 import { computed, ref, watch } from 'vue'
-import { global, router, send, store } from '@koishijs/client'
+import { global, router, send, store, useContext } from '@koishijs/client'
 import { analyzeVersions, install } from './utils'
 import { active, config } from '../utils'
 import { parse } from 'semver'
+
+const ctx = useContext()
 
 function installDep(version: string) {
   const target = shortname.value
@@ -203,21 +190,14 @@ const shortname = computed(() => {
   return active.value.replace(pluginRegExp, '')
 })
 
-const paths = computed(() => getPaths(shortname.value))
-
 function getPaths(target: string) {
   if (!target || !store.config) return []
   return [...find(target, store.config.plugins, '')]
 }
 
-function configure(key: string | true) {
-  const target = shortname.value
-  active.value = ''
-  if (key === true) {
-    key = Math.random().toString(36).slice(2, 8)
-    send('manager/unload', '', target + ':' + key, {})
-  }
-  router.push('/plugins/' + key)
+function configure() {
+  ctx.emit('config/dialog-fork', active.value)
+  active.value = null
 }
 
 </script>

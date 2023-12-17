@@ -1,7 +1,7 @@
-import { Context } from '@koishijs/client'
+import { Context, router, send } from '@koishijs/client'
 import { defineComponent, h, resolveComponent } from 'vue'
 import type {} from '@koishijs/plugin-config'
-import { type } from './components/utils'
+import { dialogFork, plugins, type } from './components/utils'
 import Settings from './components/index.vue'
 import Forks from './components/forks.vue'
 import Select from './components/select.vue'
@@ -10,6 +10,13 @@ import './index.scss'
 import './icons'
 
 export * from './components/utils'
+
+declare module '@koishijs/client' {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  interface Events<C> {
+    'config/dialog-fork'(name: string): void
+  }
+}
 
 export default (ctx: Context) => {
   ctx.slot({
@@ -34,6 +41,20 @@ export default (ctx: Context) => {
   ctx.slot({
     type: 'global',
     component: Forks,
+  })
+
+  ctx.on('config/dialog-fork', (name) => {
+    const shortname = name.replace(/(koishi-|^@koishijs\/)plugin-/, '')
+    const forks = plugins.value.forks[shortname]
+    if (!forks.length) {
+      const key = Math.random().toString(36).slice(2, 8)
+      send('manager/unload', '', shortname + ':' + key, {})
+      router.push('/plugins/' + key)
+    } else if (forks.length === 1) {
+      router.push('/plugins/' + forks[0])
+    } else {
+      dialogFork.value = name
+    }
   })
 
   ctx.page({
