@@ -71,7 +71,7 @@
 <script lang="ts" setup>
 
 import { computed, ref, watch } from 'vue'
-import { global, router, send, store, useContext } from '@koishijs/client'
+import { global, send, store, useContext } from '@koishijs/client'
 import { analyzeVersions, install } from './utils'
 import { active, config } from '../utils'
 import { parse } from 'semver'
@@ -79,17 +79,16 @@ import { parse } from 'semver'
 const ctx = useContext()
 
 function installDep(version: string) {
-  const target = shortname.value
+  const target = active.value
+  if (!target) return
   if (config.value.bulk) {
-    config.value.override[active.value] = version
+    config.value.override[target] = version
     active.value = ''
     return
   }
-  install({ [active.value]: version }, async () => {
-    if (!version || !target || !store.config || getPaths(target).length) return
-    const key = Math.random().toString(36).slice(2, 8)
-    await send('manager/unload', '', target + ':' + key, {})
-    await router.push('/plugins/' + key)
+  install({ [target]: version }, async () => {
+    if (!version) return
+    ctx.emit('config/dialog-fork', target)
   })
 }
 
@@ -189,11 +188,6 @@ const shortname = computed(() => {
   if (!pluginRegExp.test(active.value)) return ''
   return active.value.replace(pluginRegExp, '')
 })
-
-function getPaths(target: string) {
-  if (!target || !store.config) return []
-  return [...find(target, store.config.plugins, '')]
-}
 
 function configure() {
   ctx.emit('config/dialog-fork', active.value)
