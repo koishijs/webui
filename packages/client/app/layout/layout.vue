@@ -6,7 +6,11 @@
 
     <div class="main-container">
       <div class="aside-mask" @click="isLeftAsideOpen = !isLeftAsideOpen"></div>
-      <layout-header v-model:isLeftAsideOpen="isLeftAsideOpen" v-model:isRightAsideOpen="isRightAsideOpen">
+      <layout-header
+        v-model:isLeftAsideOpen="isLeftAsideOpen"
+        v-model:isRightAsideOpen="isRightAsideOpen"
+        :menu-key="typeof menu === 'string' ? menu : null"
+        :menu-data="menuData">
         <template #left>
           <slot name="header">{{ route.meta.activity?.name }}</slot>
         </template>

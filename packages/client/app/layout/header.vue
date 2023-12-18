@@ -1,5 +1,5 @@
 <template>
-  <div class="layout-header">
+  <div class="layout-header" :class="{ 'has-menu': menuKey }">
     <div
       class="toggle-sidebar-button"
       role="button"
@@ -18,17 +18,30 @@
     <div class="right">
       <slot name="right"></slot>
     </div>
+    <div class="toggle-menu-button"
+      v-if="menuKey"
+      role="button"
+      tabindex="1"
+      @click.stop="trigger($event, menuData)"
+    >
+      <k-icon name="ellipsis"></k-icon>
+    </div>
   </div>
 </template>
 
 <script lang="ts" setup>
 
 import { useRoute } from 'vue-router'
+import { useMenu } from '@koishijs/client'
 
-defineProps<{
+const props = defineProps<{
   isLeftAsideOpen: boolean
   isRightAsideOpen: boolean
+  menuKey?: string
+  menuData?: any
 }>()
+
+const trigger = useMenu(props.menuKey as any)
 
 defineEmits(['update:isLeftAsideOpen', 'update:isRightAsideOpen'])
 
@@ -70,9 +83,29 @@ const route = useRoute()
   }
 }
 
+.toggle-menu-button {
+  display: none;
+  height: 100%;
+  width: var(--header-height);
+  align-items: center;
+  justify-content: center;
+
+  .k-icon {
+    height: 1.25rem;
+  }
+}
+
 @media screen and (max-width: 768px) {
   .toggle-sidebar-button {
     display: block;
+  }
+
+  .toggle-menu-button {
+    display: flex;
+  }
+
+  .layout-header.has-menu .right {
+    display: none;
   }
 }
 

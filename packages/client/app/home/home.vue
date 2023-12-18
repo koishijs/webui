@@ -34,11 +34,6 @@ import Welcome from './welcome.vue'
     margin: var(--card-margin);
   }
 
-  .k-card-body {
-    margin: var(--card-padding-vertical) 0;
-    padding: 0 var(--card-padding-horizontal);
-  }
-
   .k-card.connect {
     width: 400px;
     max-width: 400px;

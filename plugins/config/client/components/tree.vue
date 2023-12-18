@@ -86,8 +86,12 @@ function allowDrop(source: Node, target: Node, type: 'inner' | 'prev' | 'next') 
   return target.data.id.startsWith('group:')
 }
 
-function handleClick(tree: Tree) {
+function handleClick(tree: Tree, target: Node, instance: any, event: MouseEvent) {
   model.value = tree.path
+  // el-tree will stop propagation,
+  // so we need to manually trigger the event
+  // so that context menu can be closed.
+  window.dispatchEvent(new MouseEvent(event.type, event))
 }
 
 function handleExpand(data: Tree, target: Node, instance) {

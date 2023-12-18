@@ -1,12 +1,10 @@
 <template>
-  <transition name="el-zoom-in-top">
-    <div ref="el" v-show="el" class="k-menu" :style="getStyle()">
-      <template v-for="item of ctx.internal.menus[id]">
-        <div class="k-menu-separator" v-if="item.id === '@separator'"></div>
-        <menu-item v-else v-bind="{ prefix: id, ...item }"></menu-item>
-      </template>
-    </div>
-  </transition>
+  <div ref="el" class="k-menu" :style="getStyle()">
+    <template v-for="item of ctx.internal.menus[id]">
+      <div class="k-menu-separator" v-if="item.id === '@separator'"></div>
+      <menu-item v-else v-bind="{ prefix: id, ...item }"></menu-item>
+    </template>
+  </div>
 </template>
 
 <script lang="ts" setup>
@@ -22,7 +20,7 @@ const ctx = useContext()
 const el = ref<HTMLElement>()
 
 const getStyle = () => {
-  if (!el.value) return {}
+  if (!el.value) return { visibility: 'hidden' }
   const { height, width } = el.value.getBoundingClientRect()
   const style: any = {}
   if (props.relative.right + width > window.innerWidth) {
