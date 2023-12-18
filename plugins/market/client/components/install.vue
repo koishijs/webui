@@ -48,7 +48,12 @@
 
     <template v-if="active && !global.static" #footer>
       <div class="left">
-        <el-checkbox v-model="config.bulk">批量操作模式</el-checkbox>
+        <el-checkbox v-model="config.bulk">
+          批量操作模式
+          <k-hint>
+            批量操作模式下，你可以同时安装、更新或移除多个插件。勾选此选项后，你的所有操作会被暂存，直到你点击右上角的“应用更改”按钮。
+          </k-hint>
+        </el-checkbox>
       </div>
       <div class="right">
         <el-button @click="active = ''">取消</el-button>

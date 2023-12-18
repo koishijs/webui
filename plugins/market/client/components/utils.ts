@@ -62,6 +62,7 @@ export async function install(override: Dict<string>, callback?: () => Awaitable
       message.success('安装成功！')
     }
   } catch (err) {
+    console.error(err)
     message.error('安装超时！')
   } finally {
     dispose()

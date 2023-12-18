@@ -102,7 +102,7 @@ class Insight extends DataService<Insight.Payload> {
         const isGroup = name === 'Group'
         const isRoot = uid === 0
         const node = { uid, name, weight, status, isGroup, isRoot, services: services[uid] }
-        if (key) node.name += ` <${key}>`
+        if (key) node.name += ` [${key}]`
         nodes.push(node)
       }
 
