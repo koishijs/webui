@@ -43,6 +43,7 @@ export function useContext() {
 
 export interface ActionOptions {
   shortcut?: string
+  hidden?: (scope: Flatten<ActionContext>) => boolean
   disabled?: (scope: Flatten<ActionContext>) => boolean
   action: (scope: Flatten<ActionContext>) => any
 }

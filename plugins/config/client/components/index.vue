@@ -108,17 +108,17 @@ const ctx = useContext()
 ctx.define('config.tree', current)
 
 ctx.action('config.tree.add-plugin', {
-  disabled: ({ config }) => config.tree.path && !config.tree.children,
+  hidden: ({ config }) => config.tree.path && !config.tree.children,
   action: ({ config }) => dialogSelect.value = config.tree,
 })
 
 ctx.action('config.tree.add-group', {
-  disabled: ({ config }) => config.tree.path && !config.tree.children,
+  hidden: ({ config }) => config.tree.path && !config.tree.children,
   action: ({ config }) => addItem(config.tree.path, 'reload', 'group'),
 })
 
 ctx.action('config.tree.clone', {
-  disabled: ({ config }) => !config.tree.path || !!config.tree.children,
+  hidden: ({ config }) => !config.tree.path || !!config.tree.children,
   action: async ({ config }) => {
     const ident = Math.random().toString(36).slice(2, 8)
     send('manager/unload', config.tree.parent?.path ?? '', `${config.tree.name}:${ident}`, config.tree.config)
@@ -127,7 +127,7 @@ ctx.action('config.tree.clone', {
 })
 
 ctx.action('config.tree.manage', {
-  disabled: ({ config }) => !config.tree.path || !!config.tree.children,
+  hidden: ({ config }) => !config.tree.path || !!config.tree.children,
   action: async ({ config }) => {
     dialogFork.value = config.tree.name
   },
@@ -142,7 +142,7 @@ ctx.action('config.tree.rename', {
 })
 
 ctx.action('config.tree.remove', {
-  disabled: ({ config }) => !config.tree.path,
+  disabled: ({ config }) => !config.tree.path || hasCoreDeps(config.tree),
   action: ({ config }) => remove.value = config.tree,
 })
 

@@ -1,5 +1,5 @@
 <template>
-  <template v-for="menu of ctx.internal.activeMenus" :key="id">
+  <template v-for="menu of ctx.internal.activeMenus" :key="menu.id">
     <k-menu v-bind="menu"></k-menu>
   </template>
 </template>

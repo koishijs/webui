@@ -1,7 +1,7 @@
 <template>
   <div
     class="k-menu-item"
-    v-if="forced || !disabled"
+    v-if="!hidden"
     :class="[toValue(type), { disabled }]"
     @click.prevent="item?.action(ctx.internal.createScope())"
   >
@@ -19,12 +19,16 @@ const props = defineProps<MenuItem & { prefix: string }>()
 
 const ctx = useContext()
 
-const forced = computed(() => props.id.startsWith('!'))
-
 const item = computed(() => {
   let id = props.id.replace(/^!/, '')
   if (id.startsWith('.')) id = props.prefix + id
   return ctx.internal.actions[id]
+})
+
+const hidden = computed(() => {
+  if (!item.value) return true
+  if (!item.value.hidden) return false
+  return toValue(item.value.hidden)
 })
 
 const disabled = computed(() => {

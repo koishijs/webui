@@ -68,7 +68,7 @@ export default (ctx: Context) => {
   })
 
   ctx.menu('config.tree', [{
-    id: '!config.tree.toggle',
+    id: 'config.tree.toggle',
     type: ({ config }) => config.tree?.disabled ? '' : type.value,
     icon: ({ config }) => config.tree?.disabled ? 'play' : 'stop',
     label: ({ config }) => (config.tree?.disabled ? '启用' : '停用')

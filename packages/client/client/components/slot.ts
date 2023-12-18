@@ -28,7 +28,7 @@ export const KSlot = defineComponent({
       const external = [...ctx.internal.views[props.name] || []]
         .filter(item => !item.disabled?.())
         .map(item => ({
-          node: h(item.component, { data: props.data, ...props.data }, slots),
+          node: h(item.component, { ...props.data }, slots),
           order: item.order,
           layer: 1,
         }))

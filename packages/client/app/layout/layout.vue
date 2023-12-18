@@ -16,13 +16,13 @@
               <template v-for="item in ctx.internal.menus[menu]" :key="menu">
                 <layout-menu-item
                   v-if="item.id !== '@separator'"
-                  v-bind="{ ...item, ...ctx.internal.actions[item.id.startsWith('.') ? menu + item.id : item.id] }"
+                  :item="{ ...item, ...ctx.internal.actions[item.id.startsWith('.') ? menu + item.id : item.id] }"
                   :menu-key="menu" :menu-data="menuData"
                 />
               </template>
             </template>
             <template v-else>
-              <layout-menu-item v-for="item in menu" v-bind="item" />
+              <layout-menu-item v-for="item in menu" :item="item" />
             </template>
           </slot>
         </template>

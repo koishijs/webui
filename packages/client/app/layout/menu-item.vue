@@ -1,7 +1,7 @@
 <template>
-  <el-tooltip :disabled="disabled" :content="toValue(label)" placement="bottom">
-    <span class="menu-item" :class="[toValue(type), { disabled }]" @click="trigger">
-      <k-icon class="menu-icon" :name="toValue(icon)"></k-icon>
+  <el-tooltip v-if="!hidden" :disabled="disabled" :content="toValue(item.label)" placement="bottom">
+    <span class="menu-item" :class="[toValue(item.type), { disabled }]" @click="trigger">
+      <k-icon class="menu-icon" :name="toValue(item.icon)"></k-icon>
     </span>
   </el-tooltip>
 </template>
@@ -11,17 +11,23 @@
 import { LegacyMenuItem, MaybeGetter, useContext } from '@koishijs/client'
 import { computed } from 'vue'
 
-const props = defineProps<LegacyMenuItem & {
+const props = defineProps<{
+  item: LegacyMenuItem
   menuKey?: string
   menuData?: any
 }>()
 
 const ctx = useContext()
 
+const hidden = computed(() => {
+  if (!props.item.hidden) return false
+  return toValue(props.item.hidden)
+})
+
 const disabled = computed(() => {
-  if (!props.action) return true
-  if (!props.disabled) return false
-  return toValue(props.disabled)
+  if (!props.item.action) return true
+  if (!props.item.disabled) return false
+  return toValue(props.item.disabled)
 })
 
 function toValue<T>(getter: MaybeGetter<T>): T {
@@ -30,7 +36,7 @@ function toValue<T>(getter: MaybeGetter<T>): T {
 }
 
 function trigger() {
-  return props.action(ctx.internal.createScope({
+  return props.item.action(ctx.internal.createScope({
     [props.menuKey]: props.menuData,
   }))
 }
