@@ -7,10 +7,10 @@
       <p>插件加载失败，这可能是插件本身的问题所致。{{ hint }}</p>
     </k-comment>
 
-    <k-slot v-else name="plugin-details" :data="data">
+    <k-slot v-else name="plugin-details">
       <!-- dependency -->
       <k-slot-item :order="800">
-        <k-slot name="plugin-dependency" single :data="data">
+        <k-slot name="plugin-dependency" single>
           <k-comment
             v-for="({ required, active }, name) in env.peer" :key="name"
             :type="active ? 'success' : required ? 'warning' : 'primary'">
@@ -31,11 +31,11 @@
       <!-- implements -->
       <k-slot-item :order="600">
         <template v-for="name in env.impl" :key="name">
-          <k-comment v-if="name in store.services && data.current.disabled" type="warning">
+          <k-comment v-if="name in store.services && current.disabled" type="warning">
             <p>此插件将会提供 {{ name }} 服务，但此服务已被其他插件实现。</p>
           </k-comment>
-          <k-comment v-else :type="data.current.disabled ? 'primary' : 'success'">
-            <p>此插件{{ data.current.disabled ? '启用后将会提供' : '提供了' }} {{ name }} 服务。</p>
+          <k-comment v-else :type="current.disabled ? 'primary' : 'success'">
+            <p>此插件{{ current.disabled ? '启用后将会提供' : '提供了' }} {{ name }} 服务。</p>
           </k-comment>
         </template>
       </k-slot-item>
@@ -45,7 +45,7 @@
         <k-comment v-if="local.runtime.id && !local.runtime.forkable && current.disabled" type="warning">
           <p>此插件已在运行且不可重用，启用可能会导致非预期的问题。</p>
         </k-comment>
-        <k-comment v-if="plugins.forks[shortname]?.length > 1" type="primary">
+        <k-comment v-if="plugins.forks[current.name]?.length > 1" type="primary">
           <p>此插件存在多份配置，<span class="k-link" @click.stop="dialogFork = name">点击前往管理</span>。</p>
         </k-comment>
       </k-slot-item>
@@ -112,8 +112,6 @@ const config = computed({
   set: value => emit('update:modelValue', value),
 })
 
-const shortname = computed(() => name.value.replace(/(koishi-|^@koishijs\/)plugin-/, ''))
-
 const env = computed(() => envMap.value[name.value])
 const local = computed(() => store.packages[name.value])
 const hint = computed(() => local.value.workspace ? '请检查插件源代码。' : '请联系插件作者并反馈此问题。')
@@ -123,17 +121,11 @@ watch(local, (value) => {
   send('config/request-runtime', value.name)
 }, { immediate: true })
 
+provide('plugin:name', name)
+provide('plugin:env', env)
 provide('manager.settings.local', local)
 provide('manager.settings.config', config)
 provide('manager.settings.current', computed(() => props.current))
-
-const data = computed<SettingsData>(() => ({
-  env: env.value,
-  name: name.value,
-  local: local.value,
-  config: config.value,
-  current: props.current,
-}))
 
 </script>
 

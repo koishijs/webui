@@ -1,13 +1,13 @@
 <template>
   <k-comment
-    v-for="({ required, active }, name) in data.env.peer" :key="name"
+    v-for="({ required, active }, name) in env.peer" :key="name"
     :type="active ? 'success' : required ? 'warning' : 'primary'">
     <p>
       {{ required ? '必需' : '可选' }}依赖：<k-dep-link :name="name"></k-dep-link>
     </p>
   </k-comment>
   <k-comment
-    v-for="({ required }, name) in data.env.using" :key="name"
+    v-for="({ required }, name) in env.using" :key="name"
     :type="name in store.services ? 'success' : required ? 'warning' : 'primary'">
     <p>
       {{ required ? '必需' : '可选' }}服务：{{ name }}
@@ -26,13 +26,11 @@
 <script lang="ts" setup>
 
 import { Dict, store } from '@koishijs/client'
-import { computed } from 'vue'
-import { SettingsData } from '@koishijs/plugin-config/client'
+import { computed, inject, ComputedRef } from 'vue'
+import { EnvInfo } from '@koishijs/plugin-config/client'
 import KDepLink from './dep-link.vue'
 
-const props = defineProps<{
-  data: SettingsData
-}>()
+const env = inject<ComputedRef<EnvInfo>>('plugin:env')
 
 const getImplements = (name: string) => ({
   ...store.market.data?.[name],
@@ -46,7 +44,7 @@ const getAvailable = (name: string) => Object
 
 const available = computed(() => {
   const available: Dict<string[]> = {}
-  for (const name in props.data.env.using) {
+  for (const name in env.value.using) {
     available[name] = getAvailable(name)
   }
   return available

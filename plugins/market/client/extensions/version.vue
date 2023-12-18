@@ -6,9 +6,9 @@
       :href="object.package.links.homepage"
     >插件主页</a>
     <a class="el-button" target="_blank"
-      v-if="object.package.links.npm && data.local.package.version"
-      :href="object.package.links.npm + '/v/' + data.local.package.version"
-    >当前版本：{{ data.local.package.version }}</a>
+      v-if="object.package.links.npm && local.package.version"
+      :href="object.package.links.npm + '/v/' + local.package.version"
+    >当前版本：{{ local.package.version }}</a>
     <a class="el-button" target="_blank"
       v-if="object.package.links.repository"
       :href="object.package.links.repository"
@@ -20,7 +20,7 @@
   </div>
 
   <!-- latest -->
-  <k-comment v-if="hasUpdate(data.name) && !global.static">
+  <k-comment v-if="hasUpdate(name) && !global.static">
     <p>当前的插件版本不是最新，<router-link to="/dependencies">点击前往依赖管理</router-link>。</p>
   </k-comment>
 
@@ -30,25 +30,24 @@
   </k-comment>
 
   <!-- external -->
-  <k-comment type="warning" v-if="!data.local.workspace && store.dependencies && !store.dependencies[data.name]">
-    <p>尚未将当前插件列入依赖，<span class="k-link" @click="send('market/install', { [data.name]: data.local.package.version })">点击添加</span>。</p>
+  <k-comment type="warning" v-if="!local.workspace && store.dependencies && !store.dependencies[name]">
+    <p>尚未将当前插件列入依赖，<span class="k-link" @click="send('market/install', { [name]: local.package.version })">点击添加</span>。</p>
   </k-comment>
 </template>
 
 <script lang="ts" setup>
 
 import { global, send, store } from '@koishijs/client'
-import { computed } from 'vue'
+import { computed, inject, ComputedRef } from 'vue'
 import { hasUpdate } from '../utils'
-import { SettingsData } from '@koishijs/plugin-config/client'
+import type {} from '@koishijs/plugin-config'
 
-const props = defineProps<{
-  data: SettingsData
-}>()
+const name = inject<ComputedRef<string>>('plugin:name')
 
-const object = computed(() => store.market.data?.[props.data.name])
-const dep = computed(() => store.dependencies?.[props.data.name])
-const versions = computed(() => store.registry?.[props.data.name])
+const local = computed(() => store.packages?.[name.value])
+const object = computed(() => store.market.data?.[name.value])
+const dep = computed(() => store.dependencies?.[name.value])
+const versions = computed(() => store.registry?.[name.value])
 
 </script>
 
