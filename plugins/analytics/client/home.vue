@@ -53,10 +53,17 @@ import NumberGrid from './numbers/index.vue'
       }
     }
 
-    @media (max-width: 768px) {
+    @media (max-width: 768px) and (min-width: 480px) {
       .echarts {
         width: 600px;
         height: 400px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .echarts {
+        width: 100%;
+        height: 300px;
       }
     }
   }

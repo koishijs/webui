@@ -57,6 +57,11 @@ defineProps<{
   .value {
     font-size: 1rem;
   }
+
+  @media (max-width: 768px) {
+    margin: 0.5rem 0;
+    padding: 0 1rem;
+  }
 }
 
 .k-analytic-number footer {
@@ -66,6 +71,11 @@ defineProps<{
   margin-bottom: 0.75rem;
   display: flex;
   justify-content: space-between;
+
+  @media (max-width: 768px) {
+    margin: 0.5rem 0;
+    padding: 0.5rem 1rem 0;
+  }
 }
 
 </style>
