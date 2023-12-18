@@ -87,6 +87,16 @@ type Flatten<S extends {}> = Intersect<{
     : { [P in K]: S[K] }
 }[keyof S]>
 
+export interface ActiveMenu {
+  id: string
+  relative: {
+    left: number
+    top: number
+    right: number
+    bottom: number
+  }
+}
+
 class Internal {
   extensions = extensions
   activities = activities
@@ -97,7 +107,7 @@ class Internal {
   views = reactive<Dict<SlotOptions[]>>({})
   themes = reactive<Dict<ThemeOptions>>({})
   settings = reactive<Dict<SettingOptions[]>>({})
-  activeMenus = reactive<{ id: string; styles: Partial<CSSStyleDeclaration> }[]>([])
+  activeMenus = reactive<ActiveMenu[]>([])
 
   createScope(scope = this.scope, prefix = '') {
     return new Proxy({}, {
@@ -120,7 +130,15 @@ export function useMenu<K extends keyof ActionContext>(id: K) {
     ctx.define(id, value)
     event.preventDefault()
     const { clientX, clientY } = event
-    ctx.internal.activeMenus.splice(0, Infinity, { id, styles: { left: clientX + 'px', top: clientY + 'px' } })
+    ctx.internal.activeMenus.splice(0, Infinity, {
+      id,
+      relative: {
+        left: clientX,
+        top: clientY,
+        right: clientX,
+        bottom: clientY,
+      },
+    })
   }
 }
 
