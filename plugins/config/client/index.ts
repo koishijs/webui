@@ -46,7 +46,7 @@ export default (ctx: Context) => {
   ctx.on('config/dialog-fork', (name) => {
     const shortname = name.replace(/(koishi-|^@koishijs\/)plugin-/, '')
     const forks = plugins.value.forks[shortname]
-    if (!forks.length) {
+    if (!forks?.length) {
       const key = Math.random().toString(36).slice(2, 8)
       send('manager/unload', '', shortname + ':' + key, {})
       router.push('/plugins/' + key)
@@ -68,7 +68,7 @@ export default (ctx: Context) => {
   })
 
   ctx.menu('config.tree', [{
-    id: '.toggle',
+    id: '!config.tree.toggle',
     type: ({ config }) => config.tree?.disabled ? '' : type.value,
     icon: ({ config }) => config.tree?.disabled ? 'play' : 'stop',
     label: ({ config }) => (config.tree?.disabled ? '启用' : '停用')
@@ -90,6 +90,14 @@ export default (ctx: Context) => {
     label: ({ config }) => config.tree?.children ? '移除分组' : '移除插件',
   }, {
     id: '@separator',
+  }, {
+    id: '.clone',
+    icon: 'clone',
+    label: '克隆配置',
+  }, {
+    id: '.manage',
+    icon: 'manage',
+    label: '管理多份配置',
   }, {
     id: '.add-plugin',
     icon: 'add-plugin',

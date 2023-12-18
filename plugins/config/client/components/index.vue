@@ -11,7 +11,7 @@
 
       <!-- plugin -->
       <template v-else>
-        {{ current.name }}
+        {{ current.label || current.name }} [{{ current.path }}]
       </template>
     </template>
 
@@ -62,7 +62,7 @@
 import { computed, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { clone, message, send, store, useContext, Schema } from '@koishijs/client'
-import { Tree, getFullName, addItem, hasCoreDeps, current, plugins, removeItem, dialogSelect } from './utils'
+import { Tree, getFullName, addItem, hasCoreDeps, current, plugins, removeItem, dialogSelect, dialogFork } from './utils'
 import GlobalSettings from './global.vue'
 import GroupSettings from './group.vue'
 import TreeView from './tree.vue'
@@ -115,6 +115,22 @@ ctx.action('config.tree.add-plugin', {
 ctx.action('config.tree.add-group', {
   disabled: ({ config }) => config.tree.path && !config.tree.children,
   action: ({ config }) => addItem(config.tree.path, 'reload', 'group'),
+})
+
+ctx.action('config.tree.clone', {
+  disabled: ({ config }) => !config.tree.path || !!config.tree.children,
+  action: async ({ config }) => {
+    const ident = Math.random().toString(36).slice(2, 8)
+    send('manager/unload', config.tree.parent?.path ?? '', `${config.tree.name}:${ident}`, config.tree.config)
+    router.replace(`/plugins/${ident}`)
+  },
+})
+
+ctx.action('config.tree.manage', {
+  disabled: ({ config }) => !config.tree.path || !!config.tree.children,
+  action: async ({ config }) => {
+    dialogFork.value = config.tree.name
+  },
 })
 
 ctx.action('config.tree.rename', {
