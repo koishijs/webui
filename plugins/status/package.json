@@ -46,7 +46,7 @@
   },
   "devDependencies": {
     "@koishijs/client": "^5.21.0",
-    "@koishijs/plugin-analytics": "^2.0.1",
+    "@koishijs/plugin-analytics": "^2.0.2",
     "@types/envinfo": "^7.8.3",
     "@types/throttle-debounce": "^2.1.0",
     "koishi": "^4.16.1"

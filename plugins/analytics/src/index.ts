@@ -69,7 +69,6 @@ class Analytics extends DataService<Analytics.Payload> {
     })
 
     ctx.on('message', (session) => {
-      if (session.bot.hidden) return
       this.addAudit(this.messages, {
         ...this.createIndex(session),
         type: 'receive',
@@ -78,7 +77,6 @@ class Analytics extends DataService<Analytics.Payload> {
     })
 
     ctx.on('send', (session) => {
-      if (session.bot.hidden) return
       this.addAudit(this.messages, {
         ...this.createIndex(session),
         type: 'send',
@@ -87,11 +85,10 @@ class Analytics extends DataService<Analytics.Payload> {
     })
 
     ctx.any().before('command/execute', ({ command, session }) => {
-      if (session.bot.hidden) return
       this.addAudit(this.commands, {
         ...this.createIndex(session),
         name: command.name,
-        userId: session.user['id'],
+        userId: session.user['id'] || 0,
         channelId: session.channelId,
       })
       this.upload()
@@ -171,6 +168,7 @@ class Analytics extends DataService<Analytics.Payload> {
     const data = await this.ctx.database
       .select('analytics.command', {
         date: { $gte: Time.getDateNumber() - 7 },
+        userId: { $gt: 0 },
       })
       .groupBy(['date'], {
         count: row => $.count(row.userId),
