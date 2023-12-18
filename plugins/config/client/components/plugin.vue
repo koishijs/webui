@@ -97,7 +97,7 @@
 
 import { activities, store, send } from '@koishijs/client'
 import { computed, provide, watch } from 'vue'
-import { envMap, name, plugins, SettingsData, dialogFork, Tree } from './utils'
+import { envMap, name, plugins, dialogFork, Tree } from './utils'
 import KModifier from './modifier.vue'
 
 const props = defineProps<{

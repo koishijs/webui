@@ -120,8 +120,12 @@ ctx.action('config.tree.add-group', {
 ctx.action('config.tree.clone', {
   hidden: ({ config }) => !config.tree.path || !!config.tree.children,
   action: async ({ config }) => {
+    const children = config.tree.parent.path
+      ? config.tree.parent.children
+      : plugins.value.data.slice(1)
+    const index = children.findIndex(tree => tree.path === config.tree.path)
     const ident = Math.random().toString(36).slice(2, 8)
-    send('manager/unload', config.tree.parent?.path ?? '', `${config.tree.name}:${ident}`, config.tree.config)
+    send('manager/unload', config.tree.parent?.path ?? '', `${config.tree.name}:${ident}`, config.tree.config, index + 1)
     router.replace(`/plugins/${ident}`)
   },
 })

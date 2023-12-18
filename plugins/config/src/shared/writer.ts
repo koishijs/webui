@@ -7,7 +7,7 @@ declare module '@koishijs/console' {
     'manager/app-reload'(config: any): void
     'manager/teleport'(source: string, key: string, target: string, index: number): void
     'manager/reload'(parent: string, key: string, config: any): void
-    'manager/unload'(parent: string, key: string, config: any): void
+    'manager/unload'(parent: string, key: string, config: any, index?: number): void
     'manager/remove'(parent: string, key: string): void
     'manager/meta'(ident: string, config: any): void
   }
@@ -148,10 +148,15 @@ export class ConfigWriter extends DataService<Context.Config> {
     await this.loader.writeConfig()
   }
 
-  async unload(parent: string, key: string, config = {}) {
+  async unload(parent: string, key: string, config = {}, index?: number) {
     const scope = this.resolveFork(parent)
     this.loader.unload(scope.ctx, key)
-    rename(scope.config, key, '~' + key, config)
+    if (index) {
+      const rest = Object.keys(scope.config).slice(index)
+      insertKey(scope.config, { [key]: config }, rest)
+    } else {
+      rename(scope.config, key, '~' + key, config)
+    }
     await this.loader.writeConfig()
   }
 

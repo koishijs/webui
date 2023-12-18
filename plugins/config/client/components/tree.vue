@@ -28,7 +28,7 @@
           {{ getLabel(node) }}
         </div>
         <div class="right">
-          <span class="status-light ignore-disabled" :class="getStatus(node.data)"></span>
+          <span v-if="getFullName(node.data.name)" class="status-light" :class="getStatus(node.data)"></span>
         </div>
       </div>
     </el-tree>
@@ -39,7 +39,7 @@
 
 import { ref, computed, onActivated, nextTick, watch } from 'vue'
 import { send, useMenu } from '@koishijs/client'
-import { Tree, getStatus, plugins } from './utils'
+import { Tree, getStatus, plugins, getFullName } from './utils'
 
 const props = defineProps<{
   modelValue: string
@@ -112,7 +112,7 @@ function handleDrop(source: Node, target: Node, position: 'before' | 'after' | '
 function getClass(tree: Tree) {
   const words: string[] = []
   if (tree.children) words.push('is-group')
-  if (tree.disabled) words.push('is-disabled')
+  if (!tree.children && !getFullName(tree.name)) words.push('is-disabled')
   if (tree.path === model.value) words.push('is-active')
   return words.join(' ')
 }

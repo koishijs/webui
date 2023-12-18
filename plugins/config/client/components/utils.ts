@@ -2,15 +2,6 @@ import { Dict } from 'koishi'
 import { computed, ref } from 'vue'
 import { ScopeStatus } from 'cordis'
 import { router, send, store } from '@koishijs/client'
-import { PackageProvider } from '@koishijs/plugin-config'
-
-export interface SettingsData {
-  env: EnvInfo
-  name: string
-  local: PackageProvider.Data
-  config: any
-  current: Tree
-}
 
 interface DepInfo {
   required: boolean
