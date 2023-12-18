@@ -1,7 +1,7 @@
 {
   "name": "@koishijs/components",
   "description": "Client components for Koishi",
-  "version": "1.5.1",
+  "version": "1.5.2",
   "main": "client/index.ts",
   "files": [
     "client",
@@ -31,6 +31,6 @@
   "dependencies": {
     "@satorijs/element": "^2.6.1",
     "cosmokit": "^1.5.1",
-    "schemastery-vue": "^7.2.1"
+    "schemastery-vue": "^7.2.2"
   }
 }
