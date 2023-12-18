@@ -1,6 +1,6 @@
 <template>
   <div class="card-grid numeric-grid" v-if="store.analytics">
-    <k-slot name="analytic-number" :component="Numeric">
+    <k-slot name="analytic-number">
       <k-slot-item>
         <numeric icon="analytic:user" title="用户数量">
           <template #default>{{ store.analytics.userCount }}</template>

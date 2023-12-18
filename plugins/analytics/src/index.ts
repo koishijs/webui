@@ -41,9 +41,9 @@ class Analytics extends DataService<Analytics.Payload> {
     ctx.model.extend('analytics.message', {
       date: 'integer',
       hour: 'integer',
-      type: 'string',
-      selfId: 'string',
-      platform: 'string',
+      type: 'string(63)',
+      selfId: 'string(63)',
+      platform: 'string(63)',
       count: 'integer',
     }, {
       primary: ['date', 'hour', 'type', 'selfId', 'platform'],
@@ -52,11 +52,11 @@ class Analytics extends DataService<Analytics.Payload> {
     ctx.model.extend('analytics.command', {
       date: 'integer',
       hour: 'integer',
-      name: 'string',
-      selfId: 'string',
+      name: 'string(63)',
+      selfId: 'string(63)',
       userId: 'integer',
-      channelId: 'string',
-      platform: 'string',
+      channelId: 'string(63)',
+      platform: 'string(63)',
       count: 'integer',
     }, {
       primary: ['date', 'hour', 'name', 'selfId', 'userId', 'channelId', 'platform'],
@@ -87,6 +87,7 @@ class Analytics extends DataService<Analytics.Payload> {
     })
 
     ctx.any().before('command/execute', ({ command, session }) => {
+      if (session.bot.hidden) return
       this.addAudit(this.commands, {
         ...this.createIndex(session),
         name: command.name,
