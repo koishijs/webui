@@ -24,6 +24,10 @@
       <p>正在加载版本数据……</p>
     </div>
 
+    <k-comment v-if="store.dependencies?.[active] && !current" type="danger">
+      <p>该依赖的安装发生了错误，你可以尝试修复或移除它。</p>
+    </k-comment>
+
     <el-scrollbar v-if="data?.[version] && Object.keys(data[version].peers).length">
       <table>
         <tr>
@@ -63,9 +67,9 @@
           <el-button v-else @click="installDep(version)" :disabled="unchanged">添加</el-button>
         </template>
         <template v-else-if="data">
-          <el-button v-if="current || config.bulk && config.override[active]" @click="installDep('')" type="danger">移除</el-button>
+          <el-button v-if="current || store.dependencies[active] || config.bulk && config.override[active]" @click="installDep('')" type="danger">移除</el-button>
           <el-button :type="result" @click="installDep(version)" :disabled="unchanged">
-            {{ current ? '更新' : '安装' }}
+            {{ current ? '更新' : store.dependencies?.[active] ? '修复' : '安装' }}
           </el-button>
         </template>
       </div>
@@ -114,7 +118,7 @@ const selectVersion = computed({
 
 const unchanged = computed(() => {
   return !data.value?.[version.value]
-    || version.value === store.dependencies?.[active.value]?.request
+    || version.value === store.dependencies?.[active.value]?.request && !!store.dependencies?.[active.value]?.resolved
 })
 
 const current = computed(() => store.dependencies?.[active.value]?.resolved)

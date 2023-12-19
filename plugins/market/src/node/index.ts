@@ -25,7 +25,7 @@ declare module '@koishijs/console' {
   }
 
   interface Events {
-    'market/install'(deps: Dict<string>): Promise<number>
+    'market/install'(deps: Dict<string>, forced?: boolean): Promise<number>
     'market/registry'(name: string): Promise<Dict<Pick<RemotePackage, DependencyMetaKey>>>
   }
 }
@@ -155,8 +155,8 @@ export function apply(ctx: Context, config: Config) {
       prod: resolve(__dirname, '../../dist'),
     })
 
-    ctx.console.addListener('market/install', async (deps) => {
-      const code = await ctx.installer.install(deps)
+    ctx.console.addListener('market/install', async (deps, forced) => {
+      const code = await ctx.installer.install(deps, forced)
       ctx.console.dependencies?.refresh()
       ctx.console.registry?.refresh()
       ctx.console.packages?.refresh()

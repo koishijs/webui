@@ -201,19 +201,18 @@ class Installer extends Service {
     return this.exec(this.agent, args)
   }
 
-  async install(deps: Dict<string>) {
+  async install(deps: Dict<string>, forced?: boolean) {
     const oldDeps = await this.getDeps()
     await this.override(deps)
 
-    let shouldInstall = false
     for (const name in deps) {
       const { resolved } = oldDeps[name] || {}
       if (deps[name] && resolved && satisfies(resolved, deps[name], { includePrerelease: true })) continue
-      shouldInstall = true
+      forced = true
       break
     }
 
-    if (shouldInstall) {
+    if (forced) {
       const code = await this._install()
       if (code) return code
     }
@@ -224,7 +223,12 @@ class Installer extends Service {
       const { resolved, workspace } = oldDeps[name]
       if (workspace || !newDeps[name]) continue
       if (newDeps[name].resolved === resolved) continue
-      if (!(require.resolve(name) in require.cache)) continue
+      try {
+        if (!(require.resolve(name) in require.cache)) continue
+      } catch (error) {
+        logger.warn(error)
+        continue
+      }
       this.ctx.loader.fullReload()
     }
 

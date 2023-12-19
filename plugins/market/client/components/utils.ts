@@ -43,7 +43,7 @@ export const manualDeps = reactive<Dict<Dict<AnalyzeResult>>>({})
 export const showManual = ref(false)
 export const showConfirm = ref(false)
 
-export async function install(override: Dict<string>, callback?: () => Awaitable<void>) {
+export async function install(override: Dict<string>, callback?: () => Awaitable<void>, forced?: boolean) {
   const instance = loading({
     text: '正在更新依赖……',
   })
@@ -54,7 +54,7 @@ export async function install(override: Dict<string>, callback?: () => Awaitable
   })
   try {
     active.value = ''
-    const code = await send('market/install', override)
+    const code = await send('market/install', override, forced)
     if (code) {
       message.error('安装失败！')
     } else {
