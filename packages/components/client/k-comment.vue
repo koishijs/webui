@@ -51,13 +51,11 @@ const icon = computed(() => {
 
   > .k-icon {
     position: absolute;
-    top: 20px;
+    top: 1.25em;
     left: -12px;
     width: 20px;
     height: 19px;
     border-radius: 100%;
-    font-weight: 700;
-    font-size: 20px;
     background-color: var(--k-card-bg);
   }
 
