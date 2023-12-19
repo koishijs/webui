@@ -12,7 +12,7 @@ import { LegacyMenuItem, MaybeGetter, useContext } from '@koishijs/client'
 import { computed } from 'vue'
 
 const props = defineProps<{
-  item: LegacyMenuItem
+  item: any
   menuKey?: string
   menuData?: any
 }>()

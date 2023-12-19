@@ -1,6 +1,6 @@
-import { Component, reactive } from 'vue'
+import { Component, reactive, ref } from 'vue'
 import { MaybeRefOrGetter, toValue } from '@vueuse/core'
-import { Context, Dict, Disposable, Field, omit, root, router, store } from '.'
+import { Context, Dict, Disposable, omit, root, routeCache, router, store, Store } from '.'
 
 declare module 'vue-router' {
   interface RouteMeta {
@@ -20,7 +20,7 @@ export namespace Activity {
     order?: number
     authority?: number
     position?: 'top' | 'bottom'
-    fields?: Field[]
+    fields?: (keyof Store)[]
     /** @deprecated */
     when?: () => boolean
     disabled?: () => boolean
@@ -34,6 +34,8 @@ export interface Activity extends Activity.Options {}
 function getActivityId(path: string) {
   return path.split('/').find(Boolean) ?? ''
 }
+
+export const redirectTo = ref<string>()
 
 export class Activity {
   id: string
@@ -53,10 +55,10 @@ export class Activity {
   }
 
   handleUpdate() {
-    const { redirect } = router.currentRoute.value.query
-    if (typeof redirect === 'string') {
-      const location = router.resolve(redirect)
+    if (redirectTo.value) {
+      const location = router.resolve(redirectTo.value)
       if (location.matched.length) {
+        redirectTo.value = null
         router.replace(location)
       }
     }
@@ -85,10 +87,8 @@ export class Activity {
     this._disposables.forEach(dispose => dispose())
     const current = router.currentRoute.value
     if (current?.meta?.activity === this) {
-      router.push({
-        path: '/',
-        query: { redirect: current.fullPath },
-      })
+      redirectTo.value = current.fullPath
+      router.push(routeCache['home'] || '/')
     }
     return delete activities[this.id]
   }

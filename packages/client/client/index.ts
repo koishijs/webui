@@ -2,6 +2,7 @@ import { createRouter, createWebHistory, START_LOCATION } from 'vue-router'
 import { global } from './data'
 import install, { Dict } from './components'
 import Overlay from './components/chat/overlay.vue'
+import { redirectTo } from './activity'
 import { config } from './config'
 import { initTask } from './loader'
 import { Context, routeCache } from './context'
@@ -78,7 +79,12 @@ root.slot({
 root.on('activity', data => !data)
 
 router.beforeEach(async (to, from) => {
-  if (to.matched.length) return
+  if (to.matched.length) {
+    if (to.matched[0].path !== '/') {
+      redirectTo.value = null
+    }
+    return
+  }
 
   if (from === START_LOCATION) {
     await initTask
@@ -86,8 +92,6 @@ router.beforeEach(async (to, from) => {
     if (to.matched.length) return to
   }
 
-  return {
-    path: '/',
-    query: { redirect: to.fullPath },
-  }
+  redirectTo.value = to.fullPath
+  return routeCache['home'] || '/'
 })
