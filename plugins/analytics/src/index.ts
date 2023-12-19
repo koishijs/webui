@@ -148,7 +148,7 @@ class Analytics extends DataService<Analytics.Payload> {
     }
   }
 
-  private async getCommandRate() {
+  private async getCommandRate(lengthTask: Promise<number>) {
     const data = await this.ctx.database
       .select('analytics.command', {
         date: this.queryRecent(),
@@ -157,9 +157,10 @@ class Analytics extends DataService<Analytics.Payload> {
         count: row => $.sum(row.count),
       })
       .execute()
+    const length = await lengthTask
     const result = {} as Dict<number>
     data.forEach((stat) => {
-      result[stat.name] = stat.count / this.config.recentDayCount
+      result[stat.name] = stat.count / length
     })
     return result
   }
@@ -167,14 +168,14 @@ class Analytics extends DataService<Analytics.Payload> {
   private async getDauHistory() {
     const data = await this.ctx.database
       .select('analytics.command', {
-        date: { $gte: Time.getDateNumber() - 7 },
+        date: { $gte: Time.getDateNumber() - this.config.recentDayCount },
         userId: { $gt: 0 },
       })
       .groupBy(['date'], {
         count: row => $.count(row.userId),
       })
       .execute()
-    const result: number[] = new Array(8).fill(0)
+    const result: number[] = new Array(this.config.recentDayCount + 1).fill(0)
     const today = Time.getDateNumber()
     data.forEach((stat) => {
       result[today - stat.date] = stat.count
@@ -182,7 +183,7 @@ class Analytics extends DataService<Analytics.Payload> {
     return result
   }
 
-  private async getMessageByBot() {
+  private async getMessageByBot(lengthTask: Promise<number>) {
     const data = await this.ctx.database
       .select('analytics.message', {
         date: this.queryRecent(),
@@ -191,6 +192,7 @@ class Analytics extends DataService<Analytics.Payload> {
         count: row => $.sum(row.count),
       })
       .execute()
+    const length = await lengthTask
     const result = {} as Dict<Dict<MessageStats & Universal.User>>
     data.forEach((stat) => {
       const entry = (result[stat.platform] ||= {})[stat.selfId] ||= {
@@ -198,14 +200,16 @@ class Analytics extends DataService<Analytics.Payload> {
         send: 0,
         receive: 0,
       }
-      entry[stat.type] = stat.count / this.config.recentDayCount
+      entry[stat.type] = stat.count / length
     })
     return result
   }
 
   private async getMessageByDate() {
     const data = await this.ctx.database
-      .select('analytics.message')
+      .select('analytics.message', {
+        date: { $lt: Time.getDateNumber() },
+      })
       .groupBy(['type', 'date'], {
         count: row => $.sum(row.count),
       })
@@ -217,10 +221,13 @@ class Analytics extends DataService<Analytics.Payload> {
       const entry = result[today - stat.date] ||= { send: 0, receive: 0 }
       entry[stat.type] = stat.count
     })
+    for (let i = 0; i < result.length; i++) {
+      result[i] ||= { send: 0, receive: 0 }
+    }
     return result
   }
 
-  private async getMessageByHour() {
+  private async getMessageByHour(lengthTask: Promise<number>) {
     const data = await this.ctx.database
       .select('analytics.message', {
         date: this.queryRecent(),
@@ -229,14 +236,19 @@ class Analytics extends DataService<Analytics.Payload> {
         count: row => $.sum(row.count),
       })
       .execute()
+    const length = await lengthTask
     const result = new Array(24).fill(null).map(() => ({ send: 0, receive: 0 }))
     data.forEach((stat) => {
-      result[stat.hour][stat.type] = stat.count / this.config.recentDayCount
+      result[stat.hour][stat.type] = stat.count / length
     })
     return result
   }
 
   async download(): Promise<Analytics.Payload> {
+    const messageByDateTask = this.getMessageByDate()
+    const lengthTask = messageByDateTask.then((data) => {
+      return Math.min(Math.max(data.length - 1, 1), this.config.recentDayCount)
+    })
     const [
       userCount,
       userIncrement,
@@ -261,11 +273,11 @@ class Analytics extends DataService<Analytics.Payload> {
         $.gte(row.createdAt, Time.fromDateNumber(Time.getDateNumber() - 1)),
         $.lt(row.createdAt, Time.fromDateNumber(Time.getDateNumber())),
       )),
-      this.getCommandRate(),
+      this.getCommandRate(lengthTask),
       this.getDauHistory(),
-      this.getMessageByBot(),
-      this.getMessageByDate(),
-      this.getMessageByHour(),
+      this.getMessageByBot(lengthTask),
+      messageByDateTask,
+      this.getMessageByHour(lengthTask),
     ])
     return {
       userCount,
