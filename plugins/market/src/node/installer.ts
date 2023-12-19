@@ -197,7 +197,9 @@ class Installer extends Service {
   private _install() {
     const args: string[] = []
     if (this.agent !== 'yarn') args.push('install')
-    args.push('--registry', this.endpoint)
+    if (this.config.endpoint) {
+      args.push('--registry', this.endpoint)
+    }
     return this.exec(this.agent, args)
   }
 
