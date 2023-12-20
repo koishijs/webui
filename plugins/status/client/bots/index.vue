@@ -10,7 +10,15 @@
         ></bot-preview>
       </template>
     </template>
-    <status-light v-for="(bot, key) in store.status.bots" :key="key" :class="getStatus(bot.status)"></status-light>
+    <template v-for="(count, status) in statusMap" :key="status">
+      <template v-if="count > 5">
+        <status-light :class="status"></status-light>
+        <span class="count">×{{ count }}</span>
+      </template>
+      <template v-else>
+        <status-light v-for="(_, key) in Array(count)" :key="key" :class="status"></status-light>
+      </template>
+    </template>
     <k-icon name="arrow-up"/>
     <span>{{ sent }}/min</span>
     <k-icon name="arrow-down"/>
@@ -21,10 +29,21 @@
 <script setup lang="ts">
 
 import { computed } from 'vue'
-import { store, router } from '@koishijs/client'
+import { store, router, Dict } from '@koishijs/client'
 import { getStatus } from './utils'
 import BotPreview from './preview.vue'
 import StatusLight from './light.vue'
+
+const statusMap = computed(() => {
+  const map: Dict<number> = {}
+  for (const bot of Object.values(store.status.bots)) {
+    const key = getStatus(bot.status)
+    map[key] = (map[key] || 0) + 5
+    map['reconnect'] = (map['reconnect'] || 0) + 5
+  }
+  return Object.fromEntries(Object.entries(map)
+    .sort((a, b) => a[0].localeCompare(b[0])))
+})
 
 const sent = computed(() => {
   return Object.values(store.status.bots).reduce((acc, bot) => acc + bot.messageSent, 0)
@@ -45,6 +64,11 @@ const received = computed(() => {
 
   * + .k-icon {
     margin-left: 6px;
+  }
+
+  .count {
+    margin: 0 4px 0 4px;
+    letter-spacing: 1px;
   }
 }
 
