@@ -14,11 +14,18 @@ class PackageScanner extends LocalScanner {
     logger.warn(error)
   }
 
-  async parsePackage(name: string, entry: string) {
-    const result = await super.parsePackage(name, entry)
-    if (require.cache[entry]) {
-      name = name.replace(/(koishi-|^@koishijs\/)plugin-/, '')
-      this.service.cache[name] = await this.service.parseExports(name)
+  async parsePackage(name: string) {
+    const result = await super.parsePackage(name)
+    try {
+      // require.resolve(name) may be different from require.resolve(path)
+      // because tsconfig-paths may resolve the path differently
+      const entry = require.resolve(name)
+      if (require.cache[entry]) {
+        name = name.replace(/(koishi-|^@koishijs\/)plugin-/, '')
+        this.service.cache[name] = await this.service.parseExports(name)
+      }
+    } catch (error) {
+      this.onError(error, name)
     }
     return result
   }

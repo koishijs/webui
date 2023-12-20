@@ -9,8 +9,8 @@ import { conclude } from './utils'
 export interface LocalScanner extends SearchResult {}
 
 export class LocalScanner {
-  cache: Dict<SearchObject>
-  task: Promise<void>
+  private cache: Dict<Promise<SearchObject>>
+  private task: Promise<SearchObject[]>
 
   constructor(public baseDir: string) {
     defineProperty(this, 'cache', {})
@@ -29,12 +29,12 @@ export class LocalScanner {
       root = parent
     }
     await Promise.all(tasks)
+    return Promise.all(Object.values(this.cache))
   }
 
   async collect(forced = false) {
     if (forced) delete this.task
-    await (this.task ||= this._collect())
-    this.objects = Object.values(this.cache)
+    this.objects = await (this.task ||= this._collect())
   }
 
   private async loadDirectory(baseDir: string) {
@@ -42,13 +42,13 @@ export class LocalScanner {
     const files = await readdir(base).catch(() => [])
     for (const name of files) {
       if (name.startsWith('koishi-plugin-')) {
-        this.loadPackage(name)
+        this.cache[name] ||= this.loadPackage(name)
       } else if (name.startsWith('@')) {
         const base2 = base + '/' + name
         const files = await readdir(base2).catch(() => [])
         for (const name2 of files) {
           if (name === '@koishijs' && name2.startsWith('plugin-') || name2.startsWith('koishi-plugin-')) {
-            this.loadPackage(name + '/' + name2)
+            this.cache[name + '/' + name2] ||= this.loadPackage(name + '/' + name2)
           }
         }
       }
@@ -57,10 +57,7 @@ export class LocalScanner {
 
   private async loadPackage(name: string) {
     try {
-      // require.resolve(name) may be different from require.resolve(path)
-      // because tsconfig-paths may resolve the path differently
-      const entry = require.resolve(name)
-      this.cache[entry] = await this.parsePackage(name, entry)
+      return await this.parsePackage(name)
     } catch (error) {
       this.onError(error, name)
     }
@@ -74,7 +71,7 @@ export class LocalScanner {
     return [meta, !filename.includes('node_modules')] as const
   }
 
-  protected async parsePackage(name: string, entry: string) {
+  protected async parsePackage(name: string) {
     const [data, workspace] = await this.loadManifest(name)
     return {
       workspace,

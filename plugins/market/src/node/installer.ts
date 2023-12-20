@@ -149,14 +149,18 @@ class Installer extends Service {
     return this.depTask ||= this._getDeps()
   }
 
+  refreshData() {
+    this.ctx.get('console.registry')?.refresh()
+    this.ctx.get('console.packages')?.refresh()
+  }
+
   refresh(refresh = false) {
     this.pkgTasks = {}
     this.fullCache = {}
     this.tempCache = {}
     this.depTask = this._getDeps()
     if (!refresh) return
-    this.ctx.get('console.registry')?.refresh()
-    this.ctx.get('console.packages')?.refresh()
+    this.refreshData()
   }
 
   async exec(command: string, args: string[]) {
@@ -228,11 +232,13 @@ class Installer extends Service {
       try {
         if (!(require.resolve(name) in require.cache)) continue
       } catch (error) {
-        logger.warn(error)
-        continue
+        // FIXME https://github.com/koishijs/webui/issues/265
+        // I have no idea why this happens and how to fix it.
+        logger.error(error)
       }
       this.ctx.loader.fullReload()
     }
+    this.refreshData()
 
     return 0
   }
