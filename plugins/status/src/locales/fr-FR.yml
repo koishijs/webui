@@ -8,7 +8,7 @@ commands:
         2: 正在连接
         4: 正在重连
         3: 正在断开
-      bot: <p>{user.name}：<i18n path={"commands.status.messages.status." + status}/></p>
+      bot: <p>[{user.platform}] {user.name}：<i18n path={"commands.status.messages.status." + status}/></p>
       epilog: |-
         ==========
         CPU 使用率：{ (cpu[0] * 100).toFixed() }% / { (cpu[1] * 100).toFixed() }%
