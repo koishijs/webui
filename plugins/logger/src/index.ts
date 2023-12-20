@@ -6,7 +6,7 @@ import { FileWriter } from './file'
 import { throttle } from 'throttle-debounce'
 import zhCN from './locales/zh-CN.yml'
 
-declare module '@koishijs/plugin-console' {
+declare module '@koishijs/console' {
   namespace Console {
     interface Services {
       logs: DataService<Logger.Record[]>
