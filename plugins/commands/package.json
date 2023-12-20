@@ -45,7 +45,7 @@
     }
   },
   "peerDependencies": {
-    "@koishijs/plugin-console": "^5.22.0",
+    "@koishijs/plugin-console": "^5.22.3",
     "koishi": "^4.16.1"
   },
   "peerDependenciesMeta": {
@@ -54,15 +54,15 @@
     }
   },
   "devDependencies": {
-    "@koishijs/client": "^5.22.0",
-    "@koishijs/plugin-config": "^2.7.0",
-    "@koishijs/plugin-console": "^5.22.0",
+    "@koishijs/client": "^5.22.3",
+    "@koishijs/plugin-config": "^2.7.1",
+    "@koishijs/plugin-console": "^5.22.3",
     "@koishijs/plugin-locales": "^2.5.1",
     "@koishijs/plugin-mock": "^2.6.5",
     "@types/throttle-debounce": "^2.1.0"
   },
   "dependencies": {
-    "@koishijs/console": "^5.22.0",
+    "@koishijs/console": "^5.22.3",
     "throttle-debounce": "^3.0.1"
   }
 }

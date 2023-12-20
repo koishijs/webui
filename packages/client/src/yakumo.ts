@@ -12,8 +12,9 @@ declare module 'yakumo' {
 
 export function apply(ctx: Context) {
   ctx.register('client', async () => {
-    for (const path in ctx.yakumo.targets) {
-      const meta = ctx.yakumo.targets[path]
+    const paths = ctx.yakumo.locate(ctx.yakumo.argv._)
+    for (const path of paths) {
+      const meta = ctx.yakumo.workspaces[path]
       const deps = {
         ...meta.dependencies,
         ...meta.devDependencies,

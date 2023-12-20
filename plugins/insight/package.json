@@ -53,17 +53,17 @@
     }
   },
   "peerDependencies": {
-    "@koishijs/plugin-console": "^5.22.0",
+    "@koishijs/plugin-console": "^5.22.3",
     "koishi": "^4.16.1"
   },
   "devDependencies": {
-    "@koishijs/client": "^5.22.0",
+    "@koishijs/client": "^5.22.3",
     "@types/d3-force": "^3.0.9",
     "@types/throttle-debounce": "^2.1.0",
     "d3-force": "^3.0.0"
   },
   "dependencies": {
-    "@koishijs/console": "^5.22.0",
+    "@koishijs/console": "^5.22.3",
     "throttle-debounce": "^3.0.1"
   }
 }

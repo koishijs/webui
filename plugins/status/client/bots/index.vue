@@ -38,8 +38,7 @@ const statusMap = computed(() => {
   const map: Dict<number> = {}
   for (const bot of Object.values(store.status.bots)) {
     const key = getStatus(bot.status)
-    map[key] = (map[key] || 0) + 5
-    map['reconnect'] = (map['reconnect'] || 0) + 5
+    map[key] = (map[key] || 0) + 1
   }
   return Object.fromEntries(Object.entries(map)
     .sort((a, b) => a[0].localeCompare(b[0])))
