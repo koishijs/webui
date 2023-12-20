@@ -2,7 +2,13 @@
   <k-status v-if="store.status">
     <template #tooltip>
       <span v-if="!Object.values(store.status.bots).length" class="el-popper__empty"></span>
-      <bot-preview v-for="(bot, key) in store.status.bots" :key="key" :data="bot"></bot-preview>
+      <template v-for="(bot, key) in store.status.bots" :key="key">
+        <bot-preview
+          :data="bot"
+          :class="{ 'has-link': bot.paths?.length }"
+          @click="router.push('/plugins/' + bot.paths[0].replace(/\./, '/'))"
+        ></bot-preview>
+      </template>
     </template>
     <status-light v-for="(bot, key) in store.status.bots" :key="key" :class="getStatus(bot.status)"></status-light>
     <k-icon name="arrow-up"/>
@@ -15,7 +21,7 @@
 <script setup lang="ts">
 
 import { computed } from 'vue'
-import { store } from '@koishijs/client'
+import { store, router } from '@koishijs/client'
 import { getStatus } from './utils'
 import BotPreview from './preview.vue'
 import StatusLight from './light.vue'

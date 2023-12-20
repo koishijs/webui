@@ -141,6 +141,7 @@ class ProfileProvider extends DataService<ProfileProvider.Payload> {
       if (bot.hidden) continue
       bots[bot.sid] = {
         ...bot.toJSON(),
+        paths: this.ctx.loader?.paths(bot.ctx.scope),
         error: bot.error?.message,
         messageSent: bot._messageSent.get(),
         messageReceived: bot._messageReceived.get(),
@@ -161,6 +162,7 @@ namespace ProfileProvider {
 
   export interface BotData extends Universal.Login {
     error?: string
+    paths?: string[]
     messageSent: number
     messageReceived: number
   }

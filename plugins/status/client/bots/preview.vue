@@ -1,5 +1,5 @@
 <template>
-  <div class="bot">
+  <section class="bot-view">
     <div class="avatar" :style="{ backgroundImage: `url(${withProxy(data.user.avatar)})` }" @click="$emit('avatar-click')">
       <el-tooltip :content="statusNames[data.status]" placement="right">
         <status-light :class="getStatus(data.status)"></status-light>
@@ -19,7 +19,7 @@
         </span>
       </div>
     </div>
-  </div>
+  </section>
 </template>
 
 <script lang="ts" setup>
@@ -45,7 +45,7 @@ defineProps<{
 
 <style scoped lang="scss">
 
-div.bot {
+.bot-view {
   width: 15rem;
   padding: 0.75rem 1rem;
   font-size: 14px;
@@ -106,6 +106,13 @@ div.bot {
       text-overflow: ellipsis;
       white-space: nowrap;
       overflow: hidden;
+    }
+  }
+
+  &.has-link {
+    cursor: pointer;
+    &:hover {
+      background-color: var(--bg1);
     }
   }
 }
