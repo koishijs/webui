@@ -27,6 +27,7 @@
 - @koishijs/plugin-locales
 - @koishijs/plugin-logger
 - @koishijs/plugin-market
+- @koishijs/plugin-notifier
 - @koishijs/plugin-oobe
 - @koishijs/plugin-sandbox
 - @koishijs/plugin-status

@@ -1,0 +1,65 @@
+{
+  "name": "@koishijs/plugin-notifier",
+  "description": "Notifier service for Koishi",
+  "version": "0.0.1",
+  "main": "lib/index.cjs",
+  "types": "lib/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./lib/index.mjs",
+      "require": "./lib/index.cjs",
+      "types": "./lib/index.d.ts"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "lib",
+    "dist",
+    "src"
+  ],
+  "author": "Shigma <shigma10826@gmail.com>",
+  "license": "AGPL-3.0",
+  "scripts": {
+    "lint": "eslint src --ext .ts"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/koishijs/webui.git",
+    "directory": "plugins/notifier"
+  },
+  "bugs": {
+    "url": "https://github.com/koishijs/webui/issues"
+  },
+  "homepage": "https://koishi.chat/plugins/console/notifier.html",
+  "keywords": [
+    "bot",
+    "chatbot",
+    "koishi",
+    "plugin",
+    "notifier"
+  ],
+  "koishi": {
+    "public": [
+      "dist"
+    ],
+    "description": {
+      "en": "Notifier service for Koishi",
+      "zh": "Koishi 的通知服务"
+    },
+    "service": {
+      "implements": [
+        "notifier"
+      ]
+    }
+  },
+  "peerDependencies": {
+    "@koishijs/plugin-console": "^5.22.3",
+    "koishi": "^4.16.1"
+  },
+  "devDependencies": {
+    "@koishijs/client": "^5.22.3"
+  },
+  "dependencies": {
+    "@koishijs/console": "^5.22.3"
+  }
+}
