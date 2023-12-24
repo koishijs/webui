@@ -7,7 +7,7 @@
     </div>
     <el-tree
       ref="tree"
-      node-key="id"
+      node-key="path"
       :data="plugins.data"
       :draggable="true"
       :auto-expand-parent="false"
@@ -23,7 +23,7 @@
       @node-expand="handleExpand"
       @node-collapse="handleCollapse"
       #="{ node }">
-      <div class="item">
+      <div class="item" :ref="handleItemMount">
         <div class="label" :title="getLabel(node)">
           {{ getLabel(node) }}
         </div>
@@ -37,7 +37,9 @@
 
 <script lang="ts" setup>
 
-import { ref, computed, onActivated, nextTick, watch } from 'vue'
+import { ref, onActivated, nextTick, watch } from 'vue'
+import { useRoute } from 'vue-router'
+import type { ElScrollbar, ElTree } from 'element-plus'
 import { send, useMenu } from '@koishijs/client'
 import { Tree, getStatus, plugins, getFullName } from './utils'
 
@@ -45,17 +47,43 @@ const props = defineProps<{
   modelValue: string
 }>()
 
+const route = useRoute()
 const trigger = useMenu('config.tree')
 
-const emits = defineEmits(['update:modelValue'])
+const emit = defineEmits(['update:modelValue'])
 
-const model = computed({
-  get: () => props.modelValue,
-  set: val => emits('update:modelValue', val),
-})
+const root = ref<InstanceType<typeof ElScrollbar>>(null)
+const tree = ref<InstanceType<typeof ElTree>>(null)
+const keyword = ref('')
 
 function filterNode(value: string, data: Tree) {
   return data.name.toLowerCase().includes(keyword.value.toLowerCase())
+}
+
+const isActivating = ref(true)
+
+// This will be called in 3 situations:
+// 1. the component is activated
+// 2. a new config entry is added
+// 3. route is programmatically changed
+async function activate() {
+  await nextTick()
+  const rootEl = root.value?.$el
+  const nodeEl = rootEl?.querySelector('.el-tree-node.is-active') as HTMLElement
+  if (!nodeEl || !nodeEl.offsetTop && route.path.slice(9 /* /plugins/ */)) return
+  root.value['setScrollTop'](nodeEl.offsetTop - (rootEl.offsetHeight - nodeEl.offsetHeight) / 2)
+}
+
+defineExpose({ activate })
+
+onActivated(async () => {
+  activate()
+  isActivating.value = false
+})
+
+function handleItemMount(itemEl: HTMLElement) {
+  if (!itemEl || isActivating.value) return
+  activate()
 }
 
 interface Node {
@@ -87,7 +115,7 @@ function allowDrop(source: Node, target: Node, type: 'inner' | 'prev' | 'next') 
 }
 
 function handleClick(tree: Tree, target: Node, instance: any, event: MouseEvent) {
-  model.value = tree.path
+  emit('update:modelValue', tree.path)
   // el-tree will stop propagation,
   // so we need to manually trigger the event
   // so that context menu can be closed.
@@ -113,24 +141,12 @@ function getClass(tree: Tree) {
   const words: string[] = []
   if (tree.children) words.push('is-group')
   if (!tree.children && !getFullName(tree.name)) words.push('is-disabled')
-  if (tree.path === model.value) words.push('is-active')
+  if (tree.path === props.modelValue) words.push('is-active')
   return words.join(' ')
 }
 
-const root = ref<{ $el: HTMLElement }>(null)
-const tree = ref(null)
-const keyword = ref('')
-
 watch(keyword, (val) => {
   tree.value.filter(val)
-})
-
-onActivated(async () => {
-  const container = root.value.$el
-  await nextTick()
-  const element = container.querySelector('.el-tree-node.is-active') as HTMLElement
-  if (!element) return
-  root.value['setScrollTop'](element.offsetTop - (container.offsetHeight - element.offsetHeight) / 2)
 })
 
 </script>

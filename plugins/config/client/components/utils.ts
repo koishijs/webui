@@ -181,7 +181,7 @@ export const plugins = computed(() => {
   }
   function traverse(tree: Tree) {
     if (!tree.config?.$collapsed && tree.children) {
-      expanded.push(tree.id)
+      expanded.push(tree.path)
     }
     forks[tree.name] ||= []
     forks[tree.name].push(tree.path)
@@ -202,7 +202,7 @@ export function getStatus(tree: Tree) {
   }
 }
 
-export function removeItem(tree: Tree) {
+export async function removeItem(tree: Tree) {
   send('manager/remove', tree.parent?.path ?? '', tree.id)
-  router.replace('/plugins/' + tree.parent!.path)
+  await router.replace('/plugins/' + tree.parent!.path)
 }

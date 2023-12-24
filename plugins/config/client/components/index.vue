@@ -16,7 +16,7 @@
     </template>
 
     <template #left>
-      <tree-view v-model="path"></tree-view>
+      <tree-view ref="tree" v-model="path"></tree-view>
     </template>
 
     <k-content class="plugin-view" :key="path">
@@ -36,7 +36,7 @@
       </template>
       <template #footer>
         <el-button @click="showRemove = false">取消</el-button>
-        <el-button type="danger" @click="(showRemove = false, removeItem(remove))">确定</el-button>
+        <el-button type="danger" @click="(showRemove = false, removeItem(remove), tree?.activate())">确定</el-button>
       </template>
     </el-dialog>
 
@@ -56,7 +56,7 @@
     </el-dialog>
 
     <el-dialog
-      :model-value="!!groupCreate"
+      :model-value="groupCreate !== null"
       @update:model-value="groupCreate = null"
       title="创建分组"
       destroy-on-close
@@ -72,7 +72,7 @@
 
 <script setup lang="ts">
 
-import { computed, ref, watch, nextTick, Directive } from 'vue'
+import { computed, ref, watch, Directive } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { clone, message, send, store, useContext, Schema } from '@koishijs/client'
 import { Tree, getFullName, hasCoreDeps, current, plugins, removeItem, dialogSelect, dialogFork } from './utils'
@@ -103,12 +103,13 @@ const path = computed<string>({
 
 const config = ref()
 const input = ref('')
+const tree = ref<InstanceType<typeof TreeView>>()
 
 const remove = ref<Tree>()
 const showRemove = ref(false)
 const rename = ref<Tree>()
 const showRename = ref(false)
-const groupCreate = ref<string>()
+const groupCreate = ref<string>(null)
 
 watch(remove, (value) => {
   if (value) showRemove.value = true
