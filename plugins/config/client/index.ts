@@ -14,7 +14,7 @@ export * from './components/utils'
 declare module '@koishijs/client' {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   interface Events<C> {
-    'config/dialog-fork'(name: string): void
+    'config/dialog-fork'(name: string, passive?: boolean): void
   }
 }
 
@@ -43,17 +43,17 @@ export default (ctx: Context) => {
     component: Forks,
   })
 
-  ctx.on('config/dialog-fork', (name) => {
+  ctx.on('config/dialog-fork', (name, passive) => {
     const shortname = name.replace(/(koishi-|^@koishijs\/)plugin-/, '')
     const forks = plugins.value.forks[shortname]
     if (!forks?.length) {
       const key = Math.random().toString(36).slice(2, 8)
       send('manager/unload', '', shortname + ':' + key, {})
-      router.push('/plugins/' + key)
+      if (!passive) router.push('/plugins/' + key)
     } else if (forks.length === 1) {
-      router.push('/plugins/' + forks[0])
+      if (!passive) router.push('/plugins/' + forks[0])
     } else {
-      dialogFork.value = name
+      if (!passive) dialogFork.value = name
     }
   })
 

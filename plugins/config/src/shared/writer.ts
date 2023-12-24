@@ -153,7 +153,7 @@ export class ConfigWriter extends DataService<Context.Config> {
     this.loader.unload(scope.ctx, key)
     if (index) {
       const rest = Object.keys(scope.config).slice(index)
-      insertKey(scope.config, { [key]: config }, rest)
+      insertKey(scope.config, { ['~' + key]: config }, rest)
     } else {
       rename(scope.config, key, '~' + key, config)
     }

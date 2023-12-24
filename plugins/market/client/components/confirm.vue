@@ -35,9 +35,11 @@
 
 <script lang="ts" setup>
 
-import { store } from '@koishijs/client'
+import { store, useContext } from '@koishijs/client'
 import { showConfirm, install } from './utils'
 import { config } from '../utils'
+
+const ctx = useContext()
 
 function clear() {
   showConfirm.value = false
@@ -46,7 +48,12 @@ function clear() {
 
 function confirm() {
   showConfirm.value = false
-  return install(config.value.override)
+  return install(config.value.override, async () => {
+    for (const [key, value] of Object.entries(config.value.override)) {
+      if (!value) continue
+      ctx.emit('config/dialog-fork', key, true)
+    }
+  })
 }
 
 </script>
