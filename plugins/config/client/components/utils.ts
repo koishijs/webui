@@ -202,12 +202,6 @@ export function getStatus(tree: Tree) {
   }
 }
 
-export function addItem(path: string, action: 'reload' | 'unload', name: string) {
-  const ident = Math.random().toString(36).slice(2, 8)
-  send(`manager/${action}`, path, `${name}:${ident}`, {})
-  router.replace('/plugins/' + ident)
-}
-
 export function removeItem(tree: Tree) {
   send('manager/remove', tree.parent?.path ?? '', tree.id)
   router.replace('/plugins/' + tree.parent!.path)

@@ -47,11 +47,24 @@
       @closed="rename = null"
     >
       <template v-if="rename">
-        <el-input v-model="input" @keydown.enter.stop.prevent="renameItem(rename, input)"/>
+        <el-input v-focus v-model="input" @keydown.enter.stop.prevent="renameItem(rename, input)"/>
       </template>
       <template #footer>
         <el-button @click="showRename = false">取消</el-button>
-        <el-button type="danger" @click="renameItem(rename, input)">确定</el-button>
+        <el-button type="primary" @click="renameItem(rename, input)">确定</el-button>
+      </template>
+    </el-dialog>
+
+    <el-dialog
+      :model-value="!!groupCreate"
+      @update:model-value="groupCreate = null"
+      title="创建分组"
+      destroy-on-close
+    >
+      <el-input v-focus v-model="input" @keydown.enter.stop.prevent="createGroup(input)"/>
+      <template #footer>
+        <el-button @click="groupCreate = null">取消</el-button>
+        <el-button type="primary" @click="createGroup(input)">确定</el-button>
       </template>
     </el-dialog>
   </k-layout>
@@ -59,10 +72,10 @@
 
 <script setup lang="ts">
 
-import { computed, ref, watch } from 'vue'
+import { computed, ref, watch, nextTick, Directive } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { clone, message, send, store, useContext, Schema } from '@koishijs/client'
-import { Tree, getFullName, addItem, hasCoreDeps, current, plugins, removeItem, dialogSelect, dialogFork } from './utils'
+import { Tree, getFullName, hasCoreDeps, current, plugins, removeItem, dialogSelect, dialogFork } from './utils'
 import GlobalSettings from './global.vue'
 import GroupSettings from './group.vue'
 import TreeView from './tree.vue'
@@ -70,6 +83,12 @@ import PluginSettings from './plugin.vue'
 
 const route = useRoute()
 const router = useRouter()
+
+const vFocus: Directive = {
+  mounted: (el: HTMLElement) => {
+    el.querySelector('input')?.focus()
+  },
+}
 
 const path = computed<string>({
   get() {
@@ -89,6 +108,7 @@ const remove = ref<Tree>()
 const showRemove = ref(false)
 const rename = ref<Tree>()
 const showRename = ref(false)
+const groupCreate = ref<string>()
 
 watch(remove, (value) => {
   if (value) showRemove.value = true
@@ -114,8 +134,17 @@ ctx.action('config.tree.add-plugin', {
 
 ctx.action('config.tree.add-group', {
   hidden: ({ config }) => config.tree.path && !config.tree.children,
-  action: ({ config }) => addItem(config.tree.path, 'reload', 'group'),
+  action: ({ config }) => {
+    groupCreate.value = config.tree.path
+  },
 })
+
+function createGroup($label: string) {
+  const ident = Math.random().toString(36).slice(2, 8)
+  send(`manager/reload`, groupCreate.value, `group:${ident}`, { $label })
+  router.replace('/plugins/' + ident)
+  groupCreate.value = null
+}
 
 ctx.action('config.tree.clone', {
   hidden: ({ config }) => !config.tree.path || !!config.tree.children,
