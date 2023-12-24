@@ -128,6 +128,9 @@ function scrollToTop() {
 
 .page-market .layout-main .el-scrollbar__view {
   padding: 0 var(--card-margin);
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
 }
 
 .page-market .layout-left {

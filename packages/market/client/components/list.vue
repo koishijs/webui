@@ -1,6 +1,6 @@
 <template>
-  <div class="market-list" ref="root">
-    <slot name="header" v-bind="{ all, packages, hasFilter: hasFilter(modelValue) }"></slot>
+  <slot name="header" v-bind="{ all, packages, hasFilter: hasFilter(modelValue) }"></slot>
+  <template v-if="packages.length">
     <el-pagination
       class="pagination"
       background
@@ -10,7 +10,7 @@
       :total="packages.length"
       layout="prev, pager, next"
     />
-    <div class="market-container">
+    <div class="package-list">
       <market-package
         v-for="data in pages[page - 1]"
         :key="data.package.name"
@@ -32,7 +32,10 @@
       :total="packages.length"
       layout="prev, pager, next"
     />
-  </div>
+  </template>
+  <k-empty v-else>
+    没有搜索到相关插件。
+  </k-empty>
 </template>
 
 <script lang="ts" setup>
@@ -91,17 +94,21 @@ function onQuery(word: string) {
 
 <style lang="scss" scoped>
 
-.market-container {
+.package-list {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(336px, 1fr));
   gap: var(--card-margin);
-  margin: var(--card-margin) 0;
   justify-items: center;
+  flex: 1 0 auto;
 }
 
 .pagination {
   margin: var(--card-margin) 0;
   justify-content: center;
+}
+
+.k-empty {
+  flex: 1 0 auto;
 }
 
 </style>
