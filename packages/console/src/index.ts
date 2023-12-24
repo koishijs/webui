@@ -64,18 +64,6 @@ export abstract class Console extends Service {
     ctx.plugin(SchemaProvider)
     ctx.plugin(PermissionProvider)
     this.addListener('ping', () => 'pong')
-    return new Proxy(this, {
-      get(target, key) {
-        if (typeof key === 'symbol' || key in target) return Reflect.get(target, key)
-        if (ctx[Context.internal][`console.${key}`]) return ctx.get(`console.${key}`)
-        return Reflect.get(target, key)
-      },
-      set(target, key, value) {
-        if (typeof key === 'symbol' || key in target) return Reflect.set(target, key, value)
-        if (ctx[Context.internal][`console.${key}`]) return Reflect.set(ctx, `console.${key}`, value)
-        return Reflect.set(target, key, value)
-      },
-    })
   }
 
   protected accept(socket: Universal.WebSocket, request?: IncomingMessage) {

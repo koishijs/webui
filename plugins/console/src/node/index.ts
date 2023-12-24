@@ -32,12 +32,16 @@ interface HeartbeatConfig {
 class NodeConsole extends Console {
   static inject = ['server']
 
+  // workaround for edge case (collision with @koishijs/plugin-config)
+  private _config: NodeConsole.Config
+
   public vite: ViteDevServer
   public root: string
   public layer: WebSocketLayer
 
-  constructor(public ctx: Context, public config: NodeConsole.Config) {
+  constructor(public ctx: Context, config: NodeConsole.Config) {
     super(ctx)
+    this.config = config
 
     this.layer = ctx.server.ws(config.apiPath, (socket, request) => {
       // @types/ws does not provide typings for `dispatchEvent`
@@ -52,6 +56,14 @@ class NodeConsole extends Console {
     this.root = config.root || (config.devMode
       ? resolve(require.resolve('@koishijs/client/package.json'), '../app')
       : resolve(__dirname, '../../dist'))
+  }
+
+  get config() {
+    return this._config
+  }
+
+  set config(value) {
+    this._config = value
   }
 
   createGlobal() {
