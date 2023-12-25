@@ -17,24 +17,32 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="(value, key) in config.override" :key="key">
-          <td>{{ key }}</td>
-          <td>{{ store.dependencies?.[key]?.resolved || '未安装' }}</td>
+        <tr v-for="(version, name) in config.override" :key="name">
+          <td>{{ name }}</td>
+          <td>{{ store.dependencies?.[name]?.resolved || '未安装' }}</td>
           <td class="arrow"><span><k-icon name="arrow-right"></k-icon></span></td>
-          <td>{{ value || '移除依赖' }}</td>
+          <td>{{ version || '移除依赖' }}</td>
         </tr>
       </tbody>
     </table>
     <template #footer>
-      <el-button @click="showConfirm = false">取消</el-button>
-      <el-button type="danger" @click="clear">丢弃</el-button>
-      <el-button type="primary" @click="confirm">确定</el-button>
+      <div class="left">
+        <el-checkbox :disabled="!hasRemove" v-model="config.removeConfig">
+          为新卸载的依赖删除配置
+        </el-checkbox>
+      </div>
+      <div class="right">
+        <el-button @click="showConfirm = false">取消</el-button>
+        <el-button type="danger" @click="clear">丢弃</el-button>
+        <el-button type="primary" @click="confirm">确定</el-button>
+      </div>
     </template>
   </el-dialog>
 </template>
 
 <script lang="ts" setup>
 
+import { computed } from 'vue'
 import { store, useContext } from '@koishijs/client'
 import { showConfirm, install } from './utils'
 import { config } from '../utils'
@@ -46,11 +54,15 @@ function clear() {
   config.value.override = {}
 }
 
+const hasRemove = computed(() => {
+  return Object.values(config.value.override).some(version => !version)
+})
+
 function confirm() {
   showConfirm.value = false
   return install(config.value.override, async () => {
     for (const [name, value] of Object.entries(config.value.override)) {
-      if (!value) continue
+      if (!value || store.dependencies?.[name]?.resolved) continue
       ctx.configWriter?.ensure(name, true)
     }
   })
@@ -58,14 +70,22 @@ function confirm() {
 
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 
-td.arrow {
-  padding: 0;
+.confirm-panel {
+  td.arrow {
+    padding: 0;
 
-  span {
+    span {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+  }
+
+  .el-dialog__footer {
     display: flex;
-    justify-content: center;
+    justify-content: space-between;
     align-items: center;
   }
 }

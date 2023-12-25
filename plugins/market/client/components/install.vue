@@ -63,16 +63,24 @@
         <el-button @click="active = ''">取消</el-button>
         <el-button v-if="local" type="primary" @click="configure()">配置</el-button>
         <template v-if="workspace">
-          <el-button v-if="current || config.bulk && config.override[active]" @click="installDep('')">移除</el-button>
+          <el-button v-if="current || config.bulk && config.override[active]" @click="installDep('', true)">移除</el-button>
           <el-button v-else @click="installDep(version)" :disabled="unchanged">添加</el-button>
         </template>
         <template v-else-if="data">
-          <el-button v-if="current || store.dependencies[active] || config.bulk && config.override[active]" @click="installDep('')" type="danger">移除</el-button>
+          <el-button v-if="current || store.dependencies[active] || config.bulk && config.override[active]" @click="installDep('', true)" type="danger">卸载</el-button>
           <el-button :type="result" @click="installDep(version)" :disabled="unchanged">
             {{ current ? '更新' : store.dependencies?.[active] ? '修复' : '安装' }}
           </el-button>
         </template>
       </div>
+    </template>
+  </el-dialog>
+  <el-dialog v-model="confirmRemoveConfig" destroy-on-close>
+    检测到你正在卸载一个已配置的插件，是否同时删除其配置？
+    <template #footer>
+      <el-button @click="confirmRemoveConfig = false">取消</el-button>
+      <el-button type="danger" @click="installDep('', false, true)">删除</el-button>
+      <el-button type="primary" @click="installDep('', false, false)">保留</el-button>
     </template>
   </el-dialog>
 </template>
@@ -86,8 +94,9 @@ import { active, config } from '../utils'
 import { parse } from 'semver'
 
 const ctx = useContext()
+const confirmRemoveConfig = ref(false)
 
-function installDep(version: string) {
+function installDep(version: string, checkConfig = false, removeConfig = false) {
   const target = active.value
   if (!target) return
   if (config.value.bulk) {
@@ -95,9 +104,16 @@ function installDep(version: string) {
     active.value = ''
     return
   }
+  if (checkConfig && ctx.configWriter?.get(target)?.length) {
+    confirmRemoveConfig.value = true
+    return
+  }
   install({ [target]: version }, async () => {
-    if (!version) return
-    ctx.configWriter?.ensure(target)
+    if (version) {
+      ctx.configWriter?.ensure(target)
+    } else if (removeConfig) {
+      ctx.configWriter?.remove(target)
+    }
   })
 }
 
