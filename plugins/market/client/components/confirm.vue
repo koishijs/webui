@@ -49,9 +49,9 @@ function clear() {
 function confirm() {
   showConfirm.value = false
   return install(config.value.override, async () => {
-    for (const [key, value] of Object.entries(config.value.override)) {
+    for (const [name, value] of Object.entries(config.value.override)) {
       if (!value) continue
-      ctx.emit('config/dialog-fork', key, true)
+      ctx.configWriter?.ensure(name, true)
     }
   })
 }

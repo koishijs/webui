@@ -97,7 +97,7 @@ function installDep(version: string) {
   }
   install({ [target]: version }, async () => {
     if (!version) return
-    ctx.emit('config/dialog-fork', target)
+    ctx.configWriter?.ensure(target)
   })
 }
 
@@ -178,28 +178,8 @@ watch(active, (value) => {
     || Object.keys(store.registry?.[value] || {})[0]
 }, { immediate: true })
 
-function* find(target: string, plugins: {}, prefix: string): IterableIterator<[string, string, boolean]> {
-  for (let key in plugins) {
-    const config = plugins[key]
-    const active = !key.startsWith('~')
-    if (!active) key = key.slice(1)
-    const request = key.split(':')[0]
-    if (request === target) yield [prefix + key, key.slice(request.length + 1), active]
-    if (request === 'group') {
-      yield* find(target, config, prefix + key + ' > ')
-    }
-  }
-}
-
-const pluginRegExp = /(koishi-|^@koishijs\/)plugin-/
-
-const shortname = computed(() => {
-  if (!pluginRegExp.test(active.value)) return ''
-  return active.value.replace(pluginRegExp, '')
-})
-
 function configure() {
-  ctx.emit('config/dialog-fork', active.value)
+  ctx.configWriter?.ensure(active.value)
   active.value = null
 }
 
