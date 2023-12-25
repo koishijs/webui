@@ -25,6 +25,7 @@ export const dialogSelect = ref<Tree>()
 export const coreDeps = [
   '@koishijs/plugin-console',
   '@koishijs/plugin-config',
+  '@koishijs/plugin-server',
 ]
 
 export function hasCoreDeps(tree: Tree) {
