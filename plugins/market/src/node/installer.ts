@@ -3,6 +3,7 @@ import Scanner, { DependencyMetaKey, PackageJson, Registry, RemotePackage } from
 import { resolve } from 'path'
 import { promises as fsp, readFileSync } from 'fs'
 import { compare, satisfies, valid } from 'semver'
+import { throttle } from 'throttle-debounce'
 import {} from '@koishijs/console'
 import {} from '@koishijs/loader'
 import getRegistry from 'get-registry'
@@ -67,6 +68,15 @@ class Installer extends Service {
     this.manifest = loadManifest(this.cwd)
   }
 
+  stop() {
+    this.flushData.cancel()
+  }
+
+  flushData = throttle(500, () => {
+    this.ctx.get('console')?.broadcast('market/registry', this.tempCache)
+    this.tempCache = {}
+  })
+
   get cwd() {
     return this.ctx.baseDir
   }
@@ -105,7 +115,7 @@ class Installer extends Service {
       this.fullCache[name] = this.tempCache[name] = getVersions(Object.values(registry.versions).filter((remote) => {
         return !Scanner.isPlugin(name) || Scanner.isCompatible('4', remote)
       }))
-      this.ctx.get('console.registry')?.flushData()
+      this.flushData()
       return this.fullCache[name]
     } catch (e) {
       logger.warn(e.message)
@@ -114,7 +124,7 @@ class Installer extends Service {
 
   setPackage(name: string, versions: RemotePackage[]) {
     this.fullCache[name] = this.tempCache[name] = getVersions(versions)
-    this.ctx.get('console.registry')?.flushData()
+    this.flushData()
     this.pkgTasks[name] = Promise.resolve(this.fullCache[name])
   }
 
@@ -150,8 +160,8 @@ class Installer extends Service {
   }
 
   refreshData() {
-    this.ctx.get('console.registry')?.refresh()
-    this.ctx.get('console.packages')?.refresh()
+    this.ctx.get('console')?.refresh('registry')
+    this.ctx.get('console')?.refresh('packages')
   }
 
   refresh(refresh = false) {

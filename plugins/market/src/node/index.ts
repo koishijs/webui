@@ -157,9 +157,9 @@ export function apply(ctx: Context, config: Config) {
 
     ctx.console.addListener('market/install', async (deps, forced) => {
       const code = await ctx.installer.install(deps, forced)
-      ctx.get('console.dependencies')?.refresh()
-      ctx.get('console.registry')?.refresh()
-      ctx.get('console.packages')?.refresh()
+      ctx.get('console')?.refresh('dependencies')
+      ctx.get('console')?.refresh('registry')
+      ctx.get('console')?.refresh('packages')
       return code
     }, { authority: 4 })
 

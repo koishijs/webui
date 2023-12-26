@@ -110,6 +110,14 @@ export abstract class Console extends Service {
       client.socket.send(data)
     }))
   }
+
+  refresh<K extends keyof Console.Services>(type: K) {
+    return this.ctx.get(`console.${type}`)?.refresh()
+  }
+
+  patch<K extends keyof Console.Services>(type: K, value: Console.Services[K] extends DataService<infer T> ? T : never) {
+    return this.ctx.get(`console.${type}`)?.patch(value as any)
+  }
 }
 
 export interface Events {

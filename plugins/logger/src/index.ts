@@ -92,7 +92,7 @@ export async function apply(ctx: Context, config: Config) {
   const update = throttle(100, () => {
     // Be very careful about accessing service in this callback,
     // because undeclared service access may cause infinite loop.
-    ctx.get('console.logs')?.patch(buffer)
+    ctx.get('console')?.patch('logs', buffer)
     buffer = []
   })
 
