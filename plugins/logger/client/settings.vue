@@ -37,6 +37,11 @@ const logs = computed(() => {
   :deep(.logs) {
     padding: 0.5rem 0.5rem;
   }
+
+  @media screen and (max-width: 768px) {
+    border-radius: 0;
+    margin: 0 calc(0px - var(--content-padding));
+  }
 }
 
 </style>
