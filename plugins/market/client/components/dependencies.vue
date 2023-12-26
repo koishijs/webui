@@ -62,10 +62,7 @@ watch(() => store.market?.registry, (registry) => {
       if (store.dependencies[name]) return
       const response = await fetch(`${registry}/${name}`)
       const data = await response.json()
-      manualDeps[name] = Object.fromEntries(Object
-        .entries(data.versions)
-        .map(([key]) => [key, { peers: {}, result: 'success' }] as const)
-        .sort(([a], [b]) => compare(b, a)))
+      manualDeps[name] = data
     })
   }, { immediate: true })
 }, { immediate: true })

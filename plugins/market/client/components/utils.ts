@@ -1,4 +1,5 @@
 import { Awaitable, Dict, loading, message, send, socket, store, valueMap } from '@koishijs/client'
+import type { Registry } from '@koishijs/registry'
 import { satisfies } from 'semver'
 import { reactive, ref, watch } from 'vue'
 import { active } from '../utils'
@@ -13,7 +14,7 @@ interface AnalyzeResult {
 }
 
 export function analyzeVersions(name: string): Dict<AnalyzeResult> {
-  const versions = store.registry?.[name]
+  const versions = store.registry?.[name] || manualDeps[name]?.versions
   if (!versions) return
   return valueMap(versions, (item) => {
     const peers = valueMap({ ...item.peerDependencies }, (request, name) => {
@@ -38,7 +39,7 @@ export function analyzeVersions(name: string): Dict<AnalyzeResult> {
   })
 }
 
-export const manualDeps = reactive<Dict<Dict<AnalyzeResult>>>({})
+export const manualDeps = reactive<Dict<Registry>>({})
 
 export const showManual = ref(false)
 export const showConfirm = ref(false)

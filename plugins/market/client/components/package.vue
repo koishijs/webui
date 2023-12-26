@@ -37,7 +37,7 @@
 import { computed } from 'vue'
 import { store, isNullable } from '@koishijs/client'
 import { active, config, hasUpdate } from '../utils'
-import { analyzeVersions, manualDeps } from './utils'
+import { analyzeVersions } from './utils'
 
 const props = defineProps({
   name: String,
@@ -70,8 +70,7 @@ const version = computed({
 })
 
 const data = computed(() => {
-  if (!local.value) return manualDeps[props.name]
-  if (local.value.workspace || local.value.invalid) return
+  if (local.value?.workspace || local.value?.invalid) return
   return analyzeVersions(props.name)
 })
 

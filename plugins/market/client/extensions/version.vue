@@ -58,6 +58,10 @@ const versions = computed(() => store.registry?.[name.value])
   display: flex;
   gap: 0.5rem 1rem;
   flex-wrap: wrap;
+
+  .el-button + .el-button {
+    margin-left: 0;
+  }
 }
 
 </style>

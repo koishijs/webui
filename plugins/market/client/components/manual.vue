@@ -19,7 +19,8 @@
 <script lang="ts" setup>
 
 import { computed, ref, watch } from 'vue'
-import { store, mapValues } from '@koishijs/client'
+import type { Registry } from '@koishijs/registry'
+import { store } from '@koishijs/client'
 import { useDebounceFn } from '@vueuse/core'
 import { showManual, manualDeps } from './utils'
 import { config } from '../utils'
@@ -28,12 +29,13 @@ const invalid = computed(() => false)
 
 const name = ref('')
 
-const remote = ref()
+const remote = ref<Registry>()
 
 const fetchRemote = useDebounceFn(async (name2: string) => {
   try {
     const response = await fetch(`${store.market.registry}/${name2}`)
     const data = await response.json()
+    manualDeps[name2] = data
     if (name2 === name.value) remote.value = data
   } catch {}
 }, 500)
@@ -46,8 +48,7 @@ watch(name, (name2) => {
 
 function onEnter() {
   if (!remote.value) return
-  const { name, versions } = remote.value
-  manualDeps[name] = mapValues(versions, () => ({ peers: {}, result: 'success' }))
+  const { name } = remote.value
   config.value.override[name] = remote.value['dist-tags'].latest
   showManual.value = false
 }
