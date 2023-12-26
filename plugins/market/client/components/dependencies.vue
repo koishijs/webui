@@ -36,11 +36,12 @@
 <script lang="ts" setup>
 
 import { computed, watch, WatchStopHandle } from 'vue'
-import { store, useContext, mapValues } from '@koishijs/client'
+import { store, useContext } from '@koishijs/client'
 import { config, hasUpdate } from '../utils'
 import { manualDeps } from './utils'
 import ManualInstall from './manual.vue'
 import PackageView from './package.vue'
+import { compare } from 'semver'
 
 const names = computed(() => {
   return Object
@@ -61,7 +62,10 @@ watch(() => store.market?.registry, (registry) => {
       if (store.dependencies[name]) return
       const response = await fetch(`${registry}/${name}`)
       const data = await response.json()
-      manualDeps[name] = mapValues(data.versions, () => ({ peers: {}, result: 'success' }))
+      manualDeps[name] = Object.fromEntries(Object
+        .entries(data.versions)
+        .map(([key]) => [key, { peers: {}, result: 'success' }] as const)
+        .sort(([a], [b]) => compare(b, a)))
     })
   }, { immediate: true })
 }, { immediate: true })

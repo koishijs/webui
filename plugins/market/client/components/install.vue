@@ -24,9 +24,9 @@
       <p>正在加载版本数据……</p>
     </div>
 
-    <k-comment v-if="store.dependencies?.[active] && !current" type="danger">
-      <p>该依赖的安装发生了错误，你可以尝试修复或移除它。</p>
-    </k-comment>
+    <p v-if="store.dependencies?.[active] && !current" class="danger">
+      该依赖的安装发生了错误，你可以尝试修复或移除它。
+    </p>
 
     <el-scrollbar v-if="data?.[version] && Object.keys(data[version].peers).length">
       <table>
@@ -75,6 +75,7 @@
       </div>
     </template>
   </el-dialog>
+
   <el-dialog v-model="confirmRemoveConfig" destroy-on-close>
     检测到你正在卸载一个已配置的插件，是否同时删除其配置？
     <template #footer>
@@ -162,7 +163,7 @@ const data = computed(() => {
 const danger = computed(() => {
   if (workspace.value) return
   const deprecated = versions.value?.[version.value]?.deprecated
-  if (deprecated) return deprecated
+  if (deprecated) return '此版本已废弃：' + deprecated
   if (store.market?.data[active.value]?.insecure) {
     return '警告：从此插件的最新版本中检测出安全性问题。安装或升级此插件可能导致严重问题。'
   }

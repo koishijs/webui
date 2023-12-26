@@ -25,8 +25,8 @@
     </td>
 
     <td>
-      <template v-if="!local || local.invalid">暂不支持</template>
-      <el-button v-else-if="local.workspace || versions" @click="active = name">修改</el-button>
+      <template v-if="local?.invalid">暂不支持</template>
+      <el-button v-else-if="local?.workspace || data" @click="active = name">修改</el-button>
       <template v-else>版本获取失败</template>
     </td>
   </tr>
@@ -44,7 +44,6 @@ const props = defineProps({
 })
 
 const local = computed(() => store.dependencies?.[props.name])
-const versions = computed(() => store.registry?.[props.name])
 
 const compare = computed(() => {
   const result = hasUpdate(props.name)
