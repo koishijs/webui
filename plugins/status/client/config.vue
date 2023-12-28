@@ -3,7 +3,7 @@
     <h2 class="k-schema-header">
       机器人
     </h2>
-    <div class="bots-container">
+    <div class="bots-container flex flex-wrap gap-4">
       <bot-preview v-for="(bot, sid) in bots" :key="sid" :data="bot"/>
     </div>
   </template>
@@ -28,10 +28,6 @@ const bots = computed(() => {
 <style scoped lang="scss">
 
 .bots-container {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1rem;
-
   .bot-view {
     background-color: var(--bg0);
     border-radius: 0.5rem;

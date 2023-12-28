@@ -5,6 +5,8 @@ import Settings from './settings.vue'
 import './index.scss'
 import './icons'
 
+import 'virtual:uno.css'
+
 export default (ctx: Context) => {
   ctx.page({
     path: '/logs',

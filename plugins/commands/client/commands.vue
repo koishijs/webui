@@ -17,7 +17,7 @@
     </template>
 
     <template #left>
-      <el-scrollbar class="command-tree" ref="root">
+      <el-scrollbar class="command-tree w-full h-full overflow-auto" ref="root">
         <div class="search">
           <el-input v-model="keyword" #suffix>
             <k-icon name="search"></k-icon>
@@ -40,7 +40,7 @@
     </template>
 
     <k-content class="command-config" v-if="active">
-      <div class="navigation">
+      <div class="navigation flex flex-wrap gap-x-4 gap-y-2 my-8">
         <router-link
           class="k-button"
           v-if="store.config && store.packages && command.paths.length"
@@ -252,10 +252,6 @@ onActivated(async () => {
 <style lang="scss">
 
 .command-tree {
-  width: 100%;
-  height: 100%;
-  overflow: auto;
-
   .el-scrollbar__view {
     padding: 1rem 0;
   }
@@ -268,13 +264,6 @@ onActivated(async () => {
 .command-config {
   .k-content > *:first-child {
     margin-top: 0;
-  }
-
-  .navigation {
-    margin: 2rem 0;
-    display: flex;
-    gap: 0.5rem 1rem;
-    flex-wrap: wrap;
   }
 
   .aliases {

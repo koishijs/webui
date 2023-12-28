@@ -1,6 +1,6 @@
 <template>
   <nav
-    class="layout-activity"
+    class="layout-activity flex flex-col justify-evenly"
     @contextmenu.stop="trigger($event, null)">
     <template v-for="(data, index) in groups.top" :key="data[0].id">
       <activity-separator position="top" :index="index" />
@@ -88,9 +88,6 @@ provide('groups', groups)
   bottom: 0;
   width: var(--activity-width);
   background-color: var(--k-activity-bg);
-  display: flex;
-  flex-direction: column;
-  justify-content: space-evenly;
   border-right: var(--k-activity-divider, var(--k-color-divider-dark)) 1px solid;
   transition: var(--color-transition);
 

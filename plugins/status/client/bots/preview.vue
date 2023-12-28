@@ -6,9 +6,9 @@
       </el-tooltip>
     </div>
     <div class="info">
-      <div :title="data.user.name"><k-icon name="robot"/>{{ data.user.name }}</div>
-      <div :title="data.platform"><k-icon name="platform"/>{{ data.platform }}</div>
-      <div class="cur-frequency">
+      <div class="truncate" :title="data.user.name"><k-icon name="robot"/>{{ data.user.name }}</div>
+      <div class="truncate" :title="data.platform"><k-icon name="platform"/>{{ data.platform }}</div>
+      <div class="truncate cur-frequency">
         <span style="margin-right: 8px">
           <k-icon name="arrow-up"/>
           <span>{{ data.messageSent }}/min</span>
@@ -100,12 +100,6 @@ defineProps<{
       margin-right: 6px;
       text-align: center;
       vertical-align: -2px;
-    }
-
-    > div {
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      overflow: hidden;
     }
   }
 

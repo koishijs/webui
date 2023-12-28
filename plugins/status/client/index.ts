@@ -1,4 +1,4 @@
-import { defineExtension } from '@koishijs/client'
+import { Context } from '@koishijs/client'
 import {} from '@koishijs/plugin-status/src'
 import Bots from './bots'
 import Load from './load'
@@ -7,7 +7,9 @@ import Config from './config.vue'
 import EnvInfo from './envinfo.vue'
 import './icons'
 
-export default defineExtension((ctx) => {
+import 'virtual:uno.css'
+
+export default (ctx: Context) => {
   ctx.plugin(Bots)
   ctx.plugin(Load)
 
@@ -26,4 +28,4 @@ export default defineExtension((ctx) => {
     component: Config,
     order: -500,
   })
-})
+}

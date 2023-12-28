@@ -7,6 +7,7 @@ import Upload from './upload.vue'
 import './icons'
 import './editor'
 
+import 'virtual:uno.css'
 import './editor.scss'
 
 export default (ctx: Context) => {

@@ -4,6 +4,8 @@ import Locales from './locales.vue'
 import Activity from './icons/activity.vue'
 import Globe from './icons/globe.vue'
 
+import 'virtual:uno.css'
+
 icons.register('activity:locales', Activity)
 icons.register('globe', Globe)
 

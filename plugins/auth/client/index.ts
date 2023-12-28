@@ -12,6 +12,8 @@ import UserFull from './icons/user-full.vue'
 import BindDialog from './bind-dialog.vue'
 import SyncDialog from './sync-dialog.vue'
 
+import 'virtual:uno.css'
+
 icons.register('at', At)
 icons.register('check', Check)
 icons.register('lock', Lock)

@@ -2,6 +2,8 @@ import { Context } from '@koishijs/client'
 import Sandbox from './layout.vue'
 import './icons'
 
+import 'virtual:uno.css'
+
 export default (ctx: Context) => {
   ctx.page({
     name: '沙盒',

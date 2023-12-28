@@ -1,6 +1,6 @@
 <template>
   <!-- navigation -->
-  <div class="navigation" v-if="object">
+  <div class="navigation flex flex-wrap gap-x-4 gap-y-2 my-8" v-if="object">
     <a class="el-button" target="_blank"
       v-if="object.package.links.homepage"
       :href="object.package.links.homepage"
@@ -52,16 +52,5 @@ const versions = computed(() => store.registry?.[name.value])
 </script>
 
 <style lang="scss" scoped>
-
-.navigation {
-  margin-bottom: 2rem;
-  display: flex;
-  gap: 0.5rem 1rem;
-  flex-wrap: wrap;
-
-  .el-button + .el-button {
-    margin-left: 0;
-  }
-}
 
 </style>

@@ -7,6 +7,8 @@ import Commands from './commands.vue'
 import Locales from './locales.vue'
 import Settings from './settings.vue'
 
+import 'virtual:uno.css'
+
 icons.register('activity:commands', Activity)
 icons.register('check', Check)
 icons.register('trash-can', TrashCan)

@@ -11,6 +11,8 @@ import Market from './components/market.vue'
 import Progress from './components/progress.vue'
 import './icons'
 
+import 'virtual:uno.css'
+
 receive('market/patch', (data) => {
   store.market = {
     ...data,

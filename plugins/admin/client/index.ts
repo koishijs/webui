@@ -4,6 +4,8 @@ import Activity from './icons/activity.vue'
 import TrashCan from './icons/trash-can.vue'
 import UserGroup from './group.vue'
 
+import 'virtual:uno.css'
+
 icons.register('trash-can', TrashCan)
 icons.register('activity:group', Activity)
 

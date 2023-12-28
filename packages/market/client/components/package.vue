@@ -1,12 +1,12 @@
 <template>
-  <a class="market-package" target="_blank" :href="homepage">
-    <div class="header">
-      <div class="left">
+  <a class="market-package flex flex-col gap-3" target="_blank" :href="homepage">
+    <div class="header flex flex-row gap-4">
+      <div class="left flex flex-row justify-center items-center">
         <market-icon :name="'outline:' + resolveCategory(data.category)"></market-icon>
       </div>
-      <div class="main">
+      <div class="main flex flex-col justify-around overflow-hidden">
         <h2 class="top">
-          <span class="title" :title="data.shortname">{{ data.shortname }}</span>
+          <span class="title truncate" :title="data.shortname">{{ data.shortname }}</span>
           <el-tooltip v-if="badge" placement="right" :content="t(`badge.${badge.type}`)">
             <span :class="['icon', badge.type]" @click.stop.prevent="$emit('query', badge.query)">
               <market-icon :name="badge.type"></market-icon>
@@ -28,29 +28,29 @@
     <k-markdown inline class="desc" :source="tt(data.manifest?.description) ?? ''"></k-markdown>
     <div class="footer">
       <el-tooltip :content="timeAgo(data.updatedAt)" placement="top">
-        <a class="shrink" target="_blank" :href="data.package.links.npm">
+        <a class="truncate" target="_blank" :href="data.package.links.npm">
           <market-icon name="tag"></market-icon>{{ data.package.version }}
         </a>
       </el-tooltip>
       <template v-if="data.installSize">
         <span class="spacer"></span>
-        <a target="_blank" :href="data.package.links.size">
+        <a class="truncate" target="_blank" :href="data.package.links.size">
           <market-icon name="file-archive"></market-icon>{{ formatSize(data.installSize) }}
         </a>
       </template>
       <template v-if="data.downloads">
         <span class="spacer"></span>
-        <span>
+        <span class="truncate">
           <market-icon name="download"></market-icon>{{ data.downloads.lastMonth }}
         </span>
       </template>
       <template v-if="!data.installSize && !data.downloads">
         <span class="spacer"></span>
-        <span>
+        <span class="truncate">
           <market-icon name="balance"></market-icon>{{ data.license }}
         </span>
       </template>
-      <span class="spacer grow"></span>
+      <span class="long-spacer"></span>
       <div class="avatars">
         <el-tooltip v-for="({ email, name }) in getUsers(data)" :key="name" :content="name" placement="top">
           <span class="avatar" @click.stop.prevent="$emit('query', 'email:' + email)">
@@ -153,9 +153,6 @@ if (import.meta.hot) {
   margin: 0;
   padding: 1rem 1.25rem;
   box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
   transition: box-shadow 0.3s ease;
   box-shadow: 0 0 0 2px inset transparent;
 
@@ -174,30 +171,18 @@ if (import.meta.hot) {
 
   .header {
     position: relative;
-    display: flex;
 
     .left {
       flex: 0 0 auto;
       width: 3.5rem;
       height: 3.5rem;
-      margin-right: 1rem;
       border-radius: 8px;
       border: 1px solid var(--k-color-border);
       box-sizing: border-box;
-      display: flex;
-      justify-content: center;
-      align-items: center;
 
       svg {
         height: 1.75rem;
       }
-    }
-
-    .main {
-      display: flex;
-      flex-flow: column;
-      justify-content: space-around;
-      overflow: hidden;
     }
 
     h2 {
@@ -209,9 +194,6 @@ if (import.meta.hot) {
 
       .title {
         flex: 0 1 auto;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        overflow: hidden;
         line-height: 1.5rem;
         display: inline-block;
       }
@@ -296,22 +278,25 @@ if (import.meta.hot) {
 
   .footer {
     display: flex;
+    gap: 0.5rem;
     align-items: center;
     height: 1.5rem;
     margin-bottom: -0.25rem;
     cursor: default;
     font-size: 14px;
     transition: color 0.3s ease;
-    display: flex;
     overflow: hidden;
 
-    .spacer {
-      flex: 0 2 1.5rem;
+    > * {
+      flex: 0 0 auto;
     }
 
-    .grow {
-      flex-grow: 1;
-      flex-shrink: 1;
+    .spacer {
+      flex: 0 2 0.5rem;
+    }
+
+    .long-spacer {
+      flex: 1 1 auto;
     }
 
     .market-icon {
@@ -319,13 +304,6 @@ if (import.meta.hot) {
       width: 16px;
       margin-right: 6px;
       vertical-align: -1px;
-    }
-
-    > * {
-      flex: 0 0 auto;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
     }
 
     .avatars {

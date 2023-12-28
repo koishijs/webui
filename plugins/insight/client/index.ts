@@ -3,6 +3,8 @@ import {} from '@koishijs/plugin-insight'
 import Graph from './index.vue'
 import './icons'
 
+import 'virtual:uno.css'
+
 export default (ctx: Context) => {
   ctx.page({
     path: '/graph',

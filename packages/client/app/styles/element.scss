@@ -195,3 +195,9 @@ html.dark .el-popper.is-dark {
     }
   }
 }
+
+.flex, .grid {
+  > .el-button + .el-button {
+    margin-left: 0;
+  }
+}
