@@ -6,6 +6,7 @@ import status from './status'
 import styles from './styles'
 import theme from './theme'
 
+import 'virtual:uno.css'
 import './index.scss'
 
 root.plugin(home)

@@ -1,6 +1,8 @@
 import { build, InlineConfig, mergeConfig, transformWithEsbuild, UserConfig } from 'vite'
 import { RollupOutput } from 'rollup'
 import { existsSync, promises as fsp } from 'fs'
+import unocss from 'unocss/vite'
+import mini from 'unocss/preset-mini'
 import vue from '@vitejs/plugin-vue'
 import yaml from '@maikolib/vite-plugin-yaml'
 
@@ -45,6 +47,13 @@ export async function buildExtension(root: string, config: UserConfig = {}) {
     plugins: [
       vue(),
       yaml(),
+      unocss({
+        presets: [
+          mini({
+            preflight: false,
+          }),
+        ],
+      }),
     ],
     resolve: {
       alias: {
