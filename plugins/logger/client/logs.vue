@@ -4,7 +4,7 @@
       <div :class="{ line: true, start: isStart(record) }">
         <code v-html="renderLine(record)"></code>
         <router-link
-          class="log-link"
+          class="log-link inline-flex items-center justify-center absolute w-20px h-20px bottom-0 right-0"
           v-if="showLink && store.config && store.packages && record.meta?.paths?.length"
           :to="'/plugins/' + record.meta.paths[0].replace(/\./, '/')"
         >
@@ -105,17 +105,6 @@ function renderLine(record: Logger.Record) {
     ::selection {
       background-color: var(--terminal-bg-selection);
     }
-  }
-
-  .log-link {
-    height: 20px;
-    width: 20px;
-    position: absolute;
-    bottom: 0;
-    right: 0;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
   }
 }
 

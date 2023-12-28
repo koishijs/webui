@@ -84,14 +84,6 @@ async function configure(key?: string) {
     flex: 0 0 auto;
   }
 
-  .text-left {
-    text-align: left;
-  }
-
-  .text-right {
-    text-align: right;
-  }
-
   .status-light {
     margin-right: 0.75rem;
   }

@@ -37,7 +37,7 @@
           <td>可用性</td>
         </tr>
         <tr v-for="({ request, resolved, result }, name) in data[version].peers" :key="name">
-          <td class="name">{{ name }}</td>
+          <td class="text-left">{{ name }}</td>
           <td>{{ request }}</td>
           <td>{{ resolved }}</td>
           <td :class="['theme-color', result]">
@@ -270,10 +270,6 @@ function configure() {
       padding: 0.5em 0.875em;
       white-space: nowrap;
     }
-  }
-
-  td.name {
-    text-align: left;
   }
 
   td.theme-color span {

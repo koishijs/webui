@@ -1,6 +1,6 @@
 <template>
   <tr class="dep-package-view">
-    <td class="name">{{ name }}</td>
+    <td class="text-left p-8">{{ name }}</td>
 
     <td class="current">
       <template v-if="!local">-</template>
@@ -81,11 +81,6 @@ const data = computed(() => {
 .dep-package-view {
   height: 3rem;
   position: relative;
-
-  td.name {
-    text-align: left;
-    padding-left: 2rem;
-  }
 
   .el-button {
     width: 4rem;

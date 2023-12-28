@@ -41,10 +41,6 @@ async function setMode(value?: 'upload' | 'download') {
 
 <style lang="scss" scoped>
 
-p.text-center {
-  text-align: center;
-}
-
 .el-button-group.text-center {
   display: flex;
   justify-content: center;

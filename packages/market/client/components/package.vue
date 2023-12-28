@@ -1,7 +1,7 @@
 <template>
   <a class="market-package flex flex-col gap-3" target="_blank" :href="homepage">
     <div class="header flex flex-row gap-4">
-      <div class="left flex flex-row justify-center items-center">
+      <div class="left shrink-0 flex flex-row justify-center items-center">
         <market-icon :name="'outline:' + resolveCategory(data.category)"></market-icon>
       </div>
       <div class="main flex flex-col justify-around overflow-hidden">
@@ -21,7 +21,7 @@
           </el-tooltip>
         </div>
       </div>
-      <div class="right">
+      <div class="text-right grow-1 shrink-0">
         <slot name="action"></slot>
       </div>
     </div>
@@ -173,7 +173,6 @@ if (import.meta.hot) {
     position: relative;
 
     .left {
-      flex: 0 0 auto;
       width: 3.5rem;
       height: 3.5rem;
       border-radius: 8px;
@@ -254,12 +253,6 @@ if (import.meta.hot) {
         height: 0.875rem;
         transition: color 0.3s ease;
       }
-    }
-
-    .right {
-      flex: 1 0 auto;
-      text-align: right;
-      position: relative;
     }
   }
 

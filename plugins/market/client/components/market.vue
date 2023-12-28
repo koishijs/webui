@@ -23,7 +23,7 @@
         @update:page="scrollToTop">
         <template #header="{ hasFilter, all, packages }">
           <market-search v-model="words"></market-search>
-          <div class="market-hint">
+          <div class="market-hint text-center">
             共搜索到 {{ hasFilter ? packages.length + ' / ' : '' }}{{ all.length }} 个插件。
           </div>
         </template>
@@ -155,10 +155,6 @@ function scrollToTop() {
 .market-hint {
   width: 100%;
   margin: 1rem 0 -0.5rem;
-  text-align: center;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
   color: var(--el-text-color-regular);
   font-size: var(--el-font-size-base);
   font-weight: var(--el-font-weight-primary);

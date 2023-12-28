@@ -1,5 +1,5 @@
 <template>
-  <div class="login-form">
+  <div class="login-form text-center">
     <template v-if="user">
       <h1 v-if="store.user"><span>平台账户绑定</span></h1>
       <h1 v-else><span>平台账户登录</span></h1>
@@ -101,8 +101,6 @@ function goBack() {
 <style lang="scss">
 
 .login-form {
-  text-align: center;
-
   h1 {
     font-size: 1.5rem;
     margin: 2.5rem auto;
