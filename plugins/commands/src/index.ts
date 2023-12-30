@@ -1,4 +1,4 @@
-import { Argv, Command, Context, Dict, remove, Schema } from 'koishi'
+import { Argv, clone, Command, Context, Dict, remove, Schema } from 'koishi'
 import ConsoleExtension from './console'
 import CommandExtension from './command'
 
@@ -112,8 +112,8 @@ export class CommandManager {
       parent: command.parent,
       initial: {
         aliases: command._aliases,
-        options: command._options,
-        config: command.config,
+        options: clone(command._options),
+        config: clone(command.config),
       },
       override: {
         aliases: command._aliases,
@@ -239,6 +239,11 @@ export class CommandManager {
       const override = this.config[command.name]
       if (override.config && !Object.keys(override.config).length) {
         delete override.config
+      }
+      for (const key in override.options) {
+        if (override.options[key] && !Object.keys(override.options[key]).length) {
+          delete override.options[key]
+        }
       }
       if (override.options && !Object.keys(override.options).length) {
         delete override.options
