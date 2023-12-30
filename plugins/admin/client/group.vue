@@ -51,14 +51,18 @@
 
       <h2 class="k-schema-header">权限列表</h2>
       <template v-if="permissions.length">
-        <ul>
-          <li v-for="(permission, index) in permissions">
-            <permission-name :id="permission" />
-            <el-button @click="removePermission(index)">删除</el-button>
-          </li>
-        </ul>
+        <table class="perm-table">
+          <tr v-for="(permission, index) in permissions" :key="index">
+            <td class="text-left"><permission-name :id="permission" /></td>
+            <td class="text-right">
+              <el-button v-if="getLink(permission)" @click="router.push(getLink(permission))">前往</el-button>
+              <el-button @click="removePermission(index)">删除</el-button>
+            </td>
+          </tr>
+        </table>
       </template>
       <p v-else>该用户组没有权限。</p>
+
       <el-select v-model="permission">
         <el-option
           v-for="id in store.permissions.filter(item => (active.type === 'track' ? item.startsWith('group.') : true) && !permissions.includes(item))"
@@ -87,12 +91,12 @@
     </template>
   </el-dialog>
 
-  <el-dialog v-model="showUserDialog" destroy-on-close title="用户管理">
-    <el-input v-model="platform" placeholder="平台名"/>
-    <el-input v-model="account" placeholder="账号"/>
+  <el-dialog class="user-dialog" v-model="showUserDialog" destroy-on-close title="用户管理">
+    <div class="my-4"><el-input v-model="platform" placeholder="平台名"/></div>
+    <div class="my-4"><el-input v-model="account" placeholder="账号"/></div>
     <template #footer>
-      <el-button @click="removeUser">从用户组移除</el-button>
-      <el-button @click="addUser">添加到用户组</el-button>
+      <el-button type="primary" @click="removeUser">从用户组移除</el-button>
+      <el-button type="primary" @click="addUser">添加到用户组</el-button>
     </template>
   </el-dialog>
 </template>
@@ -227,6 +231,16 @@ async function removeUser() {
   showUserDialog.value = false
 }
 
+function getLink(name: string) {
+  if (name.startsWith('group.')) {
+    return `/admin/group/${name.slice(6)}`
+  } else if (name.startsWith('track.')) {
+    return `/admin/track/${name.slice(6)}`
+  } else if (name.startsWith('command.')) {
+    return `/commands/${name.slice(8).replace(/\./g, '/')}`
+  }
+}
+
 </script>
 
 <style lang="scss">
@@ -245,6 +259,15 @@ async function removeUser() {
   }
 }
 
+.perm-table {
+  margin: 1rem 0;
+
+  tr:hover {
+    transition: var(--color-transition);
+    background-color: var(--k-side-bg);
+  }
+}
+
 .rename-input {
   border: none;
   outline: none;
@@ -252,11 +275,6 @@ async function removeUser() {
   font-size: inherit;
   font-weight: inherit;
   background: transparent;
-}
-
-.el-button-group.text-center {
-  display: flex;
-  justify-content: center;
 }
 
 .create-dialog {
