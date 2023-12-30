@@ -1,7 +1,7 @@
 <template>
   <k-schema
     v-bind="$attrs"
-    :schema="schema.list[0]"
+    :schema="{ ...schema.list[0], meta: { ...schema.meta, ...schema.list[0].meta } }"
     :modelValue="modelValue"
     @update:modelValue="emit('update:modelValue', $event)"
     :disabled="disabled"
