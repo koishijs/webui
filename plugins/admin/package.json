@@ -1,7 +1,7 @@
 {
   "name": "@koishijs/plugin-admin",
   "description": "Permission Manager for Koishi",
-  "version": "2.0.0-alpha.5",
+  "version": "2.0.0-beta.0",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
   "files": [
@@ -50,8 +50,8 @@
     }
   },
   "peerDependencies": {
-    "@koishijs/plugin-console": "^5.22.6",
-    "koishi": "^4.16.2"
+    "@koishijs/plugin-console": "^5.23.4",
+    "koishi": "^4.16.3"
   },
   "peerDependenciesMeta": {
     "@koishijs/plugin-console": {
@@ -59,14 +59,14 @@
     }
   },
   "devDependencies": {
-    "@koishijs/client": "^5.22.6",
-    "@koishijs/plugin-console": "^5.22.6",
+    "@koishijs/client": "^5.23.4",
+    "@koishijs/plugin-console": "^5.23.4",
     "@koishijs/plugin-locales": "^2.5.1",
     "@koishijs/plugin-mock": "^2.6.5",
     "@types/throttle-debounce": "^2.1.0"
   },
   "dependencies": {
-    "@koishijs/console": "^5.22.6",
+    "@koishijs/console": "^5.23.4",
     "throttle-debounce": "^3.0.1"
   }
 }

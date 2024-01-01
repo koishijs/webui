@@ -1,6 +1,6 @@
 <template>
   <tr class="dep-package-view">
-    <td class="text-left p-8">{{ name }}</td>
+    <td class="text-left pl-8">{{ name }}</td>
 
     <td class="current">
       <template v-if="!local">-</template>
