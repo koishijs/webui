@@ -65,7 +65,7 @@
 
       <el-select v-model="permission">
         <el-option
-          v-for="id in store.permissions.filter(item => (active.type === 'track' ? item.startsWith('group.') : true) && !permissions.includes(item))"
+          v-for="id in [...Object.keys(store.admin.group).map(id => `group:${id}`), ...active.type === 'track' ? [] : store.permissions]"
           :key="id"
           :value="id">
           <permission-name :id="id" />
@@ -232,11 +232,11 @@ async function removeUser() {
 }
 
 function getLink(name: string) {
-  if (name.startsWith('group.')) {
+  if (name.startsWith('group:')) {
     return `/admin/group/${name.slice(6)}`
-  } else if (name.startsWith('track.')) {
+  } else if (name.startsWith('track:')) {
     return `/admin/track/${name.slice(6)}`
-  } else if (name.startsWith('command.')) {
+  } else if (name.startsWith('command:')) {
     return `/commands/${name.slice(8).replace(/\./g, '/')}`
   }
 }

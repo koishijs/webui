@@ -1,8 +1,8 @@
 <template>
-  <template v-if="id.startsWith('command.')">
+  <template v-if="id.startsWith('command:')">
     指令：{{ id.slice(8) }}
   </template>
-  <template v-else-if="id.startsWith('group.')">
+  <template v-else-if="id.startsWith('group:')">
     用户组：{{ store.locales?.[`permission.${id}`] || store.admin.group[id.slice(6)].name || '未命名' }}
   </template>
   <template v-else>

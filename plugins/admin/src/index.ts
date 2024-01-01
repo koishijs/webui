@@ -61,7 +61,7 @@ export class Admin extends Service {
     this.tracks = await this.ctx.database.get('perm_track', {})
     for (const item of this.groups) {
       item.count = await this.ctx.database
-        .select('user', { permissions: { $el: 'group.' + item.id } })
+        .select('user', { permissions: { $el: 'group:' + item.id } })
         .execute(row => $.count(row.id)) || 0
       this.setupGroup(item)
     }
@@ -72,8 +72,7 @@ export class Admin extends Service {
 
   private setupGroup(item: PermGroup) {
     item.dispose = this.ctx.permissions.define('(name)', {
-      inherits: ({ name }) => item.permissions.includes(name) && ['group.' + item.id],
-      list: () => ['group.' + item.id],
+      inherits: ({ name }) => item.permissions.includes(name) && ['group:' + item.id],
     })
   }
 
@@ -143,13 +142,13 @@ export class Admin extends Service {
     if (index < 0) throw new Error('group not found')
     const [item] = this.groups.splice(index, 1)
     item.dispose!()
-    const users = await this.ctx.database.get('user', { permissions: { $el: 'group.' + id } }, ['id', 'permissions'])
+    const users = await this.ctx.database.get('user', { permissions: { $el: 'group:' + id } }, ['id', 'permissions'])
     for (const user of users) {
-      remove(user.permissions, 'group.' + id)
+      remove(user.permissions, 'group:' + id)
     }
     await this.ctx.database.upsert('user', users)
     const updates = this.groups.filter((group) => {
-      return remove(group.permissions, 'group.' + id)
+      return remove(group.permissions, 'group:' + id)
     })
     await this.ctx.database.upsert('group', updates)
     await this.ctx.database.remove('group', id)
@@ -169,8 +168,8 @@ export class Admin extends Service {
     if (!item) throw new Error('group not found')
     const data = await this.ctx.database.getUser(platform, aid, ['id', 'permissions'])
     if (!data) throw new Error('user not found')
-    if (!data.permissions.includes('group.' + item.id)) {
-      data.permissions.push('group.' + item.id)
+    if (!data.permissions.includes('group:' + item.id)) {
+      data.permissions.push('group:' + item.id)
       item.count!++
       await this.ctx.database.set('user', data.id, { permissions: data.permissions })
       this.ctx.get('console')?.refresh('admin')
@@ -182,7 +181,7 @@ export class Admin extends Service {
     if (!item) throw new Error('group not found')
     const data = await this.ctx.database.getUser(platform, aid, ['id', 'permissions'])
     if (!data) throw new Error('user not found')
-    if (remove(data.permissions, 'group.' + item.id)) {
+    if (remove(data.permissions, 'group:' + item.id)) {
       item.count!--
       await this.ctx.database.set('user', data.id, { permissions: data.permissions })
       this.ctx.get('console')?.refresh('admin')
