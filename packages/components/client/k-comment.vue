@@ -70,7 +70,7 @@ const icon = computed(() => {
   }
 
   :deep(a) {
-    text-decoration: underline dotted;
+    text-decoration: underline;
 
     &:hover {
       text-decoration: underline;

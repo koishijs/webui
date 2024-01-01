@@ -201,3 +201,9 @@ html.dark .el-popper.is-dark {
     margin-left: 0;
   }
 }
+
+.el-cascader-panel {
+  .el-checkbox.is-disabled {
+    visibility: hidden;
+  }
+}
