@@ -50,11 +50,14 @@ export const router = createRouter({
   routes: [],
 })
 
+const initialTitle = document.title
+
 router.afterEach((route) => {
   const { name, fullPath } = router.currentRoute.value
   routeCache[name] = fullPath
   if (route.meta.activity) {
-    document.title = `${route.meta.activity.name} | ${global.messages?.title || 'Koishi 控制台'}`
+    document.title = `${route.meta.activity.name}`
+    if (initialTitle) document.title += ` | ${initialTitle}`
   }
 })
 

@@ -32,7 +32,6 @@ root.page({
 })
 
 global.messages = {}
-global.messages.title = 'Koishi Online'
 global.messages.connecting = '正在初始化 Koishi Online 运行环境……'
 
 if (!('chrome' in window)) {

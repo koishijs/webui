@@ -164,7 +164,7 @@ class NodeConsole extends Console {
       const attrString = Object.entries(attrs).map(([key, value]) => ` ${key}="${h.escape(value ?? '', true)}"`).join('')
       headInjection += `<${tag}${attrString}>${content ?? ''}</${tag}>`
     }
-    return template.replace('</title>', '</title>' + headInjection)
+    return template.replace('<title>', headInjection + '<title>')
   }
 
   private async createVite() {
