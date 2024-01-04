@@ -166,8 +166,8 @@ class NodeConsole extends Console {
   private async createVite() {
     const { cacheDir, dev } = this.config
     const { createServer } = require('vite') as typeof import('vite')
-    const { default: mini } = require('unocss/preset-mini') as typeof import('unocss/preset-mini')
-    const { default: unocss } = require('unocss/vite') as typeof import('unocss/vite')
+    const { default: mini } = require('@unocss/preset-mini') as typeof import('@unocss/preset-mini')
+    const { default: unocss } = require('@unocss/vite') as typeof import('@unocss/vite')
     const { default: vue } = require('@vitejs/plugin-vue') as typeof import('@vitejs/plugin-vue')
     const { default: yaml } = require('@maikolib/vite-plugin-yaml') as typeof import('@maikolib/vite-plugin-yaml')
 
