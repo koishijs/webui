@@ -52,6 +52,8 @@ export class EntryProvider extends DataService<Dict<EntryData>> {
 export abstract class Console extends Service {
   static filter = false
 
+  private id = Math.random().toString(36).slice(2)
+
   readonly entries: Dict<Entry> = Object.create(null)
   readonly listeners: Dict<Listener> = Object.create(null)
   readonly clients: Dict<Client> = Object.create(null)
@@ -75,11 +77,13 @@ export abstract class Console extends Service {
   }
 
   async get(client: Client) {
-    return valueMap(this.entries, ({ files, ctx, data }, key) => ({
+    const result = valueMap(this.entries, ({ files, ctx, data }, key) => ({
       files: this.resolveEntry(files, key),
       paths: this.ctx.loader?.paths(ctx.scope),
       data: data?.(client),
     }))
+    result['_id'] = this.id as any
+    return result
   }
 
   protected abstract resolveEntry(files: Entry.Files, key: string): string[]

@@ -51,7 +51,13 @@ export const initTask = new Promise<void>((resolve) => {
       delete extensions[key]
     }
 
-    await Promise.all(Object.entries(newValue).map(([key, { files, paths, data }]) => {
+    const { _id, ...rest } = newValue
+    if (oldValue && oldValue._id !== _id) {
+      window.location.reload()
+      return
+    }
+
+    await Promise.all(Object.entries(rest).map(([key, { files, paths, data }]) => {
       if (extensions[key]) return
       const scope = root.isolate(['extension']).plugin(() => {})
       scope.ctx.extension = extensions[key] = { done: false, scope, paths, data }

@@ -102,7 +102,7 @@ class NodeConsole extends Console {
     const { devMode, uiPath } = this.config
     const filenames: string[] = []
     for (const local of makeArray(this.getFiles(files))) {
-      const filename = devMode ? '/vite/@fs/' + local : uiPath + '/' + key
+      const filename = devMode ? '/vite/@fs/' + local : uiPath + '/@plugin-' + key
       if (extname(local)) {
         filenames.push(filename)
       } else {
@@ -131,11 +131,13 @@ class NodeConsole extends Console {
         ctx.type = extname(filename)
         return ctx.body = createReadStream(filename)
       }
-      if (name.startsWith('extension-')) {
-        const key = name.slice(0, 18)
+      if (name.startsWith('@plugin-')) {
+        const [key] = name.slice(8).split('/', 1)
         if (this.entries[key]) {
-          const files = makeArray(this.getFiles(this.entries[key][0]))
-          return sendFile(files[0] + name.slice(18))
+          const files = makeArray(this.getFiles(this.entries[key].files))
+          return sendFile(files[0] + name.slice(8 + key.length))
+        } else {
+          return ctx.status = 404
         }
       }
       const filename = resolve(this.root, name)
