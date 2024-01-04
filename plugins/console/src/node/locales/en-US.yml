@@ -3,6 +3,12 @@ uiPath: 前端页面呈现的路径。
 apiPath: 后端 API 服务的路径。
 selfUrl: Koishi 服务暴露在公网的地址。
 open: 在应用启动后自动在浏览器中打开控制台。
+head:
+  $desc: 自定义页面头部信息。
+  $inner:
+    tag: 标签名。
+    attrs: 标签属性。
+    content: 标签内容。
 heartbeat:
   interval: 心跳发送间隔 (单位毫秒)。
   timeout: 心跳超时时间 (单位毫秒)。
