@@ -31,12 +31,12 @@
           </el-input>
         </div>
         <div class="k-tab-group-title">用户组</div>
-        <k-tab-group :data="store.admin.group" v-model="activeGroup" #="{ id }">
-          {{ store.locales?.[`permission.${id}`] || store.admin.group[id].name || '未命名' }}
+        <k-tab-group :data="data.group" v-model="activeGroup" #="{ id }">
+          {{ store.locales?.[`permission.${id}`] || data.group[id].name || '未命名' }}
         </k-tab-group>
         <div class="k-tab-group-title">用户组路线</div>
-        <k-tab-group :data="store.admin.track" v-model="activeTrack" #="{ id }">
-          {{ store.locales?.[`permission-track.${id}`] || store.admin.track[id].name || '未命名' }}
+        <k-tab-group :data="data.track" v-model="activeTrack" #="{ id }">
+          {{ store.locales?.[`permission-track.${id}`] || data.track[id].name || '未命名' }}
         </k-tab-group>
       </el-scrollbar>
     </template>
@@ -45,7 +45,7 @@
       <template v-if="activeGroup">
         <!-- nav: 前往本地化翻译 -->
         <h2 class="k-schema-header">用户管理</h2>
-        <p>此用户组内当前共有 {{ store.admin.group[activeGroup].count }} 个用户。</p>
+        <p>此用户组内当前共有 {{ data.group[activeGroup].count }} 个用户。</p>
         <el-button @click="showUserDialog = true">添加用户</el-button>
       </template>
 
@@ -65,7 +65,7 @@
 
       <el-select v-model="permission">
         <el-option
-          v-for="id in [...Object.keys(store.admin.group).map(id => `group:${id}`), ...active.type === 'track' ? [] : store.permissions]"
+          v-for="id in [...Object.keys(data.group).map(id => `group:${id}`), ...active.type === 'track' ? [] : store.permissions]"
           :key="id"
           :value="id">
           <permission-name :id="id" />
@@ -103,12 +103,15 @@
 
 <script lang="ts" setup>
 
-import { message, send, store } from '@koishijs/client'
+import { message, send, store, useRpc } from '@koishijs/client'
+import type Admin from '@koishijs/plugin-admin/src'
 import { useRoute, useRouter } from 'vue-router'
 import { computed, ref } from 'vue'
 import {} from '@koishijs/plugin-locales'
 import { debounce } from 'throttle-debounce'
 import PermissionName from './name.vue'
+
+const data = useRpc<Admin.Data>()
 
 const route = useRoute()
 const router = useRouter()
@@ -132,12 +135,12 @@ interface Active {
 const active = computed<Active>(() => {
   if (route.path.startsWith('/admin/group/')) {
     const id = route.path.slice(13)
-    if (id in store.admin.group) {
+    if (id in data.group) {
       return { type: 'group', id }
     }
   } else if (route.path.startsWith('/admin/track/')) {
     const id = route.path.slice(13)
-    if (id in store.admin.track) {
+    if (id in data.track) {
       return { type: 'track', id }
     }
   }
@@ -150,7 +153,7 @@ const activeGroup = computed<string>({
     return active.value.id
   },
   set(id) {
-    if (!(id in store.admin.group)) id = ''
+    if (!(id in data.group)) id = ''
     router.replace('/admin/group/' + id)
   },
 })
@@ -161,13 +164,13 @@ const activeTrack = computed<string>({
     return active.value.id
   },
   set(id) {
-    if (!(id in store.admin.track)) id = ''
+    if (!(id in data.track)) id = ''
     router.replace('/admin/track/' + id)
   },
 })
 
 const permissions = computed(() => {
-  return store.admin[active.value.type][active.value.id].permissions
+  return data[active.value.type][active.value.id].permissions
 })
 
 const renameItem = debounce(1000, (type: 'group' | 'track', id: number, name: string) => {
@@ -176,10 +179,10 @@ const renameItem = debounce(1000, (type: 'group' | 'track', id: number, name: st
 
 const renameInput = computed<string>({
   get() {
-    return store.admin[active.value.type][active.value.id].name
+    return data[active.value.type][active.value.id].name
   },
   set(value) {
-    store.admin[active.value.type][active.value.id].name = value
+    data[active.value.type][active.value.id].name = value
     renameItem(active.value.type, +active.value.id, value)
   },
 })
@@ -197,14 +200,14 @@ async function deleteItem() {
 }
 
 async function addPermission() {
-  const { permissions } = store.admin[active.value.type][active.value.id]
+  const { permissions } = data[active.value.type][active.value.id]
   permissions.push(permission.value)
   permission.value = null
   await send(`admin/update-${active.value.type}`, +active.value.id, permissions)
 }
 
 async function removePermission(index: number) {
-  const { permissions } = store.admin[active.value.type][active.value.id]
+  const { permissions } = data[active.value.type][active.value.id]
   permissions.splice(index, 1)
   await send(`admin/update-${active.value.type}`, +active.value.id, permissions)
 }

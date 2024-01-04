@@ -1,10 +1,10 @@
-import { $, Context, remove, Schema, Service } from 'koishi'
+import { $, Context, Dict, remove, Schema, Service } from 'koishi'
+import { Entry } from '@koishijs/console'
+import { resolve } from 'path'
 import command from './command'
-import console from './console'
 import zhCN from './locales/zh-CN.yml'
 
 export * from './command'
-export * from './console'
 
 declare module 'koishi' {
   interface Context {
@@ -14,6 +14,21 @@ declare module 'koishi' {
   interface Tables {
     group: PermGroup
     perm_track: PermTrack
+  }
+}
+
+declare module '@koishijs/console' {
+  interface Events {
+    'admin/create-track'(name: string): Promise<number>
+    'admin/rename-track'(id: number, name: string): Promise<void>
+    'admin/delete-track'(id: number): Promise<void>
+    'admin/update-track'(id: number, permissions: string[]): Promise<void>
+    'admin/create-group'(name: string): Promise<number>
+    'admin/rename-group'(id: number, name: string): Promise<void>
+    'admin/delete-group'(id: number): Promise<void>
+    'admin/update-group'(id: number, permissions: string[]): Promise<void>
+    'admin/add-user'(gid: number, platform: string, aid: string): Promise<void>
+    'admin/remove-user'(gid: number, platform: string, aid: string): Promise<void>
   }
 }
 
@@ -35,13 +50,13 @@ export interface PermTrack {
 export class Admin extends Service {
   groups: PermGroup[]
   tracks: PermTrack[]
+  entry?: Entry<Admin.Data>
 
   constructor(ctx: Context, public config: Admin.Config) {
     super(ctx, 'admin')
 
     ctx.i18n.define('zh-CN', zhCN)
     ctx.plugin(command)
-    ctx.plugin(console)
 
     ctx.model.extend('group', {
       id: 'unsigned',
@@ -68,6 +83,64 @@ export class Admin extends Service {
     for (const item of this.tracks) {
       this.setupTrack(item)
     }
+
+    this.ctx.inject(['console'], (ctx) => {
+      ctx.on('dispose', () => this.entry = undefined)
+
+      this.entry = ctx.console.addEntry(process.env.KOISHI_BASE ? [
+        process.env.KOISHI_BASE + '/dist/index.js',
+        process.env.KOISHI_BASE + '/dist/style.css',
+      ] : process.env.KOISHI_ENV === 'browser' ? [
+        // @ts-ignore
+        import.meta.url.replace(/\/src\/[^/]+$/, '/client/index.ts'),
+      ] : {
+        dev: resolve(__dirname, '../client/index.ts'),
+        prod: resolve(__dirname, '../dist'),
+      }, () => ({
+        group: Object.fromEntries(this.groups.map(group => [group.id, group])),
+        track: Object.fromEntries(this.tracks.map(track => [track.id, track])),
+      }))
+
+      ctx.console.addListener('admin/create-track', (name) => {
+        return this.createTrack(name)
+      })
+
+      ctx.console.addListener('admin/rename-track', (id, name) => {
+        return this.renameTrack(id, name)
+      })
+
+      ctx.console.addListener('admin/delete-track', (id) => {
+        return this.deleteTrack(id)
+      })
+
+      ctx.console.addListener('admin/update-track', (id, permissions) => {
+        return this.updateTrack(id, permissions)
+      })
+
+      ctx.console.addListener('admin/create-group', (name) => {
+        return this.createGroup(name)
+      })
+
+      ctx.console.addListener('admin/rename-group', (id, name) => {
+        return this.renameGroup(id, name)
+      })
+
+      ctx.console.addListener('admin/delete-group', (id) => {
+        return this.deleteGroup(id)
+      })
+
+      ctx.console.addListener('admin/update-group', (id, permissions) => {
+        return this.updateGroup(id, permissions)
+      })
+
+      ctx.console.addListener('admin/add-user', (gid, platform, aid) => {
+        return this.addUser(gid, platform, aid)
+      })
+
+      ctx.console.addListener('admin/remove-user', (gid, platform, aid) => {
+        return this.removeUser(gid, platform, aid)
+      })
+    })
   }
 
   private setupGroup(item: PermGroup) {
@@ -89,7 +162,7 @@ export class Admin extends Service {
     const item = await this.ctx.database.create('perm_track', { name })
     this.setupTrack(item)
     this.tracks.push(item)
-    this.ctx.get('console')?.refresh('admin')
+    this.entry?.refresh()
     return item.id
   }
 
@@ -99,7 +172,7 @@ export class Admin extends Service {
     if (item.name === name) return
     item.name = name
     await this.ctx.database.set('perm_track', id, { name })
-    this.ctx.get('console')?.refresh('admin')
+    this.entry?.refresh()
   }
 
   async deleteTrack(id: number) {
@@ -107,7 +180,7 @@ export class Admin extends Service {
     if (index < 0) throw new Error('track not found')
     const [item] = this.tracks.splice(index, 1)
     item.dispose!()
-    this.ctx.get('console')?.refresh('admin')
+    this.entry?.refresh()
     await this.ctx.database.remove('perm_track', id)
   }
 
@@ -116,7 +189,7 @@ export class Admin extends Service {
     if (!item) throw new Error('track not found')
     item.permissions = permissions
     await this.ctx.database.set('perm_track', id, { permissions })
-    this.ctx.get('console')?.refresh('admin')
+    this.entry?.refresh()
   }
 
   async createGroup(name: string) {
@@ -124,7 +197,7 @@ export class Admin extends Service {
     item.count = 0
     this.setupGroup(item)
     this.groups.push(item)
-    this.ctx.get('console')?.refresh('admin')
+    this.entry?.refresh()
     return item.id
   }
 
@@ -134,7 +207,7 @@ export class Admin extends Service {
     if (item.name === name) return
     item.name = name
     await this.ctx.database.set('group', id, { name })
-    this.ctx.get('console')?.refresh('admin')
+    this.entry?.refresh()
   }
 
   async deleteGroup(id: number) {
@@ -152,7 +225,7 @@ export class Admin extends Service {
     })
     await this.ctx.database.upsert('group', updates)
     await this.ctx.database.remove('group', id)
-    this.ctx.get('console')?.refresh('admin')
+    this.entry?.refresh()
   }
 
   async updateGroup(id: number, permissions: string[]) {
@@ -160,7 +233,7 @@ export class Admin extends Service {
     if (!item) throw new Error('group not found')
     item.permissions = permissions
     await this.ctx.database.set('group', id, { permissions })
-    this.ctx.get('console')?.refresh('admin')
+    this.entry?.refresh()
   }
 
   async addUser(id: number, platform: string, aid: string) {
@@ -172,7 +245,7 @@ export class Admin extends Service {
       data.permissions.push('group:' + item.id)
       item.count!++
       await this.ctx.database.set('user', data.id, { permissions: data.permissions })
-      this.ctx.get('console')?.refresh('admin')
+      this.entry?.refresh()
     }
   }
 
@@ -184,7 +257,7 @@ export class Admin extends Service {
     if (remove(data.permissions, 'group:' + item.id)) {
       item.count!--
       await this.ctx.database.set('user', data.id, { permissions: data.permissions })
-      this.ctx.get('console')?.refresh('admin')
+      this.entry?.refresh()
     }
   }
 }
@@ -195,6 +268,11 @@ export namespace Admin {
   export interface Config {}
 
   export const Config: Schema<Config> = Schema.object({})
+
+  export interface Data {
+    group: Dict<PermGroup>
+    track: Dict<PermTrack>
+  }
 }
 
 export default Admin

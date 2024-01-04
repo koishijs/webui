@@ -3,6 +3,7 @@ import Markdown from 'marked-vue'
 import components, { SchemaBase } from '@koishijs/components'
 import Element, { ElLoading, ElMessage, ElMessageBox } from 'element-plus'
 
+import { store } from '../data'
 import common from './common'
 import Dynamic from './dynamic.vue'
 import Perms from './perms.vue'

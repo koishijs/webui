@@ -16,7 +16,6 @@ export default (ctx: Context) => {
     icon: 'activity:group',
     order: 500,
     authority: 4,
-    fields: ['admin'],
     component: UserGroup,
   })
 }
