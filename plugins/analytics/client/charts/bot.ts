@@ -9,7 +9,6 @@ export default (ctx: Context) => {
       fields: ['analytics'],
       showTab: true,
       options({ analytics }, tab) {
-        if (!Object.keys(analytics.messageByBot).length) return
         const data = Object
           .entries(analytics.messageByBot)
           .map(([key, value]) => ({
@@ -21,6 +20,10 @@ export default (ctx: Context) => {
                 value: value[tab],
               })),
           }))
+        const total = data.reduce((sum, { children }) => {
+          return sum + children.reduce((sum, { value }) => sum + value, 0)
+        }, 0)
+        if (!total) return
 
         return {
           tooltip: Tooltip.item(({ data }) => {

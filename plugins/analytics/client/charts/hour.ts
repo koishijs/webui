@@ -41,7 +41,6 @@ export default (ctx: Context) => {
             type: 'value',
           },
           series: [{
-            name: '其他',
             data: analytics.messageByHour.map((val, index) => [index + 0.5, val[tab] || 0]),
             type: 'bar',
             stack: '1',
