@@ -41,6 +41,11 @@ export function useContext() {
   return fork.ctx
 }
 
+export function useRpc<T>(): T {
+  const parent = inject('cordis') as Context
+  return parent.extension?.data
+}
+
 export interface ActionOptions {
   shortcut?: string
   hidden?: (scope: Flatten<ActionContext>) => boolean
@@ -147,7 +152,7 @@ export const routeCache = reactive<Record<keyof any, string>>({})
 
 export class Context extends cordis.Context {
   app: App
-  extension: LoadResult
+  extension?: LoadResult
   internal = new Internal()
 
   constructor() {
@@ -160,6 +165,7 @@ export class Context extends cordis.Context {
         ]
       },
     }))
+    this.provide('extension')
     this.app.provide('cordis', this)
     window.addEventListener('keydown', (event) => {
       for (const action of Object.values(this.internal.actions)) {
@@ -193,6 +199,7 @@ export class Context extends cordis.Context {
   wrapComponent(component: Component) {
     if (!component) return
     const caller = this[Context.current] || this
+    if (!caller.extension) return component
     return defineComponent((props, { slots }) => {
       provide('cordis', caller)
       return () => h(component, props, slots)

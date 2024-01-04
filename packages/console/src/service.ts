@@ -1,5 +1,5 @@
 import { Context, Service } from 'koishi'
-import Console from '.'
+import Console, { Client } from '.'
 
 export namespace DataService {
   export interface Options {
@@ -12,7 +12,7 @@ export abstract class DataService<T = never> extends Service {
   static filter = false
   static inject = ['console']
 
-  public async get(forced?: boolean): Promise<T> {
+  public async get(forced?: boolean, client?: Client): Promise<T> {
     return null as T
   }
 
@@ -25,10 +25,10 @@ export abstract class DataService<T = never> extends Service {
   }
 
   async refresh(forced = true) {
-    this.ctx.get('console')?.broadcast('data', {
+    this.ctx.get('console')?.broadcast('data', async (client: Client) => ({
       key: this.key,
-      value: await this.get(forced),
-    }, this.options)
+      value: await this.get(forced, client),
+    }), this.options)
   }
 
   patch(value: T) {

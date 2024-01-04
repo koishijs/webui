@@ -52,7 +52,7 @@ export class Client {
       }
 
       try {
-        const value = await service.get()
+        const value = await service.get(false, this)
         if (!value) return
         this.send({ type: 'data', body: { key, value } })
       } catch (error) {

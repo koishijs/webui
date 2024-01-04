@@ -91,17 +91,17 @@ class NodeConsole extends Console {
     })
   }
 
-  private getFiles(entry: string | string[] | Entry) {
-    if (typeof entry === 'string' || Array.isArray(entry)) return entry
-    if (!this.config.devMode) return entry.prod
-    if (!existsSync(entry.dev)) return entry.prod
-    return entry.dev
+  private getFiles(files: Entry.Files) {
+    if (typeof files === 'string' || Array.isArray(files)) return files
+    if (!this.config.devMode) return files.prod
+    if (!existsSync(files.dev)) return files.prod
+    return files.dev
   }
 
-  resolveEntry(entry: string | string[] | Entry, key: string) {
+  resolveEntry(files: Entry.Files, key: string) {
     const { devMode, uiPath } = this.config
     const filenames: string[] = []
-    for (const local of makeArray(this.getFiles(entry))) {
+    for (const local of makeArray(this.getFiles(files))) {
       const filename = devMode ? '/vite/@fs/' + local : uiPath + '/' + key
       if (extname(local)) {
         filenames.push(filename)

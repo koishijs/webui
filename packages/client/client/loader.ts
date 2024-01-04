@@ -1,5 +1,5 @@
 import { reactive, watch } from 'vue'
-import { Context, Dict, root, store } from '.'
+import { Context, Dict, receive, root, store } from '.'
 import { EffectScope } from 'cordis'
 
 export type Disposable = () => void
@@ -29,7 +29,7 @@ const loaders: Dict<(ctx: Context, url: string) => Promise<void>> = {
   },
   async [``](ctx, url) {
     const exports = await import(/* @vite-ignore */ url)
-    ctx.plugin(unwrapExports(exports))
+    ctx.plugin(unwrapExports(exports), ctx.extension.data)
   },
 }
 
@@ -37,6 +37,7 @@ export interface LoadResult {
   scope: EffectScope
   done: boolean
   paths: string[]
+  data: any
 }
 
 export const extensions: Dict<LoadResult> = reactive({})
@@ -50,10 +51,10 @@ export const initTask = new Promise<void>((resolve) => {
       delete extensions[key]
     }
 
-    await Promise.all(Object.entries(newValue).map(([key, { files, paths }]) => {
+    await Promise.all(Object.entries(newValue).map(([key, { files, paths, data }]) => {
       if (extensions[key]) return
-      const scope = root.plugin(() => {})
-      scope.ctx.extension = extensions[key] = { done: false, scope, paths }
+      const scope = root.isolate(['extension']).plugin(() => {})
+      scope.ctx.extension = extensions[key] = { done: false, scope, paths, data }
       const task = Promise.all(files.map((url) => {
         for (const ext in loaders) {
           if (!url.endsWith(ext)) continue
@@ -68,4 +69,11 @@ export const initTask = new Promise<void>((resolve) => {
       if (!root.events.isActive) root.start()
     }
   }, { deep: true })
+})
+
+receive('entry-data', ({ id, data }) => {
+  const entry = store.entry?.[id]
+  if (!entry) return
+  entry.data = data
+  extensions[id].data = data
 })

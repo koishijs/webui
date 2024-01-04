@@ -9,9 +9,9 @@ class BrowserConsole extends Console {
     this.accept(this.ctx.loader[Symbol.for('koishi.socket')])
   }
 
-  resolveEntry(entry: string | string[] | Entry) {
-    if (typeof entry === 'string' || Array.isArray(entry)) return makeArray(entry)
-    return makeArray(entry.prod)
+  resolveEntry(files: Entry.Files) {
+    if (typeof files === 'string' || Array.isArray(files)) return makeArray(files)
+    return makeArray(files.prod)
   }
 }
 

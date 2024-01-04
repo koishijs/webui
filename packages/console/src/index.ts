@@ -1,11 +1,13 @@
-import { Awaitable, Context, Dict, Random, Service, Universal, valueMap } from 'koishi'
+import { Awaitable, Context, Dict, Service, Universal, valueMap } from 'koishi'
 import { DataService } from './service'
 import { SchemaProvider } from './schema'
 import { PermissionProvider } from './permission'
 import { Client } from './client'
 import { IncomingMessage } from 'http'
+import { Entry } from './entry'
 
 export * from './client'
+export * from './entry'
 export * from './service'
 
 type NestedServices = {
@@ -29,14 +31,10 @@ export interface Listener extends DataService.Options {
   callback(this: Client, ...args: any[]): Awaitable<any>
 }
 
-export interface Entry {
-  dev: string
-  prod: string | string[]
-}
-
 export interface EntryData {
   files: string[]
   paths?: string[]
+  data: () => any
 }
 
 export class EntryProvider extends DataService<Dict<EntryData>> {
@@ -46,15 +44,15 @@ export class EntryProvider extends DataService<Dict<EntryData>> {
     super(ctx, 'entry', { immediate: true })
   }
 
-  async get() {
-    return this.ctx.get('console').get()
+  async get(forced: boolean, client: Client) {
+    return this.ctx.get('console').get(client)
   }
 }
 
 export abstract class Console extends Service {
   static filter = false
 
-  readonly entries: Dict<[string | string[] | Entry, Context]> = Object.create(null)
+  readonly entries: Dict<Entry> = Object.create(null)
   readonly listeners: Dict<Listener> = Object.create(null)
   readonly clients: Dict<Client> = Object.create(null)
 
@@ -76,38 +74,32 @@ export abstract class Console extends Service {
     this.ctx.emit('console/connection', client)
   }
 
-  async get() {
-    return valueMap(this.entries, ([files, context], key) => ({
+  async get(client: Client) {
+    return valueMap(this.entries, ({ files, ctx, data }, key) => ({
       files: this.resolveEntry(files, key),
-      paths: this.ctx.loader?.paths(context.scope),
+      paths: this.ctx.loader?.paths(ctx.scope),
+      data: data?.(client),
     }))
   }
 
-  protected abstract resolveEntry(entry: string | string[] | Entry, key: string): string[]
+  protected abstract resolveEntry(files: Entry.Files, key: string): string[]
 
-  addEntry(entry: string | string[] | Entry) {
-    const caller = this[Context.current]
-    const key = 'extension-' + Random.id()
-    this.entries[key] = [entry, this[Context.current]]
-    this.entry.refresh()
-    caller?.collect('entry', () => {
-      const result = delete this.entries[key]
-      this.entry?.refresh()
-      return result
-    })
+  addEntry<T>(files: Entry.Files, data?: () => T) {
+    return new Entry(this[Context.current], files, data)
   }
 
   addListener<K extends keyof Events>(event: K, callback: Events[K], options?: DataService.Options) {
     this.listeners[event] = { callback, ...options }
   }
 
-  broadcast(type: string, body: any, options: DataService.Options = {}) {
+  async broadcast(type: string, body: any, options: DataService.Options = {}) {
     const handles = Object.values(this.clients)
     if (!handles.length) return
-    const data = JSON.stringify({ type, body })
-    Promise.all(Object.values(this.clients).map(async (client) => {
+    await Promise.all(Object.values(this.clients).map(async (client) => {
       if (await this.ctx.serial('console/intercept', client, options)) return
-      client.socket.send(data)
+      const data = { type, body }
+      if (typeof body === 'function') data.body = await body(client)
+      client.socket.send(JSON.stringify(data))
     }))
   }
 
