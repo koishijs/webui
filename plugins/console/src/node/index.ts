@@ -1,4 +1,4 @@
-import { Context, makeArray, noop, Schema, Time } from 'koishi'
+import { Context, Dict, h, makeArray, noop, Schema, Time } from 'koishi'
 import { WebSocketLayer } from '@koishijs/plugin-server'
 import { Console, Entry } from '@koishijs/console'
 import { FileSystemServeOptions, ViteDevServer } from 'vite'
@@ -146,8 +146,6 @@ class NodeConsole extends Console {
       }
       const stats = await fsp.stat(filename).catch<Stats>(noop)
       if (stats?.isFile()) return sendFile(filename)
-      // const ext = extname(filename)
-      // if (ext && ext !== '.html') return ctx.status = 404
       const template = await fsp.readFile(resolve(this.root, 'index.html'), 'utf8')
       ctx.type = 'html'
       ctx.body = await this.transformHtml(template)
@@ -155,13 +153,17 @@ class NodeConsole extends Console {
   }
 
   private async transformHtml(template: string) {
-    const { uiPath } = this.config
+    const { uiPath, head = [] } = this.config
     if (this.vite) {
       template = await this.vite.transformIndexHtml(uiPath, template)
     } else {
       template = template.replace(/(href|src)="(?=\/)/g, (_, $1) => `${$1}="${uiPath}`)
     }
-    const headInjection = `<script>KOISHI_CONFIG = ${JSON.stringify(this.createGlobal())}</script>`
+    let headInjection = `<script>KOISHI_CONFIG = ${JSON.stringify(this.createGlobal())}</script>`
+    for (const { tag, attrs = {}, content } of head) {
+      const attrString = Object.entries(attrs).map(([key, value]) => ` ${key}="${h.escape(value ?? '', true)}"`).join('')
+      headInjection += `<${tag}${attrString}>${content ?? ''}</${tag}>`
+    }
     return template.replace('</title>', '</title>' + headInjection)
   }
 
@@ -244,12 +246,25 @@ namespace NodeConsole {
     }).hidden(),
   })
 
+  export interface Head {
+    tag: string
+    attrs?: Dict<string>
+    content?: string
+  }
+
+  export const Head: Schema<Head> = Schema.object({
+    tag: Schema.string().required(),
+    attrs: Schema.dict(Schema.string()).role('table'),
+    content: Schema.string().role('textarea'),
+  })
+
   export interface Config {
     root?: string
     uiPath?: string
     devMode?: boolean
     cacheDir?: string
     open?: boolean
+    head?: Head[]
     selfUrl?: string
     apiPath?: string
     heartbeat?: HeartbeatConfig
@@ -263,6 +278,7 @@ namespace NodeConsole {
       apiPath: Schema.string().default('/status'),
       selfUrl: Schema.string().role('link').default(''),
       open: Schema.boolean(),
+      head: Schema.array(Head),
       heartbeat: Schema.object({
         interval: Schema.number().default(Time.second * 30),
         timeout: Schema.number().default(Time.minute),

@@ -16,10 +16,10 @@ export class Entry<T = any> {
 
   constructor(public ctx: Context, public files: Entry.Files, public data: (client: Client) => T) {
     ctx.console.entries[this.id] = this
-    ctx.console.entry.refresh()
+    ctx.console.refresh('entry')
     this.dispose = ctx.collect('entry', () => {
       delete this.ctx.console.entries[this.id]
-      ctx.console.entry.refresh()
+      ctx.console.refresh('entry')
     })
   }
 

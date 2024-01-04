@@ -42,19 +42,21 @@ export interface LoadResult {
 
 export const extensions: Dict<LoadResult> = reactive({})
 
+let backendId: any
+
 export const initTask = new Promise<void>((resolve) => {
   watch(() => store.entry, async (newValue, oldValue) => {
-    newValue ||= {}
-    for (const key in extensions) {
-      if (newValue[key]) continue
-      extensions[key].scope.dispose()
-      delete extensions[key]
-    }
-
-    const { _id, ...rest } = newValue
-    if (oldValue && oldValue._id !== _id) {
+    const { _id, ...rest } = newValue || {}
+    if (backendId && _id && backendId !== _id) {
       window.location.reload()
       return
+    }
+    backendId = _id
+
+    for (const key in extensions) {
+      if (rest[key]) continue
+      extensions[key].scope.dispose()
+      delete extensions[key]
     }
 
     await Promise.all(Object.entries(rest).map(([key, { files, paths, data }]) => {
