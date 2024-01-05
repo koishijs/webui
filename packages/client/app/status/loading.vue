@@ -15,7 +15,7 @@ const ctx = useContext()
 
 const progress = computed(() => {
   const states = Object.values(ctx.internal.extensions)
-  return states.filter(state => state.done).length / states.length
+  return states.filter(state => state.done.value).length / states.length
 })
 
 </script>

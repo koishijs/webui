@@ -1,5 +1,5 @@
 import { $, Context, Dict, remove, Schema, Service } from 'koishi'
-import { Entry } from '@koishijs/console'
+import type { Entry } from '@koishijs/console'
 import { resolve } from 'path'
 import command from './command'
 import zhCN from './locales/zh-CN.yml'

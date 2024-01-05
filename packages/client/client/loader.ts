@@ -1,4 +1,4 @@
-import { reactive, watch } from 'vue'
+import { ref, Ref, shallowReactive, watch } from 'vue'
 import { Context, Dict, receive, root, store } from '.'
 import { EffectScope } from 'cordis'
 
@@ -35,12 +35,12 @@ const loaders: Dict<(ctx: Context, url: string) => Promise<void>> = {
 
 export interface LoadResult {
   scope: EffectScope
-  done: boolean
   paths: string[]
-  data: any
+  done: Ref<boolean>
+  data: Ref
 }
 
-export const extensions: Dict<LoadResult> = reactive({})
+export const extensions: Dict<LoadResult> = shallowReactive({})
 
 let backendId: any
 
@@ -62,14 +62,14 @@ export const initTask = new Promise<void>((resolve) => {
     await Promise.all(Object.entries(rest).map(([key, { files, paths, data }]) => {
       if (extensions[key]) return
       const scope = root.isolate(['extension']).plugin(() => {})
-      scope.ctx.extension = extensions[key] = { done: false, scope, paths, data }
+      scope.ctx.extension = extensions[key] = { done: ref(false), scope, paths, data: ref(data) }
       const task = Promise.all(files.map((url) => {
         for (const ext in loaders) {
           if (!url.endsWith(ext)) continue
           return loaders[ext](scope.ctx, url)
         }
       }))
-      task.finally(() => extensions[key].done = true)
+      task.finally(() => extensions[key].done.value = true)
     }))
 
     if (!oldValue) {
@@ -83,5 +83,5 @@ receive('entry-data', ({ id, data }) => {
   const entry = store.entry?.[id]
   if (!entry) return
   entry.data = data
-  extensions[id].data = data
+  extensions[id].data.value = data
 })

@@ -135,12 +135,12 @@ interface Active {
 const active = computed<Active>(() => {
   if (route.path.startsWith('/admin/group/')) {
     const id = route.path.slice(13)
-    if (id in data.group) {
+    if (id in data.value.group) {
       return { type: 'group', id }
     }
   } else if (route.path.startsWith('/admin/track/')) {
     const id = route.path.slice(13)
-    if (id in data.track) {
+    if (id in data.value.track) {
       return { type: 'track', id }
     }
   }
@@ -153,7 +153,7 @@ const activeGroup = computed<string>({
     return active.value.id
   },
   set(id) {
-    if (!(id in data.group)) id = ''
+    if (!(id in data.value.group)) id = ''
     router.replace('/admin/group/' + id)
   },
 })
@@ -164,7 +164,7 @@ const activeTrack = computed<string>({
     return active.value.id
   },
   set(id) {
-    if (!(id in data.track)) id = ''
+    if (!(id in data.value.track)) id = ''
     router.replace('/admin/track/' + id)
   },
 })

@@ -3,7 +3,7 @@ import { Schema, SchemaBase } from '@koishijs/components'
 import { Dict, Intersect, remove } from 'cosmokit'
 import {
   App, Component, createApp, defineComponent, h, inject, markRaw, MaybeRefOrGetter,
-  onBeforeUnmount, provide, reactive, resolveComponent, shallowReactive, toValue,
+  onBeforeUnmount, provide, reactive, Ref, resolveComponent, shallowReactive, toValue,
 } from 'vue'
 import { activities, Activity } from './activity'
 import { SlotOptions } from './components'
@@ -41,7 +41,7 @@ export function useContext() {
   return fork.ctx
 }
 
-export function useRpc<T>(): T {
+export function useRpc<T>(): Ref<T> {
   const parent = inject('cordis') as Context
   return parent.extension?.data
 }
