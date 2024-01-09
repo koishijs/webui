@@ -49,8 +49,9 @@ class NodeConsole extends Console {
     })
 
     ctx.on('console/connection', () => {
-      if (!ctx.loader) return
-      ctx.loader.envData.clientCount = this.layer.clients.size
+      const loader = ctx.get('loader')
+      if (!loader) return
+      loader.envData.clientCount = this.layer.clients.size
     })
 
     this.root = config.root || (config.devMode
@@ -84,7 +85,7 @@ class NodeConsole extends Console {
 
     this.ctx.on('server/ready', () => {
       const target = this.ctx.server.selfUrl + this.config.uiPath
-      if (this.config.open && !this.ctx.loader?.envData.clientCount && !process.env.KOISHI_AGENT) {
+      if (this.config.open && !this.ctx.get('loader')?.envData.clientCount && !process.env.KOISHI_AGENT) {
         open(target)
       }
       this.logger.info('webui is available at %c', target)

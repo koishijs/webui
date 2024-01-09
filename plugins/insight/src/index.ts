@@ -67,7 +67,9 @@ class Insight extends DataService<Insight.Payload> {
     const services = {} as Record<number, string[]>
     for (const [key, { type }] of Object.entries(this.ctx.root[Context.internal])) {
       if (type !== 'service') continue
-      const ctx: Context = this.ctx.get(key)?.[Context.source]
+      const instance = this.ctx.get(key)
+      if (!(instance instanceof Object)) continue
+      const ctx: Context = Reflect.getOwnPropertyDescriptor(instance, Context.current)?.value
       if (ctx?.scope.uid) {
         (services[ctx.scope.uid] ||= []).push(key)
       }
@@ -110,9 +112,12 @@ class Insight extends DataService<Insight.Payload> {
         edges.push({ type, source, target })
       }
 
-      function addDeps(state: EffectScope) {
+      const addDeps = (state: EffectScope) => {
         for (const name of runtime.using) {
-          const uid = state.ctx[name]?.[Context.source]?.state.uid
+          const instance = this.ctx.get(name)
+          if (!(instance instanceof Object)) continue
+          const ctx: Context = Reflect.getOwnPropertyDescriptor(instance, Context.current)?.value
+          const uid = ctx?.state.uid
           if (!uid) continue
           addEdge('dashed', uid, state.uid)
         }

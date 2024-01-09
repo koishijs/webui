@@ -127,12 +127,12 @@ export async function apply(ctx: Context, config: Config) {
   ctx.on('dispose', () => {
     writer?.close()
     remove(Logger.targets, target)
-    if (ctx.loader) {
-      ctx.loader.prolog = []
+    if (loader) {
+      loader.prolog = []
     }
   })
 
-  for (const record of ctx.loader?.prolog || []) {
+  for (const record of loader?.prolog || []) {
     target.record(record)
   }
 

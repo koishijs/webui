@@ -79,7 +79,7 @@ export abstract class Console extends Service {
   async get(client: Client) {
     const result = valueMap(this.entries, ({ files, ctx, data }, key) => ({
       files: this.resolveEntry(files, key),
-      paths: this.ctx.loader?.paths(ctx.scope),
+      paths: this.ctx.get('loader')?.paths(ctx.scope),
       data: data?.(client),
     }))
     result['_id'] = this.id as any

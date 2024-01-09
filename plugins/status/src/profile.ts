@@ -141,7 +141,7 @@ class ProfileProvider extends DataService<ProfileProvider.Payload> {
       if (bot.hidden) continue
       bots[bot.sid] = {
         ...bot.toJSON(),
-        paths: this.ctx.loader?.paths(bot.ctx.scope),
+        paths: this.ctx.get('loader')?.paths(bot.ctx.scope),
         error: bot.error?.message,
         messageSent: bot._messageSent.get(),
         messageReceived: bot._messageReceived.get(),

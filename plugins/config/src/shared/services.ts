@@ -14,11 +14,12 @@ export class ServiceProvider extends DataService<Dict<number>> {
       attach(Object.getPrototypeOf(internal))
       for (const [key, { type }] of Object.entries(internal)) {
         if (type !== 'service') continue
-        const ctx: Context = this.ctx.get(key)?.[Context.source]
-        if (ctx) {
-          const name = key.replace(/^__/, '').replace(/__$/, '')
-          services[name] = ctx.scope.uid
-        }
+        const instance = this.ctx.get(key)
+        if (!(instance instanceof Object)) continue
+        const ctx: Context = Reflect.getOwnPropertyDescriptor(instance, Context.current)?.value
+        if (!ctx) continue
+        const name = key.replace(/^__/, '').replace(/__$/, '')
+        services[name] = ctx.scope.uid
       }
     }
     attach(this.ctx.root[Context.internal])

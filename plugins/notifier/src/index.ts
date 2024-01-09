@@ -34,7 +34,7 @@ class Notifier {
   toJSON(): Notifier.Data {
     return {
       ...this.config,
-      paths: this.ctx.loader?.paths(this.ctx.scope),
+      paths: this.ctx.get('loader')?.paths(this.ctx.scope),
     }
   }
 }
