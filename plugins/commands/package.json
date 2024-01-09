@@ -1,7 +1,7 @@
 {
   "name": "@koishijs/plugin-commands",
   "description": "Override Command Config for Koishi",
-  "version": "3.4.5",
+  "version": "3.4.7",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
   "files": [
@@ -45,8 +45,8 @@
     }
   },
   "peerDependencies": {
-    "@koishijs/plugin-console": "^5.23.4",
-    "koishi": "^4.16.3"
+    "@koishijs/plugin-console": "^5.25.5",
+    "koishi": "^4.16.4"
   },
   "peerDependenciesMeta": {
     "@koishijs/plugin-console": {
@@ -54,13 +54,13 @@
     }
   },
   "devDependencies": {
-    "@koishijs/client": "^5.23.4",
-    "@koishijs/plugin-config": "^2.8.1",
-    "@koishijs/plugin-console": "^5.23.4",
-    "@koishijs/plugin-locales": "^2.5.1",
-    "@koishijs/plugin-mock": "^2.6.5",
+    "@koishijs/client": "^5.25.5",
+    "@koishijs/plugin-config": "^2.8.2",
+    "@koishijs/plugin-console": "^5.25.5",
+    "@koishijs/plugin-locales": "^2.5.2",
+    "@koishijs/plugin-mock": "^2.6.5"
   },
   "dependencies": {
-    "@koishijs/console": "^5.23.4",
+    "@koishijs/console": "^5.25.5"
   }
 }

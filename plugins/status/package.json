@@ -1,7 +1,7 @@
 {
   "name": "@koishijs/plugin-status",
   "description": "Status view for Koishi",
-  "version": "7.4.4",
+  "version": "7.4.6",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
   "files": [
@@ -41,18 +41,18 @@
     }
   },
   "peerDependencies": {
-    "@koishijs/plugin-console": "^5.23.4",
-    "koishi": "^4.16.3"
+    "@koishijs/plugin-console": "^5.25.5",
+    "koishi": "^4.16.4"
   },
   "devDependencies": {
-    "@koishijs/client": "^5.23.4",
-    "@koishijs/plugin-analytics": "^2.0.5",
-    "@koishijs/plugin-config": "^2.8.1",
+    "@koishijs/client": "^5.25.5",
+    "@koishijs/plugin-analytics": "^2.0.6",
+    "@koishijs/plugin-config": "^2.8.2",
     "@types/envinfo": "^7.8.3",
-    "koishi": "^4.16.3"
+    "koishi": "^4.16.4"
   },
   "dependencies": {
-    "@koishijs/console": "^5.23.4",
+    "@koishijs/console": "^5.25.5",
     "envinfo": "^7.11.0",
     "which-pm-runs": "^1.1.0"
   }

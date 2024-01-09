@@ -1,7 +1,7 @@
 {
   "name": "@koishijs/plugin-locales",
   "description": "Override Locale Texts for Koishi",
-  "version": "2.5.1",
+  "version": "2.5.2",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
   "files": [
@@ -45,8 +45,8 @@
     }
   },
   "peerDependencies": {
-    "@koishijs/plugin-console": "^5.23.4",
-    "koishi": "^4.16.3"
+    "@koishijs/plugin-console": "^5.25.5",
+    "koishi": "^4.16.4"
   },
   "peerDependenciesMeta": {
     "@koishijs/plugin-console": {
@@ -54,13 +54,13 @@
     }
   },
   "devDependencies": {
-    "@koishijs/client": "^5.23.4",
-    "@koishijs/plugin-console": "^5.23.4",
+    "@koishijs/client": "^5.25.5",
+    "@koishijs/plugin-console": "^5.25.5",
     "@koishijs/plugin-mock": "^2.6.5",
-    "@types/js-yaml": "^4.0.9",
+    "@types/js-yaml": "^4.0.9"
   },
   "dependencies": {
-    "@koishijs/console": "^5.23.4",
-    "js-yaml": "^4.1.0",
+    "@koishijs/console": "^5.25.5",
+    "js-yaml": "^4.1.0"
   }
 }

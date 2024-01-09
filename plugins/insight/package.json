@@ -1,7 +1,7 @@
 {
   "name": "@koishijs/plugin-insight",
   "description": "Show plugin dependency graph for Koishi",
-  "version": "3.4.4",
+  "version": "3.4.5",
   "main": "lib/index.cjs",
   "types": "lib/index.d.ts",
   "exports": {
@@ -53,15 +53,15 @@
     }
   },
   "peerDependencies": {
-    "@koishijs/plugin-console": "^5.23.4",
-    "koishi": "^4.16.3"
+    "@koishijs/plugin-console": "^5.25.5",
+    "koishi": "^4.16.4"
   },
   "devDependencies": {
-    "@koishijs/client": "^5.23.4",
+    "@koishijs/client": "^5.25.5",
     "@types/d3-force": "^3.0.9",
     "d3-force": "^3.0.0"
   },
   "dependencies": {
-    "@koishijs/console": "^5.23.4",
+    "@koishijs/console": "^5.25.5"
   }
 }
