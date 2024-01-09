@@ -6,15 +6,17 @@ import { SandboxBot } from './bot'
 export class SandboxMessenger<C extends Context = Context> extends MessageEncoder<C, SandboxBot<C>> {
   private buffer = ''
 
-  private rules: Dict<h.Transformer> = Object.fromEntries(['image', 'audio', 'video', 'file'].map((type) => {
-    return [type, async (data) => {
-      if (data.url.startsWith('base64://')) {
-        const { mime } = await FileType.fromBuffer(Buffer.from(data.url.slice(9), 'base64'))
-        return h(type, { ...data, url: `data:${mime};base64,${data.url.slice(9)}` })
-      } else if (data.url.startsWith('file:') && this.bot.ctx.assets) {
-        return h(type, { ...data, url: await this.bot.ctx.assets.upload(data.url, data.url) })
+  private rules: Dict<h.Transformer> = Object.fromEntries(['image', 'img', 'audio', 'video', 'file'].map((type) => {
+    return [type, async (attrs) => {
+      const src = attrs.src || attrs.url
+      const type1 = type === 'image' ? 'img' : type
+      if (src.startsWith('base64://')) {
+        const { mime } = await FileType.fromBuffer(Buffer.from(src.slice(9), 'base64'))
+        return h(type1, { ...attrs, src: `data:${mime};base64,${src.slice(9)}` })
+      } else if (src.startsWith('file:') && this.bot.ctx.assets) {
+        return h(type1, { ...attrs, src: await this.bot.ctx.assets.upload(src, src) })
       }
-      return h(type, data)
+      return h(type1, { ...attrs, src })
     }]
   }))
 

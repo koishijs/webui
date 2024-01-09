@@ -9,12 +9,12 @@ const render: FunctionalComponent<segment[]> = (elements, ctx) => {
       return attrs.content
     } else if (type === 'at') {
       return h('span', `@${attrs.name}`)
-    } else if (type === 'image') {
-      return h('img', { src: attrs.url })
+    } else if (type === 'img') {
+      return h('img', { src: attrs.src })
     } else if (type === 'audio') {
-      return h('audio', { src: attrs.url, controls: true })
+      return h('audio', { src: attrs.src, controls: true })
     } else if (type === 'video') {
-      return h('video', { src: attrs.url, controls: true })
+      return h('video', { src: attrs.src, controls: true })
     } else if (inline.includes(type)) {
       return h(type, render(children, ctx))
     } else if (type === 'spl') {
