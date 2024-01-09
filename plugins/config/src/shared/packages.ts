@@ -2,7 +2,6 @@ import { Context, Dict, Logger, MainScope, Plugin, Schema } from 'koishi'
 import { ScopeStatus } from 'cordis'
 import { DataService } from '@koishijs/console'
 import { PackageJson, SearchObject, SearchResult } from '@koishijs/registry'
-import { debounce } from 'throttle-debounce'
 import {} from '@koishijs/plugin-hmr'
 
 declare module '@koishijs/loader' {
@@ -21,11 +20,12 @@ const logger = new Logger('config')
 
 export abstract class PackageProvider extends DataService<Dict<PackageProvider.Data>> {
   cache: Dict<PackageProvider.RuntimeData> = {}
-  debouncedRefresh = debounce(0, this.refresh.bind(this, false))
+  debouncedRefresh: () => void
 
   constructor(public ctx: Context) {
     super(ctx, 'packages', { authority: 4 })
 
+    this.debouncedRefresh = ctx.debounce(() => this.refresh(false), 0)
     ctx.on('internal/runtime', scope => this.update(scope.runtime.plugin))
     ctx.on('internal/fork', scope => this.update(scope.runtime.plugin))
     ctx.on('internal/status', scope => this.update(scope.runtime.plugin))

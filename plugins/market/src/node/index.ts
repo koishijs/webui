@@ -31,6 +31,7 @@ declare module '@koishijs/console' {
 }
 
 export const name = 'market'
+export const inject = ['http']
 
 export interface Config {
   registry?: Installer.Config

@@ -1,5 +1,4 @@
 import { DataService } from '@koishijs/console'
-import { debounce } from 'throttle-debounce'
 import { Command, Context, Dict } from 'koishi'
 import { resolve } from 'path'
 import { CommandManager, CommandState } from '.'
@@ -31,14 +30,14 @@ export interface CommandData {
 
 export default class CommandProvider extends DataService<CommandData[]> {
   cached: CommandData[]
-  update = debounce(0, () => this.refresh())
+  update: () => void
 
   constructor(ctx: Context, private manager: CommandManager) {
     super(ctx, 'commands', { authority: 4 })
 
+    this.update = ctx.debounce(() => this.refresh(), 0)
     ctx.on('command-added', this.update)
     ctx.on('command-removed', this.update)
-    ctx.on('dispose', this.update.cancel)
 
     ctx.console.addEntry(process.env.KOISHI_BASE ? [
       process.env.KOISHI_BASE + '/dist/index.js',

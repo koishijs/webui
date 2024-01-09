@@ -1,7 +1,6 @@
 import { Context, Dict, Quester, Schema, Time } from 'koishi'
 import Scanner, { SearchObject, SearchResult } from '@koishijs/registry'
 import { MarketProvider as BaseMarketProvider } from '../shared'
-import { throttle } from 'throttle-debounce'
 
 class MarketProvider extends BaseMarketProvider {
   private http: Quester
@@ -9,10 +8,20 @@ class MarketProvider extends BaseMarketProvider {
   private scanner: Scanner
   private fullCache: Dict<SearchObject> = {}
   private tempCache: Dict<SearchObject> = {}
+  private flushData: () => void
 
   constructor(ctx: Context, public config: MarketProvider.Config) {
     super(ctx)
     if (config.endpoint) this.http = ctx.http.extend(config)
+    this.flushData = ctx.throttle(() => {
+      ctx.console.broadcast('market/patch', {
+        data: this.tempCache,
+        failed: this.failed.length,
+        total: this.scanner.total,
+        progress: this.scanner.progress,
+      })
+      this.tempCache = {}
+    }, 500)
   }
 
   async start(refresh = false) {
@@ -23,20 +32,6 @@ class MarketProvider extends BaseMarketProvider {
     await this.prepare()
     super.start()
   }
-
-  stop() {
-    this.flushData.cancel()
-  }
-
-  flushData = throttle(500, () => {
-    this.ctx.console.broadcast('market/patch', {
-      data: this.tempCache,
-      failed: this.failed.length,
-      total: this.scanner.total,
-      progress: this.scanner.progress,
-    })
-    this.tempCache = {}
-  })
 
   async collect() {
     const { timeout } = this.config

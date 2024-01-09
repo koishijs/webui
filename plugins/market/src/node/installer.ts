@@ -3,7 +3,6 @@ import Scanner, { DependencyMetaKey, PackageJson, Registry, RemotePackage } from
 import { resolve } from 'path'
 import { promises as fsp, readFileSync } from 'fs'
 import { compare, satisfies, valid } from 'semver'
-import { throttle } from 'throttle-debounce'
 import {} from '@koishijs/console'
 import {} from '@koishijs/loader'
 import getRegistry from 'get-registry'
@@ -62,20 +61,16 @@ class Installer extends Service {
   private agent = which()?.name || 'npm'
   private manifest: PackageJson
   private depTask: Promise<Dict<Dependency>>
+  private flushData: () => void
 
   constructor(public ctx: Context, public config: Installer.Config) {
     super(ctx, 'installer')
     this.manifest = loadManifest(this.cwd)
+    this.flushData = ctx.throttle(() => {
+      ctx.get('console')?.broadcast('market/registry', this.tempCache)
+      this.tempCache = {}
+    }, 500)
   }
-
-  stop() {
-    this.flushData.cancel()
-  }
-
-  flushData = throttle(500, () => {
-    this.ctx.get('console')?.broadcast('market/registry', this.tempCache)
-    this.tempCache = {}
-  })
 
   get cwd() {
     return this.ctx.baseDir

@@ -3,7 +3,6 @@ import { DataService } from '@koishijs/plugin-console'
 import { resolve } from 'path'
 import { mkdir, readdir, rm } from 'fs/promises'
 import { FileWriter } from './file'
-import { throttle } from 'throttle-debounce'
 import zhCN from './locales/zh-CN.yml'
 
 declare module '@koishijs/console' {
@@ -89,12 +88,12 @@ export async function apply(ctx: Context, config: Config) {
   createFile(date, Math.max(...files[date] ?? [0]) + 1)
 
   let buffer: Logger.Record[] = []
-  const update = throttle(100, () => {
+  const update = ctx.throttle(() => {
     // Be very careful about accessing service in this callback,
     // because undeclared service access may cause infinite loop.
     ctx.get('console')?.patch('logs', buffer)
     buffer = []
-  })
+  }, 100)
 
   const loader = ctx.get('loader')
   const target: Logger.Target = {

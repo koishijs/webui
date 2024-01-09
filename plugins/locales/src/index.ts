@@ -2,7 +2,6 @@ import { Context, Dict, I18n, Logger, Schema } from 'koishi'
 import { DataService } from '@koishijs/console'
 import { mkdir, readdir, readFile, writeFile } from 'fs/promises'
 import { resolve } from 'path'
-import { debounce } from 'throttle-debounce'
 import { dump, load } from 'js-yaml'
 
 declare module '@koishijs/console' {
@@ -20,12 +19,11 @@ declare module '@koishijs/console' {
 const logger = new Logger('locales')
 
 class LocaleProvider extends DataService<Dict<I18n.Store>> {
-  update = debounce(0, () => this.refresh())
-
   constructor(ctx: Context, private config: Config) {
     super(ctx, 'locales', { authority: 4 })
 
-    ctx.on('internal/i18n', this.update)
+    const update = ctx.debounce(() => this.refresh(), 0)
+    ctx.on('internal/i18n', update)
 
     ctx.console.addEntry(process.env.KOISHI_BASE ? [
       process.env.KOISHI_BASE + '/dist/index.js',

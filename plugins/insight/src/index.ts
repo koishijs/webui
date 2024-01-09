@@ -1,5 +1,4 @@
 import { camelize, capitalize, Context, EffectScope, ForkScope, Plugin, Schema, ScopeStatus } from 'koishi'
-import { debounce } from 'throttle-debounce'
 import { DataService } from '@koishijs/console'
 import { resolve } from 'path'
 import {} from '@koishijs/loader'
@@ -46,19 +45,12 @@ class Insight extends DataService<Insight.Payload> {
       prod: resolve(__dirname, '../dist'),
     })
 
-    ctx.on('internal/fork', this.update)
-    ctx.on('internal/runtime', this.update)
-    ctx.on('internal/service', this.update)
-    ctx.on('internal/status', this.update)
+    const update = ctx.debounce(() => this.refresh(), 0)
+    ctx.on('internal/fork', update)
+    ctx.on('internal/runtime', update)
+    ctx.on('internal/service', update)
+    ctx.on('internal/status', update)
   }
-
-  stop() {
-    this.update.cancel()
-  }
-
-  private update = debounce(0, () => {
-    this.refresh()
-  })
 
   async get() {
     const nodes: Insight.Node[] = []

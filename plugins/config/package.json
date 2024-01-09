@@ -62,11 +62,9 @@
   "devDependencies": {
     "@koishijs/client": "^5.23.4",
     "@koishijs/plugin-hmr": "^1.2.6",
-    "@types/throttle-debounce": "^2.1.0"
   },
   "dependencies": {
     "@koishijs/console": "^5.23.4",
     "@koishijs/registry": "^7.0.0",
-    "throttle-debounce": "^3.0.1"
   }
 }
