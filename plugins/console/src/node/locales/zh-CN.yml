@@ -6,7 +6,15 @@ open: 在应用启动后自动在浏览器中打开控制台。
 head:
   $desc: 自定义页面头部信息。
   $inner:
-    tag: 标签名。
+    tag: 
+      $desc: 标签名。
+      $inner:
+        - title
+        - link
+        - meta
+        - script
+        - style
+        - 自定义
     attrs: 标签属性。
     content: 标签内容。
 heartbeat:

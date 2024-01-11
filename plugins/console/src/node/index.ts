@@ -253,11 +253,47 @@ namespace NodeConsole {
     content?: string
   }
 
-  export const Head: Schema<Head> = Schema.object({
-    tag: Schema.string().required(),
-    attrs: Schema.dict(Schema.string()).role('table'),
-    content: Schema.string().role('textarea'),
-  })
+  export const Head: Schema<Head> = Schema.intersect([
+    Schema.object({
+      tag: Schema.union([
+        'title',
+        'link',
+        'meta',
+        'script',
+        'style',
+        Schema.string(),
+      ]).required(),
+    }),
+    Schema.union([
+      Schema.object({
+        tag: Schema.const('title').required(),
+        content: Schema.string().role('textarea'),
+      }),
+      Schema.object({
+        tag: Schema.const('link').required(),
+        attrs: Schema.dict(Schema.string()).role('table'),
+      }),
+      Schema.object({
+        tag: Schema.const('meta').required(),
+        attrs: Schema.dict(Schema.string()).role('table'),
+      }),
+      Schema.object({
+        tag: Schema.const('script').required(),
+        attrs: Schema.dict(Schema.string()).role('table'),
+        content: Schema.string().role('textarea'),
+      }),
+      Schema.object({
+        tag: Schema.const('style').required(),
+        attrs: Schema.dict(Schema.string()).role('table'),
+        content: Schema.string().role('textarea'),
+      }),
+      Schema.object({
+        tag: Schema.string().required(),
+        attrs: Schema.dict(Schema.string()).role('table'),
+        content: Schema.string().role('textarea'),
+      }),
+    ]),
+  ])
 
   export interface Config {
     root?: string
