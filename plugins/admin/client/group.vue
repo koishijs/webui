@@ -170,7 +170,7 @@ const activeTrack = computed<string>({
 })
 
 const permissions = computed(() => {
-  return data[active.value.type][active.value.id].permissions
+  return data.value[active.value.type][active.value.id].permissions
 })
 
 const renameItem = debounce(1000, (type: 'group' | 'track', id: number, name: string) => {
@@ -179,10 +179,10 @@ const renameItem = debounce(1000, (type: 'group' | 'track', id: number, name: st
 
 const renameInput = computed<string>({
   get() {
-    return data[active.value.type][active.value.id].name
+    return data.value[active.value.type][active.value.id].name
   },
   set(value) {
-    data[active.value.type][active.value.id].name = value
+    data.value[active.value.type][active.value.id].name = value
     renameItem(active.value.type, +active.value.id, value)
   },
 })
@@ -200,14 +200,14 @@ async function deleteItem() {
 }
 
 async function addPermission() {
-  const { permissions } = data[active.value.type][active.value.id]
+  const { permissions } = data.value[active.value.type][active.value.id]
   permissions.push(permission.value)
   permission.value = null
   await send(`admin/update-${active.value.type}`, +active.value.id, permissions)
 }
 
 async function removePermission(index: number) {
-  const { permissions } = data[active.value.type][active.value.id]
+  const { permissions } = data.value[active.value.type][active.value.id]
   permissions.splice(index, 1)
   await send(`admin/update-${active.value.type}`, +active.value.id, permissions)
 }
