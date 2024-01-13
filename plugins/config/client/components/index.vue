@@ -44,10 +44,11 @@
       v-model="showRename"
       title="重命名"
       destroy-on-close
+      @open="handleOpen"
       @closed="rename = null"
     >
       <template v-if="rename">
-        <el-input v-focus v-model="input" @keydown.enter.stop.prevent="renameItem(rename, input)"/>
+        <el-input ref="inputEl" v-model="input" @keydown.enter.stop.prevent="renameItem(rename, input)"/>
       </template>
       <template #footer>
         <el-button @click="showRename = false">取消</el-button>
@@ -60,8 +61,9 @@
       @update:model-value="groupCreate = null"
       title="创建分组"
       destroy-on-close
+      @open="handleOpen"
     >
-      <el-input v-focus v-model="input" @keydown.enter.stop.prevent="createGroup(input)"/>
+      <el-input ref="inputEl" v-model="input" @keydown.enter.stop.prevent="createGroup(input)"/>
       <template #footer>
         <el-button @click="groupCreate = null">取消</el-button>
         <el-button type="primary" @click="createGroup(input)">确定</el-button>
@@ -72,7 +74,7 @@
 
 <script setup lang="ts">
 
-import { computed, ref, watch, Directive } from 'vue'
+import { computed, ref, watch, nextTick } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { clone, message, send, store, useContext, Schema } from '@koishijs/client'
 import { Tree, getFullName, hasCoreDeps, current, plugins, removeItem, dialogSelect, dialogFork } from './utils'
@@ -83,12 +85,6 @@ import PluginSettings from './plugin.vue'
 
 const route = useRoute()
 const router = useRouter()
-
-const vFocus: Directive = {
-  mounted: (el: HTMLElement) => {
-    el.querySelector('input')?.focus()
-  },
-}
 
 const path = computed<string>({
   get() {
@@ -103,7 +99,14 @@ const path = computed<string>({
 
 const config = ref()
 const input = ref('')
+const inputEl = ref()
 const tree = ref<InstanceType<typeof TreeView>>()
+
+async function handleOpen() {
+  // https://github.com/element-plus/element-plus/issues/15250
+  await nextTick()
+  inputEl.value?.focus()
+}
 
 const remove = ref<Tree>()
 const showRemove = ref(false)

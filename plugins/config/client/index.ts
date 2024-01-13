@@ -6,6 +6,7 @@ import Settings from './components/index.vue'
 import Forks from './components/forks.vue'
 import Select from './components/select.vue'
 
+import 'virtual:uno.css'
 import './index.scss'
 import './icons'
 

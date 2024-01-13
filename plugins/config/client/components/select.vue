@@ -47,6 +47,7 @@ function configure(shortname: string) {
   const path = dialogSelect.value.path
   const ident = Math.random().toString(36).slice(2, 8)
   dialogSelect.value = null
+  keyword.value = ''
   send('manager/unload', path, shortname + ':' + ident, {})
   router.push('/plugins/' + ident)
 }
