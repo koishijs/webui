@@ -1,4 +1,4 @@
-import { Context, remove, Schema, Service } from 'koishi'
+import { Context, Dict, h, isNullable, remove, Schema, Service } from 'koishi'
 import type { Entry } from '@koishijs/plugin-console'
 import { resolve } from 'path'
 
@@ -8,57 +8,93 @@ declare module 'koishi' {
   }
 }
 
+declare module '@koishijs/console' {
+  interface Events {
+    'notifier/button'(id: string): void
+  }
+}
+
 class Notifier {
-  public config: Required<Notifier.Config>
+  public options: Notifier.Config
   public dispose: () => void
 
-  constructor(public ctx: Context, config: string | Notifier.Config) {
-    this.config = {
+  private actionKeys: string[] = []
+
+  constructor(public ctx: Context, options: string | Notifier.Options) {
+    this.options = {
       type: 'primary',
-      content: '',
-      ...Notifier.resolve(config),
+      content: [],
     }
     ctx.notifier.store.push(this)
+    this.update(options)
     ctx.notifier.entry?.refresh()
     this.dispose = ctx.collect('entry', () => {
+      this.clearActions()
       remove(ctx.notifier.store, this)
       ctx.notifier.entry?.refresh()
     })
   }
 
-  update(config: string | Notifier.Config) {
-    Object.assign(this.config, Notifier.resolve(config))
+  clearActions() {
+    for (const key of this.actionKeys) {
+      delete this.ctx.notifier.actions[key]
+    }
+    this.actionKeys = []
+  }
+
+  update(options: h.Fragment | Notifier.Options) {
+    if (typeof options === 'string' || h.isElement(options) || Array.isArray(options)) {
+      options = { content: options }
+    }
+    if (!isNullable(options?.content)) {
+      this.clearActions()
+      const content = typeof options.content === 'string'
+        ? [h('p', options.content)]
+        : h.toElementArray(options.content)
+      options.content = h.transform(content, ({ type, attrs }) => {
+        if (type === 'button' && typeof attrs.onclick === 'function') {
+          const key = Math.random().toString(36).slice(2)
+          this.ctx.notifier.actions[key] = attrs.onclick
+          this.actionKeys.push(key)
+          attrs.onclick = key
+        }
+        return true
+      })
+    }
+    Object.assign(this.options, options)
     this.ctx.notifier.entry?.refresh()
   }
 
   toJSON(): Notifier.Data {
     return {
-      ...this.config,
+      ...this.options,
+      content: this.options.content.join(''),
       paths: this.ctx.get('loader')?.paths(this.ctx.scope),
     }
   }
 }
 
 namespace Notifier {
-  export type Type = 'primary' | 'info' | 'success' | 'warning' | 'error'
+  export type Type = 'primary' | 'success' | 'warning' | 'danger'
 
-  export interface Config {
+  export interface Options {
     type?: Type
-    content?: string
+    content?: h.Fragment
   }
 
-  export function resolve(input: string | Config) {
-    if (typeof input === 'object') return input
-    return { content: input || '' }
+  export interface Config extends Required<Options> {
+    content: h[]
   }
 
-  export interface Data extends Required<Config> {
-    paths: string[]
+  export interface Data extends Required<Options> {
+    content: string
+    paths?: string[]
   }
 }
 
 class NotifierService extends Service {
   public store: Notifier[] = []
+  public actions: Dict<() => void> = Object.create(null)
   public entry?: Entry<NotifierService.Data>
 
   constructor(ctx: Context, public config: NotifierService.Config) {
@@ -79,11 +115,15 @@ class NotifierService extends Service {
       }, () => ({
         notifiers: this.store.map(notifier => notifier.toJSON()),
       }))
+
+      ctx.console.addListener('notifier/button', (id: string) => {
+        return this.actions[id]()
+      })
     })
   }
 
-  create(config?: string | Notifier.Config) {
-    return new Notifier(this[Context.current], config)
+  create(options?: string | Notifier.Options) {
+    return new Notifier(this[Context.current], options)
   }
 }
 
