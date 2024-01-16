@@ -71,7 +71,7 @@ const version = computed({
 
 const data = computed(() => {
   if (local.value?.workspace || local.value?.invalid) return
-  return analyzeVersions(props.name)
+  return analyzeVersions(props.name, true)
 })
 
 </script>

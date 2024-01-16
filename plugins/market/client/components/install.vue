@@ -8,7 +8,7 @@
       <span :id="titleId" :class="titleClass">
         {{ active + (workspace ? ' (工作区)' : '') }}
       </span>
-      <el-select v-if="data" :disabled="workspace" v-model="selectVersion">
+      <el-select v-if="data" :disabled="!!workspace" v-model="selectVersion">
         <el-option v-for="({ result }, version) in data" :key="version" :value="version">
           {{ version }}
           <template v-if="version === current">(当前)</template>
@@ -41,10 +41,10 @@
           <td>{{ request }}</td>
           <td>{{ resolved }}</td>
           <td :class="['theme-color', result]">
-            <span v-if="result === 'primary'"><k-icon name="info-full"></k-icon>可选</span>
-            <span v-else-if="result === 'warning'"><k-icon name="exclamation-full"></k-icon>未下载</span>
-            <span v-else-if="result === 'success'"><k-icon name="check-full"></k-icon>已下载</span>
-            <span v-else><k-icon name="times-full"></k-icon>不兼容</span>
+            <span class="inline-flex items-center gap-1">
+              <k-icon :name="getResultIcon(result)"></k-icon>
+              {{ getResultText(result, name) }}
+            </span>
           </td>
         </tr>
       </table>
@@ -60,14 +60,13 @@
         </el-checkbox>
       </div>
       <div class="right">
-        <el-button @click="active = ''">取消</el-button>
         <el-button v-if="local" type="primary" @click="configure()">配置</el-button>
         <template v-if="workspace">
-          <el-button v-if="current || config.bulk && config.override[active]" @click="installDep('', true)">移除</el-button>
-          <el-button v-else @click="installDep(version)" :disabled="unchanged">添加</el-button>
+          <el-button v-if="showRemoveButton" @click="installDep('', true)" type="danger">移除</el-button>
+          <el-button v-else @click="installDep(workspace)" type="success">添加</el-button>
         </template>
         <template v-else-if="data">
-          <el-button v-if="current || store.dependencies[active] || config.bulk && config.override[active]" @click="installDep('', true)" type="danger">卸载</el-button>
+          <el-button v-if="showRemoveButton" @click="installDep('', true)" type="danger">卸载</el-button>
           <el-button :type="result" @click="installDep(version)" :disabled="unchanged">
             {{ current ? '更新' : store.dependencies?.[active] ? '修复' : '安装' }}
           </el-button>
@@ -100,7 +99,8 @@ const confirmRemoveConfig = ref(false)
 function installDep(version: string, checkConfig = false, removeConfig = false) {
   const target = active.value
   if (!target) return
-  if (config.value.bulk) {
+  // workspace packages don't need to be installed
+  if (config.value.bulk && !workspace.value) {
     config.value.override[target] = version
     active.value = ''
     return
@@ -110,6 +110,7 @@ function installDep(version: string, checkConfig = false, removeConfig = false) 
     return
   }
   install({ [target]: version }, async () => {
+    if (workspace.value) return
     if (version) {
       ctx.configWriter?.ensure(target)
     } else if (removeConfig) {
@@ -142,10 +143,19 @@ const current = computed(() => store.dependencies?.[active.value]?.resolved)
 const local = computed(() => store.packages?.[active.value])
 const versions = computed(() => store.registry?.[active.value])
 
+const showRemoveButton = computed(() => {
+  return current.value || store.dependencies[active.value] || config.value.bulk && config.value.override[active.value]
+})
+
 const workspace = computed(() => {
   // workspace plugins:     dependencies ? packages √
   // workspace non-plugins: dependencies √ packages ×
-  return store.dependencies?.[active.value]?.workspace || local.value?.workspace
+  if (store.dependencies?.[active.value]?.workspace) {
+    return store.dependencies?.[active.value]?.resolved
+  }
+  if (local.value?.workspace) {
+    return local.value?.package.version
+  }
 })
 
 watch(active, async (name) => {
@@ -157,7 +167,7 @@ watch(active, async (name) => {
 
 const data = computed(() => {
   if (!active.value || workspace.value) return
-  return analyzeVersions(active.value)
+  return analyzeVersions(active.value, config.value.bulk)
 })
 
 const danger = computed(() => {
@@ -198,6 +208,26 @@ watch(active, (value) => {
 function configure() {
   ctx.configWriter?.ensure(active.value)
   active.value = null
+}
+
+function getResultIcon(type: 'primary' | 'warning' | 'danger' | 'success') {
+  switch (type) {
+    case 'primary': return 'info-full'
+    case 'warning': return 'exclamation-full'
+    case 'danger': return 'times-full'
+    case 'success': return 'check-full'
+  }
+}
+
+function getResultText(type: 'primary' | 'warning' | 'danger' | 'success', name: string) {
+  const isOverriden = config.value.bulk && name in config.value.override
+  const isInstalled = store.packages ? !!store.packages[name] : !!store.dependencies?.[name]
+  switch (type) {
+    case 'primary': return '可选'
+    case 'warning': return isOverriden ? '等待移除' : '未下载'
+    case 'danger': return '不兼容'
+    case 'success': return isOverriden ? isInstalled ? '等待更新' : '等待安装' : '已下载'
+  }
 }
 
 </script>
@@ -270,12 +300,6 @@ function configure() {
       padding: 0.5em 0.875em;
       white-space: nowrap;
     }
-  }
-
-  td.theme-color span {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.25rem;
   }
 
   span.link {

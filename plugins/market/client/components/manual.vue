@@ -22,7 +22,7 @@ import { computed, ref, watch } from 'vue'
 import type { Registry } from '@koishijs/registry'
 import { store } from '@koishijs/client'
 import { useDebounceFn } from '@vueuse/core'
-import { showManual, manualDeps } from './utils'
+import { showManual, addManual } from './utils'
 import { config } from '../utils'
 
 const invalid = computed(() => false)
@@ -33,9 +33,7 @@ const remote = ref<Registry>()
 
 const fetchRemote = useDebounceFn(async (name2: string) => {
   try {
-    const response = await fetch(`${store.market.registry}/${name2}`)
-    const data = await response.json()
-    manualDeps[name2] = data
+    const data = await addManual(name2)
     if (name2 === name.value) remote.value = data
   } catch {}
 }, 500)

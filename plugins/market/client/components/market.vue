@@ -114,7 +114,7 @@ function getText(data: SearchObject) {
     if (version) return '等待更新'
     return '修改'
   }
-  if (version) return '等待添加'
+  if (version) return '等待安装'
   return '添加'
 }
 

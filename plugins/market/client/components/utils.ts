@@ -1,25 +1,29 @@
 import { Awaitable, Dict, loading, message, send, socket, store, valueMap } from '@koishijs/client'
 import type { Registry } from '@koishijs/registry'
-import { satisfies } from 'semver'
+import { compare, satisfies } from 'semver'
 import { reactive, ref, watch } from 'vue'
-import { active } from '../utils'
+import { active, config } from '../utils'
+
+type ResultType = 'success' | 'warning' | 'danger' | 'primary'
 
 interface AnalyzeResult {
   peers: Dict<{
     request: string
     resolved: string
-    result: 'success' | 'warning' | 'danger' | 'primary'
+    result: ResultType
   }>
-  result: 'success' | 'warning' | 'danger' | 'primary'
+  result: ResultType
 }
 
-export function analyzeVersions(name: string): Dict<AnalyzeResult> {
+export function analyzeVersions(name: string, bulkMode = true): Dict<AnalyzeResult> {
   const versions = store.registry?.[name] || manualDeps[name]?.versions
   if (!versions) return
   return valueMap(versions, (item) => {
     const peers = valueMap({ ...item.peerDependencies }, (request, name) => {
-      const resolved = store.dependencies[name]?.resolved || store.packages?.[name]?.package.version
-      const result: 'success' | 'warning' | 'danger' | 'primary' = !resolved
+      const resolved = (bulkMode ? config.value.override[name] : null)
+        ?? store.dependencies[name]?.resolved
+        ?? store.packages?.[name]?.package.version
+      const result: ResultType = !resolved
         ? item.peerDependenciesMeta?.[name]?.optional ? 'primary' : 'warning'
         : satisfies(resolved, request, { includePrerelease: true }) ? 'success' : 'danger'
       return { request, resolved, result }
@@ -40,6 +44,13 @@ export function analyzeVersions(name: string): Dict<AnalyzeResult> {
 }
 
 export const manualDeps = reactive<Dict<Registry>>({})
+
+export async function addManual(name: string) {
+  const response = await fetch(`${store.market.registry}/${name}`)
+  const data: Registry = await response.json()
+  data.versions = Object.fromEntries(Object.entries(data.versions).sort((a, b) => compare(b[0], a[0])))
+  return manualDeps[name] = data
+}
 
 export const showManual = ref(false)
 export const showConfirm = ref(false)
