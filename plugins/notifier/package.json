@@ -1,7 +1,7 @@
 {
   "name": "@koishijs/plugin-notifier",
   "description": "Notifier service for Koishi",
-  "version": "0.0.1",
+  "version": "1.1.1",
   "main": "lib/index.cjs",
   "types": "lib/index.d.ts",
   "exports": {
@@ -30,7 +30,7 @@
   "bugs": {
     "url": "https://github.com/koishijs/webui/issues"
   },
-  "homepage": "https://koishi.chat/plugins/console/notifier.html",
+  "homepage": "https://koishi.chat/plugins/develop/notifier.html",
   "keywords": [
     "bot",
     "chatbot",

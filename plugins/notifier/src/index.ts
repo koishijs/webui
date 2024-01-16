@@ -14,7 +14,7 @@ declare module '@koishijs/console' {
   }
 }
 
-class Notifier {
+export class Notifier {
   public options: Notifier.Config
   public dispose: () => void
 
@@ -74,7 +74,7 @@ class Notifier {
   }
 }
 
-namespace Notifier {
+export namespace Notifier {
   export type Type = 'primary' | 'success' | 'warning' | 'danger'
 
   export interface Options {
