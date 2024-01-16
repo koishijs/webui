@@ -212,13 +212,25 @@ class Installer extends Service {
     return this.exec(this.agent, args)
   }
 
+  private _getLocalDeps(override: Dict<string>) {
+    return valueMap(override, (request, name) => {
+      const dep = { request } as Dependency
+      try {
+        const meta = loadManifest(name)
+        dep.resolved = meta.version
+        dep.workspace = meta.$workspace
+      } catch {}
+      return dep
+    })
+  }
+
   async install(deps: Dict<string>, forced?: boolean) {
-    const oldDeps = await this.getDeps()
+    const localDeps = this._getLocalDeps(deps)
     await this.override(deps)
 
     for (const name in deps) {
-      const { resolved } = oldDeps[name] || {}
-      if (deps[name] && resolved && satisfies(resolved, deps[name], { includePrerelease: true })) continue
+      const { resolved, workspace } = localDeps[name] || {}
+      if (workspace || deps[name] && resolved && satisfies(resolved, deps[name], { includePrerelease: true })) continue
       forced = true
       break
     }
@@ -230,8 +242,8 @@ class Installer extends Service {
 
     this.refresh()
     const newDeps = await this.getDeps()
-    for (const name in oldDeps) {
-      const { resolved, workspace } = oldDeps[name]
+    for (const name in localDeps) {
+      const { resolved, workspace } = localDeps[name]
       if (workspace || !newDeps[name]) continue
       if (newDeps[name].resolved === resolved) continue
       try {
