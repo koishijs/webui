@@ -15,7 +15,7 @@ import {} from '@koishijs/plugin-analytics/src'
 const AnalyticNumber = inject('component:analytic-number')
 
 const current = computed(() => {
-  return Object.values(store.status.bots).reduce((acc, bot) => acc + bot.messageReceived, 0)
+  return Object.values(store.status.bots).reduce((acc, bot) => acc + bot.messageReceived, 0) / 60
 })
 
 const recent = computed(() => {
