@@ -11,7 +11,7 @@
       </template>
     </template>
     <template v-for="(count, status) in statusMap" :key="status">
-      <template v-if="count > 5">
+      <template v-if="count >= 10">
         <status-light :class="status"></status-light>
         <span class="count">×{{ count }}</span>
       </template>
