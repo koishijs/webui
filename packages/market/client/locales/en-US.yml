@@ -19,14 +19,15 @@ category:
   all: All
   other: Uncategorized
   adapter: Adapters
-  storage: Storage
+  general: General
   extension: Extension
-  console: Koishi Console
+  webui: WebUI
   manage: Administration
   preset: Behavior
   image: Image
   media: Information
   tool: Utilities
+  life: Life
   ai: AI
   meme: Meme
   game: Entertainment
