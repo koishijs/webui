@@ -90,8 +90,26 @@ const svgAttrs = computed(() => {
   }
 })
 
-const forceLink = d3.forceLink<Node, Link>(links.value).id(node => node.uid)
-const forceManyBody = d3.forceManyBody<Node>().strength(-200)
+function weight(link: Link) {
+  return link.type === 'solid' ? 1 : 0.2
+}
+
+function degree(node: Node) {
+  let count = 0
+  for (const link of links.value) {
+    if (link.source !== node && link.target !== node) continue
+    count += weight(link)
+  }
+  return count
+}
+
+const forceLink = d3.forceLink<Node, Link>(links.value)
+  .id(node => node.uid)
+  .strength((link) => {
+    return weight(link) / Math.min(degree(link.source), degree(link.target))
+  })
+
+const forceManyBody = d3.forceManyBody<Node>()
 const forceX = d3.forceX<Node>()
 const forceY = d3.forceY<Node>()
 

@@ -12,8 +12,8 @@
     <line
       :x1="link.source.x"
       :y1="link.source.y"
-      :x2="link.target.x"
-      :y2="link.target.y"
+      :x2="arrow.x0"
+      :y2="arrow.y0"
       :class="link.type"
     />
     <line
