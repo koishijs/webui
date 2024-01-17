@@ -22,14 +22,15 @@ category:
   all: 所有插件
   other: 未分类
   adapter: 适配器
-  storage: 存储服务
+  general: 通用服务
   extension: 扩展功能
-  console: 控制台
+  webui: 控制台
   manage: 管理工具
   preset: 行为预设
   image: 图片服务
   media: 资讯服务
   tool: 实用工具
+  life: 生活指南
   ai: 人工智能
   meme: 趣味交互
   game: 娱乐玩法

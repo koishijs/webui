@@ -120,14 +120,15 @@ export const comparators: Dict<Comparator> = {
 
 export const categories = [
   'adapter',
-  'storage',
+  'general',
   'extension',
-  'console',
+  'webui',
   'manage',
   'preset',
   'image',
   'media',
   'tool',
+  'life',
   'ai',
   'meme',
   'game',
