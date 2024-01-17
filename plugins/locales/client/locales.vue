@@ -45,15 +45,19 @@
 
       <template v-for="path in data.map[active]" :key="path">
         <h3>{{ path }}</h3>
-        <div class="translation" v-for="locale in displayLocales" :key="locale">
-          <span class="locale">{{ locale }}</span>
-          <el-input
-            autosize
-            type="textarea"
-            :modelValue="(store.locales['$' + locale]?.[`${active}.${path}`] as any)"
-            :placeholder="store.locales[locale]?.[`${active}.${path}`] || store.locales[''][`${active}.${path}`] as any"
-            @update:modelValue="handleUpdate(locale, path, $event)"
-          ></el-input>
+        <div class="grid my-4 translation gap-y-2">
+          <template v-for="locale in displayLocales" :key="locale">
+            <div class="lh-8 px-4">{{ locale }}</div>
+            <div>
+              <el-input
+                autosize
+                type="textarea"
+                :modelValue="(store.locales['$' + locale]?.[`${active}.${path}`] as any)"
+                :placeholder="store.locales[locale]?.[`${active}.${path}`] || store.locales[''][`${active}.${path}`] as any"
+                @update:modelValue="handleUpdate(locale, path, $event)"
+              ></el-input>
+            </div>
+          </template>
         </div>
       </template>
     </k-content>
@@ -67,7 +71,7 @@
 
 import { useRoute, useRouter } from 'vue-router'
 import { Dict, send, store } from '@koishijs/client'
-import { computed, ref, watch } from 'vue'
+import { computed, ref, watch, provide } from 'vue'
 import { useDebounceFn } from '@vueuse/core'
 
 const route = useRoute()
@@ -91,6 +95,8 @@ const active = computed<string>({
     router.replace('/locales/' + name.replace(/\./g, '/'))
   },
 })
+
+provide('locale:prefix', active)
 
 function filterNode(value: string, data: Tree) {
   return data.label.toLowerCase().includes(keyword.value.toLowerCase())
@@ -191,16 +197,7 @@ function handleUpdate(locale: string, path: string, value: string) {
   }
 
   .translation {
-    display: flex;
-    margin: 0.5rem;
-
-    span.locale {
-      width: 4rem;
-      height: 2rem;
-      flex: 0 0 auto;
-      padding: 0.25rem 0.5rem;
-      box-sizing: border-box;
-    }
+    grid-template-columns: auto 1fr;
   }
 }
 
