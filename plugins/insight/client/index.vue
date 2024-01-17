@@ -4,9 +4,7 @@
       <svg
         ref="svg"
         id="couple"
-        :width="width"
-        :height="height"
-        :viewBox="`-${width / 2} -${height / 2} ${width} ${height}`"
+        v-bind="svgAttrs"
       >
         <g class="links">
           <link-view
@@ -43,7 +41,7 @@
 import { onMounted, ref, computed, watch, reactive } from 'vue'
 import { store } from '@koishijs/client'
 import { useTooltip, getEventPoint } from './tooltip'
-import { useElementSize, useEventListener } from '@vueuse/core'
+import { useElementSize, useEventListener, watchThrottled } from '@vueuse/core'
 import { Node, Link } from './utils'
 import * as d3 from 'd3-force'
 import LinkView from './link.vue'
@@ -60,18 +58,81 @@ const fLink = ref<Link>(null)
 const nodes = reactive<Node[]>(store.insight.nodes as any)
 const links = computed<Link[]>(() => store.insight.edges as any)
 
-const forceLink = d3
-  .forceLink<Node, Link>(links.value)
-  .id(node => node.uid)
-  .distance(100)
+const svgAttrs = computed(() => {
+  // fix all the nodes in the root element
+  let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity
+  for (const node of nodes) {
+    minX = Math.min(minX, node.x)
+    minY = Math.min(minY, node.y)
+    maxX = Math.max(maxX, node.x)
+    maxY = Math.max(maxY, node.y)
+  }
+  const vpWidth = maxX - minX + 200
+  const vpHeight = maxY - minY + 200
+  let transform: string
+  if (width.value / vpWidth > height.value / vpHeight) {
+    const scale = height.value / vpHeight
+    const realWidth = vpWidth * scale
+    transform = `scale(${scale}) translateX(${(width.value - realWidth) / 2 / scale}px)`
+  } else {
+    const scale = width.value / vpWidth
+    const realHeight = vpHeight * scale
+    transform = `scale(${scale}) translateY(${(height.value - realHeight) / 2 / scale}px)`
+  }
+  return {
+    width: vpWidth + 'px',
+    height: vpHeight + 'px',
+    viewBox: `${minX - 100} ${minY - 100} ${vpWidth} ${vpHeight}`,
+    style: {
+      transform,
+      transformOrigin: 'top left',
+    },
+  }
+})
+
+const forceLink = d3.forceLink<Node, Link>(links.value).id(node => node.uid)
+const forceManyBody = d3.forceManyBody<Node>().strength(-200)
+const forceX = d3.forceX<Node>()
+const forceY = d3.forceY<Node>()
 
 const simulation = d3
   .forceSimulation(nodes)
   .force('link', forceLink)
-  .force('charge', d3.forceManyBody().strength(-200))
-  .force('x', d3.forceX().strength(0.05))
-  .force('y', d3.forceY().strength(0.05))
+  .force('charge', forceManyBody)
+  .force('x', forceX)
+  .force('y', forceY)
   .stop()
+
+function resetForce() {
+  forceLink.distance(100) // (config.value.link.distance)
+  forceManyBody.strength(-200) // (-config.value.strengh.repulsion)
+  forceX.strength(0.1 * (height.value / (width.value + height.value) || 1)) // (config.value.strengh.centering)
+  forceY.strength(0.1 * (width.value / (width.value + height.value) || 1)) // (config.value.strengh.centering)
+
+  const alphaMin = Math.exp(-6) // (-config.value.simulation.logMin)
+  const alphaTicks = Math.exp(7) // (config.value.simulation.logTicks)
+  simulation
+    .alpha(1) // config.value.simulation.initial)
+    .alphaMin(alphaMin)
+    .alphaDecay(1 - Math.pow(alphaMin, 1 / alphaTicks))
+}
+
+onMounted(() => {
+  resetForce()
+  simulation.restart()
+
+  watchThrottled(() => [
+    // config.value.link.distance,
+    // config.value.cluster,
+    // config.value.strengh,
+    // config.value.simulation,
+    width.value,
+    height.value,
+  ], () => {
+    resetForce()
+    simulation.restart()
+  }, { deep: true, throttle: 100, trailing: true })
+})
 
 watch(() => store.insight, (value) => {
   if (!value) return
@@ -90,17 +151,6 @@ watch(() => store.insight, (value) => {
   simulation.nodes(nodes)
   forceLink.links(value.edges as any)
   simulation.alpha(0.3).restart()
-})
-
-const ticks = 500
-const alphaMin = 0.001
-
-onMounted(() => {
-  simulation
-    .alpha(1)
-    .alphaMin(alphaMin)
-    .alphaDecay(1 - Math.pow(alphaMin, 1 / ticks))
-    .restart()
 })
 
 useEventListener('mousemove', onDragMove)
@@ -153,12 +203,6 @@ function onDragMove(event: MouseEvent | TouchEvent) {
   node.fy += point.clientY - node.lastY
   node.lastX = point.clientX
   node.lastY = point.clientY
-  // const dist2 = node.fx ** 2 + node.fy ** 2
-  // if (dist2 > this.DRAGGABLE_RADIUS ** 2) {
-  //   const scale = this.DRAGGABLE_RADIUS / Math.sqrt(dist2)
-  //   node.fx *= scale
-  //   node.fy *= scale
-  // }
 }
 
 function onDragEnd(event: MouseEvent | TouchEvent) {
