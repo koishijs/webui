@@ -38,8 +38,7 @@ const render: FunctionalComponent<{ children: segment[] }> = ({ children }, ctx)
     } else if (type === 'button') {
       return h(resolveComponent('el-button'), {
         ...attrs,
-        onclick: undefined,
-        onClick: () => send('notifier/button', attrs.onclick),
+        onClick: () => send('notifier/button', attrs.onClick),
       }, {
         default: () => render({ children }, ctx),
       })

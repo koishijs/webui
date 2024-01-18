@@ -52,11 +52,11 @@ export class Notifier {
         ? [h('p', options.content)]
         : h.toElementArray(options.content)
       options.content = h.transform(content, ({ type, attrs }) => {
-        if (type === 'button' && typeof attrs.onclick === 'function') {
+        if (type === 'button' && typeof attrs.onClick === 'function') {
           const key = Math.random().toString(36).slice(2)
-          this.ctx.notifier.actions[key] = attrs.onclick
+          this.ctx.notifier.actions[key] = attrs.onClick
           this.actionKeys.push(key)
-          attrs.onclick = key
+          attrs.onClick = key
         }
         return true
       })
