@@ -32,6 +32,20 @@ export interface Dependency {
   latest?: string
 }
 
+export interface JsonFmt {
+  type: 'warning' | 'info' | 'error' | string
+  name: number | null
+  displayName: string
+  indent?: string
+  data: string
+}
+
+const levelMap = {
+  'info': 'info',
+  'warning': 'warn',
+  'error': 'error',
+}
+
 export interface LocalPackage extends PackageJson {
   private?: boolean
   $workspace?: boolean
@@ -169,24 +183,33 @@ class Installer extends Service {
   }
 
   async exec(command: string, args: string[]) {
+    const useJson = command === 'yarn'
     return new Promise<number>((resolve) => {
+      if (useJson) args.push('--json')
       const child = spawn(command, args, { cwd: this.cwd })
       child.on('exit', (code) => resolve(code))
       child.on('error', () => resolve(-1))
-      child.stderr.on('data', (data) => {
-        data = data.toString().trim()
-        if (!data) return
-        for (const line of data.split('\n')) {
-          logger.warn(line)
-        }
-      })
-      child.stdout.on('data', (data) => {
-        data = data.toString().trim()
-        if (!data) return
-        for (const line of data.split('\n')) {
-          logger.info(line)
-        }
-      })
+      if (useJson) {
+        child.stdout.on('data', (data) => {
+          const { type, data: format } = JSON.parse(data.toString()) as JsonFmt
+          logger[levelMap[type] ?? 'info'](format)
+        })
+      } else {
+        child.stderr.on('data', (data) => {
+          data = data.toString().trim()
+          if (!data) return
+          for (const line of data.split('\n')) {
+            logger.warn(line)
+          }
+        })
+        child.stdout.on('data', (data) => {
+          data = data.toString().trim()
+          if (!data) return
+          for (const line of data.split('\n')) {
+            logger.info(line)
+          }
+        })
+      }
     })
   }
 
