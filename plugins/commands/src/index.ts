@@ -1,4 +1,4 @@
-import { Argv, clone, Command, Context, Dict, remove, Schema } from 'koishi'
+import { Argv, clone, Command, Context, deepEqual, Dict, filterKeys, mapValues, remove, Schema } from 'koishi'
 import ConsoleExtension from './console'
 import CommandExtension from './command'
 
@@ -23,7 +23,7 @@ const Override: Schema<Override> = Schema.object({
 })
 
 export interface CommandState {
-  aliases: Dict<Command.Alias>
+  aliases: Dict<false | Command.Alias>
   config: Command.Config
   options: Dict<Argv.OptionDeclaration>
 }
@@ -52,7 +52,7 @@ export class CommandManager {
 
   constructor(private ctx: Context, private config: Dict<Config>) {
     for (const key in config) {
-      const command = ctx.$commander.resolve(key)
+      const command = ctx.$commander.get(key, true)
       if (command) {
         this.accept(command, config[key])
       } else if (config[key].create) {
@@ -61,13 +61,13 @@ export class CommandManager {
       }
     }
 
-    ctx.on('command-added', (cmd) => {
+    ctx.on('command-added', async (cmd) => {
       for (const key in config) {
-        if (cmd !== ctx.$commander.resolve(key)) continue
+        if (cmd !== ctx.$commander.get(key, true)) continue
         return this.accept(cmd, config[key])
       }
       for (const { command, pending } of Object.values(this.snapshots)) {
-        const parent = this.ctx.$commander.resolve(pending)
+        const parent = this.ctx.$commander.get(pending, true)
         if (!parent || !pending) continue
         this.snapshots[command.name].pending = null
         this._teleport(command, parent)
@@ -75,6 +75,7 @@ export class CommandManager {
     })
 
     ctx.on('command-removed', (cmd) => {
+      delete this.snapshots[cmd.name]
       for (const command of cmd.children) {
         const parent = this.snapshots[command.name]?.parent
         if (!parent || parent === cmd) continue
@@ -82,20 +83,13 @@ export class CommandManager {
       }
     })
 
-    ctx.on('command-removed', (cmd) => {
-      delete this.snapshots[cmd.name]
-    })
-
     ctx.on('dispose', () => {
       for (const key in this.snapshots) {
-        const { command, parent, initial, override } = this.snapshots[key]
+        const { command, parent, initial } = this.snapshots[key]
         command.config = initial.config
-        command._aliases = initial.aliases
+        // initial aliases cannot include false values
+        command._aliases = initial.aliases as any
         Object.assign(command._options, initial.options)
-        for (const name in override.aliases) {
-          if (initial.aliases[name]) continue
-          ctx.$commander._commands.delete(name)
-        }
         this._teleport(command, parent)
       }
     }, true)
@@ -105,7 +99,7 @@ export class CommandManager {
   }
 
   ensure(name: string, create?: boolean) {
-    const command = this.ctx.$commander.resolve(name)
+    const command = this.ctx.$commander.get(name, true)
     return this.snapshots[command.name] ||= {
       create,
       command,
@@ -133,7 +127,7 @@ export class CommandManager {
 
   teleport(command: Command, name: string, write = false) {
     this.snapshots[command.name].pending = null
-    const parent = this.ctx.$commander.resolve(name)
+    const parent = this.ctx.$commander.get(name, true)
     if (name && !parent) {
       this.snapshots[command.name].pending = name
     } else {
@@ -147,23 +141,16 @@ export class CommandManager {
     }
   }
 
-  alias(command: Command, aliases: Dict<Command.Alias>, write = false) {
+  alias(command: Command, aliases: Dict<false | Command.Alias>, write = false) {
     const { initial, override } = this.snapshots[command.name]
-    for (const name in command._aliases) {
-      if (aliases[name]) continue
-      this.ctx.$commander._commands.delete(name)
-    }
-    command._aliases = override.aliases = aliases
-    for (const name in aliases) {
-      this.ctx.$commander.set(name, command)
-    }
+    command._aliases = override.aliases = mapValues(aliases, (value) => value || null)
 
     if (write) {
       this.config[command.name] ||= {}
       this.config[command.name].name = `${command.parent?.name || ''}/${command.displayName}`
-      this.config[command.name].aliases = Object.fromEntries(Object.entries(aliases).filter(([name]) => {
-        return command.displayName !== name && !initial.aliases[name]
-      }))
+      this.config[command.name].aliases = filterKeys(aliases, (key, value) => {
+        return !deepEqual(initial.aliases[key], value || null)
+      })
       this.write(command)
     }
   }

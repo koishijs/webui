@@ -55,22 +55,27 @@
 
       <div class="aliases">
         <h2 class="k-schema-header">名称设置</h2>
-        <ul>
-          <li v-for="([name, item], index) in Object.entries(current.aliases)" :key="name">
-            <span>{{ name }}</span>
-            <span class="button"
-              v-if="index > 0"
-              @click.stop.prevent="setDefault(name)"
-            >设置为默认</span>
-            <span class="button"
-              v-if="!command.initial.aliases[name]"
-              @click.stop.prevent="deleteAlias(name)"
-            >删除别名</span>
-          </li>
-          <li>
-            <span class="button" @click.stop.prevent="title = '编辑别名'">添加别名</span>
-          </li>
-        </ul>
+        <table>
+          <colgroup>
+            <col/>
+            <col width="240px"/>
+          </colgroup>
+          <tr v-for="([name, item], index) in Object.entries(current.aliases)" :key="name">
+            <td class="text-left alias-name" :class="{ disabled: !item }">{{ name }}</td>
+            <td class="text-right">
+              <el-button
+                v-if="index > 0"
+                :disabled="!item"
+                @click="setDefault(name)"
+              >{{ index > 0 ? '设为默认' : '显示名称' }}</el-button>
+              <el-button v-if="item" @click="deleteAlias(name)">{{ command.initial.aliases[name] ? '禁用' : '删除' }}</el-button>
+              <el-button v-else @click="recoverAlias(name)">恢复</el-button>
+            </td>
+          </tr>
+        </table>
+        <p>
+          <el-button @click="title = '编辑别名'">添加别名</el-button>
+        </p>
       </div>
 
       <k-form
@@ -242,7 +247,16 @@ function setDefault(name: string) {
 }
 
 function deleteAlias(name: string) {
-  delete current.value.aliases[name]
+  if (command.value.initial.aliases[name]) {
+    current.value.aliases[name] = false
+  } else {
+    delete current.value.aliases[name]
+  }
+  send('command/aliases', command.value.name, current.value.aliases)
+}
+
+function recoverAlias(name: string) {
+  current.value.aliases[name] = command.value.initial.aliases[name]
   send('command/aliases', command.value.name, current.value.aliases)
 }
 
@@ -284,6 +298,11 @@ onActivated(async () => {
       cursor: pointer;
       text-decoration: underline;
     }
+  }
+
+  .alias-name.disabled {
+    text-decoration: line-through;
+    color: var(--k-color-disabled);
   }
 }
 
