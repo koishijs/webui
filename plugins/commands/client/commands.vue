@@ -42,12 +42,12 @@
     <k-content class="command-config" v-if="active">
       <div class="navigation flex flex-wrap gap-x-4 gap-y-2 my-8">
         <router-link
-          class="k-button"
+          class="el-button"
           v-if="store.config && store.packages && command.paths.length"
           :to="'/plugins/' + command.paths[0].replace(/\./, '/')"
         >前往插件</router-link>
         <router-link
-          class="k-button"
+          class="el-button"
           v-if="store.locales"
           :to="'/locales/commands/' + active.replace(/\./, '/')"
         >前往本地化</router-link>
@@ -94,8 +94,8 @@
       <div>请在左侧选择指令</div>
     </k-empty>
 
-    <el-dialog class="command-dialog" destroy-on-close v-model="dialog" :title="title">
-      <el-input :class="{ invalid }" v-model="alias" @keydown.enter.stop.prevent="onEnter" placeholder="请输入名称"></el-input>
+    <el-dialog class="command-dialog" destroy-on-close v-model="dialog" :title="title" @open="handleOpen">
+      <el-input ref="inputEl" :class="{ invalid }" v-model="alias" @keydown.enter.stop.prevent="onEnter" placeholder="请输入名称"></el-input>
       <template #footer>
         <el-button @click="title = ''">取消</el-button>
         <el-button type="primary" :disabled="invalid" @click="onEnter">确定</el-button>
@@ -117,6 +117,7 @@ import { commands, createSchema } from './utils'
 const route = useRoute()
 const router = useRouter()
 
+const inputEl = ref()
 const title = ref('')
 const alias = ref('')
 const tree = ref(null)
@@ -142,6 +143,12 @@ const dialog = computed({
     if (!value) title.value = ''
   },
 })
+
+async function handleOpen() {
+  // https://github.com/element-plus/element-plus/issues/15250
+  await nextTick()
+  inputEl.value?.focus()
+}
 
 watch(keyword, (val) => {
   tree.value.filter(val)
