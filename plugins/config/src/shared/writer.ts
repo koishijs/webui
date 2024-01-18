@@ -143,7 +143,7 @@ export class ConfigWriter extends DataService<Context.Config> {
 
   async reload(parent: string, key: string, config: any) {
     const scope = this.resolveFork(parent)
-    await this.loader.reload(scope.ctx, key, config)
+    await this.loader.reload(scope.ctx, key, this.loader.interpolate(config))
     rename(scope.config, key, key, config)
     await this.loader.writeConfig()
   }
