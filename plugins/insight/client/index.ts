@@ -10,7 +10,7 @@ export default (ctx: Context) => {
     path: '/graph',
     name: '依赖图',
     icon: 'activity:network',
-    order: 600,
+    order: 550,
     fields: ['insight'],
     component: Graph,
   })
