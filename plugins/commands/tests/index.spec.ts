@@ -51,7 +51,8 @@ describe('@koishijs/plugin-commands', () => {
       await client.shouldNotReply('bar')
       await client.shouldNotReply('baz')
 
-      const cmd = app.command('bar').action(() => 'test')
+      app.command('bar').action(() => 'test')
+      await app.sleep(0)
 
       await client.shouldReply('bar', 'test')
       await client.shouldReply('baz', 'test')
@@ -133,6 +134,7 @@ describe('@koishijs/plugin-commands', () => {
 
       expect(bar.children).to.have.length(1)
       const baz = app.command('baz')
+      await app.sleep(0)
       expect(bar.children).to.have.length(0)
       expect(baz.children).to.have.length(1)
       await client.shouldReply('foo', 'test')
@@ -191,6 +193,7 @@ describe('@koishijs/plugin-commands', () => {
       await client.shouldReply('command foo -p baz', '已更新指令配置。')
       expect(bar.children).to.have.length(1)
       const baz = app.command('baz')
+      await app.sleep(0)
       expect(bar.children).to.have.length(0)
       expect(baz.children).to.have.length(1)
       await client.shouldReply('foo', 'test')
@@ -234,6 +237,7 @@ describe('@koishijs/plugin-commands', () => {
       await client.shouldReply('command foo -c', '已创建指令。')
 
       const foo = app.command('foo')
+      await app.sleep(0)
       expect(foo.children).to.have.length(1)
       await client.shouldReply('foo', /baz/)
       await client.shouldReply('baz', 'test')

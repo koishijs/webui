@@ -48,7 +48,9 @@ export class CommandManager {
   static filter = false
   static schema: Schema<Dict<string | Config>, Dict<Config>> = Schema.dict(Config).hidden()
 
-  public snapshots: Dict<Snapshot> = {}
+  private _tasks: Dict<() => void> = Object.create(null)
+
+  public snapshots: Dict<Snapshot> = Object.create(null)
 
   constructor(private ctx: Context, private config: Dict<Config>) {
     for (const key in config) {
@@ -61,11 +63,10 @@ export class CommandManager {
       }
     }
 
+    // The command API is chained, so it's better to wait for the next tick
+    // because the command may not be fully initialized at this moment.
     ctx.on('command-added', async (cmd) => {
-      for (const key in config) {
-        if (cmd !== ctx.$commander.get(key, true)) continue
-        return this.accept(cmd, config[key])
-      }
+      this.init(cmd)
       for (const { command, pending } of Object.values(this.snapshots)) {
         const parent = this.ctx.$commander.get(pending, true)
         if (!parent || !pending) continue
@@ -74,7 +75,12 @@ export class CommandManager {
       }
     })
 
+    ctx.on('command-updated', (cmd) => {
+      this.init(cmd)
+    })
+
     ctx.on('command-removed', (cmd) => {
+      delete this._tasks[cmd.name]
       delete this.snapshots[cmd.name]
       for (const command of cmd.children) {
         const parent = this.snapshots[command.name]?.parent
@@ -84,6 +90,7 @@ export class CommandManager {
     })
 
     ctx.on('dispose', () => {
+      this._tasks = Object.create(null)
       for (const key in this.snapshots) {
         const { command, parent, initial } = this.snapshots[key]
         command.config = initial.config
@@ -98,14 +105,36 @@ export class CommandManager {
     ctx.plugin(CommandExtension, this)
   }
 
-  ensure(name: string, create?: boolean) {
+  init(command: Command) {
+    if (!this.config[command.name]) return
+    this._tasks[command.name] ||= this.ctx.setTimeout(() => {
+      delete this._tasks[command.name]
+      this.accept(command, this.config[command.name], true)
+    }, 0)
+  }
+
+  ensure(name: string, create?: boolean, patch?: boolean) {
     const command = this.ctx.$commander.get(name, true)
+    const snapshot = this.snapshots[command.name]
+    if (patch && snapshot) {
+      // Aliases and options may be modified by other plugins.
+      snapshot.initial.options = mapValues(command._options, (option, key) => {
+        return snapshot.initial.options[key] || clone(option)
+      })
+      for (const key of Object.keys(command._aliases)) {
+        if (snapshot.initial.aliases[key]) continue
+        if (snapshot.override.aliases[key]) continue
+        snapshot.initial.aliases[key] = command._aliases[key]
+      }
+      snapshot.override.aliases = command._aliases
+      return snapshot
+    }
     return this.snapshots[command.name] ||= {
       create,
       command,
       parent: command.parent,
       initial: {
-        aliases: command._aliases,
+        aliases: { ...command._aliases },
         options: clone(command._options),
         config: clone(command.config),
       },
@@ -195,11 +224,11 @@ export class CommandManager {
     this.write(...commands)
   }
 
-  accept(target: Command, override: Override) {
+  accept(target: Command, override: Override, patch?: boolean) {
     const { create, options = {}, config = {} } = override
 
     // create snapshot for restoration
-    this.ensure(target.name, create)
+    this.ensure(target.name, create, patch)
 
     // override config and options
     this.update(target, { options, config })
