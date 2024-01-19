@@ -29,7 +29,7 @@
     "vue": "^3"
   },
   "dependencies": {
-    "@satorijs/element": "^3.0.0",
+    "@satorijs/element": "^3.1.2",
     "cosmokit": "^1.5.2",
     "schemastery-vue": "^7.2.4"
   }
