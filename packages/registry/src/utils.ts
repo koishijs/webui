@@ -20,7 +20,8 @@ export namespace Ensure {
     }, {})
   }
 
-  const primitive = <T>(type: string): Ensure<T> => (value: any, fallback?: T) => {
+  // https://github.com/microsoft/TypeScript/issues/15713#issuecomment-499474386
+  const primitive = <T, >(type: string): Ensure<T> => (value: any, fallback?: T) => {
     if (typeof value !== type) return fallback
     return value
   }
