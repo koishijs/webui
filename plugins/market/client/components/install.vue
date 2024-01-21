@@ -101,7 +101,11 @@ function installDep(version: string, checkConfig = false, removeConfig = false) 
   if (!target) return
   // workspace packages don't need to be installed
   if (config.value.bulk && !workspace.value) {
-    config.value.override[target] = version
+    if (dep.value?.resolved === version || !version && !dep.value) {
+      delete config.value.override[target]
+    } else {
+      config.value.override[target] = version
+    }
     active.value = ''
     return
   }
@@ -139,6 +143,7 @@ const unchanged = computed(() => {
     || version.value === store.dependencies?.[active.value]?.request && !!store.dependencies?.[active.value]?.resolved
 })
 
+const dep = computed(() => store.dependencies?.[active.value])
 const current = computed(() => store.dependencies?.[active.value]?.resolved)
 const local = computed(() => store.packages?.[active.value])
 const versions = computed(() => store.registry?.[active.value])
