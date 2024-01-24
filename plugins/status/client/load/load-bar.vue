@@ -8,6 +8,7 @@
         :class="[type, 'bar']"
         :style="{ width: percentage(distribution[index]) }">
         <template v-if="index === maxIndex">{{ caption }}</template>
+        <template v-else-if="maxIndex === -1 && distribution[index] >= 0.2">{{ percentage(distribution[index]) }}</template>
       </span>
     </span>
   </div>
@@ -20,8 +21,8 @@ import { computed } from 'vue'
 
 const props = defineProps<{ rate: LoadRate, title: string }>()
 
-function percentage(value: number, digits = 3) {
-  return (value * 100).toFixed(digits) + '%'
+function percentage(value: number, digits = 1) {
+  return +(value * 100).toFixed(digits) + '%'
 }
 
 const types = ['used', 'app', 'free'] as const
@@ -33,7 +34,7 @@ const distribution = computed(() => [
 ])
 
 const maxIndex = computed(() => {
-  return distribution.value.indexOf(Math.max(...distribution.value))
+  return distribution.value.findIndex(value => value >= 0.5)
 })
 
 const caption = computed(() => {
@@ -58,7 +59,7 @@ const caption = computed(() => {
   .body {
     width: 10rem;
     height: 0.8rem;
-    font-size: 0.8em;
+    font-size: 10px;
     position: relative;
     display: inline;
     background-color: var(--k-c-divisor);
@@ -75,6 +76,7 @@ const caption = computed(() => {
     display: flex;
     align-items: center;
     justify-content: center;
+    white-space: pre;
   }
 
   .used {
@@ -82,7 +84,7 @@ const caption = computed(() => {
     color: white;
     transition: color 0.3s ease, background-color 0.3s ease;
     &:hover {
-      background-color: var(--primary-tint);
+      background-color: var(--primary-tint, var(--primary));
     }
   }
 
@@ -90,7 +92,7 @@ const caption = computed(() => {
     background-color: var(--k-color-warning);
     transition: color 0.3s ease, background-color 0.3s ease;
     &:hover {
-      background-color: var(--k-color-warning-tint);
+      background-color: var(--k-color-warning-tint, var(--k-color-warning));
     }
   }
 }
