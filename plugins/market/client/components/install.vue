@@ -36,11 +36,11 @@
           <td>当前版本</td>
           <td>可用性</td>
         </tr>
-        <tr v-for="({ request, resolved, result }, name) in data[version].peers" :key="name">
+        <tr v-for="(peer, name) in data[version].peers" :key="name">
           <td class="text-left">{{ name }}</td>
-          <td>{{ request }}</td>
-          <td class="has-select">
-            <span class="wrapper" v-if="store.registry[name] && !getWorkspaceVersion(name)">
+          <td>{{ peer.request }}</td>
+          <td>
+            <span class="wrapper" v-if="store.registry?.[name] && !getWorkspaceVersion(name)">
               <span class="shadow">{{ getVersion(name) || 'Select' }}</span>
               <el-select
                 class="frameless"
@@ -55,12 +55,12 @@
                 </el-option>
               </el-select>
             </span>
-            <template v-else>{{ resolved + (getWorkspaceVersion(name) ? ' (工作区)' : '') }}</template>
+            <template v-else>{{ peer.resolved }}{{ getWorkspaceVersion(name) ? ' (工作区)' : '' }}</template>
           </td>
-          <td :class="['theme-color', result]">
+          <td :class="['theme-color', peer.result]">
             <span class="inline-flex items-center gap-1">
-              <k-icon :name="getResultIcon(result)"></k-icon>
-              {{ getResultText(result, name) }}
+              <k-icon :name="getResultIcon(peer.result)"></k-icon>
+              {{ getResultText(peer, name) }}
             </span>
           </td>
         </tr>
@@ -69,7 +69,7 @@
 
     <template v-if="active && !global.static" #footer>
       <div class="left">
-        <el-checkbox v-model="config.bulk">
+        <el-checkbox v-model="config.bulkMode">
           批量操作模式
           <k-hint>
             批量操作模式下，你可以同时安装、更新或移除多个插件。勾选此选项后，你的所有操作会被暂存，直到你点击右上角的“应用更改”按钮。
@@ -106,7 +106,7 @@
 
 import { computed, ref, watch, reactive } from 'vue'
 import { Dict, global, send, store, useContext } from '@koishijs/client'
-import { analyzeVersions, install } from './utils'
+import { analyzeVersions, install, PeerInfo, ResultType } from './utils'
 import { active, config } from '../utils'
 import { parse } from 'semver'
 
@@ -117,7 +117,7 @@ function installDep(version: string, checkConfig = false, removeConfig = false) 
   const target = active.value
   if (!target) return
   // workspace packages don't need to be installed
-  if (config.value.bulk && !workspace.value) {
+  if (config.value.bulkMode && !workspace.value) {
     if (dep.value?.resolved === version || !version && !dep.value) {
       delete config.value.override[target]
     } else {
@@ -162,7 +162,7 @@ const selectVersion = computed({
 const versions = reactive<Dict<string>>({})
 
 function getOverride() {
-  return config.value.bulk ? config.value.override : versions
+  return config.value.bulkMode ? config.value.override : versions
 }
 
 function getVersion(name: string) {
@@ -189,7 +189,7 @@ const current = computed(() => store.dependencies?.[active.value]?.resolved)
 const local = computed(() => store.packages?.[active.value])
 
 const showRemoveButton = computed(() => {
-  return current.value || store.dependencies[active.value] || config.value.bulk && config.value.override[active.value]
+  return current.value || store.dependencies[active.value] || config.value.bulkMode && config.value.override[active.value]
 })
 
 const workspace = computed(() => getWorkspaceVersion(active.value))
@@ -204,13 +204,6 @@ function getWorkspaceVersion(name: string) {
     return store.packages?.[name]?.package.version
   }
 }
-
-watch(active, async (name) => {
-  if (name && !workspace.value && !store.registry?.[active.value]) {
-    const data = await send('market/registry', [name])
-    version.value = Object.keys(data)[0]
-  }
-}, { immediate: true })
 
 const data = computed(() => {
   if (!active.value || workspace.value) return
@@ -245,11 +238,45 @@ const result = computed(() => {
   return result
 })
 
-watch(active, (value) => {
-  if (!value) return
+function shouldFetchRegistry(name: string) {
+  return !store.registry?.[name] && !getWorkspaceVersion(name)
+}
+
+watch(() => data.value?.[version.value]?.peers, async (peers) => {
+  if (!peers) return
+  const names = Object.keys(peers).filter(shouldFetchRegistry)
+  let registry: typeof store.registry = {}
+  if (names.length) {
+    registry = await send('market/registry', names)
+  }
+  Object.assign(registry, store.registry)
+  if (config.value.bulkMode) return
+
+  // rebuild versions
+  for (const name of Object.keys(versions)) {
+    if (name === active.value) continue
+    if (name in peers) continue
+    delete versions[name]
+  }
+  for (const name in peers) {
+    if (!registry[name]) continue
+    const { result } = peers[name]
+    if (result !== 'warning' && result !== 'danger') continue
+    versions[name] = Object.keys(registry[name])[0]
+  }
+})
+
+watch(active, async (name) => {
+  if (!name) return
+
   version.value = config.value.override[active.value]
     || store.dependencies?.[active.value]?.request
-    || Object.keys(store.registry?.[value] || {})[0]
+    || Object.keys(store.registry?.[name] || {})[0]
+
+  if (shouldFetchRegistry(name)) {
+    const registry = await send('market/registry', [name])
+    version.value = Object.keys(registry[active.value])[0]
+  }
 }, { immediate: true })
 
 function configure() {
@@ -257,7 +284,7 @@ function configure() {
   active.value = null
 }
 
-function getResultIcon(type: 'primary' | 'warning' | 'danger' | 'success') {
+function getResultIcon(type: ResultType) {
   switch (type) {
     case 'primary': return 'info-full'
     case 'warning': return 'exclamation-full'
@@ -266,13 +293,12 @@ function getResultIcon(type: 'primary' | 'warning' | 'danger' | 'success') {
   }
 }
 
-function getResultText(type: 'primary' | 'warning' | 'danger' | 'success', name: string) {
-  const isOverriden = config.value.bulk ? name in config.value.override : name in versions
+function getResultText(peer: PeerInfo, name: string) {
+  const isOverriden = name in getOverride()
   const isInstalled = store.packages ? !!store.packages[name] : !!store.dependencies?.[name]
-  switch (type) {
-    case 'primary': return '可选'
-    case 'warning': return isOverriden ? '等待移除' : '未下载'
-    case 'danger': return '不兼容'
+  switch (peer.result) {
+    case 'primary': return isOverriden ? '等待移除' : '可选'
+    case 'danger': return peer.resolved ? '不兼容' : isOverriden ? '等待移除' : '未下载'
     case 'success': return isOverriden ? isInstalled ? '等待更新' : '等待安装' : '已下载'
   }
 }

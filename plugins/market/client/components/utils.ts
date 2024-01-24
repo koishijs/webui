@@ -4,14 +4,16 @@ import { compare, satisfies } from 'semver'
 import { reactive, ref, watch } from 'vue'
 import { active } from '../utils'
 
-type ResultType = 'success' | 'warning' | 'danger' | 'primary'
+export type ResultType = 'success' | 'warning' | 'danger' | 'primary'
 
 interface AnalyzeResult {
-  peers: Dict<{
-    request: string
-    resolved: string
-    result: ResultType
-  }>
+  peers: Dict<PeerInfo>
+  result: ResultType
+}
+
+export interface PeerInfo {
+  request: string
+  resolved: string
   result: ResultType
 }
 
@@ -24,9 +26,10 @@ export function analyzeVersions(name: string, getVersion: (name: string) => stri
         ?? store.dependencies[name]?.resolved
         ?? store.packages?.[name]?.package.version
       const result: ResultType = !resolved
-        ? item.peerDependenciesMeta?.[name]?.optional ? 'primary' : 'warning'
+        ? item.peerDependenciesMeta?.[name]?.optional ? 'primary' : 'danger'
         : satisfies(resolved, request, { includePrerelease: true }) ? 'success' : 'danger'
-      return { request, resolved, result }
+      if (result === 'danger') console.log(name, request, resolved)
+      return { request, resolved, result } as PeerInfo
     })
     let result: 'success' | 'warning' | 'danger' = 'success'
     for (const peer of Object.values(peers)) {
