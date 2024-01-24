@@ -39,7 +39,24 @@
         <tr v-for="({ request, resolved, result }, name) in data[version].peers" :key="name">
           <td class="text-left">{{ name }}</td>
           <td>{{ request }}</td>
-          <td>{{ resolved }}</td>
+          <td class="has-select">
+            <span class="wrapper" v-if="store.registry[name] && !getWorkspaceVersion(name)">
+              <span class="shadow">{{ getVersion(name) || 'Select' }}</span>
+              <el-select
+                class="frameless"
+                :model-value="getVersion(name)"
+                @update:model-value="setVersion(name, $event)"
+              >
+                <el-option value="">移除依赖</el-option>
+                <el-option v-for="(_, version) in store.registry[name]" :key="version" :value="version">
+                  {{ version }}
+                  <template v-if="version === current">(当前)</template>
+                  <!-- <span :class="[result, 'theme-color', 'dot-hint']"></span> -->
+                </el-option>
+              </el-select>
+            </span>
+            <template v-else>{{ resolved + (getWorkspaceVersion(name) ? ' (工作区)' : '') }}</template>
+          </td>
           <td :class="['theme-color', result]">
             <span class="inline-flex items-center gap-1">
               <k-icon :name="getResultIcon(result)"></k-icon>
@@ -87,8 +104,8 @@
 
 <script lang="ts" setup>
 
-import { computed, ref, watch } from 'vue'
-import { global, send, store, useContext } from '@koishijs/client'
+import { computed, ref, watch, reactive } from 'vue'
+import { Dict, global, send, store, useContext } from '@koishijs/client'
 import { analyzeVersions, install } from './utils'
 import { active, config } from '../utils'
 import { parse } from 'semver'
@@ -113,7 +130,8 @@ function installDep(version: string, checkConfig = false, removeConfig = false) 
     confirmRemoveConfig.value = true
     return
   }
-  install({ [target]: version }, async () => {
+  versions[target] = version
+  install(versions, async () => {
     if (workspace.value) return
     if (version) {
       ctx.configWriter?.ensure(target)
@@ -123,7 +141,10 @@ function installDep(version: string, checkConfig = false, removeConfig = false) 
   })
 }
 
-const version = ref<string>()
+const version = computed({
+  get: () => versions[active.value],
+  set: (value) => versions[active.value] = value,
+})
 
 const selectVersion = computed({
   get() {
@@ -138,6 +159,26 @@ const selectVersion = computed({
   },
 })
 
+const versions = reactive<Dict<string>>({})
+
+function getOverride() {
+  return config.value.bulk ? config.value.override : versions
+}
+
+function getVersion(name: string) {
+  const override = getOverride()
+  return override[name]
+}
+
+function setVersion(name: string, version: string) {
+  const override = getOverride()
+  if (version) {
+    override[name] = version
+  } else {
+    delete override[name]
+  }
+}
+
 const unchanged = computed(() => {
   return !data.value?.[version.value]
     || version.value === store.dependencies?.[active.value]?.request && !!store.dependencies?.[active.value]?.resolved
@@ -146,38 +187,39 @@ const unchanged = computed(() => {
 const dep = computed(() => store.dependencies?.[active.value])
 const current = computed(() => store.dependencies?.[active.value]?.resolved)
 const local = computed(() => store.packages?.[active.value])
-const versions = computed(() => store.registry?.[active.value])
 
 const showRemoveButton = computed(() => {
   return current.value || store.dependencies[active.value] || config.value.bulk && config.value.override[active.value]
 })
 
-const workspace = computed(() => {
+const workspace = computed(() => getWorkspaceVersion(active.value))
+
+function getWorkspaceVersion(name: string) {
   // workspace plugins:     dependencies ? packages √
   // workspace non-plugins: dependencies √ packages ×
-  if (store.dependencies?.[active.value]?.workspace) {
-    return store.dependencies?.[active.value]?.resolved
+  if (store.dependencies?.[name]?.workspace) {
+    return store.dependencies?.[name]?.resolved
   }
-  if (local.value?.workspace) {
-    return local.value?.package.version
+  if (store.packages?.[name]?.workspace) {
+    return store.packages?.[name]?.package.version
   }
-})
+}
 
 watch(active, async (name) => {
-  if (name && !workspace.value && !versions.value) {
-    const data = await send('market/registry', name)
+  if (name && !workspace.value && !store.registry?.[active.value]) {
+    const data = await send('market/registry', [name])
     version.value = Object.keys(data)[0]
   }
 }, { immediate: true })
 
 const data = computed(() => {
   if (!active.value || workspace.value) return
-  return analyzeVersions(active.value, config.value.bulk)
+  return analyzeVersions(active.value, getVersion)
 })
 
 const danger = computed(() => {
   if (workspace.value) return
-  const deprecated = versions.value?.[version.value]?.deprecated
+  const deprecated = store.registry?.[active.value]?.[version.value]?.deprecated
   if (deprecated) return '此版本已废弃：' + deprecated
   if (store.market?.data[active.value]?.insecure) {
     return '警告：从此插件的最新版本中检测出安全性问题。安装或升级此插件可能导致严重问题。'
@@ -225,7 +267,7 @@ function getResultIcon(type: 'primary' | 'warning' | 'danger' | 'success') {
 }
 
 function getResultText(type: 'primary' | 'warning' | 'danger' | 'success', name: string) {
-  const isOverriden = config.value.bulk && name in config.value.override
+  const isOverriden = config.value.bulk ? name in config.value.override : name in versions
   const isInstalled = store.packages ? !!store.packages[name] : !!store.dependencies?.[name]
   switch (type) {
     case 'primary': return '可选'
@@ -322,6 +364,25 @@ function getResultText(type: 'primary' | 'warning' | 'danger' | 'success', name:
     display: flex;
     justify-content: space-between;
     align-items: center;
+  }
+  
+  .wrapper {
+    position: relative;
+    display: inline-flex;
+
+    .shadow {
+      letter-spacing: 1px;
+      visibility: hidden;
+      padding-right: 22px; // .el-input__suffix
+    }
+
+    .el-select {
+      position: absolute;
+      left: 0;
+      top: 50%;
+      right: 0;
+      transform: translateY(-50%);
+    }
   }
 }
 

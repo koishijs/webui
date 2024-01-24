@@ -2,7 +2,7 @@ import { Awaitable, Dict, loading, message, send, socket, store, valueMap } from
 import type { Registry } from '@koishijs/registry'
 import { compare, satisfies } from 'semver'
 import { reactive, ref, watch } from 'vue'
-import { active, config } from '../utils'
+import { active } from '../utils'
 
 type ResultType = 'success' | 'warning' | 'danger' | 'primary'
 
@@ -15,12 +15,12 @@ interface AnalyzeResult {
   result: ResultType
 }
 
-export function analyzeVersions(name: string, bulkMode = true): Dict<AnalyzeResult> {
+export function analyzeVersions(name: string, getVersion: (name: string) => string): Dict<AnalyzeResult> {
   const versions = store.registry?.[name] || manualDeps[name]?.versions
   if (!versions) return
   return valueMap(versions, (item) => {
     const peers = valueMap({ ...item.peerDependencies }, (request, name) => {
-      const resolved = (bulkMode ? config.value.override[name] : null)
+      const resolved = (getVersion ? getVersion(name) : null)
         ?? store.dependencies[name]?.resolved
         ?? store.packages?.[name]?.package.version
       const result: ResultType = !resolved

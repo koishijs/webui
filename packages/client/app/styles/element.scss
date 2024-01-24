@@ -207,3 +207,11 @@ html.dark .el-popper.is-dark {
     visibility: hidden;
   }
 }
+
+.el-select.frameless {
+  .el-input .el-input__wrapper {
+    --el-input-height: 1rem;
+    box-shadow: none !important;
+    padding: 0 !important;
+  }
+}

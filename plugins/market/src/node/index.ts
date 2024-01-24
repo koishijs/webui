@@ -26,7 +26,7 @@ declare module '@koishijs/console' {
 
   interface Events {
     'market/install'(deps: Dict<string>, forced?: boolean): Promise<number>
-    'market/registry'(name: string): Promise<Dict<Pick<RemotePackage, DependencyMetaKey>>>
+    'market/registry'(names: string[]): Promise<Dict<Pick<RemotePackage, DependencyMetaKey>>[]>
   }
 }
 
@@ -164,8 +164,8 @@ export function apply(ctx: Context, config: Config) {
       return code
     }, { authority: 4 })
 
-    ctx.console.addListener('market/registry', async (name) => {
-      return ctx.installer.getPackage(name)
+    ctx.console.addListener('market/registry', async (names) => {
+      return Promise.all(names.map(name => ctx.installer.getPackage(name)))
     }, { authority: 4 })
   })
 }
