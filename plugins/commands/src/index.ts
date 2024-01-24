@@ -1,8 +1,17 @@
 import { Argv, clone, Command, Context, deepEqual, Dict, filterKeys, mapValues, remove, Schema } from 'koishi'
-import ConsoleExtension from './console'
 import CommandExtension from './command'
+import { resolve } from 'path'
+import { Entry } from '@koishijs/console'
 
-export * from './console'
+declare module '@koishijs/console' {
+  interface Events {
+    'command/create'(name: string): void
+    'command/remove'(name: string): void
+    'command/update'(name: string, config: Pick<CommandState, 'config' | 'options'>): void
+    'command/teleport'(name: string, parent: string): void
+    'command/aliases'(name: string, aliases: Dict<false | Command.Alias>): void
+  }
+}
 
 interface Override extends Partial<CommandState> {
   name?: string
@@ -49,10 +58,18 @@ export class CommandManager {
   static schema: Schema<Dict<string | Config>, Dict<Config>> = Schema.dict(Config).hidden()
 
   private _tasks: Dict<() => void> = Object.create(null)
+  private _cache: CommandData[]
+  private entry: Entry<CommandData[]>
+  private refresh: () => void
 
   public snapshots: Dict<Snapshot> = Object.create(null)
 
   constructor(private ctx: Context, private config: Dict<Config>) {
+    this.refresh = this.ctx.debounce(() => {
+      this._cache = null
+      this.entry?.refresh()
+    }, 0)
+
     for (const key in config) {
       const command = ctx.$commander.get(key, true)
       if (command) {
@@ -87,6 +104,7 @@ export class CommandManager {
         if (!parent || parent === cmd) continue
         this._teleport(command, parent)
       }
+      this.refresh()
     })
 
     ctx.on('dispose', () => {
@@ -101,8 +119,9 @@ export class CommandManager {
       }
     }, true)
 
-    ctx.plugin(ConsoleExtension, this)
     ctx.plugin(CommandExtension, this)
+
+    this.installWebUI()
   }
 
   init(command: Command) {
@@ -247,6 +266,8 @@ export class CommandManager {
       ...target._aliases,
       ...override.aliases,
     })
+
+    this.refresh()
   }
 
   write(...commands: Command[]) {
@@ -279,6 +300,71 @@ export class CommandManager {
     }
     this.ctx.scope.update(this.config, false)
   }
+
+  installWebUI() {
+    this.ctx.inject(['console'], (ctx) => {
+      ctx.on('dispose', () => this.entry = undefined)
+
+      this.entry = ctx.console.addEntry(process.env.KOISHI_BASE ? [
+        process.env.KOISHI_BASE + '/dist/index.js',
+        process.env.KOISHI_BASE + '/dist/style.css',
+      ] : process.env.KOISHI_ENV === 'browser' ? [
+        // @ts-ignore
+        import.meta.url.replace(/\/src\/[^/]+$/, '/client/index.ts'),
+      ] : {
+        dev: resolve(__dirname, '../client/index.ts'),
+        prod: resolve(__dirname, '../dist'),
+      }, () => this._cache ||= this.traverse(this.ctx.$commander._commandList.filter(cmd => !cmd.parent)))
+
+      ctx.console.addListener('command/update', (name, config) => {
+        const { command } = this.ensure(name)
+        this.update(command, config, true)
+        this.refresh()
+      }, { authority: 4 })
+
+      ctx.console.addListener('command/teleport', (name, parent) => {
+        const { command } = this.ensure(name)
+        this.teleport(command, parent, true)
+        this.refresh()
+      }, { authority: 4 })
+
+      ctx.console.addListener('command/aliases', (name, aliases) => {
+        const { command } = this.ensure(name)
+        this.alias(command, aliases, true)
+        this.refresh()
+      }, { authority: 4 })
+
+      ctx.console.addListener('command/create', (name) => {
+        this.create(name)
+        this.refresh()
+      }, { authority: 4 })
+
+      ctx.console.addListener('command/remove', (name) => {
+        this.remove(name)
+        this.refresh()
+      }, { authority: 4 })
+    })
+  }
+
+  traverse(commands: Command[]): CommandData[] {
+    return commands.map((command) => ({
+      name: command.name,
+      children: this.traverse(command.children),
+      create: this.snapshots[command.name]?.create,
+      initial: this.snapshots[command.name]?.initial || { aliases: command._aliases, config: command.config, options: command._options },
+      override: this.snapshots[command.name]?.override || { aliases: command._aliases, config: null, options: {} },
+      paths: this.ctx.get('loader')?.paths(command.ctx.scope) || [],
+    })).sort((a, b) => a.name.localeCompare(b.name))
+  }
+}
+
+export interface CommandData {
+  create: boolean
+  name: string
+  paths: string[]
+  children: CommandData[]
+  initial: CommandState
+  override: CommandState
 }
 
 export default CommandManager

@@ -26,7 +26,7 @@
         <el-tree
           ref="tree"
           :draggable="true"
-          :data="store.commands"
+          :data="data"
           :props="{ label: 'name', class: getClass }"
           :filter-node-method="filterNode"
           :default-expand-all="true"
@@ -111,16 +111,18 @@
 
 <script lang="ts" setup>
 
-import { clone, Dict, pick, Schema, send, store, valueMap } from '@koishijs/client'
+import { clone, Dict, pick, Schema, send, store, useRpc, valueMap } from '@koishijs/client'
 import { useRoute, useRouter } from 'vue-router'
 import { computed, nextTick, onActivated, ref, watch } from 'vue'
 import { CommandData, CommandState } from '@koishijs/plugin-commands'
 import {} from '@koishijs/plugin-locales'
 import {} from '@koishijs/plugin-config'
-import { commands, createSchema } from './utils'
+import { createSchema } from './utils'
 
 const route = useRoute()
 const router = useRouter()
+
+const data = useRpc<CommandData[]>()
 
 const inputEl = ref()
 const title = ref('')
@@ -133,6 +135,21 @@ const schema = ref<{
   config: Schema
   options: Dict<Schema>
 }>()
+
+function getCommands(data: CommandData[]) {
+  const result: CommandData[] = []
+  for (const item of data) {
+    result.push(item)
+    if (!item.children) continue
+    result.push(...getCommands(item.children))
+  }
+  return result
+}
+
+const commands = computed<Dict<CommandData>>(() => {
+  if (!data.value) return {}
+  return Object.fromEntries(getCommands(data.value).map((item) => [item.name, item]))
+})
 
 const aliases = computed(() => {
   return Object.values(commands.value).flatMap(command => command.override.aliases)

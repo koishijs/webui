@@ -1,5 +1,5 @@
 <template>
-  <div v-if="active && active.startsWith('commands.') && store.commands" class="navigation flex flex-wrap gap-x-4 gap-y-2 my-8">
+  <div v-if="active && active.startsWith('commands.') && data" class="navigation flex flex-wrap gap-x-4 gap-y-2 my-8">
     <router-link
       class="el-button"
       :to="'/commands/' + active.slice(9).replace(/\./, '/')"
@@ -9,10 +9,13 @@
 
 <script lang="ts" setup>
 
-import { store } from '@koishijs/client'
-import { inject, Computed } from 'vue'
+import { useRpc } from '@koishijs/client'
+import { inject, ComputedRef } from 'vue'
+import { CommandData } from '../lib';
 
-const active = inject<Computed<string>>('locale:prefix')
+const active = inject<ComputedRef<string>>('locale:prefix')
+
+const data = useRpc<CommandData[]>()
 
 </script>
 

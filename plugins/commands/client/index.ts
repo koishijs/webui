@@ -20,7 +20,6 @@ export default (ctx: Context) => {
     icon: 'activity:commands',
     order: 500,
     authority: 4,
-    fields: ['commands'],
     component: Commands,
   })
 
