@@ -11,7 +11,7 @@
       </template>
     </template>
     <template v-for="(count, status) in statusMap" :key="status">
-      <template v-if="count >= 10">
+      <template v-if="count > (config.mergeThreshold ?? 10)">
         <status-light :class="status"></status-light>
         <span class="count">×{{ count }}</span>
       </template>
@@ -29,10 +29,12 @@
 <script setup lang="ts">
 
 import { computed } from 'vue'
-import { store, router, Dict } from '@koishijs/client'
+import { store, router, Dict, useConfig } from '@koishijs/client'
 import { getStatus } from './utils'
 import BotPreview from './preview.vue'
 import StatusLight from './light.vue'
+
+const config = useConfig()
 
 const statusMap = computed(() => {
   const map: Dict<number> = {}
