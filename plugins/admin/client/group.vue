@@ -280,10 +280,4 @@ function getLink(name: string) {
   background: transparent;
 }
 
-.create-dialog {
-  .el-input.invalid .el-input__wrapper {
-    box-shadow: 0 0 0 1px var(--el-color-danger) inset;
-  }
-}
-
 </style>
