@@ -13,27 +13,17 @@
 
 import { computed, inject } from 'vue'
 import { CommandData } from '../lib'
-import { useRpc } from '@koishijs/client'
+import { Dict, useRpc } from '@koishijs/client'
 
 const current: any = inject('manager.settings.current')
 
-const data = useRpc<CommandData[]>()
+const data = useRpc<Dict<CommandData>>()
 
 const list = computed(() => {
-  return getCommands(data.value)
+  return Object.values(data.value)
     .filter(item => item.paths.includes(current.value.path))
     .sort((a, b) => a.name.localeCompare(b.name))
 })
-
-function getCommands(data: CommandData[]) {
-  const result: CommandData[] = []
-  for (const item of data) {
-    result.push(item)
-    if (!item.children) continue
-    result.push(...getCommands(item.children))
-  }
-  return result
-}
 
 </script>
 

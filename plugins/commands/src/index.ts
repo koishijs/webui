@@ -9,7 +9,7 @@ declare module '@koishijs/console' {
     'command/remove'(name: string): void
     'command/update'(name: string, config: Pick<CommandState, 'config' | 'options'>): void
     'command/teleport'(name: string, parent: string): void
-    'command/aliases'(name: string, aliases: Dict<false | Command.Alias>): void
+    'command/aliases'(name: string, aliases: Dict<Command.Alias>): void
   }
 }
 
@@ -22,7 +22,14 @@ const Override: Schema<Override> = Schema.object({
   name: Schema.string(),
   create: Schema.boolean(),
   aliases: Schema.union([
-    Schema.dict(null),
+    Schema.dict(Schema.union([
+      Schema.object({
+        args: Schema.array(null),
+        options: Schema.dict(null),
+        filter: Schema.any(),
+      }),
+      Schema.transform(false, () => ({ filter: false })),
+    ])),
     Schema.transform(Schema.array(String), (aliases) => {
       return Object.fromEntries(aliases.map((name) => [name, {}]))
     }),
@@ -32,7 +39,7 @@ const Override: Schema<Override> = Schema.object({
 })
 
 export interface CommandState {
-  aliases: Dict<false | Command.Alias>
+  aliases: Dict<Command.Alias>
   config: Command.Config
   options: Dict<Argv.OptionDeclaration>
 }
@@ -53,13 +60,22 @@ const Config: Schema<string | Config, Config> = Schema.union([
   Schema.transform(String, (name) => ({ name, aliases: {}, config: {}, options: {} })),
 ])
 
+export interface CommandData {
+  create: boolean
+  name: string
+  paths: string[]
+  children: string[]
+  initial: CommandState
+  override: CommandState
+}
+
 export class CommandManager {
   static filter = false
   static schema: Schema<Dict<string | Config>, Dict<Config>> = Schema.dict(Config).hidden()
 
   private _tasks: Dict<() => void> = Object.create(null)
-  private _cache: CommandData[]
-  private entry: Entry<CommandData[]>
+  private _cache: Dict<CommandData>
+  private entry: Entry<Dict<CommandData>>
   private refresh: () => void
 
   public snapshots: Dict<Snapshot> = Object.create(null)
@@ -71,7 +87,7 @@ export class CommandManager {
     }, 0)
 
     for (const key in config) {
-      const command = ctx.$commander.get(key, true)
+      const command = ctx.$commander.get(key)
       if (command) {
         this.accept(command, config[key])
       } else if (config[key].create) {
@@ -85,7 +101,7 @@ export class CommandManager {
     ctx.on('command-added', async (cmd) => {
       this.init(cmd)
       for (const { command, pending } of Object.values(this.snapshots)) {
-        const parent = this.ctx.$commander.get(pending, true)
+        const parent = this.ctx.$commander.get(pending)
         if (!parent || !pending) continue
         this.snapshots[command.name].pending = null
         this._teleport(command, parent)
@@ -133,7 +149,7 @@ export class CommandManager {
   }
 
   ensure(name: string, create?: boolean, patch?: boolean) {
-    const command = this.ctx.$commander.get(name, true)
+    const command = this.ctx.$commander.get(name)
     const snapshot = this.snapshots[command.name]
     if (patch && snapshot) {
       // Aliases and options may be modified by other plugins.
@@ -175,7 +191,7 @@ export class CommandManager {
 
   teleport(command: Command, name: string, write = false) {
     this.snapshots[command.name].pending = null
-    const parent = this.ctx.$commander.get(name, true)
+    const parent = this.ctx.$commander.get(name)
     if (name && !parent) {
       this.snapshots[command.name].pending = name
     } else {
@@ -189,9 +205,9 @@ export class CommandManager {
     }
   }
 
-  alias(command: Command, aliases: Dict<false | Command.Alias>, write = false) {
+  alias(command: Command, aliases: Dict<Command.Alias>, write = false) {
     const { initial, override } = this.snapshots[command.name]
-    command._aliases = override.aliases = mapValues(aliases, (value) => value || null)
+    command._aliases = override.aliases = aliases
 
     if (write) {
       this.config[command.name] ||= {}
@@ -274,9 +290,13 @@ export class CommandManager {
     for (const command of commands) {
       const snapshot = this.ensure(command.name)
       const override = this.config[command.name]
+
+      // config
       if (override.config && !Object.keys(override.config).length) {
         delete override.config
       }
+
+      // options
       for (const key in override.options) {
         if (override.options[key] && !Object.keys(override.options[key]).length) {
           delete override.options[key]
@@ -285,6 +305,8 @@ export class CommandManager {
       if (override.options && !Object.keys(override.options).length) {
         delete override.options
       }
+
+      // aliases
       if (override.aliases && !Object.keys(override.aliases).length) {
         delete override.aliases
       }
@@ -294,6 +316,7 @@ export class CommandManager {
           delete this.config[command.name].name
         }
       }
+
       if (!Object.keys(override).length) {
         delete this.config[command.name]
       }
@@ -314,7 +337,16 @@ export class CommandManager {
       ] : {
         dev: resolve(__dirname, '../client/index.ts'),
         prod: resolve(__dirname, '../dist'),
-      }, () => this._cache ||= this.traverse(this.ctx.$commander._commandList.filter(cmd => !cmd.parent)))
+      }, () => {
+        return this._cache ||= Object.fromEntries(ctx.$commander._commandList.map<[string, CommandData]>((command) => [command.name, {
+          name: command.name,
+          children: command.children.map((child) => child.name),
+          create: this.snapshots[command.name]?.create,
+          initial: this.snapshots[command.name]?.initial || { aliases: command._aliases, config: command.config, options: command._options },
+          override: this.snapshots[command.name]?.override || { aliases: command._aliases, config: null, options: {} },
+          paths: this.ctx.get('loader')?.paths(command.ctx.scope) || [],
+        }]))
+      })
 
       ctx.console.addListener('command/update', (name, config) => {
         const { command } = this.ensure(name)
@@ -345,26 +377,6 @@ export class CommandManager {
       }, { authority: 4 })
     })
   }
-
-  traverse(commands: Command[]): CommandData[] {
-    return commands.map((command) => ({
-      name: command.name,
-      children: this.traverse(command.children),
-      create: this.snapshots[command.name]?.create,
-      initial: this.snapshots[command.name]?.initial || { aliases: command._aliases, config: command.config, options: command._options },
-      override: this.snapshots[command.name]?.override || { aliases: command._aliases, config: null, options: {} },
-      paths: this.ctx.get('loader')?.paths(command.ctx.scope) || [],
-    })).sort((a, b) => a.name.localeCompare(b.name))
-  }
-}
-
-export interface CommandData {
-  create: boolean
-  name: string
-  paths: string[]
-  children: CommandData[]
-  initial: CommandState
-  override: CommandState
 }
 
 export default CommandManager
