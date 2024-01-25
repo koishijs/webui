@@ -10,6 +10,7 @@ declare module '@koishijs/console' {
     'command/update'(name: string, config: Pick<CommandState, 'config' | 'options'>): void
     'command/teleport'(name: string, parent: string): void
     'command/aliases'(name: string, aliases: Dict<Command.Alias>): void
+    'command/parse'(name: string, source: string): Argv
   }
 }
 
@@ -375,6 +376,11 @@ export class CommandManager {
         this.remove(name)
         this.refresh()
       }, { authority: 4 })
+
+      ctx.console.addListener('command/parse', (name, source) => {
+        const command = this.ctx.$commander.get(name)
+        return command.parse(source)
+      })
     })
   }
 }
