@@ -127,24 +127,48 @@ class NodeConsole extends Console {
       if (ctx.path === uiPath && !uiPath.endsWith('/')) {
         return ctx.redirect(ctx.path + '/')
       }
+
       const name = ctx.path.slice(uiPath.length).replace(/^\/+/, '')
       const sendFile = (filename: string) => {
         ctx.type = extname(filename)
         return ctx.body = createReadStream(filename)
       }
+
       if (name.startsWith('@plugin-')) {
         const [key] = name.slice(8).split('/', 1)
         if (this.entries[key]) {
           const files = makeArray(this.getFiles(this.entries[key].files))
-          return sendFile(files[0] + name.slice(8 + key.length))
+          const filename = files[0] + name.slice(8 + key.length)
+          ctx.type = extname(filename)
+          if (this.config.devMode || ctx.type !== 'application/javascript') {
+            return sendFile(filename)
+          }
+
+          // we only transform js imports in production mode
+          let source = await fsp.readFile(filename, 'utf8')
+          let output = ''
+          let cap: RegExpExecArray
+          while ((cap = /^(import\b[^'"]+\bfrom\s*)(['"])([^'"]+)\2;/.exec(source))) {
+            const [stmt, left, quote, path] = cap
+            output += left + quote + ({
+              'vue': '../vue.js',
+              'vue-router': '../vue-router.js',
+              '@vueuse/core': '../vueuse.js',
+              '@koishijs/client': '../client.js',
+            }[path] ?? path) + quote + ';'
+            source = source.slice(cap.index + stmt.length)
+          }
+          return ctx.body = output + source
         } else {
           return ctx.status = 404
         }
       }
+
       const filename = resolve(this.root, name)
       if (!filename.startsWith(this.root) && !filename.includes('node_modules')) {
         return ctx.status = 403
       }
+
       const stats = await fsp.stat(filename).catch<Stats>(noop)
       if (stats?.isFile()) return sendFile(filename)
       const template = await fsp.readFile(resolve(this.root, 'index.html'), 'utf8')
@@ -198,6 +222,7 @@ class NodeConsole extends Console {
       resolve: {
         dedupe: ['vue', 'vue-demi', 'vue-router', 'element-plus', '@vueuse/core', '@popperjs/core', 'marked', 'xss'],
         alias: {
+          // for backward compatibility
           '../client.js': '@koishijs/client',
           '../vue.js': 'vue',
           '../vue-router.js': 'vue-router',

@@ -10,6 +10,8 @@ declare module 'yakumo' {
   }
 }
 
+export const inject = ['yakumo']
+
 export function apply(ctx: Context) {
   ctx.register('client', async () => {
     const paths = ctx.yakumo.locate(ctx.yakumo.argv._)

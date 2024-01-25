@@ -34,10 +34,10 @@ export async function buildExtension(root: string, config: UserConfig = {}) {
       rollupOptions: {
         makeAbsoluteExternalsRelative: true,
         external: [
-          root + '/vue.js',
-          root + '/vue-router.js',
-          root + '/vueuse.js',
-          root + '/client.js',
+          'vue',
+          'vue-router',
+          '@vueuse/core',
+          '@koishijs/client',
         ],
         output: {
           format: 'iife',
@@ -57,12 +57,8 @@ export async function buildExtension(root: string, config: UserConfig = {}) {
     ],
     resolve: {
       alias: {
-        'vue': root + '/vue.js',
-        'vue-i18n': root + '/client.js',
-        'vue-router': root + '/vue-router.js',
-        '@vueuse/core': root + '/vueuse.js',
-        '@koishijs/client': root + '/client.js',
-        '@koishijs/components': root + '/client.js',
+        'vue-i18n': '@koishijs/client',
+        '@koishijs/components': '@koishijs/client',
       },
     },
     define: {
@@ -78,6 +74,7 @@ export async function buildExtension(root: string, config: UserConfig = {}) {
     } else {
       const result = await transformWithEsbuild(item.code, dest, {
         minifyWhitespace: true,
+        charset: 'utf8',
       })
       await fsp.writeFile(dest, result.code)
     }
