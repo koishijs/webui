@@ -6,7 +6,10 @@
   "types": "lib/index.d.ts",
   "exports": {
     ".": {
-      "node": "./lib/node/index.js",
+      "node": {
+        "require": "./lib/node/index.js",
+        "import": "./lib/node/index.mjs"
+      },
       "browser": "./lib/browser/index.mjs",
       "types": "./lib/index.d.ts"
     },

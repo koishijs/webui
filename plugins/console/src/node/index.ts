@@ -6,6 +6,8 @@ import { extname, resolve } from 'path'
 import { createReadStream, existsSync, promises as fsp, Stats } from 'fs'
 import {} from '@koishijs/plugin-server-proxy'
 import open from 'open'
+import { createRequire } from 'module'
+import { fileURLToPath } from 'url'
 
 declare module 'koishi' {
   interface EnvData {
@@ -54,9 +56,12 @@ class NodeConsole extends Console {
       loader.envData.clientCount = this.layer.clients.size
     })
 
+    // @ts-ignore
+    const require = createRequire(import.meta.url)
     this.root = config.root || (config.devMode
       ? resolve(require.resolve('@koishijs/client/package.json'), '../app')
-      : resolve(__dirname, '../../dist'))
+      // @ts-ignore
+      : fileURLToPath(new URL('../../dist', import.meta.url)))
   }
 
   get config() {
@@ -84,7 +89,9 @@ class NodeConsole extends Console {
     this.serveAssets()
 
     this.ctx.on('server/ready', () => {
-      const target = this.ctx.server.selfUrl + this.config.uiPath
+      let { host, port } = this.ctx.server
+      if (['0.0.0.0', '::'].includes(host)) host = '127.0.0.1'
+      const target = `http://${host}:${port}${this.config.uiPath}`
       if (this.config.open && !this.ctx.get('loader')?.envData.clientCount && !process.env.KOISHI_AGENT) {
         open(target)
       }
@@ -194,11 +201,11 @@ class NodeConsole extends Console {
 
   private async createVite() {
     const { cacheDir, dev } = this.config
-    const { createServer } = require('vite') as typeof import('vite')
-    const { default: mini } = require('unocss/preset-mini') as typeof import('unocss/preset-mini')
-    const { default: unocss } = require('unocss/vite') as typeof import('unocss/vite')
-    const { default: vue } = require('@vitejs/plugin-vue') as typeof import('@vitejs/plugin-vue')
-    const { default: yaml } = require('@maikolib/vite-plugin-yaml') as typeof import('@maikolib/vite-plugin-yaml')
+    const { createServer } = await import('vite')
+    const { default: mini } = await import('unocss/preset-mini')
+    const { default: unocss } = await import('unocss/vite')
+    const { default: vue } = await import('@vitejs/plugin-vue')
+    const { default: yaml } = await import('@maikolib/vite-plugin-yaml')
 
     this.vite = await createServer({
       root: this.root,
