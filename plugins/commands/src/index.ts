@@ -25,8 +25,8 @@ const Override: Schema<Override> = Schema.object({
   aliases: Schema.union([
     Schema.dict(Schema.union([
       Schema.object({
-        args: Schema.array(null),
-        options: Schema.dict(null),
+        args: Schema.array(null).default(null),
+        options: Schema.dict(null).default(null),
         filter: Schema.any(),
       }),
       Schema.transform(false, () => ({ filter: false })),
@@ -35,7 +35,7 @@ const Override: Schema<Override> = Schema.object({
       return Object.fromEntries(aliases.map((name) => [name, {}]))
     }),
   ]),
-  options: Schema.dict(null),
+  options: Schema.dict(null).default(null),
   config: Schema.any(),
 })
 

@@ -75,7 +75,6 @@ describe('@koishijs/plugin-commands', () => {
           aliases: {
             baz: {},
           },
-          options: {},
         },
       })
 
