@@ -203,7 +203,7 @@ class NodeConsole extends Console {
     const { cacheDir, dev } = this.config
     const { createServer } = await import('@koishijs/client/lib/index.js')
 
-    this.vite = await createServer({
+    this.vite = await createServer(this.ctx.baseDir, {
       cacheDir: resolve(this.ctx.baseDir, cacheDir),
       server: {
         fs: dev.fs,

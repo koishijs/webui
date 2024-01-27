@@ -82,13 +82,18 @@ export async function build(root: string, config: vite.UserConfig = {}) {
   }
 }
 
-export function createServer(config?: vite.InlineConfig) {
+export function createServer(baseDir: string, config?: vite.InlineConfig) {
   const root = resolve(__dirname, '../app')
   return vite.createServer(vite.mergeConfig({
     root,
     base: '/vite/',
     server: {
       middlewareMode: true,
+      fs: {
+        allow: [
+          vite.searchForWorkspaceRoot(baseDir),
+        ],
+      },
     },
     plugins: [
       vue(),
@@ -127,5 +132,5 @@ export function createServer(config?: vite.InlineConfig) {
         input: root + '/index.html',
       },
     },
-  }, config))
+  } as vite.InlineConfig, config))
 }

@@ -96,5 +96,7 @@ router.beforeEach(async (to, from) => {
   }
 
   redirectTo.value = to.fullPath
-  return routeCache['home'] || '/'
+  const result = routeCache['home'] || '/'
+  if (result === to.fullPath) return
+  return result
 })
