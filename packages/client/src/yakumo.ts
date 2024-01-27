@@ -1,7 +1,7 @@
 import { createRequire } from 'module'
 import { UserConfig } from 'vite'
 import { Context } from 'yakumo'
-import { buildExtension } from '.'
+import { build } from '.'
 import ns from 'ns-require'
 
 declare module 'yakumo' {
@@ -35,7 +35,7 @@ export function apply(ctx: Context) {
       } else if (!deps['@koishijs/client']) {
         continue
       }
-      await buildExtension(ctx.yakumo.cwd + path, config)
+      await build(ctx.yakumo.cwd + path, config)
     }
   })
 }

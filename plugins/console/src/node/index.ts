@@ -7,7 +7,7 @@ import { createReadStream, existsSync, promises as fsp, Stats } from 'fs'
 import {} from '@koishijs/plugin-server-proxy'
 import open from 'open'
 import { createRequire } from 'module'
-import { fileURLToPath } from 'url'
+import { fileURLToPath, pathToFileURL } from 'url'
 
 declare module 'koishi' {
   interface EnvData {
@@ -57,11 +57,11 @@ class NodeConsole extends Console {
     })
 
     // @ts-ignore
-    const require = createRequire(import.meta.url)
+    const base = import.meta.url || pathToFileURL(__filename).href
+    const require = createRequire(base)
     this.root = config.root || (config.devMode
       ? resolve(require.resolve('@koishijs/client/package.json'), '../app')
-      // @ts-ignore
-      : fileURLToPath(new URL('../../dist', import.meta.url)))
+      : fileURLToPath(new URL('../../dist', base)))
   }
 
   get config() {
@@ -201,56 +201,12 @@ class NodeConsole extends Console {
 
   private async createVite() {
     const { cacheDir, dev } = this.config
-    const { createServer } = await import('vite')
-    const { default: mini } = await import('unocss/preset-mini')
-    const { default: unocss } = await import('unocss/vite')
-    const { default: vue } = await import('@vitejs/plugin-vue')
-    const { default: yaml } = await import('@maikolib/vite-plugin-yaml')
+    const { createServer } = await import('@koishijs/client/lib/index.js')
 
     this.vite = await createServer({
-      root: this.root,
-      base: '/vite/',
       cacheDir: resolve(this.ctx.baseDir, cacheDir),
       server: {
-        middlewareMode: true,
         fs: dev.fs,
-      },
-      plugins: [
-        vue(),
-        yaml(),
-        unocss({
-          presets: [
-            mini({
-              preflight: false,
-            }),
-          ],
-        }),
-      ],
-      resolve: {
-        dedupe: ['vue', 'vue-demi', 'vue-router', 'element-plus', '@vueuse/core', '@popperjs/core', 'marked', 'xss'],
-        alias: {
-          // for backward compatibility
-          '../client.js': '@koishijs/client',
-          '../vue.js': 'vue',
-          '../vue-router.js': 'vue-router',
-          '../vueuse.js': '@vueuse/core',
-        },
-      },
-      optimizeDeps: {
-        include: [
-          'vue',
-          'vue-router',
-          'element-plus',
-          '@vueuse/core',
-          '@popperjs/core',
-          'marked',
-          'xss',
-        ],
-      },
-      build: {
-        rollupOptions: {
-          input: this.root + '/index.html',
-        },
       },
     })
 

@@ -13,7 +13,7 @@
   "license": "MIT",
   "scripts": {
     "client": "yakumo client",
-    "build": "tsc -b packages/client && yakumo tsx build",
+    "build": "tsc -b packages/client && yakumo build",
     "bump": "yakumo version",
     "dep": "yakumo upgrade",
     "pub": "yakumo publish",
