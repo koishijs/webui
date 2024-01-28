@@ -1,5 +1,5 @@
 import { Context, Dict, Logger, remove, Schema, Time } from 'koishi'
-import { DataService } from '@koishijs/plugin-console'
+import { DataService } from '@koishijs/console'
 import { resolve } from 'path'
 import { mkdir, readdir, rm } from 'fs/promises'
 import { FileWriter } from './file'
