@@ -1,7 +1,7 @@
 {
   "name": "@koishijs/registry",
   "description": "Scan Package Manager for Koishi Plugins",
-  "version": "7.0.1",
+  "version": "7.0.3",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
   "files": [

@@ -43,9 +43,9 @@
     "build"
   ],
   "dependencies": {
-    "@koishijs/components": "1.5.7",
+    "@koishijs/components": "1.5.8",
     "@maikolib/vite-plugin-yaml": "^1.0.1",
-    "@satorijs/protocol": "^1.2.0",
+    "@satorijs/protocol": "^1.2.1",
     "@vitejs/plugin-vue": "^4.5.1",
     "@vueuse/core": "^10.6.1",
     "cac": "^6.7.14",
@@ -62,6 +62,6 @@
     "vue-router": "^4.2.5"
   },
   "yakumo": {
-    "client": "./scripts/client"
+    "client": "./scripts/client.ts"
   }
 }

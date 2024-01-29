@@ -32,7 +32,7 @@
     "status"
   ],
   "yakumo": {
-    "client": "./build/client"
+    "client": "./build/client.ts"
   },
   "koishi": {
     "description": {
@@ -49,17 +49,17 @@
     }
   },
   "peerDependencies": {
-    "@koishijs/plugin-console": "^5.26.0",
-    "koishi": "^4.16.6"
+    "@koishijs/plugin-console": "^5.27.1",
+    "koishi": "^4.16.7"
   },
   "devDependencies": {
     "@koishijs/assets": "^1.0.3",
-    "@koishijs/client": "^5.26.0",
+    "@koishijs/client": "^5.27.1",
     "echarts": "^5.4.3",
-    "koishi": "^4.16.6",
+    "koishi": "^4.16.7",
     "vue-echarts": "^6.6.1"
   },
   "dependencies": {
-    "@koishijs/console": "^5.26.0"
+    "@koishijs/console": "^5.27.1"
   }
 }
