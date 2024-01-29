@@ -1,7 +1,6 @@
-import { defineComponent, h } from 'vue'
-import { Context, global, receive, router, send, store } from '@koishijs/client'
+import { defineComponent, h, watch } from 'vue'
+import { Context, Dict, global, receive, router, Schema, send, store, useConfig } from '@koishijs/client'
 import type {} from '@koishijs/plugin-market'
-import { config } from './utils'
 import { showConfirm, showManual } from './components/utils'
 import extensions from './extensions'
 import Dependencies from './components/dependencies.vue'
@@ -12,6 +11,18 @@ import Progress from './components/progress.vue'
 import './icons'
 
 import 'virtual:uno.css'
+
+declare module '@koishijs/client' {
+  interface Config {
+    market: MarketConfig
+  }
+}
+
+interface MarketConfig {
+  bulkMode?: boolean
+  removeConfig?: boolean
+  override?: Dict<string>
+}
 
 receive('market/patch', (data) => {
   store.market = {
@@ -64,6 +75,24 @@ export default (ctx: Context) => {
     component: Market,
   })
 
+  ctx.settings({
+    id: 'market',
+    title: '插件市场设置',
+    schema: Schema.object({
+      market: Schema.object({
+        bulkMode: Schema.boolean().default(false).description('批量操作模式。'),
+        removeConfig: Schema.union([
+          Schema.const(undefined).description('每次询问'),
+          Schema.const(true).description('总是'),
+          Schema.const(false).description('从不'),
+        ]).description('移除插件时是否移除其已经存在的配置。'),
+        override: Schema.dict(String).hidden(),
+      }),
+    }),
+  })
+
+  const config = useConfig()
+
   if (!global.static) {
     ctx.slot({
       type: 'status-right',
@@ -88,7 +117,7 @@ export default (ctx: Context) => {
   })
 
   ctx.action('market.install', {
-    disabled: () => !Object.keys(config.value.override).length,
+    disabled: () => !Object.keys(config.value.market.override).length,
     action() {
       showConfirm.value = true
     },
@@ -129,4 +158,21 @@ export default (ctx: Context) => {
     label: '刷新',
     type: () => !store.market || store.market.progress < store.market.total ? 'spin disabled' : '',
   }])
+
+  ctx.effect(() => {
+    return watch(() => store.dependencies, (value) => {
+      if (!value) return
+      for (const key in config.value.market.override) {
+        if (value[key]?.workspace) {
+          delete config.value.market.override[key]
+        } else if (!config.value.market.override[key] && !value[key]) {
+          // package to be removed has been removed
+          delete config.value.market.override[key]
+        } else if (value[key]?.request === config.value.market.override[key]) {
+          // package has been installed to the right version
+          delete config.value.market.override[key]
+        }
+      }
+    }, { immediate: true })
+  })
 }

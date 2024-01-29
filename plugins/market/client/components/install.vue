@@ -69,7 +69,7 @@
 
     <template v-if="active && !global.static" #footer>
       <div class="left">
-        <el-checkbox v-model="config.bulkMode">
+        <el-checkbox v-model="config.market.bulkMode">
           批量操作模式
           <k-hint>
             批量操作模式下，你可以同时安装、更新或移除多个插件。勾选此选项后，你的所有操作会被暂存，直到你点击右上角的“应用更改”按钮。
@@ -92,11 +92,21 @@
     </template>
   </el-dialog>
 
-  <el-dialog v-model="confirmRemoveConfig" destroy-on-close>
+  <el-dialog v-model="showRemoveDialog" destroy-on-close>
     检测到你正在卸载一个已配置的插件，是否同时删除其配置？
     <template #footer>
-      <el-button type="danger" @click="installDep('', false, true)">删除</el-button>
-      <el-button type="primary" @click="installDep('', false, false)">保留</el-button>
+      <div class="left">
+        <el-checkbox v-model="saveChoice">
+          记住我的选择
+          <k-hint>
+            未来将不再弹出此对话框。你仍然可以在用户设置中更改此行为。
+          </k-hint>
+        </el-checkbox>
+      </div>
+      <div class="right">
+        <el-button type="danger" @click="installDep('', false, true)">删除</el-button>
+        <el-button type="primary" @click="installDep('', false, false)">保留</el-button>
+      </div>
     </template>
   </el-dialog>
 </template>
@@ -104,37 +114,60 @@
 <script lang="ts" setup>
 
 import { computed, ref, watch, reactive } from 'vue'
-import { Dict, global, send, store, useContext } from '@koishijs/client'
+import { Dict, global, send, store, useContext, useConfig } from '@koishijs/client'
 import { analyzeVersions, install, PeerInfo, ResultType } from './utils'
-import { active, config } from '../utils'
+import { active } from '../utils'
 import { parse } from 'semver'
 
 const ctx = useContext()
-const confirmRemoveConfig = ref(false)
+const config = useConfig()
+
+const saveChoice = ref(false)
+const showRemoveDialog = ref(false)
 
 function installDep(version: string, checkConfig = false, removeConfig = false) {
   const target = active.value
   if (!target) return
+
   // workspace packages don't need to be installed
-  if (config.value.bulkMode && !workspace.value) {
+  if (config.value.market.bulkMode && !workspace.value) {
     if (dep.value?.resolved === version || !version && !dep.value) {
-      delete config.value.override[target]
+      delete config.value.market.override[target]
     } else {
-      config.value.override[target] = version
+      config.value.market.override[target] = version
     }
     active.value = ''
     return
   }
+
+  // 1. The plugin is to be removed.
+  // 2. The plugin has config entries.
+  // 3. `removeConfig` is not set.
   if (checkConfig && ctx.configWriter?.get(target)?.length) {
-    confirmRemoveConfig.value = true
-    return
+    if (typeof config.value.market?.removeConfig !== 'boolean') {
+      showRemoveDialog.value = true
+      return
+    } else {
+      removeConfig = config.value.market.removeConfig
+    }
   }
-  confirmRemoveConfig.value = false
+
+  if (saveChoice.value) {
+    config.value.market = {
+      ...config.value.market,
+      removeConfig,
+    }
+  }
+  saveChoice.value = false
+  showRemoveDialog.value = false
+
   versions[target] = version
-  install(versions, async () => {
+  return install(versions, async () => {
     if (workspace.value) return
     if (version) {
-      ctx.configWriter?.ensure(target)
+      for (const key in versions) {
+        ctx.configWriter?.ensure(key, key !== target)
+      }
     } else if (removeConfig) {
       ctx.configWriter?.remove(target)
     }
@@ -162,7 +195,7 @@ const selectVersion = computed({
 const versions = reactive<Dict<string>>({})
 
 function getOverride() {
-  return config.value.bulkMode ? config.value.override : versions
+  return config.value.market.bulkMode ? config.value.market.override : versions
 }
 
 function getVersion(name: string) {
@@ -189,7 +222,7 @@ const current = computed(() => store.dependencies?.[active.value]?.resolved)
 const local = computed(() => store.packages?.[active.value])
 
 const showRemoveButton = computed(() => {
-  return current.value || store.dependencies[active.value] || config.value.bulkMode && config.value.override[active.value]
+  return current.value || store.dependencies[active.value] || config.value.market.bulkMode && config.value.market.override[active.value]
 })
 
 const workspace = computed(() => getWorkspaceVersion(active.value))
@@ -250,7 +283,7 @@ watch(() => data.value?.[version.value]?.peers, async (peers) => {
     registry = await send('market/registry', names)
   }
   Object.assign(registry, store.registry)
-  if (config.value.bulkMode) return
+  if (config.value.market.bulkMode) return
 
   // rebuild versions
   for (const name of Object.keys(versions)) {
@@ -269,7 +302,7 @@ watch(() => data.value?.[version.value]?.peers, async (peers) => {
 watch(active, async (name) => {
   if (!name) return
 
-  version.value = config.value.override[active.value]
+  version.value = config.value.market.override[active.value]
     || store.dependencies?.[active.value]?.request
     || Object.keys(store.registry?.[name] || {})[0]
 

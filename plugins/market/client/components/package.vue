@@ -35,13 +35,15 @@
 <script lang="ts" setup>
 
 import { computed } from 'vue'
-import { store, isNullable } from '@koishijs/client'
-import { active, config, hasUpdate } from '../utils'
+import { store, isNullable, useConfig } from '@koishijs/client'
+import { active, hasUpdate } from '../utils'
 import { analyzeVersions } from './utils'
 
 const props = defineProps({
   name: String,
 })
+
+const config = useConfig()
 
 const dep = computed(() => store.dependencies?.[props.name])
 
@@ -53,7 +55,7 @@ const compare = computed(() => {
 
 const version = computed({
   get() {
-    const value = config.value.override[props.name]
+    const value = config.value.market.override[props.name]
     if (dep.value?.resolved === value) {
       return
     } else {
@@ -62,16 +64,16 @@ const version = computed({
   },
   set(value) {
     if (dep.value?.resolved === value || !value && !dep.value) {
-      delete config.value.override[props.name]
+      delete config.value.market.override[props.name]
     } else {
-      config.value.override[props.name] = value
+      config.value.market.override[props.name] = value
     }
   },
 })
 
 const data = computed(() => {
   if (dep.value?.workspace || dep.value?.invalid) return
-  return analyzeVersions(props.name, (name) => config.value.override[name])
+  return analyzeVersions(props.name, (name) => config.value.market.override[name])
 })
 
 </script>

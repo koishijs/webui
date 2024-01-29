@@ -20,15 +20,13 @@
 
 import { computed, ref, watch } from 'vue'
 import type { Registry } from '@koishijs/registry'
-import { store } from '@koishijs/client'
+import { store, useConfig } from '@koishijs/client'
 import { useDebounceFn } from '@vueuse/core'
 import { showManual, addManual } from './utils'
-import { config } from '../utils'
 
+const config = useConfig()
 const invalid = computed(() => false)
-
 const name = ref('')
-
 const remote = ref<Registry>()
 
 const fetchRemote = useDebounceFn(async (name2: string) => {
@@ -47,7 +45,7 @@ watch(name, (name2) => {
 function onEnter() {
   if (!remote.value) return
   const { name } = remote.value
-  config.value.override[name] = remote.value['dist-tags'].latest
+  config.value.market.override[name] = remote.value['dist-tags'].latest
   showManual.value = false
 }
 

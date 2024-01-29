@@ -36,17 +36,19 @@
 <script lang="ts" setup>
 
 import { computed, watch, WatchStopHandle } from 'vue'
-import { store, useContext } from '@koishijs/client'
-import { config, hasUpdate } from '../utils'
+import { store, useConfig, useContext } from '@koishijs/client'
+import { hasUpdate } from '../utils'
 import { addManual } from './utils'
 import ManualInstall from './manual.vue'
 import PackageView from './package.vue'
+
+const config = useConfig()
 
 const names = computed(() => {
   return Object
     .keys({
       ...store.dependencies,
-      ...config.value.override,
+      ...config.value.market.override,
     })
     .sort((a, b) => a > b ? 1 : -1)
 })
@@ -55,12 +57,12 @@ let dispose: WatchStopHandle
 watch(() => store.market?.registry, (registry) => {
   dispose?.()
   if (!registry) return
-  dispose = watch(() => config.value.override, (object) => {
+  dispose = watch(() => config.value.market.override, (object) => {
     Object.keys(object).forEach(async (name) => {
       if (store.dependencies[name]) return
       addManual(name)
     })
-  }, { immediate: true })
+  }, { immediate: true, deep: true })
 }, { immediate: true })
 
 const updates = computed(() => names.value.filter(hasUpdate))
@@ -72,7 +74,7 @@ ctx.action('dependencies.upgrade', {
   async action() {
     for (const name of updates.value) {
       const versions = store.registry[name]
-      config.value.override[name] = Object.keys(versions)[0]
+      config.value.market.override[name] = Object.keys(versions)[0]
     }
   },
 })

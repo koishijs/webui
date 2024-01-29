@@ -50,9 +50,9 @@
 
 <script setup lang="ts">
 
-import { router, store, global } from '@koishijs/client'
+import { router, store, global, useConfig } from '@koishijs/client'
 import { computed, provide, ref, watch } from 'vue'
-import { active, config } from '../utils'
+import { active } from '../utils'
 import { getSorted, kConfig, MarketFilter, MarketList, MarketSearch } from '@koishijs/market'
 import { SearchObject } from '@koishijs/registry'
 
@@ -69,6 +69,7 @@ provide(kConfig, {
 })
 
 const root = ref()
+const config = useConfig()
 
 const words = ref<string[]>([''])
 
@@ -96,7 +97,7 @@ watch(prompt, (value) => {
 
 function getType(data: SearchObject) {
   if (global.static) return 'primary'
-  const version = config.value.override[data.package.name]
+  const version = config.value.market.override[data.package.name]
   if (installed(data)) {
     if (version === '') return 'danger'
     if (version) return 'warning'
@@ -108,7 +109,7 @@ function getType(data: SearchObject) {
 
 function getText(data: SearchObject) {
   if (global.static) return '配置'
-  const version = config.value.override[data.package.name]
+  const version = config.value.market.override[data.package.name]
   if (installed(data)) {
     if (version === '') return '等待移除'
     if (version) return '等待更新'
