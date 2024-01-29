@@ -42,6 +42,10 @@ const render: FunctionalComponent<{ children: segment[] }> = ({ children }, ctx)
       }, {
         default: () => render({ children }, ctx),
       })
+    } else if (type === 'progress') {
+      return h(resolveComponent('el-progress'), attrs, {
+        default: () => render({ children }, ctx),
+      })
     } else if (type === 'template') {
       return render({ children }, ctx)
     }

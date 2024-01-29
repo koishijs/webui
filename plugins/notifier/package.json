@@ -1,7 +1,7 @@
 {
   "name": "@koishijs/plugin-notifier",
   "description": "Notifier service for Koishi",
-  "version": "1.1.2",
+  "version": "1.2.0",
   "main": "lib/index.cjs",
   "types": "lib/index.d.ts",
   "exports": {
