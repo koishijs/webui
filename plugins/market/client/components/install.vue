@@ -95,7 +95,6 @@
   <el-dialog v-model="confirmRemoveConfig" destroy-on-close>
     检测到你正在卸载一个已配置的插件，是否同时删除其配置？
     <template #footer>
-      <el-button @click="confirmRemoveConfig = false">取消</el-button>
       <el-button type="danger" @click="installDep('', false, true)">删除</el-button>
       <el-button type="primary" @click="installDep('', false, false)">保留</el-button>
     </template>
@@ -130,6 +129,7 @@ function installDep(version: string, checkConfig = false, removeConfig = false) 
     confirmRemoveConfig.value = true
     return
   }
+  confirmRemoveConfig.value = false
   versions[target] = version
   install(versions, async () => {
     if (workspace.value) return
