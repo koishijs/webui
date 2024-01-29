@@ -63,6 +63,10 @@ class MarketProvider extends BaseMarketProvider {
           this.ctx.installer.setPackage(registry.name, versions)
         },
         onSuccess: (object, versions) => {
+          // npmmirror lacks `links` field
+          object.package.links ||= {
+            npm: `${registry.config.endpoint.replace('registry.', 'www.')}/package/${object.package.name}`,
+          }
           this.fullCache[object.package.name] = this.tempCache[object.package.name] = object
         },
         after: () => this.flushData(),

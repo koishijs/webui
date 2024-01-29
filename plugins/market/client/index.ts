@@ -88,7 +88,7 @@ export default (ctx: Context) => {
           Schema.const(false).description('从不'),
         ]).description('移除插件时是否移除其已经存在的配置。'),
         override: Schema.dict(String).hidden(),
-        gravatar: Schema.string().description('Gravatar 头像地址。'),
+        gravatar: Schema.string().description('Gravatar 镜像地址。'),
       }),
     }),
   })
@@ -163,7 +163,7 @@ export default (ctx: Context) => {
 
   ctx.effect(() => {
     return watch(() => store.dependencies, (value) => {
-      if (!value) return
+      if (!value || !config.value.market) return
       for (const key in config.value.market.override) {
         if (value[key]?.workspace) {
           delete config.value.market.override[key]

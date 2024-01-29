@@ -79,7 +79,10 @@ class Installer extends Service {
   async start() {
     const { endpoint, timeout } = this.config
     this.endpoint = endpoint || await getRegistry()
-    this.http = this.ctx.http.extend({ endpoint: this.endpoint, timeout })
+    this.http = this.ctx.http.extend({
+      endpoint: this.endpoint,
+      timeout,
+    })
   }
 
   resolveName(name: string) {
