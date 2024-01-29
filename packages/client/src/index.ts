@@ -1,20 +1,27 @@
 import * as vite from 'vite'
 import { RollupOutput } from 'rollup'
-import { existsSync, promises as fsp } from 'fs'
-import unocss from 'unocss/vite'
-import mini from 'unocss/preset-mini'
+import { existsSync, promises as fs } from 'fs'
+import { resolve } from 'path'
+import { Context } from 'yakumo'
+import * as unocss from 'unocss/vite'
+import * as mini from 'unocss/preset-mini'
 import vue from '@vitejs/plugin-vue'
 import yaml from '@maikolib/vite-plugin-yaml'
-import { resolve } from 'path'
+
+declare module 'yakumo' {
+  interface PackageConfig {
+    client?: string
+  }
+}
 
 export async function build(root: string, config: vite.UserConfig = {}) {
   if (!existsSync(root + '/client')) return
 
   const outDir = root + '/dist'
   if (existsSync(outDir)) {
-    await fsp.rm(outDir, { recursive: true })
+    await fs.rm(outDir, { recursive: true })
   }
-  await fsp.mkdir(root + '/dist', { recursive: true })
+  await fs.mkdir(root + '/dist', { recursive: true })
 
   const results = await vite.build(vite.mergeConfig({
     root,
@@ -48,9 +55,9 @@ export async function build(root: string, config: vite.UserConfig = {}) {
     plugins: [
       vue(),
       yaml(),
-      unocss({
+      unocss.default({
         presets: [
-          mini({
+          mini.default({
             preflight: false,
           }),
         ],
@@ -71,18 +78,18 @@ export async function build(root: string, config: vite.UserConfig = {}) {
     if (item.fileName === 'index.mjs') item.fileName = 'index.js'
     const dest = root + '/dist/' + item.fileName
     if (item.type === 'asset') {
-      await fsp.writeFile(dest, item.source)
+      await fs.writeFile(dest, item.source)
     } else {
       const result = await vite.transformWithEsbuild(item.code, dest, {
         minifyWhitespace: true,
         charset: 'utf8',
       })
-      await fsp.writeFile(dest, result.code)
+      await fs.writeFile(dest, result.code)
     }
   }
 }
 
-export function createServer(baseDir: string, config?: vite.InlineConfig) {
+export async function createServer(baseDir: string, config?: vite.InlineConfig) {
   const root = resolve(__dirname, '../app')
   return vite.createServer(vite.mergeConfig({
     root,
@@ -98,9 +105,9 @@ export function createServer(baseDir: string, config?: vite.InlineConfig) {
     plugins: [
       vue(),
       yaml(),
-      unocss({
+      unocss.default({
         presets: [
-          mini({
+          mini.default({
             preflight: false,
           }),
         ],
@@ -133,4 +140,34 @@ export function createServer(baseDir: string, config?: vite.InlineConfig) {
       },
     },
   } as vite.InlineConfig, config))
+}
+
+export const inject = ['yakumo']
+
+export function apply(ctx: Context) {
+  ctx.register('client', async () => {
+    const paths = ctx.yakumo.locate(ctx.yakumo.argv._)
+    for (const path of paths) {
+      const meta = ctx.yakumo.workspaces[path]
+      const deps = {
+        ...meta.dependencies,
+        ...meta.devDependencies,
+        ...meta.peerDependencies,
+        ...meta.optionalDependencies,
+      }
+      let config: vite.UserConfig = {}
+      if (meta.yakumo?.client) {
+        const filename = resolve(ctx.yakumo.cwd + path, meta.yakumo.client)
+        const exports = (await import(filename)).default
+        if (typeof exports === 'function') {
+          await exports()
+          continue
+        }
+        config = exports
+      } else if (!deps['@koishijs/client']) {
+        continue
+      }
+      await build(ctx.yakumo.cwd + path, config)
+    }
+  })
 }

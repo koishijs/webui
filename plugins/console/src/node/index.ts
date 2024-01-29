@@ -3,7 +3,7 @@ import { WebSocketLayer } from '@koishijs/plugin-server'
 import { Console, Entry } from '@koishijs/console'
 import { FileSystemServeOptions, ViteDevServer } from 'vite'
 import { extname, resolve } from 'path'
-import { createReadStream, existsSync, promises as fsp, Stats } from 'fs'
+import { createReadStream, existsSync, promises as fs, Stats } from 'fs'
 import {} from '@koishijs/plugin-server-proxy'
 import open from 'open'
 import { createRequire } from 'module'
@@ -59,9 +59,9 @@ class NodeConsole extends Console {
     // @ts-ignore
     const base = import.meta.url || pathToFileURL(__filename).href
     const require = createRequire(base)
-    this.root = config.root || (config.devMode
+    this.root = config.devMode
       ? resolve(require.resolve('@koishijs/client/package.json'), '../app')
-      : fileURLToPath(new URL('../../dist', base)))
+      : fileURLToPath(new URL('../../dist', base))
   }
 
   get config() {
@@ -152,7 +152,7 @@ class NodeConsole extends Console {
           }
 
           // we only transform js imports in production mode
-          let source = await fsp.readFile(filename, 'utf8')
+          let source = await fs.readFile(filename, 'utf8')
           let output = ''
           let cap: RegExpExecArray
           while ((cap = /^(import\b[^'"]+\bfrom\s*)(['"])([^'"]+)\2;/.exec(source))) {
@@ -176,9 +176,9 @@ class NodeConsole extends Console {
         return ctx.status = 403
       }
 
-      const stats = await fsp.stat(filename).catch<Stats>(noop)
+      const stats = await fs.stat(filename).catch<Stats>(noop)
       if (stats?.isFile()) return sendFile(filename)
-      const template = await fsp.readFile(resolve(this.root, 'index.html'), 'utf8')
+      const template = await fs.readFile(resolve(this.root, 'index.html'), 'utf8')
       ctx.type = 'html'
       ctx.body = await this.transformHtml(template)
     })
@@ -201,7 +201,7 @@ class NodeConsole extends Console {
 
   private async createVite() {
     const { cacheDir, dev } = this.config
-    const { createServer } = await import('@koishijs/client/lib/index.js')
+    const { createServer } = require('@koishijs/client/lib') as typeof import('@koishijs/client/lib')
 
     this.vite = await createServer(this.ctx.baseDir, {
       cacheDir: resolve(this.ctx.baseDir, cacheDir),
@@ -284,7 +284,6 @@ namespace NodeConsole {
   ])
 
   export interface Config {
-    root?: string
     uiPath?: string
     devMode?: boolean
     cacheDir?: string
@@ -298,7 +297,6 @@ namespace NodeConsole {
 
   export const Config: Schema<Config> = Schema.intersect([
     Schema.object({
-      root: Schema.string().hidden(),
       uiPath: Schema.string().default(''),
       apiPath: Schema.string().default('/status'),
       selfUrl: Schema.string().role('link').default(''),

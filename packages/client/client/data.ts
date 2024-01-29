@@ -1,6 +1,7 @@
 import type { ClientConfig, Console, DataService, Events } from '@koishijs/plugin-console'
 import type { Promisify, Universal } from 'koishi'
 import { markRaw, reactive, ref } from 'vue'
+import { root } from '.'
 
 export type Store = {
   [K in keyof Console.Services]?: Console.Services[K] extends DataService<infer T> ? T : never
@@ -93,6 +94,7 @@ export function connect(callback: () => Universal.WebSocket) {
     if (data.type in listeners) {
       listeners[data.type](data.body)
     }
+    root.emit(data.type, data.body)
   })
 
   value.addEventListener('close', reconnect)

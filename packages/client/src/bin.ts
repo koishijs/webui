@@ -1,10 +1,11 @@
-import CAC from 'cac'
+#!/usr/bin/env node
+
+import { cac } from 'cac'
 import { resolve } from 'path'
 import { build } from '.'
+import { version } from '../package.json'
 
-const { version } = require('../package.json')
-
-const cli = CAC('koishi-console').help().version(version)
+const cli = cac('koishi-console').help().version(version)
 
 cli.command('build [root]')
   .action((root) => {
