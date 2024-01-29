@@ -1,13 +1,14 @@
 {
   "name": "@koishijs/client",
   "description": "Koishi Console Client",
-  "version": "5.26.0",
+  "version": "5.27.1",
   "main": "client/index.ts",
   "exports": {
     ".": "./client/index.ts",
     "./bin": "./lib/bin.js",
     "./lib": "./lib/index.js",
-    "./yakumo": "./lib/yakumo.js",
+    "./lib/yakumo": "./lib/yakumo.js",
+    "./lib/yakumo.js": "./lib/yakumo.js",
     "./package.json": "./package.json"
   },
   "files": [

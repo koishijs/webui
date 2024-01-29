@@ -12,8 +12,8 @@
   "packageManager": "yarn@4.0.2",
   "license": "MIT",
   "scripts": {
-    "client": "yakumo client",
-    "build": "tsc -b packages/client && yakumo build",
+    "client": "yakumo --import tsx client",
+    "build": "yakumo --import tsx build",
     "bump": "yakumo version",
     "dep": "yakumo upgrade",
     "pub": "yakumo publish",
@@ -51,9 +51,9 @@
     "shx": "^0.3.4",
     "typescript": "^5.3.2",
     "yakumo": "^1.0.0-beta.2",
-    "yakumo-esbuild": "^1.0.0-beta.1",
-    "yakumo-mocha": "^1.0.0-beta.1",
-    "yakumo-tsc": "^1.0.0-beta.0",
+    "yakumo-esbuild": "^1.0.0-beta.2",
+    "yakumo-mocha": "^1.0.0-beta.2",
+    "yakumo-tsc": "^1.0.0-beta.1",
     "yml-register": "^1.1.0"
   }
 }

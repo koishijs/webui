@@ -150,12 +150,22 @@ export function useMenu<K extends keyof ActionContext>(id: K) {
 export const routeCache = reactive<Record<keyof any, string>>({})
 
 export class Context extends cordis.Context {
+  // workaround injection check
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  __v_isRef = undefined
+
   app: App
   extension?: LoadResult
   internal = new Internal()
 
   constructor() {
     super()
+    this.on('internal/error', (error) => {
+      console.error(error)
+    })
+    this.on('internal/warning', (error) => {
+      console.warn(error)
+    })
     this.app = createApp(defineComponent({
       setup() {
         return () => [
