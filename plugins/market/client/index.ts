@@ -22,6 +22,7 @@ interface MarketConfig {
   bulkMode?: boolean
   removeConfig?: boolean
   override?: Dict<string>
+  gravatar?: string
 }
 
 receive('market/patch', (data) => {
@@ -87,6 +88,7 @@ export default (ctx: Context) => {
           Schema.const(false).description('从不'),
         ]).description('移除插件时是否移除其已经存在的配置。'),
         override: Schema.dict(String).hidden(),
+        gravatar: Schema.string().description('Gravatar 头像地址。'),
       }),
     }),
   })

@@ -19,7 +19,7 @@
       <market-list
         v-model="words"
         :data="data"
-        :gravatar="store.market.gravatar"
+        :gravatar="config.market.gravatar || store.market.gravatar"
         @update:page="scrollToTop">
         <template #header="{ hasFilter, all, packages }">
           <market-search v-model="words"></market-search>

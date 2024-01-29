@@ -28,7 +28,6 @@ export function analyzeVersions(name: string, getVersion: (name: string) => stri
       const result: ResultType = !resolved
         ? item.peerDependenciesMeta?.[name]?.optional ? 'primary' : 'danger'
         : satisfies(resolved, request, { includePrerelease: true }) ? 'success' : 'danger'
-      if (result === 'danger') console.log(name, request, resolved)
       return { request, resolved, result } as PeerInfo
     })
     let result: 'success' | 'warning' | 'danger' = 'success'
