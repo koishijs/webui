@@ -8,7 +8,7 @@
 
 <script lang="ts" setup>
 
-import { LegacyMenuItem, MaybeGetter, useContext } from '@koishijs/client'
+import { MaybeGetter, useContext } from '@koishijs/client'
 import { computed } from 'vue'
 
 const props = defineProps<{
@@ -30,15 +30,17 @@ const disabled = computed(() => {
   return toValue(props.item.disabled)
 })
 
+const scope = computed(() => ctx.$action.createScope({
+  [props.menuKey]: props.menuData,
+}))
+
 function toValue<T>(getter: MaybeGetter<T>): T {
   if (typeof getter !== 'function') return getter
-  return (getter as any)(ctx.$action.createScope())
+  return (getter as any)(scope.value)
 }
 
 function trigger() {
-  return props.item.action(ctx.$action.createScope({
-    [props.menuKey]: props.menuData,
-  }))
+  return props.item.action(scope.value)
 }
 
 </script>
