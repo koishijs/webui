@@ -17,6 +17,20 @@ declare module '../context' {
   }
 }
 
+declare module '..' {
+  interface Config {
+    theme: Config.Theme
+  }
+
+  export namespace Config {
+    export interface Theme {
+      mode: 'auto' | 'dark' | 'light'
+      dark: string
+      light: string
+    }
+  }
+}
+
 export interface ThemeOptions {
   id: string
   name: string | Dict<string>
@@ -29,7 +43,6 @@ const config = useConfig()
 
 const colorMode = computed(() => {
   const mode = config.value.theme.mode
-  console.log(mode, preferDark.value)
   if (mode !== 'auto') return mode
   return preferDark.value ? 'dark' : 'light'
 })

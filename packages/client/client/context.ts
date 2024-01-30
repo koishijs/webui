@@ -1,26 +1,22 @@
 import * as cordis from 'cordis'
-import { Dict, remove } from 'cosmokit'
 import {
   App, Component, createApp, defineComponent, h, inject, markRaw,
-  onBeforeUnmount, provide, reactive, Ref, resolveComponent,
+  onBeforeUnmount, provide, Ref, resolveComponent,
 } from 'vue'
-import { createI18n } from 'vue-i18n'
-import { activities, Activity } from './activity'
-import { SlotOptions } from './components'
-import { extensions, LoadResult } from './loader'
 import ActionService from './plugins/action'
+import I18nService from './plugins/i18n'
+import LoaderService from './plugins/loader'
+import RouterService from './plugins/router'
 import SettingService from './plugins/setting'
 import ThemeService from './plugins/theme'
-import { insert } from './utils'
 
 // layout api
 
-export interface Events<C extends Context> extends cordis.Events<C> {
-  'activity'(activity: Activity): boolean
-}
+export interface Events<C extends Context> extends cordis.Events<C> {}
 
 export interface Context {
   [Context.events]: Events<this>
+  internal: Internal
 }
 
 export function useContext() {
@@ -35,18 +31,7 @@ export function useRpc<T>(): Ref<T> {
   return parent.extension?.data
 }
 
-export class Internal {
-  extensions = extensions
-  activities = activities
-  routeCache = routeCache
-  views = reactive<Dict<SlotOptions[]>>({})
-  i18n = createI18n({
-    legacy: false,
-    fallbackLocale: 'zh-CN',
-  })
-}
-
-export const routeCache = reactive<Record<keyof any, string>>({})
+export interface Internal {}
 
 export class Context extends cordis.Context {
   // workaround injection check
@@ -55,25 +40,31 @@ export class Context extends cordis.Context {
 
   app: App
 
-  extension?: LoadResult
-  internal = new Internal()
-
   constructor() {
     super()
-    this.provide('extension')
-
+    this.extension = null
+    this.internal = {} as Internal
     this.app = createApp(defineComponent({
       setup: () => () => [
         h(resolveComponent('k-slot'), { name: 'root', single: true }),
         h(resolveComponent('k-slot'), { name: 'global' }),
       ],
     }))
-    this.app.use(this.internal.i18n)
     this.app.provide('cordis', this)
 
     this.plugin(ActionService)
+    this.plugin(I18nService)
+    this.plugin(LoaderService)
+    this.plugin(RouterService)
     this.plugin(SettingService)
     this.plugin(ThemeService)
+
+    this.on('ready', async () => {
+      await this.$loader.initTask
+      this.app.use(this.$i18n.i18n)
+      this.app.use(this.$router.router)
+      this.app.mount('#app')
+    })
   }
 
   addEventListener<K extends keyof WindowEventMap>(
@@ -95,31 +86,6 @@ export class Context extends cordis.Context {
       provide('cordis', caller)
       return () => h(component, props, slots)
     })
-  }
-
-  /** @deprecated */
-  addView(options: SlotOptions) {
-    return this.slot(options)
-  }
-
-  /** @deprecated */
-  addPage(options: Activity.Options) {
-    return this.page(options)
-  }
-
-  slot(options: SlotOptions) {
-    options.order ??= 0
-    options.component = this.wrapComponent(options.component)
-    if (options.when) options.disabled = () => !options.when()
-    const list = this.internal.views[options.type] ||= []
-    insert(list, options)
-    return this.scope.collect('view', () => remove(list, options))
-  }
-
-  page(options: Activity.Options) {
-    options.component = this.wrapComponent(options.component)
-    const activity = new Activity(this, options)
-    return this.scope.collect('page', () => activity.dispose())
   }
 }
 

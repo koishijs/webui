@@ -16,9 +16,9 @@ root.plugin(status)
 root.plugin(styles)
 root.plugin(theme)
 
-root.app.mount('#app')
+root.start()
 
 if (!global.static) {
   const endpoint = new URL(global.endpoint, location.origin).toString()
-  connect(() => new WebSocket(endpoint.replace(/^http/, 'ws')))
+  connect(root, () => new WebSocket(endpoint.replace(/^http/, 'ws')))
 }

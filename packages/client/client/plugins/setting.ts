@@ -3,7 +3,7 @@ import { RemovableRef, useLocalStorage } from '@vueuse/core'
 import { Context } from '../context'
 import { insert, Ordered, Service } from '../utils'
 import { Dict, remove } from 'cosmokit'
-import { Component, computed, markRaw, reactive, ref, watch, watchEffect } from 'vue'
+import { Component, computed, markRaw, reactive, ref, watch } from 'vue'
 import { Config } from '..'
 
 declare module '../context' {
@@ -66,10 +66,6 @@ export const original = useStorage<Config>('config', undefined, () => ({
   locale: 'zh-CN',
 }))
 
-watch(original, (value) => {
-  console.log(value)
-})
-
 export const resolved = ref({} as Config)
 
 export const useConfig = (useOriginal = false) => useOriginal ? original : resolved
@@ -123,10 +119,6 @@ export default class SettingService extends Service {
 
     ctx.effect(() => watch(original, update, { deep: true }))
     ctx.effect(() => watch(schema, update))
-
-    ctx.effect(() => watchEffect(() => {
-      ctx.internal.i18n.global.locale.value = resolved.value.locale
-    }, { flush: 'post' }))
   }
 
   schema(extension: SchemaBase.Extension) {

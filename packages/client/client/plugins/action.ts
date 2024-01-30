@@ -117,8 +117,8 @@ export default class ActionService extends Service {
   action(id: string, options: ActionOptions) {
     markRaw(options)
     return this[Context.current].effect(() => {
-      this.ctx.internal.scope[id] = options
-      return () => delete this.ctx.internal.scope[id]
+      this.ctx.internal.actions[id] = options
+      return () => delete this.ctx.internal.actions[id]
     })
   }
 

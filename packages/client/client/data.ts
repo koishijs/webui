@@ -1,7 +1,7 @@
 import type { ClientConfig, Console, DataService, Events } from '@koishijs/plugin-console'
 import type { Promisify, Universal } from 'koishi'
 import { markRaw, reactive, ref } from 'vue'
-import { root } from '.'
+import { Context } from './context'
 
 export type Store = {
   [K in keyof Console.Services]?: Console.Services[K] extends DataService<infer T> ? T : never
@@ -61,7 +61,7 @@ receive('response', ({ id, value, error }) => {
   }
 })
 
-export function connect(callback: () => Universal.WebSocket) {
+export function connect(ctx: Context, callback: () => Universal.WebSocket) {
   const value = callback()
 
   let sendTimer: number
@@ -81,7 +81,7 @@ export function connect(callback: () => Universal.WebSocket) {
     }
     console.log('[koishi] websocket disconnected, will retry in 1s...')
     setTimeout(() => {
-      connect(callback).then(location.reload, () => {
+      connect(ctx, callback).then(location.reload, () => {
         console.log('[koishi] websocket disconnected, will retry in 1s...')
       })
     }, 1000)
@@ -94,7 +94,7 @@ export function connect(callback: () => Universal.WebSocket) {
     if (data.type in listeners) {
       listeners[data.type](data.body)
     }
-    root.emit(data.type, data.body)
+    ctx.emit(data.type, data.body)
   })
 
   value.addEventListener('close', reconnect)

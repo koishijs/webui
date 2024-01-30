@@ -52,7 +52,7 @@
 
       <!-- implements -->
       <k-slot-item :order="300">
-        <template v-for="(activity, key) in activities" :key="key">
+        <template v-for="(activity, key) in ctx.$router.pages" :key="key">
           <k-comment type="success" v-if="activity.ctx.extension?.paths.includes(current.path) && !activity.disabled()">
             <p>
               <span>此插件提供了页面：</span>
@@ -95,7 +95,7 @@
 
 <script lang="ts" setup>
 
-import { activities, store, send } from '@koishijs/client'
+import { store, send, useContext } from '@koishijs/client'
 import { computed, provide, watch } from 'vue'
 import { envMap, name, plugins, dialogFork, Tree } from './utils'
 import KModifier from './modifier.vue'
@@ -106,6 +106,8 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits(['update:modelValue'])
+
+const ctx = useContext()
 
 const config = computed({
   get: () => props.modelValue,

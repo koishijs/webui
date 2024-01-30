@@ -8,13 +8,13 @@
 
 <script lang="ts" setup>
 
-import { store, activities, useContext } from '@koishijs/client'
+import { store, useContext } from '@koishijs/client'
 import { computed } from 'vue'
 
 const ctx = useContext()
 
 const isLoading = computed(() => {
-  if (ctx.bail('activity', activities['market'])) return false
+  if (ctx.bail('activity', ctx.$router.pages['market'])) return false
   return !store.market || store.market.total > store.market.progress
 })
 

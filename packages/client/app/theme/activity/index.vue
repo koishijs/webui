@@ -21,10 +21,11 @@
 
 import { computed, provide } from 'vue'
 import { useWindowSize } from '@vueuse/core'
-import { activities, Activity, useConfig, useMenu } from '@koishijs/client'
+import { Activity, useConfig, useContext, useMenu } from '@koishijs/client'
 import ActivityItem from './item.vue'
 import ActivitySeparator from './separator.vue'
 
+const ctx = useContext()
 const config = useConfig()
 const trigger = useMenu('theme.activity')
 const { height, width } = useWindowSize()
@@ -34,7 +35,7 @@ const groups = computed(() => {
   const unit = width.value <= 768 ? 52 : 56
   const total = height.value - (width.value <= 768 ? 4 : 8)
   const available = Object.fromEntries(Object
-    .entries(activities)
+    .entries(ctx.$router.pages)
     .filter(([, data]) => !data.disabled())
     .map(([key, data]) => [key, [data]]))
   for (const id of Object.keys(available)) {

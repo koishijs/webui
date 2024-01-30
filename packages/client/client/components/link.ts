@@ -9,9 +9,9 @@ const KActivityLink = defineComponent({
   setup(props, { slots }) {
     const ctx = useContext()
     return () => {
-      const activity = ctx.internal.activities[props.id]
+      const activity = ctx.$router.pages[props.id]
       return h(RouterLink, {
-        to: ctx.internal.routeCache[activity?.id] || activity?.path.replace(/:.+/, ''),
+        to: ctx.$router.cache[activity?.id] || activity?.path.replace(/:.+/, ''),
       }, {
         default: () => slots.default?.() ?? activity?.name,
       })

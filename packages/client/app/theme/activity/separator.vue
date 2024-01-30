@@ -12,7 +12,7 @@
 <script lang="ts" setup>
 
 import { ComputedRef, ref, inject } from 'vue'
-import { activities, Activity, useConfig } from '@koishijs/client'
+import { Activity, useConfig, useContext } from '@koishijs/client'
 
 type Position = 'top' | 'bottom'
 
@@ -34,6 +34,7 @@ function handleDragLeave(event: DragEvent) {
 }
 
 const config = useConfig()
+const ctx = useContext()
 
 function handleDrop(event: DragEvent) {
   hasDragOver.value = false
@@ -46,7 +47,7 @@ function handleDrop(event: DragEvent) {
   event.preventDefault()
 
   let index = props.index
-  const item = activities[id]
+  const item = ctx.$router.pages[id]
   if (oldIndex < 0) {
     list.splice(index, 0, item)
   } else {
