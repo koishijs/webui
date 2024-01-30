@@ -3,7 +3,7 @@
     class="k-menu-item"
     v-if="!hidden"
     :class="[toValue(type), { disabled }]"
-    @click.prevent="item?.action(ctx.internal.createScope())"
+    @click.prevent="item?.action(ctx.$action.createScope())"
   >
     <span v-if="icon" class="k-menu-icon"><k-icon :name="icon"/></span>
     {{ toValue(label) }}
@@ -41,7 +41,7 @@ const icon = computed(() => toValue(props.icon))
 
 function toValue<T>(getter: MaybeGetter<T>): T {
   if (typeof getter !== 'function') return getter
-  return (getter as any)(ctx.internal.createScope())
+  return (getter as any)(ctx.$action.createScope())
 }
 
 </script>

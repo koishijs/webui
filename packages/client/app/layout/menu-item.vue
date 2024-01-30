@@ -32,11 +32,11 @@ const disabled = computed(() => {
 
 function toValue<T>(getter: MaybeGetter<T>): T {
   if (typeof getter !== 'function') return getter
-  return (getter as any)(ctx.internal.createScope())
+  return (getter as any)(ctx.$action.createScope())
 }
 
 function trigger() {
-  return props.item.action(ctx.internal.createScope({
+  return props.item.action(ctx.$action.createScope({
     [props.menuKey]: props.menuData,
   }))
 }

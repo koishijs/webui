@@ -36,7 +36,7 @@ import { useConfig, useContext } from '@koishijs/client'
 const route = useRoute()
 const router = useRouter()
 
-const config = useConfig()
+const config = useConfig(true)
 const ctx = useContext()
 
 interface Tree {

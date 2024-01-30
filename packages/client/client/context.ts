@@ -1,29 +1,19 @@
 import * as cordis from 'cordis'
-import { Schema, SchemaBase } from '@koishijs/components'
-import { Dict, Intersect, remove } from 'cosmokit'
+import { Dict, remove } from 'cosmokit'
 import {
-  App, Component, computed, createApp, defineComponent, h, inject, markRaw, MaybeRefOrGetter,
-  onBeforeUnmount, provide, reactive, Ref, resolveComponent, shallowReactive, toValue, watch,
+  App, Component, createApp, defineComponent, h, inject, markRaw,
+  onBeforeUnmount, provide, reactive, Ref, resolveComponent,
 } from 'vue'
+import { createI18n } from 'vue-i18n'
 import { activities, Activity } from './activity'
 import { SlotOptions } from './components'
-import { rawConfig, resolvedConfig, useColorMode } from './config'
 import { extensions, LoadResult } from './loader'
-import { ActionContext } from '.'
-
-export const Service = cordis.Service<Context>
-
-const mode = useColorMode()
+import ActionService from './plugins/action'
+import SettingService from './plugins/setting'
+import ThemeService from './plugins/theme'
+import { insert } from './utils'
 
 // layout api
-
-export interface ThemeOptions {
-  id: string
-  name: string | Dict<string>
-  components?: Dict<Component>
-}
-
-export type MaybeGetter<T> = T | ((scope: Flatten<ActionContext>) => T)
 
 export interface Events<C extends Context> extends cordis.Events<C> {
   'activity'(activity: Activity): boolean
@@ -45,106 +35,15 @@ export function useRpc<T>(): Ref<T> {
   return parent.extension?.data
 }
 
-export interface ActionOptions {
-  shortcut?: string
-  hidden?: (scope: Flatten<ActionContext>) => boolean
-  disabled?: (scope: Flatten<ActionContext>) => boolean
-  action: (scope: Flatten<ActionContext>) => any
-}
-
-export type LegacyMenuItem = Partial<ActionOptions> & Omit<MenuItem, 'id'>
-
-export interface MenuItem {
-  id: string
-  label?: MaybeGetter<string>
-  type?: MaybeGetter<string>
-  icon?: MaybeGetter<string>
-  order?: number
-}
-
-interface SettingOptions extends Ordered {
-  id: string
-  title?: string
-  disabled?: () => boolean
-  schema?: Schema
-  component?: Component
-}
-
-interface Ordered {
-  order?: number
-}
-
-function insert<T extends Ordered>(list: T[], item: T) {
-  markRaw(item)
-  const index = list.findIndex(a => a.order < item.order)
-  if (index >= 0) {
-    list.splice(index, 0, item)
-  } else {
-    list.push(item)
-  }
-}
-
-type Store<S extends {}> = { [K in keyof S]?: MaybeRefOrGetter<S[K]> }
-
-type Flatten<S extends {}> = Intersect<{
-  [K in keyof S]: K extends `${infer L}.${infer R}`
-    ? { [P in L]: Flatten<{ [P in R]: S[K] }> }
-    : { [P in K]: S[K] }
-}[keyof S]>
-
-export interface ActiveMenu {
-  id: string
-  relative: {
-    left: number
-    top: number
-    right: number
-    bottom: number
-  }
-}
-
-class Internal {
+export class Internal {
   extensions = extensions
   activities = activities
   routeCache = routeCache
-  scope = shallowReactive<Store<ActionContext>>({})
-  menus = reactive<Dict<MenuItem[]>>({})
-  actions = reactive<Dict<ActionOptions>>({})
   views = reactive<Dict<SlotOptions[]>>({})
-  themes = reactive<Dict<ThemeOptions>>({})
-  settings = reactive<Dict<SettingOptions[]>>({})
-  activeMenus = reactive<ActiveMenu[]>([])
-
-  createScope(scope = this.scope, prefix = '') {
-    return new Proxy({}, {
-      get: (target, key) => {
-        if (typeof key === 'symbol') return target[key]
-        key = prefix + key
-        if (key in scope) return toValue(scope[key])
-        const _prefix = key + '.'
-        if (Object.keys(scope).some(k => k.startsWith(_prefix))) {
-          return this.createScope(scope, key + '.')
-        }
-      },
-    })
-  }
-}
-
-export function useMenu<K extends keyof ActionContext>(id: K) {
-  const ctx = useContext()
-  return (event: MouseEvent, value: MaybeRefOrGetter<ActionContext[K]>) => {
-    ctx.define(id, value)
-    event.preventDefault()
-    const { clientX, clientY } = event
-    ctx.internal.activeMenus.splice(0, Infinity, {
-      id,
-      relative: {
-        left: clientX,
-        top: clientY,
-        right: clientX,
-        bottom: clientY,
-      },
-    })
-  }
+  i18n = createI18n({
+    legacy: false,
+    fallbackLocale: 'zh-CN',
+  })
 }
 
 export const routeCache = reactive<Record<keyof any, string>>({})
@@ -155,82 +54,36 @@ export class Context extends cordis.Context {
   __v_isRef = undefined
 
   app: App
+
   extension?: LoadResult
   internal = new Internal()
 
   constructor() {
     super()
-    this.on('internal/error', (error) => {
-      console.error(error)
-    })
-    this.on('internal/warning', (error) => {
-      console.warn(error)
-    })
-    this.app = createApp(defineComponent({
-      setup() {
-        return () => [
-          h(resolveComponent('k-slot'), { name: 'root', single: true }),
-          h(resolveComponent('k-slot'), { name: 'global' }),
-        ]
-      },
-    }))
     this.provide('extension')
+
+    this.app = createApp(defineComponent({
+      setup: () => () => [
+        h(resolveComponent('k-slot'), { name: 'root', single: true }),
+        h(resolveComponent('k-slot'), { name: 'global' }),
+      ],
+    }))
+    this.app.use(this.internal.i18n)
     this.app.provide('cordis', this)
-    window.addEventListener('keydown', (event) => {
-      for (const action of Object.values(this.internal.actions)) {
-        if (!action.shortcut) continue
-        const keys = action.shortcut.split('+').map(key => key.toLowerCase().trim())
-        let ctrlKey = false, shiftKey = false, metaKey = false, code: string
-        for (const key of keys) {
-          switch (key) {
-            case 'shift': shiftKey = true; continue
-            case 'ctrl':
-              if (navigator.platform.toLowerCase().includes('mac')) {
-                metaKey = true
-              } else {
-                ctrlKey = true
-              }
-              continue
-            default:
-              code = key
-          }
-        }
-        if (ctrlKey !== event.ctrlKey) continue
-        if (shiftKey !== event.shiftKey) continue
-        if (metaKey !== event.metaKey) continue
-        if (code !== event.key.toLowerCase()) continue
-        event.preventDefault()
-        action.action(this.internal.createScope())
-      }
-    })
 
-    const schema = computed(() => {
-      const list: Schema[] = []
-      for (const settings of Object.values(this.internal.settings)) {
-        for (const options of settings) {
-          if (options.schema) {
-            list.push(options.schema)
-          }
-        }
-      }
-      return Schema.intersect(list)
-    })
+    this.plugin(ActionService)
+    this.plugin(SettingService)
+    this.plugin(ThemeService)
+  }
 
-    const doWatch = () => watch(resolvedConfig, (value) => {
-      console.debug('config', value)
-      rawConfig.value = schema.value.simplify(value)
-    }, { deep: true })
-
-    let stop = doWatch()
-
-    watch(schema, () => {
-      stop?.()
-      try {
-        resolvedConfig.value = schema.value(rawConfig.value, { autofix: true })
-      } catch (error) {
-        console.error(error)
-      }
-      stop = doWatch()
+  addEventListener<K extends keyof WindowEventMap>(
+    type: K,
+    listener: (this: Window, ev: WindowEventMap[K]) => any,
+    options?: boolean | AddEventListenerOptions,
+  ) {
+    return this.effect(() => {
+      window.addEventListener(type, listener, options)
+      return () => window.removeEventListener(type, listener, options)
     })
   }
 
@@ -267,61 +120,6 @@ export class Context extends cordis.Context {
     options.component = this.wrapComponent(options.component)
     const activity = new Activity(this, options)
     return this.scope.collect('page', () => activity.dispose())
-  }
-
-  schema(extension: SchemaBase.Extension) {
-    SchemaBase.extensions.add(extension)
-    extension.component = this.wrapComponent(extension.component)
-    return this.scope.collect('schema', () => SchemaBase.extensions.delete(extension))
-  }
-
-  action(id: string, options: ActionOptions) {
-    markRaw(options)
-    this.internal.actions[id] = options
-    return this.scope.collect('actions', () => delete this.internal.actions[id])
-  }
-
-  menu(id: string, items: MenuItem[]) {
-    const list = this.internal.menus[id] ||= []
-    items.forEach(item => insert(list, item))
-    return this.scope.collect('menus', () => {
-      items.forEach(item => remove(list, item))
-      return true
-    })
-  }
-
-  define<K extends keyof ActionContext>(key: K, value: MaybeRefOrGetter<ActionContext[K]>) {
-    this.internal.scope[key] = value as any
-    return this.scope.collect('activate', () => delete this.internal.scope[key])
-  }
-
-  settings(options: SettingOptions) {
-    markRaw(options)
-    options.order ??= 0
-    options.component = this.wrapComponent(options.component)
-    return this.effect(() => {
-      const list = this.internal.settings[options.id] ||= []
-      insert(list, options)
-      return () => {
-        remove(list, options)
-        if (!list.length) {
-          delete this.internal.settings[options.id]
-        }
-      }
-    })
-  }
-
-  theme(options: ThemeOptions) {
-    markRaw(options)
-    this.internal.themes[options.id] = options
-    for (const [type, component] of Object.entries(options.components || {})) {
-      this.slot({
-        type,
-        disabled: () => resolvedConfig.value.theme[mode.value] !== options.id,
-        component,
-      })
-    }
-    return this.scope.collect('view', () => delete this.internal.themes[options.id])
   }
 }
 

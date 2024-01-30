@@ -3,11 +3,8 @@ import { global } from './data'
 import install, { Dict } from './components'
 import Overlay from './components/chat/overlay.vue'
 import { redirectTo } from './activity'
-import { useConfig } from './config'
 import { initTask } from './loader'
 import { Context, routeCache } from './context'
-import { createI18n } from 'vue-i18n'
-import { watchEffect } from 'vue'
 
 declare module '@koishijs/plugin-console' {
   export interface ClientConfig {
@@ -18,12 +15,15 @@ declare module '@koishijs/plugin-console' {
 
 export * as Satori from '@satorijs/protocol'
 export * as Universal from '@satorijs/protocol'
+export * from './plugins/action'
+export * from './plugins/setting'
+export * from './plugins/theme'
 export * from './activity'
 export * from './components'
-export * from './config'
 export * from './context'
 export * from './loader'
 export * from './data'
+export { Service } from './utils'
 
 export default install
 
@@ -61,19 +61,7 @@ router.afterEach((route) => {
   }
 })
 
-export const i18n = createI18n({
-  legacy: false,
-  fallbackLocale: 'zh-CN',
-})
-
-const config = useConfig()
-
-watchEffect(() => {
-  i18n.global.locale.value = config.value.locale
-})
-
 root.app.use(install)
-root.app.use(i18n)
 root.app.use(router)
 
 root.slot({
