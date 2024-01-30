@@ -4,11 +4,13 @@
 
 <style lang="scss" scoped>
 
+$size: 0.625rem;
+
 .status-light {
-  border-radius: 100%;
+  border-radius: $size;
   transition: var(--color-transition);
-  width: 0.625rem;
-  height: 0.625rem;
+  width: $size;
+  height: $size;
 
   &.online {
     background-color: var(--k-color-success);

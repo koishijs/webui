@@ -44,6 +44,12 @@ export default function (ctx: Context) {
     }),
   })
 
+  ctx.settings({
+    id: 'status',
+    title: '状态栏设置',
+    order: 800,
+  })
+
   // ctx.settings({
   //   id: 'activity',
   //   title: '活动栏设置',

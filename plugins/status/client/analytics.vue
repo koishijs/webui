@@ -1,6 +1,6 @@
 <template>
   <analytic-number icon="analytic:pulse" title="当前 QPS">
-    <template #default>{{ current }}</template>
+    <template #default>{{ +current.toFixed(2) }}</template>
     <template #footer-left>近期 QPS</template>
     <template #footer-right>{{ +recent.toFixed(2) }}</template>
   </analytic-number>

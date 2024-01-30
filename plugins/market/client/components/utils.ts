@@ -2,31 +2,33 @@ import { Awaitable, Dict, loading, message, send, socket, store, valueMap } from
 import type { Registry } from '@koishijs/registry'
 import { compare, satisfies } from 'semver'
 import { reactive, ref, watch } from 'vue'
-import { active, config } from '../utils'
+import { active } from '../utils'
 
-type ResultType = 'success' | 'warning' | 'danger' | 'primary'
+export type ResultType = 'success' | 'warning' | 'danger' | 'primary'
 
 interface AnalyzeResult {
-  peers: Dict<{
-    request: string
-    resolved: string
-    result: ResultType
-  }>
+  peers: Dict<PeerInfo>
   result: ResultType
 }
 
-export function analyzeVersions(name: string, bulkMode = true): Dict<AnalyzeResult> {
+export interface PeerInfo {
+  request: string
+  resolved: string
+  result: ResultType
+}
+
+export function analyzeVersions(name: string, getVersion: (name: string) => string): Dict<AnalyzeResult> {
   const versions = store.registry?.[name] || manualDeps[name]?.versions
   if (!versions) return
   return valueMap(versions, (item) => {
     const peers = valueMap({ ...item.peerDependencies }, (request, name) => {
-      const resolved = (bulkMode ? config.value.override[name] : null)
+      const resolved = (getVersion ? getVersion(name) : null)
         ?? store.dependencies[name]?.resolved
         ?? store.packages?.[name]?.package.version
       const result: ResultType = !resolved
-        ? item.peerDependenciesMeta?.[name]?.optional ? 'primary' : 'warning'
+        ? item.peerDependenciesMeta?.[name]?.optional ? 'primary' : 'danger'
         : satisfies(resolved, request, { includePrerelease: true }) ? 'success' : 'danger'
-      return { request, resolved, result }
+      return { request, resolved, result } as PeerInfo
     })
     let result: 'success' | 'warning' | 'danger' = 'success'
     for (const peer of Object.values(peers)) {

@@ -3,7 +3,7 @@ import { global } from './data'
 import install, { Dict } from './components'
 import Overlay from './components/chat/overlay.vue'
 import { redirectTo } from './activity'
-import { config } from './config'
+import { useConfig } from './config'
 import { initTask } from './loader'
 import { Context, routeCache } from './context'
 import { createI18n } from 'vue-i18n'
@@ -66,6 +66,8 @@ export const i18n = createI18n({
   fallbackLocale: 'zh-CN',
 })
 
+const config = useConfig()
+
 watchEffect(() => {
   i18n.global.locale.value = config.value.locale
 })
@@ -96,5 +98,7 @@ router.beforeEach(async (to, from) => {
   }
 
   redirectTo.value = to.fullPath
-  return routeCache['home'] || '/'
+  const result = routeCache['home'] || '/'
+  if (result === to.fullPath) return
+  return result
 })

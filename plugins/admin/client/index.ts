@@ -14,7 +14,7 @@ export default (ctx: Context) => {
     path: '/admin/:path*',
     name: '权限管理',
     icon: 'activity:group',
-    order: 500,
+    order: 400,
     authority: 4,
     component: UserGroup,
   })

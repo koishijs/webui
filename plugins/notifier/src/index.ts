@@ -20,7 +20,7 @@ export class Notifier {
 
   private actionKeys: string[] = []
 
-  constructor(public ctx: Context, options: string | Notifier.Options) {
+  constructor(public ctx: Context, options: h.Fragment | Notifier.Options) {
     this.options = {
       type: 'primary',
       content: [],
@@ -52,11 +52,11 @@ export class Notifier {
         ? [h('p', options.content)]
         : h.toElementArray(options.content)
       options.content = h.transform(content, ({ type, attrs }) => {
-        if (type === 'button' && typeof attrs.onclick === 'function') {
+        if (type === 'button' && typeof attrs.onClick === 'function') {
           const key = Math.random().toString(36).slice(2)
-          this.ctx.notifier.actions[key] = attrs.onclick
+          this.ctx.notifier.actions[key] = attrs.onClick
           this.actionKeys.push(key)
-          attrs.onclick = key
+          attrs.onClick = key
         }
         return true
       })
@@ -77,9 +77,9 @@ export class Notifier {
 export namespace Notifier {
   export type Type = 'primary' | 'success' | 'warning' | 'danger'
 
-  export interface Options {
+  export interface Options<T = h.Fragment> {
     type?: Type
-    content?: h.Fragment
+    content?: T
   }
 
   export interface Config extends Required<Options> {
@@ -122,7 +122,15 @@ class NotifierService extends Service {
     })
   }
 
-  create(options?: string | Notifier.Options) {
+  message(options?: string | Notifier.Options<string>) {
+    if (typeof options === 'string') {
+      options = { content: options }
+    }
+    options.type ||= 'primary'
+    this.ctx.get('console').broadcast('notifier/message', options)
+  }
+
+  create(options?: h.Fragment | Notifier.Options) {
     return new Notifier(this[Context.current], options)
   }
 }

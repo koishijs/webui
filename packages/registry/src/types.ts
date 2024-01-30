@@ -101,12 +101,16 @@ export interface DatedPackage extends BasePackage {
 }
 
 export interface SearchPackage extends DatedPackage, Pick<RemotePackage, DependencyMetaKey> {
-  links: Dict<string>
+  // `links` is absent in npmmirror
+  links?: Dict<string>
   author?: User
   contributors?: User[]
   keywords: string[]
   publisher: User
   maintainers: User[]
+  // npmmirror only
+  versions?: string[]
+  'dist-tags'?: Dict<string>
 }
 
 export interface SearchObject {

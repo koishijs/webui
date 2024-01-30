@@ -14,7 +14,7 @@ export default (ctx: Context) => {
     path: '/locales/:path*',
     name: '本地化',
     icon: 'activity:locales',
-    order: 500,
+    order: 450,
     authority: 4,
     fields: ['locales'],
     component: Locales,

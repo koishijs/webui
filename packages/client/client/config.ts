@@ -1,5 +1,5 @@
 import { RemovableRef, useLocalStorage, usePreferredDark } from '@vueuse/core'
-import { computed, reactive, watchEffect } from 'vue'
+import { computed, reactive, ref, watchEffect } from 'vue'
 import { Config } from '.'
 
 export let useStorage = <T extends object>(key: string, version: number, fallback?: () => T): RemovableRef<T> => {
@@ -32,7 +32,7 @@ export function createStorage<T extends object>(key: string, version: number, fa
   return reactive<T>(storage.value['data'])
 }
 
-export const config = useStorage<Config>('config', undefined, () => ({
+export const rawConfig = useStorage<Config>('config', undefined, () => ({
   theme: {
     mode: 'auto',
     dark: 'default-dark',
@@ -44,17 +44,19 @@ export const config = useStorage<Config>('config', undefined, () => ({
 const preferDark = usePreferredDark()
 
 const mode = computed(() => {
-  const mode = config.value.theme.mode
+  const mode = rawConfig.value.theme.mode
   if (mode !== 'auto') return mode
   return preferDark.value ? 'dark' : 'light'
 })
 
-export const useConfig = () => config
+export const resolvedConfig = ref<Config>(rawConfig.value)
+
+export const useConfig = (raw = false) => raw ? rawConfig : resolvedConfig
 export const useColorMode = () => mode
 
 watchEffect(() => {
   const root = window.document.querySelector('html')
-  root.setAttribute('theme', config.value.theme[mode.value])
+  root.setAttribute('theme', rawConfig.value.theme[mode.value])
   if (mode.value === 'dark') {
     root.classList.add('dark')
   } else {

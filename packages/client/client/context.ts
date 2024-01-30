@@ -2,18 +2,17 @@ import * as cordis from 'cordis'
 import { Schema, SchemaBase } from '@koishijs/components'
 import { Dict, Intersect, remove } from 'cosmokit'
 import {
-  App, Component, createApp, defineComponent, h, inject, markRaw, MaybeRefOrGetter,
-  onBeforeUnmount, provide, reactive, Ref, resolveComponent, shallowReactive, toValue,
+  App, Component, computed, createApp, defineComponent, h, inject, markRaw, MaybeRefOrGetter,
+  onBeforeUnmount, provide, reactive, Ref, resolveComponent, shallowReactive, toValue, watch,
 } from 'vue'
 import { activities, Activity } from './activity'
 import { SlotOptions } from './components'
-import { useColorMode, useConfig } from './config'
+import { rawConfig, resolvedConfig, useColorMode } from './config'
 import { extensions, LoadResult } from './loader'
 import { ActionContext } from '.'
 
 export const Service = cordis.Service<Context>
 
-const config = useConfig()
 const mode = useColorMode()
 
 // layout api
@@ -151,12 +150,22 @@ export function useMenu<K extends keyof ActionContext>(id: K) {
 export const routeCache = reactive<Record<keyof any, string>>({})
 
 export class Context extends cordis.Context {
+  // workaround injection check
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  __v_isRef = undefined
+
   app: App
   extension?: LoadResult
   internal = new Internal()
 
   constructor() {
     super()
+    this.on('internal/error', (error) => {
+      console.error(error)
+    })
+    this.on('internal/warning', (error) => {
+      console.warn(error)
+    })
     this.app = createApp(defineComponent({
       setup() {
         return () => [
@@ -193,6 +202,35 @@ export class Context extends cordis.Context {
         event.preventDefault()
         action.action(this.internal.createScope())
       }
+    })
+
+    const schema = computed(() => {
+      const list: Schema[] = []
+      for (const settings of Object.values(this.internal.settings)) {
+        for (const options of settings) {
+          if (options.schema) {
+            list.push(options.schema)
+          }
+        }
+      }
+      return Schema.intersect(list)
+    })
+
+    const doWatch = () => watch(resolvedConfig, (value) => {
+      console.debug('config', value)
+      rawConfig.value = schema.value.simplify(value)
+    }, { deep: true })
+
+    let stop = doWatch()
+
+    watch(schema, () => {
+      stop?.()
+      try {
+        resolvedConfig.value = schema.value(rawConfig.value, { autofix: true })
+      } catch (error) {
+        console.error(error)
+      }
+      stop = doWatch()
     })
   }
 
@@ -261,16 +299,16 @@ export class Context extends cordis.Context {
     markRaw(options)
     options.order ??= 0
     options.component = this.wrapComponent(options.component)
-    const list = this.internal.settings[options.id] ||= []
-    insert(list, options)
-    if (options.schema) {
-      try {
-        options.schema(config.value, { autofix: true })
-      } catch (error) {
-        console.error(error)
+    return this.effect(() => {
+      const list = this.internal.settings[options.id] ||= []
+      insert(list, options)
+      return () => {
+        remove(list, options)
+        if (!list.length) {
+          delete this.internal.settings[options.id]
+        }
       }
-    }
-    return this.scope.collect('settings', () => remove(list, options))
+    })
   }
 
   theme(options: ThemeOptions) {
@@ -279,7 +317,7 @@ export class Context extends cordis.Context {
     for (const [type, component] of Object.entries(options.components || {})) {
       this.slot({
         type,
-        disabled: () => config.value.theme[mode.value] !== options.id,
+        disabled: () => resolvedConfig.value.theme[mode.value] !== options.id,
         component,
       })
     }
