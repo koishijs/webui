@@ -24,6 +24,7 @@ export default (ctx: Context) => {
   })
 
   ctx.page({
+    id: 'files',
     path: '/files/:name*',
     name: '资源管理器',
     icon: 'activity:explorer',

@@ -86,6 +86,7 @@ export default class ActionService extends Service {
     ctx.internal.activeMenus = reactive([])
 
     ctx.addEventListener('keydown', (event) => {
+      const scope = this.createScope()
       for (const action of Object.values(ctx.internal.actions)) {
         if (!action.shortcut) continue
         const keys = action.shortcut.split('+').map(key => key.toLowerCase().trim())
@@ -108,8 +109,9 @@ export default class ActionService extends Service {
         if (shiftKey !== event.shiftKey) continue
         if (metaKey !== event.metaKey) continue
         if (code !== event.key.toLowerCase()) continue
+        if (action.disabled?.(scope)) continue
         event.preventDefault()
-        action.action(this.createScope())
+        action.action(scope)
       }
     })
   }

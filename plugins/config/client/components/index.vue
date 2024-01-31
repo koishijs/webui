@@ -197,6 +197,7 @@ function checkConfig(name: string) {
 
 ctx.action('config.tree.save', {
   shortcut: 'ctrl+s',
+  disabled: (scope) => !scope?.config?.tree || !['config'].includes(router.currentRoute.value?.meta?.activity.id),
   action: async ({ config: { tree } }) => {
     const { disabled, path } = tree
     if (!disabled && !checkConfig(tree.name)) return

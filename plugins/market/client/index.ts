@@ -103,6 +103,7 @@ export default (ctx: Context) => {
     })
 
     ctx.page({
+      id: 'dependencies',
       path: '/dependencies',
       name: '依赖管理',
       icon: 'activity:deps',
@@ -115,6 +116,7 @@ export default (ctx: Context) => {
 
   ctx.action('market.refresh', {
     shortcut: 'ctrl+r',
+    disabled: () => !['market', 'dependencies'].includes(router.currentRoute.value?.meta?.activity.id),
     action: (scope) => send('market/refresh'),
   })
 

@@ -103,7 +103,7 @@ const trigger = useMenu('explorer.tree')
 
 ctx.action('explorer.save', {
   shortcut: 'ctrl+s',
-  disabled: () => files[active.value]?.newValue === files[active.value]?.oldValue,
+  disabled: () => files[active.value]?.newValue === files[active.value]?.oldValue || !['files'].includes(router.currentRoute.value?.meta?.activity.id),
   action: async () => {
     const content = files[active.value].newValue
     await send('explorer/write', active.value, content)
@@ -113,6 +113,7 @@ ctx.action('explorer.save', {
 
 ctx.action('explorer.refresh', {
   shortcut: 'ctrl+r',
+  disabled: () => !['files'].includes(router.currentRoute.value?.meta?.activity.id),
   action: () => send('explorer/refresh'),
 })
 

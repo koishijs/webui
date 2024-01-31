@@ -47,6 +47,7 @@ export default class ConfigWriter extends Service {
     })
 
     ctx.page({
+      id: 'config',
       path: '/plugins/:name*',
       name: '插件配置',
       icon: 'activity:plugin',
