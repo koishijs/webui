@@ -32,6 +32,20 @@ export interface Dependency {
   latest?: string
 }
 
+export interface YarnLog {
+  type: 'warning' | 'info' | 'error' | string
+  name: number | null
+  displayName: string
+  indent?: string
+  data: string
+}
+
+const levelMap = {
+  'info': 'info',
+  'warning': 'debug',
+  'error': 'warn',
+}
+
 export interface LocalPackage extends PackageJson {
   private?: boolean
   $workspace?: boolean
@@ -58,7 +72,7 @@ class Installer extends Service {
   public tempCache: Dict<Dict<Pick<RemotePackage, DependencyMetaKey>>> = {}
 
   private pkgTasks: Dict<Promise<Dict<Pick<RemotePackage, DependencyMetaKey>>>> = {}
-  private agent = which()?.name || 'npm'
+  private agent = which()
   private manifest: PackageJson
   private depTask: Promise<Dict<Dependency>>
   private flushData: () => void
@@ -171,23 +185,43 @@ class Installer extends Service {
     this.refreshData()
   }
 
-  async exec(command: string, args: string[]) {
+  async exec(args: string[]) {
+    const name = this.agent?.name ?? 'npm'
+    const useJson = name === 'yarn' && this.agent.version >= '2'
+    if (name !== 'yarn') args.unshift('install')
     return new Promise<number>((resolve) => {
-      const child = spawn(command, args, { cwd: this.cwd })
+      if (useJson) args.push('--json')
+      const child = spawn(name, args, { cwd: this.cwd })
       child.on('exit', (code) => resolve(code))
       child.on('error', () => resolve(-1))
+
+      let stderr = ''
       child.stderr.on('data', (data) => {
-        data = data.toString().trim()
-        if (!data) return
-        for (const line of data.split('\n')) {
+        data = stderr + data.toString()
+        const lines = data.split('\n')
+        stderr = lines.pop()!
+        for (const line of lines) {
           logger.warn(line)
         }
       })
+
+      let stdout = ''
       child.stdout.on('data', (data) => {
-        data = data.toString().trim()
-        if (!data) return
-        for (const line of data.split('\n')) {
-          logger.info(line)
+        data = stdout + data.toString()
+        const lines = data.split('\n')
+        stdout = lines.pop()!
+        for (const line of lines) {
+          if (!useJson) {
+            logger.info(line)
+            continue
+          }
+          try {
+            const { type, data } = JSON.parse(line) as YarnLog
+            logger[levelMap[type] ?? 'info'](data)
+          } catch (error) {
+            logger.warn(line)
+            logger.warn(error)
+          }
         }
       })
     })
@@ -208,11 +242,10 @@ class Installer extends Service {
 
   private _install() {
     const args: string[] = []
-    if (this.agent !== 'yarn') args.push('install')
     if (this.config.endpoint) {
       args.push('--registry', this.endpoint)
     }
-    return this.exec(this.agent, args)
+    return this.exec(args)
   }
 
   private _getLocalDeps(override: Dict<string>) {
