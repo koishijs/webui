@@ -211,7 +211,7 @@ class Installer extends Service {
         const lines = data.split('\n')
         stdout = lines.pop()!
         for (const line of lines) {
-          if (!useJson) {
+          if (!useJson || line[0] !== '{') {
             logger.info(line)
             continue
           }

@@ -32,7 +32,6 @@
         </el-checkbox>
       </div>
       <div class="right">
-        <el-button @click="showConfirm = false">取消</el-button>
         <el-button type="danger" @click="clear">丢弃改动</el-button>
         <el-button type="primary" @click="confirm">确认安装</el-button>
       </div>
