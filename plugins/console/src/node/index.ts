@@ -152,20 +152,8 @@ class NodeConsole extends Console {
           }
 
           // we only transform js imports in production mode
-          let source = await fs.readFile(filename, 'utf8')
-          let output = ''
-          let cap: RegExpExecArray
-          while ((cap = /^(import\b[^'"]+\bfrom\s*)(['"])([^'"]+)\2;/.exec(source))) {
-            const [stmt, left, quote, path] = cap
-            output += left + quote + ({
-              'vue': '../vue.js',
-              'vue-router': '../vue-router.js',
-              '@vueuse/core': '../vueuse.js',
-              '@koishijs/client': '../client.js',
-            }[path] ?? path) + quote + ';'
-            source = source.slice(cap.index + stmt.length)
-          }
-          return ctx.body = output + source
+          const source = await fs.readFile(filename, 'utf8')
+          return ctx.body = await this.transformImport(source)
         } else {
           return ctx.status = 404
         }
@@ -182,6 +170,22 @@ class NodeConsole extends Console {
       ctx.type = 'html'
       ctx.body = await this.transformHtml(template)
     })
+  }
+
+  private async transformImport(source: string) {
+    let output = ''
+    let cap: RegExpExecArray
+    while ((cap = /((?:^|;)import\b[^'"]+\bfrom\s*)(['"])([^'"]+)\2;/m.exec(source))) {
+      const [stmt, left, quote, path] = cap
+      output += source.slice(0, cap.index) + left + quote + ({
+        'vue': '../vue.js',
+        'vue-router': '../vue-router.js',
+        '@vueuse/core': '../vueuse.js',
+        '@koishijs/client': '../client.js',
+      }[path] ?? path) + quote + ';'
+      source = source.slice(cap.index + stmt.length)
+    }
+    return output + source
   }
 
   private async transformHtml(template: string) {

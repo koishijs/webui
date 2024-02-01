@@ -20,6 +20,7 @@ export * from './components'
 export * from './context'
 export * from './data'
 export { Service } from './utils'
+export { ScopeStatus } from 'cordis'
 
 export default install
 

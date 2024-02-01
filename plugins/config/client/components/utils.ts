@@ -1,7 +1,6 @@
 import { Dict } from 'koishi'
 import { computed, ref } from 'vue'
-import { ScopeStatus } from 'cordis'
-import { router, send, store } from '@koishijs/client'
+import { router, ScopeStatus, send, store } from '@koishijs/client'
 
 interface DepInfo {
   required: boolean
