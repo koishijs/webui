@@ -1,7 +1,7 @@
 {
   "name": "@koishijs/plugin-console",
   "description": "Web User Interface for Koishi",
-  "version": "5.27.1",
+  "version": "5.27.9",
   "main": "lib/node/index.js",
   "types": "lib/index.d.ts",
   "exports": {
@@ -55,8 +55,8 @@
     }
   },
   "peerDependencies": {
-    "@koishijs/client": "^5.27.1",
-    "koishi": "^4.16.7"
+    "@koishijs/client": "^5.27.9",
+    "koishi": "^4.16.8"
   },
   "peerDependenciesMeta": {
     "@koishijs/client": {
@@ -64,8 +64,8 @@
     }
   },
   "devDependencies": {
-    "@koishijs/client": "^5.27.1",
-    "@koishijs/loader": "^4.4.3",
+    "@koishijs/client": "^5.27.9",
+    "@koishijs/loader": "^4.4.4",
     "@koishijs/plugin-server": "^3.1.7",
     "@koishijs/plugin-server-proxy": "^1.1.0",
     "@maikolib/vite-plugin-yaml": "^1.0.1",
@@ -75,7 +75,7 @@
     "vite": "^4.5.0"
   },
   "dependencies": {
-    "@koishijs/console": "^5.27.1",
+    "@koishijs/console": "^5.27.9",
     "open": "^8.4.2",
     "uuid": "^8.3.2",
     "ws": "^8.14.2"
