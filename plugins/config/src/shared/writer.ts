@@ -143,6 +143,7 @@ export class ConfigWriter extends DataService<Context.Config> {
 
   async reload(parent: string, key: string, config: any) {
     const scope = this.resolveFork(parent)
+    if (!scope) return
     await this.loader.reload(scope.ctx, key, config)
     rename(scope.config, key, key, config)
     await this.loader.writeConfig()
@@ -150,6 +151,7 @@ export class ConfigWriter extends DataService<Context.Config> {
 
   async unload(parent: string, key: string, config = {}, index?: number) {
     const scope = this.resolveFork(parent)
+    if (!scope) return
     this.loader.unload(scope.ctx, key)
     if (index) {
       const rest = Object.keys(scope.config).slice(index)
