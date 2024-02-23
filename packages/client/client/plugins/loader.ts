@@ -83,7 +83,7 @@ export default class LoaderService extends Service {
 
       await Promise.all(Object.entries(rest).map(([key, { files, paths, data }]) => {
         if (this.extensions[key]) return
-        const scope = this.ctx.isolate(['extension']).plugin(() => {})
+        const scope = this.ctx.isolate('extension').plugin(() => {})
         scope.ctx.extension = this.extensions[key] = { done: ref(false), scope, paths, data: ref(data) }
         const task = Promise.all(files.map((url) => {
           for (const ext in loaders) {

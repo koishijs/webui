@@ -19,7 +19,7 @@ declare module '@koishijs/console' {
 const logger = new Logger('locales')
 
 class LocaleProvider extends DataService<Dict<I18n.Store>> {
-  constructor(ctx: Context, private config: Config) {
+  constructor(ctx: Context, public config: Config) {
     super(ctx, 'locales', { authority: 4 })
 
     const update = ctx.debounce(() => this.refresh(), 0)

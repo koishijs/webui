@@ -83,7 +83,7 @@ function toHash(password: string) {
 class AuthService extends Service {
   static inject = ['console', 'database']
 
-  constructor(ctx: Context, private config: AuthService.Config) {
+  constructor(ctx: Context, public config: AuthService.Config) {
     super(ctx, 'auth')
 
     ctx.model.extend('user', {
@@ -122,7 +122,7 @@ class AuthService extends Service {
   async start() {
     const { enabled, username, password } = this.config.admin
     if (!enabled) return
-    this.logger.info('creating admin account')
+    this.ctx.logger.info('creating admin account')
     await this.ctx.database.upsert('user', [{
       id: 0,
       name: username,

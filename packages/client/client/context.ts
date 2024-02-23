@@ -34,10 +34,6 @@ export function useRpc<T>(): Ref<T> {
 export interface Internal {}
 
 export class Context extends cordis.Context {
-  // workaround injection check
-  // eslint-disable-next-line @typescript-eslint/naming-convention
-  __v_isRef = undefined
-
   app: App
 
   constructor() {

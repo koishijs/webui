@@ -54,7 +54,7 @@ class MarketProvider extends BaseMarketProvider {
         onFailure: (name, reason) => {
           this.failed.push(name)
           if (registry.config.endpoint.startsWith('https://registry.npmmirror.com')) {
-            if (Quester.isAxiosError(reason) && reason.response?.status === 404) {
+            if (Quester.Error.is(reason) && reason.response?.status === 404) {
               // ignore 404 error for npmmirror
             }
           }

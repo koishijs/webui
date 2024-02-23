@@ -80,7 +80,7 @@ function updateCpuUsage() {
 class ProfileProvider extends DataService<ProfileProvider.Payload> {
   cached: ProfileProvider.Payload
 
-  constructor(ctx: Context, private config: ProfileProvider.Config) {
+  constructor(ctx: Context, public config: ProfileProvider.Config) {
     super(ctx, 'status')
 
     ctx.i18n.define('zh-CN', zhCN)

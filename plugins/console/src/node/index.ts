@@ -64,6 +64,7 @@ class NodeConsole extends Console {
       : fileURLToPath(new URL('../../dist', base))
   }
 
+  // @ts-ignore FIXME
   get config() {
     return this._config
   }
@@ -95,7 +96,7 @@ class NodeConsole extends Console {
       if (this.config.open && !this.ctx.get('loader')?.envData.clientCount && !process.env.KOISHI_AGENT) {
         open(target)
       }
-      this.logger.info('webui is available at %c', target)
+      this.ctx.logger.info('webui is available at %c', target)
     })
   }
 

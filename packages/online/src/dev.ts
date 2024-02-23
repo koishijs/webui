@@ -166,7 +166,7 @@ async function createVite() {
         ...require.resolve('@root/minato/package.json') ? {
           '@minatojs/driver-sqlite': '@minatojs/driver-sqlite/src/index.ts',
           '@minatojs/sql-utils': '@minatojs/sql-utils/src/index.ts',
-          '@minatojs/core': '@minatojs/core/src/index.ts',
+          'minato': 'minato/src/index.ts',
         } : {},
         '@koishijs/plugin-console': '@koishijs/plugin-console/src/browser/index.ts',
         'chokidar': '@koishijs/fs/src/index.ts',

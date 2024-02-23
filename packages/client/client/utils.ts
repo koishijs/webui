@@ -2,8 +2,7 @@ import { markRaw } from 'vue'
 import * as cordis from 'cordis'
 import { Context } from './context'
 
-export type Service = cordis.Service<Context>
-export const Service = cordis.Service<Context>
+export abstract class Service<T = unknown, C extends Context = Context> extends cordis.Service<T, C> {}
 
 export interface Ordered {
   order?: number

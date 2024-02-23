@@ -35,7 +35,7 @@ class Analytics extends DataService<Analytics.Payload> {
   private messages: Analytics.Message[] = []
   private commands: Analytics.Command[] = []
 
-  constructor(ctx: Context, private config: Analytics.Config = {}) {
+  constructor(ctx: Context, public config: Analytics.Config = {}) {
     super(ctx, 'analytics')
 
     ctx.model.extend('analytics.message', {
