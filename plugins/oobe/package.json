@@ -53,13 +53,13 @@
     }
   },
   "peerDependencies": {
-    "@koishijs/plugin-console": "^5.27.9",
-    "koishi": "^4.16.8"
+    "@koishijs/plugin-console": "^5.28.0",
+    "koishi": "^4.17.1"
   },
   "devDependencies": {
-    "@koishijs/client": "^5.27.9"
+    "@koishijs/client": "^5.28.0"
   },
   "dependencies": {
-    "@koishijs/console": "^5.27.9"
+    "@koishijs/console": "^5.28.0"
   }
 }

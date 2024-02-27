@@ -49,17 +49,17 @@
     }
   },
   "peerDependencies": {
-    "@koishijs/plugin-console": "^5.27.9",
-    "koishi": "^4.16.8"
+    "@koishijs/plugin-console": "^5.28.0",
+    "koishi": "^4.17.1"
   },
   "devDependencies": {
-    "@koishijs/assets": "^1.0.3",
-    "@koishijs/client": "^5.27.9",
+    "@koishijs/assets": "^1.0.4",
+    "@koishijs/client": "^5.28.0",
     "echarts": "^5.4.3",
-    "koishi": "^4.16.8",
+    "koishi": "^4.17.1",
     "vue-echarts": "^6.6.1"
   },
   "dependencies": {
-    "@koishijs/console": "^5.27.9"
+    "@koishijs/console": "^5.28.0"
   }
 }
