@@ -285,7 +285,7 @@ class Installer extends Service {
       try {
         if (!(require.resolve(name) in require.cache)) continue
       } catch (error) {
-        // FIXME https://github.com/koishijs/webui/issues/265
+        // FIXME https://github.com/koishijs/webui/issues/273
         // I have no idea why this happens and how to fix it.
         logger.error(error)
       }
