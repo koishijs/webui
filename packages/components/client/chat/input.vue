@@ -1,13 +1,14 @@
 <template>
-  <div class="textarea">
-    <input
+  <div class="textarea" :data-replicated-text="text">
+    <textarea
       autocomplete="off"
       step="any"
       :value="text"
       :placeholder="placeholder"
       @input="onInput"
       @paste="onPaste"
-      @keydown.enter.stop="onEnter"
+      @keydown.enter.exact.stop.prevent="onEnter"
+      @keydown.shift.enter.stop.prevent="onShiftEnter"
     />
   </div>
 </template>
@@ -38,6 +39,11 @@ function onEnter() {
   if (!text.value) return
   emit('send', segment.escape(text.value))
   text.value = ''
+}
+
+function onShiftEnter() {
+  text.value ??= ''
+  text.value += '\n'
 }
 
 function onInput(event: Event) {
@@ -79,18 +85,37 @@ async function onPaste(event: ClipboardEvent) {
 
 <style lang="scss" scoped>
 
-input {
+.textarea {
+  display: grid;
+
+  &::after {
+    // This value is required for preventing jumpy behaviour !
+    content: attr(data-replicated-text) ' ';
+    white-space: pre-wrap;
+    visibility: hidden;
+  }
+}
+
+.textarea::after,
+textarea {
+  grid-area: 1 / 1 / 2 / 2;
+
   padding: 0;
   width: 100%;
   border: none;
   outline: none;
   font-size: 1em;
   height: inherit;
+  box-sizing: border-box;
+}
+
+textarea {
   color: inherit;
   display: inline-block;
   transition: 0.3s ease;
-  box-sizing: border-box;
   background-color: transparent;
+  resize: none;
+  overflow: hidden;
 }
 
 </style>
