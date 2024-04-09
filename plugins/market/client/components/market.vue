@@ -42,7 +42,7 @@
       <p>无法连接到插件市场。这可能是以下原因导致的：</p>
       <ul>
         <li>无法连接到网络，请检查你的网络连接和代理设置</li>
-        <li>您所用的 registry 不支持搜索功能 (如 npmmirror)，请考虑进行更换</li>
+        <li>您所用的 registry 不支持搜索功能，请考虑进行更换</li>
       </ul>
     </k-comment>
   </k-layout>

@@ -33,6 +33,17 @@ declare module '@koishijs/console' {
 export const name = 'market'
 export const inject = ['http']
 
+export const usage = `
+如果插件市场页面提示「无法连接到插件市场」，则可以选择一个 Koishi 社区提供的镜像地址，填入下方对应的配置项中。
+
+## 插件市场（填入 search.endpoint）
+
+- [t4wefan](https://k.ilharp.cc/2611)（大陆）：https://registry.koishi.t4wefan.pub/index.json
+- [Lipraty](https://k.ilharp.cc/3530)（大陆）：https://koi.nyan.zone/registry/index.json
+- Koishi（全球）：https://registry.koishi.chat/index.json
+
+要浏览更多社区镜像，请访问 [Koishi 论坛上的镜像一览](https://k.ilharp.cc/4000)。`
+
 export interface Config {
   registry?: Installer.Config
   search?: MarketProvider.Config
