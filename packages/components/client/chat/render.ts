@@ -10,7 +10,7 @@ const render: FunctionalComponent<segment[]> = (elements, ctx) => {
     } else if (type === 'at') {
       return h('span', `@${attrs.name}`)
     } else if (type === 'img') {
-      return h('img', { src: attrs.src })
+      return h('img', { src: attrs.src || attrs.url })
     } else if (type === 'audio') {
       return h('audio', { src: attrs.src, controls: true })
     } else if (type === 'video') {
