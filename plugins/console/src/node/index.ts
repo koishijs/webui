@@ -17,7 +17,7 @@ declare module 'koishi' {
 
 export * from '@koishijs/console'
 
-interface ClientConfig {
+export interface ClientConfig {
   devMode: boolean
   uiPath: string
   endpoint: string
