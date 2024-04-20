@@ -16,7 +16,8 @@
 <script lang="ts" setup>
 
 import { Message } from '@koishijs/plugin-sandbox'
-import { MessageContent, useMenu } from '@koishijs/client'
+import { useMenu } from '@koishijs/client'
+import { MessageContent } from '@satorijs/components-vue'
 
 defineProps<{
   data: Message

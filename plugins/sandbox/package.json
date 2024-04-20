@@ -58,9 +58,10 @@
   "devDependencies": {
     "@koishijs/assets": "^1.0.4",
     "@koishijs/client": "^5.28.0",
-    "@koishijs/plugin-console": "^5.28.0"
+    "@koishijs/plugin-console": "^5.28.3",
+    "@satorijs/components-vue": "^0.7.0"
   },
   "dependencies": {
-    "@koishijs/console": "^5.28.0"
+    "@koishijs/console": "^5.28.3"
   }
 }
