@@ -43,8 +43,8 @@ export class Client {
 
   refresh() {
     Object.keys(this.ctx.root[Context.internal]).forEach(async (name) => {
-      if (!name.startsWith('console.')) return
-      const key = name.slice(8)
+      if (!name.startsWith('console.services.')) return
+      const key = name.slice(17)
       const service = this.ctx.get(name) as DataService
       if (!service) return
       if (await this.ctx.serial('console/intercept', this, service.options)) {

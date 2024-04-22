@@ -10,12 +10,8 @@ export * from './client'
 export * from './entry'
 export * from './service'
 
-type NestedServices = {
-  [K in keyof Console.Services as `console.${K}`]: Console.Services[K]
-}
-
 declare module 'koishi' {
-  interface Context extends NestedServices {
+  interface Context {
     console: Console
   }
 
@@ -57,6 +53,16 @@ export abstract class Console extends Service {
   readonly entries: Dict<Entry> = Object.create(null)
   readonly listeners: Dict<Listener> = Object.create(null)
   readonly clients: Dict<Client> = Object.create(null)
+
+  public services = new Proxy({} as Console.Services, {
+    get: (target, key, receiver) => {
+      if (typeof key === 'symbol') return Reflect.get(target, key, receiver)
+      return this.ctx.get(`console.services.${key}`)
+    },
+    set: (target, key, value, receiver) => {
+      return false
+    },
+  })
 
   constructor(public ctx: Context) {
     super(ctx, 'console', true)
@@ -108,11 +114,11 @@ export abstract class Console extends Service {
   }
 
   refresh<K extends keyof Console.Services>(type: K) {
-    return this.ctx.get(`console.${type}`)?.refresh()
+    return this.ctx.get(`console.services.${type}`)?.refresh()
   }
 
   patch<K extends keyof Console.Services>(type: K, value: Console.Services[K] extends DataService<infer T> ? T : never) {
-    return this.ctx.get(`console.${type}`)?.patch(value as any)
+    return this.ctx.get(`console.services.${type}`)?.patch(value as any)
   }
 }
 

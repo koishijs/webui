@@ -17,7 +17,7 @@ export abstract class DataService<T = never> extends Service {
   }
 
   constructor(protected ctx: Context, protected key: keyof Console.Services, public options: DataService.Options = {}) {
-    super(ctx, `console.${key}`, options.immediate)
+    super(ctx, `console.services.${key}`, options.immediate)
   }
 
   start() {
