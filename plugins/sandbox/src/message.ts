@@ -1,5 +1,4 @@
 import { Context, Dict, h, MessageEncoder, Random } from 'koishi'
-import FileType from 'file-type'
 import {} from '@koishijs/assets'
 import { SandboxBot } from './bot'
 
@@ -10,10 +9,7 @@ export class SandboxMessenger<C extends Context = Context> extends MessageEncode
     return [type, async (attrs) => {
       const src = attrs.src || attrs.url
       const type1 = type === 'image' ? 'img' : type
-      if (src.startsWith('base64://')) {
-        const { mime } = await FileType.fromBuffer(Buffer.from(src.slice(9), 'base64'))
-        return h(type1, { ...attrs, src: `data:${mime};base64,${src.slice(9)}` })
-      } else if (src.startsWith('file:') && this.bot.ctx.assets) {
+      if (src.startsWith('file:') && this.bot.ctx.assets) {
         return h(type1, { ...attrs, src: await this.bot.ctx.assets.upload(src, src) })
       }
       return h(type1, { ...attrs, src })

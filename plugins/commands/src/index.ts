@@ -214,7 +214,7 @@ export class CommandManager {
       this.config[command.name] ||= {}
       this.config[command.name].name = `${command.parent?.name || ''}/${command.displayName}`
       this.config[command.name].aliases = filterKeys(aliases, (key, value) => {
-        return !deepEqual(initial.aliases[key], value || null)
+        return !deepEqual(initial.aliases[key], value, true)
       })
       this.write(command)
     }

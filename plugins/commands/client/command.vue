@@ -20,16 +20,16 @@
     <table>
       <tr v-for="([name, alias], index) in Object.entries(current.aliases)" :key="name">
         <td class="text-left">
-          <span class="alias-name" :class="{ disabled: alias.filter === false }">{{ name }}</span>
+          <span class="alias-name" :class="{ disabled: alias?.filter === false }">{{ name }}</span>
           {{ stringify(alias) ? `(${stringify(alias)})` : '' }}
         </td>
         <td class="text-right">
           <el-button
             v-if="index > 0"
-            :disabled="alias.filter === false"
+            :disabled="alias?.filter === false"
             @click="setDefault(name)"
           >{{ index > 0 ? '设为默认' : '显示名称' }}</el-button>
-          <el-button v-if="alias.filter !== false" @click="deleteAlias(name)">
+          <el-button v-if="alias?.filter !== false" @click="deleteAlias(name)">
             {{ command.initial.aliases[name] ? '禁用' : '删除' }}
           </el-button>
           <el-button v-else @click="recoverAlias(name)">恢复</el-button>
@@ -80,7 +80,7 @@
     </div>
     <template #footer>
       <el-button @click="showAliasDialog = false">取消</el-button>
-      <el-button type="primary" :disabled="invalidName || parsed.error" @click="onEnter">确定</el-button>
+      <el-button type="primary" :disabled="invalidName || !!parsed.error" @click="onEnter">确定</el-button>
     </template>
   </el-dialog>
 </template>
@@ -160,8 +160,8 @@ function recoverAlias(name: string) {
 
 function stringify(alias: Command.Alias) {
   return [
-    ...alias.args || [],
-    ...Object.entries(alias.options || {}).map(([key, value]) => {
+    ...alias?.args || [],
+    ...Object.entries(alias?.options || {}).map(([key, value]) => {
       return value === true ? `--${key}` : `--${key}=${value}`
     }),
   ].join(' ')
@@ -178,7 +178,7 @@ const aliases = computed(() => {
 })
 
 const invalidName = computed(() => {
-  return !inputName.value || aliases.value[inputName.value]
+  return !inputName.value || !!aliases.value[inputName.value]
 })
 
 const parsed = ref<Argv>({})

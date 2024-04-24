@@ -145,6 +145,7 @@ function handleDrop(source: Node, target: Node, position: 'before' | 'after' | '
 async function onEnter() {
   await send('command/create', inputText.value)
   inputText.value = ''
+  showCreateDialog.value = false
 }
 
 onActivated(async () => {
