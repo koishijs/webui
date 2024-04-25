@@ -1,9 +1,8 @@
-import install, { Dict } from './components'
+import install from './components'
 import { Context } from './context'
 
 declare module '@koishijs/plugin-console' {
   export interface ClientConfig {
-    messages?: Dict<string>
     unsupported?: string[]
   }
 }

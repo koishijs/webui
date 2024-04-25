@@ -31,9 +31,6 @@ root.page({
   component: Instances,
 })
 
-global.messages = {}
-global.messages.connecting = '正在初始化 Koishi Online 运行环境……'
-
 if (!('chrome' in window)) {
   global.unsupported = [
     '您的浏览器不支持 Koishi Online。',

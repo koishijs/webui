@@ -48,7 +48,7 @@
       </k-content>
     </el-scrollbar>
     <div v-else>
-      <k-card class="connect">{{ global.messages?.connecting || '正在连接到 Koishi 服务器……' }}</k-card>
+      <k-card class="connect">正在初始化 Koishi Online 运行环境……</k-card>
     </div>
   </k-layout>
 </template>
