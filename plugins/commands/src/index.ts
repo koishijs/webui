@@ -30,7 +30,7 @@ const Override: Schema<Override> = Schema.object({
         filter: Schema.any(),
       }),
       Schema.transform(false, () => ({ filter: false })),
-    ])),
+    ]).default({} as any)),
     Schema.transform(Schema.array(String), (aliases) => {
       return Object.fromEntries(aliases.map((name) => [name, {}]))
     }),
