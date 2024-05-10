@@ -116,6 +116,7 @@ export async function apply(ctx: Context, config: Config) {
       if (writer.size >= config.maxSize) {
         writer.close()
         const index = Math.max(...files[date] ?? [0]) + 1
+        files[date] ??= []
         files[date].push(index)
         createFile(date, index)
       }
