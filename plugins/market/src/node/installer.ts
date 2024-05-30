@@ -1,4 +1,4 @@
-import { Context, defineProperty, Dict, Logger, pick, Quester, Schema, Service, Time, valueMap } from 'koishi'
+import { Context, defineProperty, Dict, HTTP, Logger, pick, Schema, Service, Time, valueMap } from 'koishi'
 import Scanner, { DependencyMetaKey, PackageJson, Registry, RemotePackage } from '@koishijs/registry'
 import { resolve } from 'path'
 import { promises as fsp, readFileSync } from 'fs'
@@ -66,7 +66,7 @@ function getVersions(versions: RemotePackage[]) {
 }
 
 class Installer extends Service {
-  public http: Quester
+  public http: HTTP
   public endpoint: string
   public fullCache: Dict<Dict<Pick<RemotePackage, DependencyMetaKey>>> = {}
   public tempCache: Dict<Dict<Pick<RemotePackage, DependencyMetaKey>>> = {}
@@ -306,7 +306,7 @@ namespace Installer {
   export const Config: Schema<Config> = Schema.object({
     endpoint: Schema.string().role('link'),
     timeout: Schema.number().role('time').default(Time.second * 5),
-  })
+  }) // TODO .hidden()
 }
 
 export default Installer

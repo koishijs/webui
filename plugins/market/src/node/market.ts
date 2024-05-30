@@ -1,9 +1,9 @@
-import { Context, Dict, Quester, Schema, Time } from 'koishi'
+import { Context, Dict, HTTP, Schema, Time } from 'koishi'
 import Scanner, { SearchObject, SearchResult } from '@koishijs/registry'
 import { MarketProvider as BaseMarketProvider } from '../shared'
 
 class MarketProvider extends BaseMarketProvider {
-  private http: Quester
+  private http: HTTP
   private failed: string[] = []
   private scanner: Scanner
   private fullCache: Dict<SearchObject> = {}
@@ -54,7 +54,7 @@ class MarketProvider extends BaseMarketProvider {
         onFailure: (name, reason) => {
           this.failed.push(name)
           if (registry.config.endpoint.startsWith('https://registry.npmmirror.com')) {
-            if (Quester.Error.is(reason) && reason.response?.status === 404) {
+            if (this.ctx.http.isError(reason) && reason.response?.status === 404) {
               // ignore 404 error for npmmirror
             }
           }
