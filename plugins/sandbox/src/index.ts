@@ -122,28 +122,30 @@ export function apply(ctx: Context, config: Config) {
   }, { authority: 4 })
 
   ctx.console.addListener('sandbox/get-user', async function (platform, pid) {
-    if (!ctx.database) return
-    const [binding] = await ctx.database.get('binding', { platform, pid }, ['aid'])
-    if (binding) return ctx.database.getUser(platform, pid)
-    return ctx.database.createUser(platform, pid, {
+    const database = ctx.get('database')
+    if (!database) return
+    const [binding] = await database.get('binding', { platform, pid }, ['aid'])
+    if (binding) return database.getUser(platform, pid)
+    return database.createUser(platform, pid, {
       authority: 1,
     })
   }, { authority: 4 })
 
   ctx.console.addListener('sandbox/set-user', async function (platform, pid, data) {
-    if (!ctx.database) return
-    const [binding] = await ctx.database.get('binding', { platform, pid }, ['aid'])
+    const database = ctx.get('database')
+    if (!database) return
+    const [binding] = await database.get('binding', { platform, pid }, ['aid'])
     if (!binding) {
       if (!data) return
-      await ctx.database.createUser(platform, pid, {
+      await database.createUser(platform, pid, {
         authority: 1,
         ...data,
       })
     } else if (!data) {
-      await ctx.database.remove('user', binding.aid)
-      await ctx.database.remove('binding', { platform, pid })
+      await database.remove('user', binding.aid)
+      await database.remove('binding', { platform, pid })
     } else {
-      await ctx.database.upsert('user', [{
+      await database.upsert('user', [{
         id: binding.aid,
         ...data,
       }])
