@@ -82,7 +82,7 @@
 import { ref, computed, watch, onActivated, nextTick } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useElementSize } from '@vueuse/core'
-import { base64ToArrayBuffer, send, store, useColorMode, useContext, useMenu } from '@koishijs/client'
+import { Binary, send, store, useColorMode, useContext, useMenu } from '@koishijs/client'
 import { Entry } from '@koishijs/plugin-explorer'
 import { files, TreeEntry, uploading, vFocus } from './store'
 import { model } from './editor'
@@ -323,7 +323,7 @@ watch(() => files[active.value], async (entry) => {
     if (mime) {
       entry.oldValue = entry.newValue = `data:${mime};base64,${base64}`
     } else {
-      entry.oldValue = entry.newValue = new TextDecoder().decode(base64ToArrayBuffer(base64))
+      entry.oldValue = entry.newValue = new TextDecoder().decode(Binary.fromBase64(base64))
     }
   }
   model.setValue(entry.newValue)
@@ -374,7 +374,7 @@ onActivated(async () => {
 
 async function downloadFile(filename: string) {
   const { base64 } = await send('explorer/read', filename)
-  const blob = new Blob([base64ToArrayBuffer(base64)])
+  const blob = new Blob([Binary.fromBase64(base64)])
   const url = URL.createObjectURL(blob)
   const a = document.createElement("a")
   a.href = url

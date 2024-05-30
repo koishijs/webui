@@ -13,7 +13,7 @@
 
 import { computed } from 'vue'
 import { useEventListener } from '@vueuse/core'
-import { arrayBufferToBase64, send } from '@koishijs/client'
+import { Binary, send } from '@koishijs/client'
 import { uploading } from './store'
 
 const showUploading = computed({
@@ -29,7 +29,7 @@ function handleDataTransfer(event: Event, transfer: DataTransfer) {
     const file = item.getAsFile()
     const reader = new FileReader()
     reader.addEventListener('load', function () {
-      send('explorer/write', prefix + file.name, arrayBufferToBase64(reader.result as ArrayBuffer), true)
+      send('explorer/write', prefix + file.name, Binary.toBase64(reader.result as ArrayBuffer), true)
     }, false)
     reader.readAsArrayBuffer(file)
   }

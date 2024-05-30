@@ -73,10 +73,12 @@ const allowDir = computed(() => options.value.filters.includes('directory'))
 const allowFile = computed(() => options.value.filters.some(x => x !== 'directory'))
 
 const hint = computed(() => {
-  if (allowDir.value) {
-    return options.value.filters.length === 1 ? '选择目录' : '选择目录或文件'
-  } else {
+  if (!allowDir.value) {
     return '选择文件'
+  } else if (allowFile.value) {
+    return '选择目录或文件'
+  } else {
+    return '选择目录'
   }
 })
 
@@ -89,11 +91,16 @@ const entries = computed(() => {
   return children.filter((entry) => {
     if (entry.type === 'directory') return true
     if (entry.type === 'file' || entry.type === 'symlink') {
-      if (filters.includes('file')) return true
+      const index = entry.name.lastIndexOf('.')
+      const ext = index === -1 ? '' : entry.name.slice(index)
       return filters.some((filter) => {
-        const index = entry.name.lastIndexOf('.')
-        const ext = index === -1 ? '' : entry.name.slice(index)
-        return filter === ext
+        if (filter === 'directory') return false
+        if (filter === 'file') return true
+        if (typeof filter === 'string') {
+          return filter === ext
+        } else {
+          return filter.extensions.includes(ext)
+        }
       })
     }
   })

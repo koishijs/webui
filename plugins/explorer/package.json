@@ -71,7 +71,8 @@
     "@koishijs/console": "^5.28.0",
     "anymatch": "^3.1.3",
     "chardet": "^2.0.0",
-    "chokidar": "^3.5.3",
+    "chokidar": "^3.6.0",
+    "file-type": "^16.5.4",
     "throttle-debounce": "^3.0.1"
   }
 }
