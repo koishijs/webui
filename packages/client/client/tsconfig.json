@@ -10,7 +10,7 @@
     "incremental": true,
     "skipLibCheck": true,
     "esModuleInterop": true,
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "strictBindCallApply": true,
     "types": [
       "@koishijs/client/global",

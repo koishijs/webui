@@ -12,7 +12,7 @@ export default function (ctx: Context) {
     component: Settings,
   })
 
-  ctx.schema({
+  ctx.schema.component({
     type: 'string',
     role: 'theme',
     component: Theme,

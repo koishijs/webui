@@ -6,10 +6,15 @@ import { Dict, remove } from 'cosmokit'
 import { Component, computed, markRaw, reactive, ref, watch } from 'vue'
 import { Config } from '..'
 
+declare module '@cordisjs/schema' {
+  interface SchemaService {
+    component(extension: SchemaBase.Extension): () => void
+  }
+}
+
 declare module '../context' {
   interface Context {
     $setting: SettingService
-    schema(extension: SchemaBase.Extension): () => void
     settings(options: SettingOptions): () => void
   }
 
@@ -73,7 +78,10 @@ export const useConfig = (useOriginal = false) => useOriginal ? original : resol
 export default class SettingService extends Service {
   constructor(ctx: Context) {
     super(ctx, '$setting', true)
-    ctx.mixin('$setting', ['schema', 'settings'])
+    ctx.mixin('$setting', {
+      'schema': 'schema.component',
+      'settings': 'settings',
+    })
 
     ctx.internal.settings = reactive({})
 

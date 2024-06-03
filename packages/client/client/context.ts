@@ -12,7 +12,7 @@ import ThemeService from './plugins/theme'
 
 // layout api
 
-export interface Events<C extends Context> extends cordis.Events<C> {}
+export interface Events<C extends Context = Context> extends cordis.Events<C> {}
 
 export interface Context {
   [Context.events]: Events<this>

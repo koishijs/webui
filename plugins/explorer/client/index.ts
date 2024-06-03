@@ -11,7 +11,7 @@ import 'virtual:uno.css'
 import './editor.scss'
 
 export default (ctx: Context) => {
-  ctx.schema({
+  ctx.schema.component({
     type: 'string',
     role: 'path',
     component: FilePicker,
