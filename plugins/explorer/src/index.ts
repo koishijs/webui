@@ -1,8 +1,8 @@
-import { Context, Schema } from 'koishi'
+import { Context, Dict, Schema } from 'koishi'
 import { DataService } from '@koishijs/console'
 import { join, relative, resolve } from 'path'
 import { mkdir, readdir, readFile, readlink, rename, rm, writeFile } from 'fs/promises'
-import { FSWatcher, watch } from 'chokidar'
+import { FSWatcher } from 'chokidar'
 import { detect } from 'chardet'
 import FileType from 'file-type'
 import anymatch, { Tester } from 'anymatch'
@@ -45,7 +45,7 @@ export interface Entry {
 
 class Explorer extends DataService<Entry[]> {
   task: Promise<Entry[]>
-  watcher: FSWatcher
+  watchers: Dict<FSWatcher> = Object.create(null)
   globFilter: Tester
   root: string
 
@@ -65,10 +65,6 @@ class Explorer extends DataService<Entry[]> {
 
     this.globFilter = anymatch(config.ignored)
     this.root = resolve(ctx.baseDir, config.root)
-    this.watcher = watch(this.root, {
-      cwd: this.root,
-      ignored: config.ignored,
-    })
 
     ctx.console.addListener('explorer/read', async (filename, binary) => {
       filename = join(this.root, filename)
@@ -117,7 +113,9 @@ class Explorer extends DataService<Entry[]> {
   }
 
   stop() {
-    this.watcher?.close()
+    for (const watcher of Object.values(this.watchers)) {
+      watcher.close()
+    }
   }
 
   private async traverse(root: string): Promise<Entry[]> {
