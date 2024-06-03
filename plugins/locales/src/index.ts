@@ -1,54 +1,16 @@
 import { Context, Dict, I18n, Logger, Schema } from 'koishi'
-import { DataService } from '@koishijs/console'
+import {} from '@koishijs/plugin-console'
 import { mkdir, readdir, readFile, writeFile } from 'fs/promises'
 import { resolve } from 'path'
 import { dump, load } from 'js-yaml'
 
 declare module '@koishijs/console' {
-  namespace Console {
-    interface Services {
-      locales: LocaleProvider
-    }
-  }
-
   interface Events {
     'l10n'(data: Dict<I18n.Store>): void
   }
 }
 
 const logger = new Logger('locales')
-
-class LocaleProvider extends DataService<Dict<I18n.Store>> {
-  constructor(ctx: Context, public config: Config) {
-    super(ctx, 'locales', { authority: 4 })
-
-    const update = ctx.debounce(() => this.refresh(), 0)
-    ctx.on('internal/i18n', update)
-
-    ctx.console.addEntry(process.env.KOISHI_BASE ? [
-      process.env.KOISHI_BASE + '/dist/index.js',
-      process.env.KOISHI_BASE + '/dist/style.css',
-    ] : process.env.KOISHI_ENV === 'browser' ? [
-      // @ts-ignore
-      import.meta.url.replace(/\/src\/[^/]+$/, '/client/index.ts'),
-    ] : {
-      dev: resolve(__dirname, '../client/index.ts'),
-      prod: resolve(__dirname, '../dist'),
-    })
-
-    ctx.console.addListener('l10n', async (data) => {
-      for (const locale in data) {
-        ctx.i18n.define('$' + locale, data[locale])
-        const content = dump(data[locale])
-        await writeFile(resolve(ctx.baseDir, config.root[0], locale + '.yml'), content)
-      }
-    })
-  }
-
-  async get() {
-    return this.ctx.i18n._data
-  }
-}
 
 export const name = 'locales'
 
@@ -79,5 +41,27 @@ export async function apply(ctx: Context, config: Config) {
     }
   }
 
-  ctx.plugin(LocaleProvider, config)
+  ctx.inject(['console'], (ctx) => {
+    const entry = ctx.console.addEntry(process.env.KOISHI_BASE ? [
+      process.env.KOISHI_BASE + '/dist/index.js',
+      process.env.KOISHI_BASE + '/dist/style.css',
+    ] : process.env.KOISHI_ENV === 'browser' ? [
+      // @ts-ignore
+      import.meta.url.replace(/\/src\/[^/]+$/, '/client/index.ts'),
+    ] : {
+      dev: resolve(__dirname, '../client/index.ts'),
+      prod: resolve(__dirname, '../dist'),
+    }, () => ctx.i18n._data)
+
+    ctx.console.addListener('l10n', async (data) => {
+      for (const locale in data) {
+        ctx.i18n.define('$' + locale, data[locale])
+        const content = dump(data[locale])
+        await writeFile(resolve(ctx.baseDir, config.root[0], locale + '.yml'), content)
+      }
+    }, { authority: 4 })
+
+    const update = ctx.debounce(() => entry.refresh(), 0)
+    ctx.on('internal/i18n', update)
+  })
 }

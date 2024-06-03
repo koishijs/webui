@@ -45,9 +45,9 @@ const builtins = [
 ]
 
 const shims = {
-  dns: '@koishijs/dns',
-  fs: '@koishijs/fs',
-  path: '@koishijs/path',
+  dns: '@cordiverse/dns',
+  fs: '@cordiverse/fs',
+  path: '@cordiverse/path',
 }
 
 function toExternal(name: string) {

@@ -35,8 +35,8 @@
     "vue-i18n": "^9"
   },
   "dependencies": {
-    "@koishijs/components": "^1.5.8",
-    "cosmokit": "^1.5.2",
+    "@koishijs/components": "^1.5.13",
+    "cosmokit": "^1.6.2",
     "spark-md5": "^3.0.2"
   }
 }

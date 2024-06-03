@@ -41,19 +41,19 @@
     }
   },
   "peerDependencies": {
-    "@koishijs/plugin-console": "^5.28.0",
-    "koishi": "^4.17.1"
+    "@koishijs/plugin-console": "^5.29.1",
+    "koishi": "^4.17.8"
   },
   "devDependencies": {
-    "@koishijs/client": "^5.28.0",
+    "@koishijs/client": "^5.29.1",
     "@koishijs/plugin-analytics": "^2.0.6",
-    "@koishijs/plugin-config": "^2.8.4",
+    "@koishijs/plugin-config": "^2.8.5",
     "@types/envinfo": "^7.8.3",
-    "koishi": "^4.17.1"
+    "koishi": "^4.17.8"
   },
   "dependencies": {
-    "@koishijs/console": "^5.28.0",
-    "envinfo": "^7.11.0",
+    "@koishijs/console": "^5.29.1",
+    "envinfo": "^7.11.1",
     "which-pm-runs": "^1.1.0"
   }
 }

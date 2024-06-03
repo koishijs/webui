@@ -1,7 +1,7 @@
 {
   "name": "@koishijs/plugin-config",
   "description": "Manage your bots and plugins with console",
-  "version": "2.8.4",
+  "version": "2.8.5",
   "main": "lib/node/index.js",
   "types": "lib/index.d.ts",
   "exports": {
@@ -14,6 +14,7 @@
       "require": "./lib/shared/index.js",
       "import": "./lib/shared/index.mjs"
     },
+    "./src/*": "./src/*",
     "./package.json": "./package.json"
   },
   "files": [
@@ -56,15 +57,16 @@
     }
   },
   "peerDependencies": {
-    "@koishijs/plugin-console": "^5.28.0",
-    "koishi": "^4.17.1"
+    "@koishijs/loader": "^4.5.8",
+    "@koishijs/plugin-console": "^5.29.1",
+    "koishi": "^4.17.8"
   },
   "devDependencies": {
-    "@koishijs/client": "^5.28.0",
-    "@koishijs/plugin-hmr": "^1.2.8"
+    "@koishijs/client": "^5.29.1",
+    "@koishijs/plugin-hmr": "^1.2.9"
   },
   "dependencies": {
-    "@koishijs/console": "^5.28.0",
+    "@koishijs/console": "^5.29.1",
     "@koishijs/registry": "^7.0.3"
   }
 }

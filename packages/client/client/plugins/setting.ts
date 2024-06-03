@@ -107,7 +107,7 @@ export default class SettingService extends Service {
     })
 
     const doWatch = () => watch(resolved, (value) => {
-      console.debug('config', value)
+      console.debug('config', JSON.stringify(value))
       original.value = schema.value.simplify(value)
     }, { deep: true })
 
