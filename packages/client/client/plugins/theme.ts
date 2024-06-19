@@ -87,15 +87,14 @@ export default class ThemeService extends Service {
 
   theme(options: ThemeOptions) {
     markRaw(options)
-    const caller = this[Context.current]
     for (const [type, component] of Object.entries(options.components || {})) {
-      caller.slot({
+      this.ctx.slot({
         type,
         disabled: () => config.value.theme[colorMode.value] !== options.id,
         component,
       })
     }
-    return caller.effect(() => {
+    return this.ctx.effect(() => {
       this.ctx.internal.themes[options.id] = options
       return () => delete this.ctx.internal.themes[options.id]
     })

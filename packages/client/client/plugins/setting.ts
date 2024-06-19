@@ -6,15 +6,10 @@ import { Dict, remove } from 'cosmokit'
 import { Component, computed, markRaw, reactive, ref, watch } from 'vue'
 import { Config } from '..'
 
-declare module '@cordisjs/schema' {
-  interface SchemaService {
-    component(extension: SchemaBase.Extension): () => void
-  }
-}
-
 declare module '../context' {
   interface Context {
     $setting: SettingService
+    schema(extension: SchemaBase.Extension): () => void
     settings(options: SettingOptions): () => void
   }
 
@@ -79,8 +74,8 @@ export default class SettingService extends Service {
   constructor(ctx: Context) {
     super(ctx, '$setting', true)
     ctx.mixin('$setting', {
-      'schema': 'schema.component',
-      'settings': 'settings',
+      settings: 'settings',
+      extendSchema: 'schema',
     })
 
     ctx.internal.settings = reactive({})
@@ -129,10 +124,9 @@ export default class SettingService extends Service {
     ctx.effect(() => watch(schema, update))
   }
 
-  schema(extension: SchemaBase.Extension) {
-    const caller = this[Context.current]
-    extension.component = caller.wrapComponent(extension.component)
-    return caller.effect(() => {
+  extendSchema(extension: SchemaBase.Extension) {
+    extension.component = this.ctx.wrapComponent(extension.component)
+    return this.ctx.effect(() => {
       SchemaBase.extensions.add(extension)
       return () => SchemaBase.extensions.delete(extension)
     })
@@ -140,15 +134,14 @@ export default class SettingService extends Service {
 
   settings(options: SettingOptions) {
     markRaw(options)
-    const caller = this[Context.current]
     options.order ??= 0
-    options.component = caller.wrapComponent(options.component)
-    return caller.effect(() => {
-      const list = caller.internal.settings[options.id] ||= []
+    options.component = this.ctx.wrapComponent(options.component)
+    return this.ctx.effect(() => {
+      const list = this.ctx.internal.settings[options.id] ||= []
       insert(list, options)
       return () => {
         remove(list, options)
-        if (!list.length) delete caller.internal.settings[options.id]
+        if (!list.length) delete this.ctx.internal.settings[options.id]
       }
     })
   }

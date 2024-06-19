@@ -131,7 +131,7 @@ class NotifierService extends Service {
   }
 
   create(options?: h.Fragment | Notifier.Options) {
-    return new Notifier(this[Context.current], options)
+    return new Notifier(this.ctx, options)
   }
 }
 

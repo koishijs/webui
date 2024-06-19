@@ -105,7 +105,8 @@ class Insight extends DataService<Insight.Payload> {
       }
 
       const addDeps = (state: EffectScope) => {
-        for (const name of runtime.using) {
+        for (const [name, meta] of Object.entries(runtime.inject)) {
+          if (!meta.required) continue
           const instance = this.ctx.get(name)
           if (!(instance instanceof Object)) continue
           const ctx: Context = Reflect.getOwnPropertyDescriptor(instance, Context.current)?.value

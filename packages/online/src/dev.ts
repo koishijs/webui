@@ -22,30 +22,30 @@ const root = resolve(require.resolve('@koishijs/online/package.json'), '../app')
 
 let vite: ViteDevServer
 
-router.get(uiPath + '(/.+)*', async (ctx, next) => {
+router.get(uiPath + '(/.+)*', async (koa, next) => {
   await next()
-  if (ctx.body || ctx.response.body) return
+  if (koa.body || koa.response.body) return
 
   // add trailing slash and redirect
-  if (ctx.path === uiPath && !uiPath.endsWith('/')) {
-    return ctx.redirect(ctx.path + '/')
+  if (koa.path === uiPath && !uiPath.endsWith('/')) {
+    return koa.redirect(koa.path + '/')
   }
-  const name = ctx.path.slice(uiPath.length).replace(/^\/+/, '')
+  const name = koa.path.slice(uiPath.length).replace(/^\/+/, '')
   const sendFile = (filename: string) => {
-    ctx.type = extname(filename)
-    return ctx.body = createReadStream(filename)
+    koa.type = extname(filename)
+    return koa.body = createReadStream(filename)
   }
   const filename = resolve(root, name)
   if (!filename.startsWith(root) && !filename.includes('node_modules')) {
-    return ctx.status = 403
+    return koa.status = 403
   }
   const stats = await stat(filename).catch<Stats>(noop)
   if (stats?.isFile()) return sendFile(filename)
   const ext = extname(filename)
-  if (ext && ext !== '.html') return ctx.status = 404
+  if (ext && ext !== '.html') return koa.status = 404
   const template = await readFile(resolve(root, 'index.html'), 'utf8')
-  ctx.type = 'html'
-  ctx.body = await transformHtml(template)
+  koa.type = 'html'
+  koa.body = await transformHtml(template)
 })
 
 const scanner = new LocalScanner(__dirname)

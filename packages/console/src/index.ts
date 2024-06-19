@@ -21,8 +21,6 @@ declare module 'koishi' {
   }
 }
 
-export interface Console extends Console.Services {}
-
 export interface Listener extends DataService.Options {
   callback(this: Client, ...args: any[]): Awaitable<any>
 }
@@ -95,7 +93,7 @@ export abstract class Console extends Service {
   protected abstract resolveEntry(files: Entry.Files, key: string): string[]
 
   addEntry<T>(files: Entry.Files, data?: () => T) {
-    return new Entry(this[Context.current], files, data)
+    return new Entry(this.ctx, files, data)
   }
 
   addListener<K extends keyof Events>(event: K, callback: Events[K], options?: DataService.Options) {

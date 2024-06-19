@@ -161,11 +161,10 @@ export default class RouterService extends Service {
   }
 
   slot(options: SlotOptions) {
-    const caller = this[Context.current]
     options.order ??= 0
-    options.component = caller.wrapComponent(options.component)
+    options.component = this.ctx.wrapComponent(options.component)
     if (options.when) options.disabled = () => !options.when()
-    return caller.effect(() => {
+    return this.ctx.effect(() => {
       const list = this.views[options.type] ||= []
       insert(list, options)
       return () => {
@@ -176,10 +175,9 @@ export default class RouterService extends Service {
   }
 
   page(options: Activity.Options) {
-    const caller = this[Context.current]
-    options.component = caller.wrapComponent(options.component)
-    return caller.effect(() => {
-      const activity = new Activity(caller, options)
+    options.component = this.ctx.wrapComponent(options.component)
+    return this.ctx.effect(() => {
+      const activity = new Activity(this.ctx, options)
       return () => activity.dispose()
     })
   }

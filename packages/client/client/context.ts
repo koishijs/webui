@@ -76,10 +76,9 @@ export class Context extends cordis.Context {
 
   wrapComponent(component: Component) {
     if (!component) return
-    const caller = this[Context.current] || this
-    if (!caller.extension) return component
+    if (!this.extension) return component
     return defineComponent((props, { slots }) => {
-      provide('cordis', caller)
+      provide('cordis', this)
       return () => h(component, props, slots)
     })
   }
