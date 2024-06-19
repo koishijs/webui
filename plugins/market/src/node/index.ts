@@ -45,6 +45,13 @@ export const usage = `
 
 要浏览更多社区镜像，请访问 [Koishi 论坛上的镜像一览](https://k.ilharp.cc/4000)。`
 
+// ## 软件源（填入 npmRegistryServer）
+
+// - 淘宝（大陆）：https://registry.npmmirror.com
+// - 腾讯（大陆）：https://mirrors.cloud.tencent.com/npm
+// - npm（全球）：https://registry.npmjs.org
+// - yarn（全球）：https://registry.yarnpkg.com
+
 export interface Config {
   registry?: Installer.Config
   search?: MarketProvider.Config

@@ -1,7 +1,7 @@
 {
   "name": "@koishijs/plugin-notifier",
   "description": "Notifier service for Koishi",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "main": "lib/index.cjs",
   "types": "lib/index.d.ts",
   "exports": {
@@ -53,11 +53,11 @@
     }
   },
   "peerDependencies": {
-    "@koishijs/plugin-console": "^5.29.1",
-    "koishi": "^4.17.8"
+    "@koishijs/plugin-console": "^5.29.2",
+    "koishi": "^4.17.9"
   },
   "devDependencies": {
-    "@koishijs/client": "^5.29.1",
+    "@koishijs/client": "^5.29.2",
     "@koishijs/plugin-config": "^2.8.5"
   }
 }

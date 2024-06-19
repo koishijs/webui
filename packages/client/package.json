@@ -1,7 +1,7 @@
 {
   "name": "@koishijs/client",
   "description": "Koishi Console Client",
-  "version": "5.29.1",
+  "version": "5.29.2",
   "main": "client/index.ts",
   "exports": {
     ".": "./client/index.ts",
@@ -46,11 +46,11 @@
   "dependencies": {
     "@koishijs/components": "1.5.13",
     "@maikolib/vite-plugin-yaml": "^1.0.1",
-    "@satorijs/protocol": "^1.4.0",
+    "@satorijs/protocol": "^1.4.1",
     "@vitejs/plugin-vue": "^4.6.2",
     "@vueuse/core": "^10.9.0",
     "cac": "^6.7.14",
-    "cordis": "^3.16.1",
+    "cordis": "^3.17.3",
     "cosmokit": "^1.6.2",
     "element-plus": "2.7.3",
     "marked-vue": "^1.3.0",

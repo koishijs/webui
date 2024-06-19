@@ -31,8 +31,8 @@
     "@cordiverse/os": "^1.0.2",
     "@cordiverse/path": "^1.0.0",
     "@cordiverse/url": "^1.0.3",
-    "@koishijs/client": "^5.29.1",
-    "@koishijs/loader": "^4.5.8"
+    "@koishijs/client": "^5.29.2",
+    "@koishijs/loader": "^4.5.9"
   },
   "yakumo": {
     "client": "./src/build.ts"

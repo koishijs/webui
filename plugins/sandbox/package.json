@@ -52,16 +52,16 @@
     }
   },
   "peerDependencies": {
-    "@koishijs/plugin-console": "^5.29.1",
-    "koishi": "^4.17.8"
+    "@koishijs/plugin-console": "^5.29.2",
+    "koishi": "^4.17.9"
   },
   "devDependencies": {
     "@koishijs/assets": "^1.1.2",
-    "@koishijs/client": "^5.29.1",
-    "@koishijs/plugin-console": "^5.29.1",
+    "@koishijs/client": "^5.29.2",
+    "@koishijs/plugin-console": "^5.29.2",
     "@satorijs/components-vue": "^0.7.2"
   },
   "dependencies": {
-    "@koishijs/console": "^5.29.1"
+    "@koishijs/console": "^5.29.2"
   }
 }
