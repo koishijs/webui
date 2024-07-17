@@ -56,6 +56,12 @@ function onClick(event: MouseEvent) {
   padding: 0.4em 1em;
   transition: var(--color-transition);
   display: inline-block;
+
+  // default: transparent & framed
+  color: var(--el-button-text-color);
+  border: 1px solid var(--k-color-border);
+  background-color: transparent;
+
   &.round {
     border-radius: 50%;
   }
@@ -66,10 +72,6 @@ function onClick(event: MouseEvent) {
     cursor: default;
   }
 
-  // default: transparent & framed
-  color: var(--el-button-text-color);
-  border: 1px solid var(--k-color-border);
-  background-color: transparent;
   &.disabled {
     color: var(--k-color-disabled);
     border-color: var(--k-color-border);
