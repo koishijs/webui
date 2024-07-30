@@ -1,5 +1,4 @@
 import { Context, Dict, h, MessageEncoder, Random } from 'koishi'
-import {} from '@koishijs/assets'
 import { SandboxBot } from './bot'
 
 export class SandboxMessenger<C extends Context = Context> extends MessageEncoder<C, SandboxBot<C>> {
@@ -9,8 +8,8 @@ export class SandboxMessenger<C extends Context = Context> extends MessageEncode
     return [type, async (attrs) => {
       const src = attrs.src || attrs.url
       const type1 = type === 'image' ? 'img' : type
-      if (src.startsWith('file:') && this.bot.ctx.assets) {
-        return h(type1, { ...attrs, src: await this.bot.ctx.assets.upload(src, src) })
+      if (src.startsWith('file:')) {
+        return h(type1, { ...attrs, src: `${this.bot.ctx.server.selfUrl}/sandbox/${src}` })
       }
       return h(type1, { ...attrs, src })
     }]

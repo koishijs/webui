@@ -1,8 +1,11 @@
 import { $, Context, Dict, Random, Schema, Universal, User } from 'koishi'
 import { Client, DataService } from '@koishijs/console'
-import { resolve } from 'path'
+import {} from '@koishijs/plugin-server'
+import { extname, resolve } from 'path'
 import { SandboxBot } from './bot'
 import zhCN from './locales/zh-CN.yml'
+import { createReadStream } from 'fs'
+import { fileURLToPath } from 'url'
 
 declare module 'koishi' {
   interface Events {
@@ -37,11 +40,19 @@ export interface Message {
 
 export const filter = false
 export const name = 'sandbox'
-export const inject = ['console']
+export const inject = ['console', 'server']
 
-export interface Config {}
+export interface Config {
+  fileServer: {
+    enabled: boolean
+  }
+}
 
-export const Config: Schema<Config> = Schema.object({})
+export const Config: Schema<Config> = Schema.object({
+  fileServer: Schema.object({
+    enabled: Schema.boolean().default(false).description('是否提供本地静态文件服务 (请勿在暴露在公网的设备上开启此选项)。')
+  }),
+})
 
 class SandboxService extends DataService<Dict<number>> {
   static inject = ['database']
@@ -174,6 +185,14 @@ export function apply(ctx: Context, config: Config) {
       }
     }
   })
+
+  if (config.fileServer.enabled) {
+    ctx.server.get('/sandbox/:url(file:.+)', async (koa) => {
+      const { url } = koa.params
+      koa.type = extname(url)
+      koa.body = createReadStream(fileURLToPath(url))
+    })
+  }
 
   ctx.i18n.define('zh-CN', zhCN)
 
