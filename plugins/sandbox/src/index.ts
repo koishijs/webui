@@ -1,5 +1,5 @@
 import { $, Context, Dict, Random, Schema, Universal, User } from 'koishi'
-import { DataService } from '@koishijs/console'
+import { Client, DataService } from '@koishijs/console'
 import { resolve } from 'path'
 import { SandboxBot } from './bot'
 import zhCN from './locales/zh-CN.yml'
@@ -87,12 +87,16 @@ export function apply(ctx: Context, config: Config) {
     }
   }
 
-  ctx.console.addListener('sandbox/send-message', async function (platform, userId, channel, content, quote) {
-    const bot = bots[platform] ||= new SandboxBot(ctx, {
+  const ensureBot = (platform: string, client: Client) => {
+    // assert unique platform
+    return bots[platform] ||= new SandboxBot(ctx, client, {
       platform,
       selfId: 'koishi',
     })
-    bot.clients.add(this)
+  }
+
+  ctx.console.addListener('sandbox/send-message', async function (platform, userId, channel, content, quote) {
+    const bot = ensureBot(platform, this)
     const id = Random.id()
     this.send({
       type: 'sandbox/message',
@@ -110,11 +114,7 @@ export function apply(ctx: Context, config: Config) {
   }, { authority: 4 })
 
   ctx.console.addListener('sandbox/delete-message', async function (platform, userId, channel, messageId) {
-    const bot = bots[platform] ||= new SandboxBot(ctx, {
-      platform,
-      selfId: 'koishi',
-    })
-    bot.clients.add(this)
+    const bot = ensureBot(platform, this)
     const session = bot.session(createEvent(userId, channel))
     session.type = 'message-deleted'
     session.messageId = messageId
@@ -132,6 +132,15 @@ export function apply(ctx: Context, config: Config) {
   }, { authority: 4 })
 
   ctx.console.addListener('sandbox/set-user', async function (platform, pid, data) {
+    const bot = ensureBot(platform, this)
+    const session = bot.session(createEvent(pid, '#'))
+    if (data) {
+      session.type = 'guild-member-added'
+      ctx.emit('guild-member-added', session)
+    } else {
+      session.type = 'guild-member-removed'
+      ctx.emit('guild-member-removed', session)
+    }
     const database = ctx.get('database')
     if (!database) return
     const [binding] = await database.get('binding', { platform, pid }, ['aid'])
@@ -158,10 +167,8 @@ export function apply(ctx: Context, config: Config) {
 
   ctx.on('console/connection', async (client) => {
     if (ctx.console.clients[client.id]) return
-    for (const platform of Object.keys(bots)) {
-      const bot = bots[platform]
-      bot.clients.delete(client)
-      if (!bot.clients.size) {
+    for (const [platform, bot] of Object.entries(bots)) {
+      if (bot.client === client) {
         delete bots[platform]
         delete ctx.bots[bot.sid]
       }
@@ -173,10 +180,8 @@ export function apply(ctx: Context, config: Config) {
   ctx.intersect(session => session.platform.startsWith('sandbox:'))
     .command('clear')
     .action(({ session }) => {
-      for (const client of (session.bot as SandboxBot).clients) {
-        client.send({
-          type: 'sandbox/clear',
-        })
-      }
+      (session.bot as SandboxBot).client.send({
+        type: 'sandbox/clear',
+      })
     })
 }

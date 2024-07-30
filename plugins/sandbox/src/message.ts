@@ -21,18 +21,16 @@ export class SandboxMessenger<C extends Context = Context> extends MessageEncode
     const content = await h.transformAsync(this.buffer.trim(), this.rules)
     const session = this.bot.session(this.session.event)
     session.messageId = Random.id()
-    for (const client of this.bot.clients) {
-      client.send({
-        type: 'sandbox/message',
-        body: {
-          content,
-          user: 'Koishi',
-          channel: session.channelId,
-          id: session.messageId,
-          platform: session.platform,
-        },
-      })
-    }
+    this.bot.client.send({
+      type: 'sandbox/message',
+      body: {
+        content,
+        user: 'Koishi',
+        channel: session.channelId,
+        id: session.messageId,
+        platform: session.platform,
+      },
+    })
     this.results.push(session.event.message)
     this.buffer = ''
   }
