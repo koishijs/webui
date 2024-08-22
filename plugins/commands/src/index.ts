@@ -82,6 +82,7 @@ export class CommandManager {
   public snapshots: Dict<Snapshot> = Object.create(null)
 
   constructor(private ctx: Context, private config: Dict<Config>) {
+    this.config = CommandManager.schema(config)
     this.refresh = this.ctx.debounce(() => {
       this._cache = null
       this.entry?.refresh()
