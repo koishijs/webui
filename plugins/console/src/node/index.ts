@@ -127,7 +127,7 @@ class NodeConsole extends Console {
   private serveAssets() {
     const { uiPath } = this.config
 
-    this.ctx.server.get(uiPath + '(/.+)*', async (ctx, next) => {
+    this.ctx.server.get(uiPath + '(.*)', async (ctx, next) => {
       await next()
       if (ctx.body || ctx.response.body) return
 
@@ -215,7 +215,7 @@ class NodeConsole extends Console {
       },
     })
 
-    this.ctx.server.all('/vite(/.+)*', (ctx) => new Promise((resolve) => {
+    this.ctx.server.all('/vite(.*)', (ctx) => new Promise((resolve) => {
       this.vite.middlewares(ctx.req, ctx.res, resolve)
     }))
 
