@@ -48,6 +48,13 @@ export async function build(root: string, config: vite.UserConfig = {}, isClient
       yaml(),
       ...config.plugins || [],
     ],
+    css: {
+      preprocessorOptions: {
+        scss: {
+          api: 'modern-compiler',
+        },
+      },
+    },
     resolve: {
       alias: {
         'vue': root + '/vue.js',

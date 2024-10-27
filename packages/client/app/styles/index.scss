@@ -1,7 +1,7 @@
 @use 'sass:color';
-@import './layout.scss';
-@import './element.scss';
-@import './hc.scss';
+@use './layout.scss';
+@use './element.scss';
+@use './hc.scss';
 
 $black: #000000;
 $white: #ffffff;
@@ -42,9 +42,9 @@ $white: #ffffff;
 
   @mixin apply-color($name, $base) {
     --k-color-#{$name}: #{$base};
-    --k-color-#{$name}-shade: #{mix($base, $black, 90%)};
-    --k-color-#{$name}-tint: #{mix($base, $white, 80%)};
-    --k-color-#{$name}-fade: #{fade-out($base, 0.9)};
+    --k-color-#{$name}-shade: #{color.mix($base, $black, 90%)};
+    --k-color-#{$name}-tint: #{color.mix($base, $white, 80%)};
+    --k-color-#{$name}-fade: #{color.adjust($base, $alpha: -0.9)};
   }
 
   @include apply-color(primary, #409eff);
@@ -89,9 +89,9 @@ html.dark, .theme-root.dark {
 
   @mixin apply-color($name, $base) {
     --k-color-#{$name}: #{$base};
-    --k-color-#{$name}-shade: #{mix($base, $black, 80%)};
-    --k-color-#{$name}-tint: #{mix($base, $white, 90%)};
-    --k-color-#{$name}-fade: #{fade-out($base, 0.9)};
+    --k-color-#{$name}-shade: #{color.mix($base, $black, 80%)};
+    --k-color-#{$name}-tint: #{color.mix($base, $white, 90%)};
+    --k-color-#{$name}-fade: #{color.adjust($base, $alpha: -0.9)};
   }
 
   @include apply-color(primary, #7459ff);

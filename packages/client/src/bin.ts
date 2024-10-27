@@ -15,6 +15,6 @@ cli.command('build [root]')
 
 cli.parse()
 
-if (!cli.matchedCommand) {
+if (!cli.matchedCommand && !cli.options.help) {
   cli.outputHelp()
 }

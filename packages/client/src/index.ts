@@ -3,8 +3,6 @@ import { RollupOutput } from 'rollup'
 import { existsSync, promises as fs } from 'fs'
 import { resolve } from 'path'
 import { Context } from 'yakumo'
-import * as unocss from 'unocss/vite'
-import * as mini from 'unocss/preset-mini'
 import vue from '@vitejs/plugin-vue'
 import yaml from '@maikolib/vite-plugin-yaml'
 
@@ -55,14 +53,21 @@ export async function build(root: string, config: vite.UserConfig = {}) {
     plugins: [
       vue(),
       yaml(),
-      unocss.default({
+      (await import('unocss/vite')).default({
         presets: [
-          mini.default({
+          (await import('unocss/preset-mini')).default({
             preflight: false,
           }),
         ],
       }),
     ],
+    css: {
+      preprocessorOptions: {
+        scss: {
+          api: 'modern-compiler',
+        },
+      },
+    },
     resolve: {
       alias: {
         'vue-i18n': '@koishijs/client',
@@ -105,14 +110,21 @@ export async function createServer(baseDir: string, config?: vite.InlineConfig) 
     plugins: [
       vue(),
       yaml(),
-      unocss.default({
+      (await import('unocss/vite')).default({
         presets: [
-          mini.default({
+          (await import('unocss/preset-mini')).default({
             preflight: false,
           }),
         ],
       }),
     ],
+    css: {
+      preprocessorOptions: {
+        scss: {
+          api: 'modern-compiler',
+        },
+      },
+    },
     resolve: {
       dedupe: ['vue', 'vue-demi', 'vue-router', 'element-plus', '@vueuse/core', '@popperjs/core', 'marked', 'xss'],
       alias: {
