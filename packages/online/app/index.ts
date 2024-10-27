@@ -1,10 +1,10 @@
 import { connect, global, icons, root } from '@koishijs/client'
 import IconDocs from './icons/docs.vue'
 import IconForum from './icons/forum.vue'
-import IconInstances from './icons/instances.vue'
+import IconInstances from './icons/apps.vue'
 import IconShare from './icons/share.vue'
 import Home from './components/home.vue'
-import Instances from './components/instances.vue'
+import Instances from './components/apps.vue'
 import ClientWebSocket from './socket'
 import '@koishijs/client/app'
 
@@ -24,7 +24,7 @@ root.page({
 
 root.page({
   id: 'instances',
-  path: '/instances',
+  path: '/apps',
   name: '实例管理',
   icon: 'activity:instances',
   order: 900,

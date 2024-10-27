@@ -6,9 +6,9 @@
   "types": "lib/index.d.ts",
   "exports": {
     ".": {
+      "types": "./lib/index.d.ts",
       "import": "./lib/index.mjs",
-      "require": "./lib/index.cjs",
-      "types": "./lib/index.d.ts"
+      "require": "./lib/index.cjs"
     },
     "./package.json": "./package.json"
   },
@@ -53,15 +53,17 @@
     }
   },
   "peerDependencies": {
-    "@koishijs/plugin-console": "^5.29.2",
-    "koishi": "^4.17.9"
+    "@koishijs/plugin-console": "^5.30.0",
+    "koishi": "^4.18.0"
   },
   "devDependencies": {
-    "@koishijs/client": "^5.29.2",
+    "@koishijs/client": "^5.30.0",
+    "@koishijs/plugin-console": "^5.30.0",
     "@types/d3-force": "^3.0.9",
-    "d3-force": "^3.0.0"
+    "d3-force": "^3.0.0",
+    "koishi": "^4.18.0"
   },
   "dependencies": {
-    "@koishijs/console": "^5.29.2"
+    "@koishijs/console": "^5.30.0"
   }
 }

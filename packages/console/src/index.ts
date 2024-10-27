@@ -45,6 +45,7 @@ export class EntryProvider extends DataService<Dict<EntryData>> {
 
 export abstract class Console extends Service {
   static filter = false
+  static inject = { optional: ['console'] }
 
   private id = Math.random().toString(36).slice(2)
 
