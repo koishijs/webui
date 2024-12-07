@@ -23,10 +23,10 @@ export class FileWriter {
     if (!this.temp.length) return
     this.task = this.task.then(async (handle) => {
       const content = Buffer.from(this.temp.map((record) => JSON.stringify(record) + '\n').join(''))
-      await handle.write(content)
       this.data.push(...this.temp)
-      this.size += content.byteLength
       this.temp = []
+      await handle.write(content)
+      this.size += content.byteLength
       return handle
     })
   }
