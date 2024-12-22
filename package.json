@@ -39,7 +39,7 @@
     "esbuild-register": "^3.5.0",
     "eslint": "^8.57.0",
     "eslint-plugin-mocha": "^10.4.1",
-    "koishi": "^4.18.0",
+    "koishi": "^4.18.3",
     "mocha": "^9.2.2",
     "shx": "^0.3.4",
     "tsx": "^4.16.2",
