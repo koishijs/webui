@@ -3,7 +3,7 @@
     v-if="inner"
     :modelValue="modelValue"
     @update:modelValue="$emit('update:modelValue', $event)"
-    :schema="{ ...inner, meta: { ...inner.meta, ...schema.meta } }"
+    :schema="{ ...inner, meta: { ...schema.meta, ...inner.meta } }"
     :initial="initial"
     :disabled="disabled"
     :prefix="prefix"
