@@ -93,6 +93,8 @@ export namespace Notifier {
 }
 
 class NotifierService extends Service {
+  static inject = { optional: ['notifier'] }
+
   public store: Notifier[] = []
   public actions: Dict<() => void> = Object.create(null)
   public entry?: Entry<NotifierService.Data>

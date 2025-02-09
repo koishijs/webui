@@ -1,5 +1,5 @@
 import { compare, intersects } from 'semver'
-import { Awaitable, defineProperty, Dict, Time } from 'cosmokit'
+import { Awaitable, defineProperty, Dict, isNonNullable, Time } from 'cosmokit'
 import { Registry, RemotePackage, SearchObject, SearchResult } from './types'
 import { conclude } from './utils'
 import pMap from 'p-map'
@@ -156,8 +156,4 @@ export default class Scanner {
 
     return result.filter(isNonNullable)
   }
-}
-
-function isNonNullable<T>(value: T): value is Exclude<T, null | undefined | void> {
-  return value !== null && value !== undefined
 }

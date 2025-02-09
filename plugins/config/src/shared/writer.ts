@@ -182,7 +182,7 @@ export class ConfigWriter extends DataService<Context.Config> {
       fork.parent = parentT.ctx
       Object.setPrototypeOf(fork.ctx, parentT.ctx)
       fork.ctx.emit('internal/fork', fork)
-      if (fork.runtime.using.some(name => parentS[name] !== parentT[name])) {
+      if (Object.keys(fork.runtime.inject).some(name => parentS[name] !== parentT[name])) {
         fork.restart()
       }
     }

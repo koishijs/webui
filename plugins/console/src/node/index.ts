@@ -32,7 +32,8 @@ interface HeartbeatConfig {
 }
 
 class NodeConsole extends Console {
-  static inject = ['server']
+  static inject = { required: ['server'], optional: ['console'] }
+  // static inject = ['server']
 
   // workaround for edge case (collision with @koishijs/plugin-config)
   private _config: NodeConsole.Config
