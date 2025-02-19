@@ -1,6 +1,9 @@
 import { Context, Dict, HTTP, Schema, Time } from 'koishi'
 import Scanner, { SearchObject, SearchResult } from '@koishijs/registry'
 import { MarketProvider as BaseMarketProvider } from '../shared'
+import * as fs from 'node:fs/promises'
+import * as path from 'node:path'
+import { URL } from 'node:url'
 
 class MarketProvider extends BaseMarketProvider {
   private http: HTTP
@@ -39,41 +42,78 @@ class MarketProvider extends BaseMarketProvider {
 
     this.failed = []
     this.scanner = new Scanner(registry.get)
-    if (this.http) {
-      const result = await this.http.get<SearchResult>('')
-      this.scanner.objects = result.objects.filter(object => !object.ignored)
-      this.scanner.total = this.scanner.objects.length
-      this.scanner.version = result.version
+
+    if (this.config.endpoint) {
+      if (this.config.endpoint.startsWith('file://')) {
+        // 处理本地文件 URL
+        try {
+          const fileUrl = new URL(this.config.endpoint); // 使用 URL 构造函数解析
+          if (fileUrl.protocol !== 'file:') { // 确保协议是 'file:'
+            throw new Error('Endpoint URL is not a file URL.');
+          }
+          let filePath = decodeURIComponent(fileUrl.pathname); // 解码 URL 编码的路径
+          if (process.platform === 'win32' && filePath.startsWith('/')) {
+            filePath = filePath.slice(1); // 去除 Windows 路径开头的斜杠
+          }
+          const resolvedPath = path.resolve(filePath); // 解析为绝对路径，更安全
+
+          const fileContent = await fs.readFile(resolvedPath, 'utf-8');
+          const result: SearchResult = JSON.parse(fileContent);
+          this.scanner.objects = result.objects.filter(object => !object.ignored);
+          this.scanner.total = this.scanner.objects.length;
+          this.scanner.version = result.version;
+        } catch (error) {
+          this.ctx.logger.error('Failed to load market data from local file:', error);
+          this._error = error;
+          return null;
+        }
+      } else {
+        // 原有的 HTTP 请求逻辑
+        if (this.http) {
+          try {
+            const result = await this.http.get<SearchResult>('');
+            this.scanner.objects = result.objects.filter(object => !object.ignored);
+            this.scanner.total = this.scanner.objects.length;
+            this.scanner.version = result.version;
+          } catch (error) {
+            this.ctx.logger.error('Failed to fetch market data from endpoint:', error);
+            this._error = error;
+            return null;
+          }
+        } else {
+          await this.scanner.collect({ timeout });
+        }
+      }
     } else {
-      await this.scanner.collect({ timeout })
+      await this.scanner.collect({ timeout });
     }
 
     if (!this.scanner.version) {
       this.scanner.analyze({
         version: '4',
         onFailure: (name, reason) => {
-          this.failed.push(name)
-          if (registry.config.endpoint.startsWith('https://registry.npmmirror.com')) {
+          this.failed.push(name);
+          if (registry.config.endpoint?.startsWith('https://registry.npmmirror.com')) {
             if (this.ctx.http.isError(reason) && reason.response?.status === 404) {
               // ignore 404 error for npmmirror
             }
           }
         },
         onRegistry: (registry, versions) => {
-          this.ctx.installer.setPackage(registry.name, versions)
+          this.ctx.installer.setPackage(registry.name, versions);
         },
         onSuccess: (object, versions) => {
           // npmmirror lacks `links` field
           object.package.links ||= {
-            npm: `${registry.config.endpoint.replace('registry.', 'www.')}/package/${object.package.name}`,
-          }
-          this.fullCache[object.package.name] = this.tempCache[object.package.name] = object
+            npm: `${registry.config.endpoint?.replace('registry.', 'www.')}/package/${object.package.name}`,
+          };
+          this.fullCache[object.package.name] = this.tempCache[object.package.name] = object;
         },
         after: () => this.flushData(),
-      })
+      });
     }
 
-    return null
+    return null;
   }
 
   async get() {
