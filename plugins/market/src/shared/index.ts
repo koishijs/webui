@@ -36,6 +36,7 @@ export abstract class MarketProvider extends DataService<MarketProvider.Payload>
 
   start(refresh = false): Awaitable<void> {
     this._task = null
+    this._error = null
     this._timestamp = Date.now()
     this.refresh()
   }
