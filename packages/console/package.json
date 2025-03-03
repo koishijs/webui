@@ -1,7 +1,7 @@
 {
   "name": "@koishijs/console",
   "description": "Console Service for Koishi",
-  "version": "5.30.3",
+  "version": "5.30.7",
   "main": "lib/index.js",
   "module": "lib/index.mjs",
   "types": "lib/index.d.ts",
