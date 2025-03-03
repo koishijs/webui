@@ -11,7 +11,7 @@
   >
     <template #title><slot name="title"></slot></template>
     <template #desc>
-      <k-markdown :source="schema.meta.description"></k-markdown>
+      <k-markdown :source="tt(schema.meta.description ?? schema.list[0].meta.description)"></k-markdown>
     </template>
     <template #menu>
       <div class="k-menu-separator"></div>
@@ -84,7 +84,7 @@
 
 import { computed, PropType } from 'vue'
 import { clone } from 'cosmokit'
-import { Schema, IconArrowDown, IconArrowUp, IconBranch, IconDelete, IconInsertAfter, IconInsertBefore } from 'schemastery-vue'
+import { Schema, IconArrowDown, IconArrowUp, IconBranch, IconDelete, IconInsertAfter, IconInsertBefore, useI18nText } from 'schemastery-vue'
 import KFilterButton from './k-filter-button.vue'
 
 const props = defineProps({
@@ -97,6 +97,8 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['update:modelValue'])
+
+const tt = useI18nText()
 
 const isSwitch = computed(() => {
   return props.schema?.meta.role === 'computed' && props.modelValue?.$switch
