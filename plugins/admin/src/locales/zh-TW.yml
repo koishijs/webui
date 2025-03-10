@@ -4,7 +4,7 @@ commands:
   channel:
     description: 頻道管理
   authorize:
-    description: 权限管理
+    description: 權限管理
   assign:
     description: 受理者賬號
   user.locale:

@@ -19,14 +19,15 @@ category:
   all: 所有外掛程式
   other: 未分類
   adapter: 適配器
-  storage: 儲存服務
+  general: 通用服务
   extension: 擴展功能
-  console: 控制台
+  webui: 控制台
   manage: 管理工具
   preset: 行為預設
   image: 圖片服務
   media: 資訊服務
   tool: 實用工具
+  life: 生活指南
   ai: 人工智慧
   meme: 趣味交互
   game: 娛樂玩法
