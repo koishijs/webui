@@ -111,6 +111,7 @@ export class CommandManager {
 
     ctx.on('command-updated', (cmd) => {
       this.init(cmd)
+      this.refresh()
     })
 
     ctx.on('command-removed', (cmd) => {
