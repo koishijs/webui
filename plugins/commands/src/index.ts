@@ -107,6 +107,7 @@ export class CommandManager {
         this.snapshots[command.name].pending = null
         this._teleport(command, parent)
       }
+      this.refresh()
     })
 
     ctx.on('command-updated', (cmd) => {
