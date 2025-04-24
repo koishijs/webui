@@ -42,6 +42,7 @@ export const usage = `
 - [Lipraty](https://k.ilharp.cc/3530)（大陆）：https://koi.nyan.zone/registry/index.json
 - [itzdrli](https://k.ilharp.cc/9975)（全球）：https://kp.itzdrli.cc
 - [Q78KG](https://k.ilharp.cc/10042)（全球）：https://koishi-registry.yumetsuki.moe/index.json
+- [Q78KG](https://k.ilharp.cc/10042)（大陆）：https://gitcode.com/Q78KG/koishi-registry/blob/pages/index.json
 - Koishi（全球）：https://registry.koishi.chat/index.json
 
 要浏览更多社区镜像，请访问 [Koishi 论坛上的镜像一览](https://k.ilharp.cc/4000)。`
