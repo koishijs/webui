@@ -159,12 +159,20 @@ html.dark .el-popper.is-dark {
   }
 }
 
+.el-table--border {
+  border-radius: 4px;
+}
+
+.el-table.is-always-shadow {
+  box-shadow: var(--el-box-shadow-light);
+}
+
 .el-table__body-wrapper,
 .el-table__footer-wrapper,
 .el-table__header-wrapper {
-  --el-table-tr-bg-color: var(--card-bg);
-  --el-table-header-bg-color: var(--bg2);
-  --el-table-row-hover-bg-color: var(--bg1);
+  --el-table-tr-bg-color: var(--el-fill-color-blank);
+  --el-table-header-bg-color: var(--el-fill-color-blank);
+  --el-table-row-hover-bg-color: var(--bg2);
   tr {
     td,
     th {
