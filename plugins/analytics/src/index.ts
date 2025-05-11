@@ -141,7 +141,7 @@ class Analytics extends DataService<Analytics.Payload> {
     }
   }
 
-  private queryRecent(): Query.FieldQuery<number> {
+  private queryRecent(): Query.FieldExpr<number> {
     return {
       $gte: Time.getDateNumber() - this.config.recentDayCount,
       $lt: Time.getDateNumber(),
