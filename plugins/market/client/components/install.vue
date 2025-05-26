@@ -402,11 +402,11 @@ function getResultText(peer: PeerInfo, name: string) {
   }
 
   table {
-  thead, tbody {
-    td, th {
-      padding: 0.5em 0.875em;
-      white-space: nowrap;
-    }
+    thead, tbody {
+      td, th {
+        padding: 0.5em 0.875em;
+        white-space: nowrap;
+      }
     }
   }
 
