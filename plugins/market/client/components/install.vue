@@ -1,9 +1,5 @@
 <template>
-  <el-dialog
-    :model-value="!!active"
-    @update:model-value="active = ''"
-    class="install-panel"
-    destroy-on-close>
+  <el-dialog :model-value="!!active" @update:model-value="active = ''" class="install-panel" destroy-on-close>
     <template v-if="active" #header="{ titleId, titleClass }">
       <span :id="titleId" :class="titleClass">
         {{ active + (workspace ? ' (工作区)' : '') }}
@@ -30,40 +26,44 @@
 
     <el-scrollbar v-if="data?.[version] && Object.keys(data[version].peers).length">
       <table>
-        <tr>
-          <td>依赖名称</td>
-          <td>版本区间</td>
-          <td>当前版本</td>
-          <td>可用性</td>
-        </tr>
-        <tr v-for="(peer, name) in data[version].peers" :key="name">
-          <td class="text-left">{{ name }}</td>
-          <td>{{ peer.request }}</td>
-          <td>
-            <span class="wrapper" v-if="store.registry?.[name] && !getWorkspaceVersion(name)">
-              <span class="shadow">{{ getVersion(name) || 'Select' }}</span>
-              <el-select
-                class="frameless"
-                :model-value="getVersion(name)"
-                @update:model-value="setVersion(name, $event)"
-              >
-                <el-option value="">移除依赖</el-option>
-                <el-option v-for="(_, version) in store.registry[name]" :key="version" :value="version">
-                  {{ version }}
-                  <template v-if="version === current">(当前)</template>
-                  <!-- <span :class="[result, 'theme-color', 'dot-hint']"></span> -->
-                </el-option>
-              </el-select>
-            </span>
-            <template v-else>{{ peer.resolved }}{{ getWorkspaceVersion(name) ? ' (工作区)' : '' }}</template>
-          </td>
-          <td :class="['theme-color', peer.result]">
-            <span class="inline-flex items-center gap-1">
-              <k-icon :name="getResultIcon(peer.result)"></k-icon>
-              {{ getResultText(peer, name) }}
-            </span>
-          </td>
-        </tr>
+        <thead>
+          <tr>
+            <th>依赖名称</th>
+            <th>版本区间</th>
+            <th>当前版本</th>
+            <th>可用性</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="(peer, name) in data[version].peers" :key="name">
+            <td class="text-left">{{ name }}</td>
+            <td>{{ peer.request }}</td>
+            <td>
+              <span class="wrapper" v-if="store.registry?.[name] && !getWorkspaceVersion(name)">
+                <span class="shadow">{{ getVersion(name) || 'Select' }}</span>
+                <el-select
+                  class="frameless"
+                  :model-value="getVersion(name)"
+                  @update:model-value="setVersion(name, $event)"
+                >
+                  <el-option value="">移除依赖</el-option>
+                  <el-option v-for="(_, version) in store.registry[name]" :key="version" :value="version">
+                    {{ version }}
+                    <template v-if="version === current">(当前)</template>
+                    <!-- <span :class="[result, 'theme-color', 'dot-hint']"></span> -->
+                  </el-option>
+                </el-select>
+              </span>
+              <template v-else>{{ peer.resolved }}{{ getWorkspaceVersion(name) ? ' (工作区)' : '' }}</template>
+            </td>
+            <td :class="['theme-color', peer.result]">
+              <span class="inline-flex items-center gap-1">
+                <k-icon :name="getResultIcon(peer.result)"></k-icon>
+                {{ getResultText(peer, name) }}
+              </span>
+            </td>
+          </tr>
+        </tbody>
       </table>
     </el-scrollbar>
 
@@ -402,9 +402,11 @@ function getResultText(peer: PeerInfo, name: string) {
   }
 
   table {
-    td, th {
-      padding: 0.5em 0.875em;
-      white-space: nowrap;
+    thead, tbody {
+      td, th {
+        padding: 0.5em 0.875em;
+        white-space: nowrap;
+      }
     }
   }
 
@@ -424,7 +426,7 @@ function getResultText(peer: PeerInfo, name: string) {
     justify-content: space-between;
     align-items: center;
   }
-  
+
   .wrapper {
     position: relative;
     display: inline-flex;
