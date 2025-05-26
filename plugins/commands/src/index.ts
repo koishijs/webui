@@ -323,6 +323,8 @@ export class CommandManager {
       if (!Object.keys(override).length) {
         delete this.config[command.name]
       }
+
+      this.ctx.emit('command-updated', command)
     }
     this.ctx.scope.update(this.config, false)
   }
