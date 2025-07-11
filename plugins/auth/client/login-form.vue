@@ -36,10 +36,10 @@
           <k-icon name="user"></k-icon>
         </el-input>
         <el-input placeholder="密码" v-model="shared.password" @keypress.enter.stop="loginWithPassword"
-          :type="shared.showPass ? 'text' : 'password'">
+          :type="showPassword ? 'text' : 'password'">
           <template #prefix><k-icon name="lock"></k-icon></template>
           <template #suffix>
-            <k-icon :name="shared.showPass ? 'eye' : 'eye-slash'" @click="shared.showPass = !shared.showPass"></k-icon>
+            <k-icon :name="showPassword ? 'eye' : 'eye-slash'" @click="showPassword = !showPassword"></k-icon>
           </template>
         </el-input>
         <p class="error" v-if="error">{{ error }}</p>
@@ -62,6 +62,7 @@ import { UserLogin } from '@koishijs/plugin-auth'
 
 const error = ref<string>()
 const user = ref<UserLogin>()
+const showPassword = ref<boolean>(false)
 
 let timestamp = 0
 async function loginWithAccount() {
