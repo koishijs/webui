@@ -16,7 +16,7 @@ export class SandboxBot<C extends Context = Context> extends Bot<C, SandboxBot.C
   internal = {}
 
   constructor(ctx: C, public client: Client, config: SandboxBot.Config) {
-    super(ctx, config)
+    super(ctx, config, 'sandbox')
     this.selfId = config.selfId
     this.platform = config.platform
     this.user.name = 'koishi'
