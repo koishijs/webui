@@ -57,16 +57,16 @@
     }
   },
   "peerDependencies": {
-    "@koishijs/loader": "^4.6.7",
-    "@koishijs/plugin-console": "^5.30.7",
-    "koishi": "^4.18.7"
+    "@koishijs/loader": "^4.6.8",
+    "@koishijs/plugin-console": "^5.30.9",
+    "koishi": "^4.18.8"
   },
   "devDependencies": {
-    "@koishijs/client": "^5.30.7",
+    "@koishijs/client": "^5.30.9",
     "@koishijs/plugin-hmr": "^1.2.9"
   },
   "dependencies": {
-    "@koishijs/console": "^5.30.7",
+    "@koishijs/console": "^5.30.9",
     "@koishijs/registry": "^7.0.3"
   }
 }
