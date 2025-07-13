@@ -14,7 +14,6 @@ interface SharedConfig extends Partial<LoginToken> {
   authType: 0 | 1
   platform?: string
   userId?: string
-  showPass?: boolean
   password?: string
 }
 
