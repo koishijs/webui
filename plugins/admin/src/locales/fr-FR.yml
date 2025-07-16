@@ -1,10 +1,10 @@
 commands:
   user:
-    description: 用户管理
+    description: Gestion des utilisateurs
   channel:
     description: Gestion des canaux
   authorize:
-    description: 权限管理
+    description: Gestion des permissions
   assign:
     description: Compte du destinataire
   user.locale:
@@ -15,7 +15,7 @@ admin:
   user-option: Spécification de l'utilisateur cible
   user-not-found: L'utilisateur spécifié n'a pas été trouvé.
   user-unchanged: Les données de l'utilisateur n'ont pas été modifiées.
-  user-updated: 用户数据已修改。
+  user-updated: Les données de l'utilisateur ont été modifiées.
   channel-option: Spécification du canal cible
   channel-not-found: Le canal spécifié n'a pas été trouvé.
   channel-unchanged: Les données du canal n'ont pas été modifiées.
