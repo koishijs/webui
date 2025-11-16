@@ -147,7 +147,11 @@ class NodeConsole extends Console {
         const [key] = name.slice(8).split('/', 1)
         if (this.entries[key]) {
           const files = makeArray(this.getFiles(this.entries[key].files))
-          const filename = files[0] + name.slice(8 + key.length)
+          let filename = files[0] + name.slice(8 + key.length)
+          filename = resolve(this.root, filename)
+          if (!filename.startsWith(this.root) && !filename.includes('node_modules')) {
+            return ctx.status = 403
+          }
           ctx.type = extname(filename)
           if (this.config.devMode || ctx.type !== 'application/javascript') {
             return sendFile(filename)
