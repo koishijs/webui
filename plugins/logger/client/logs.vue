@@ -1,6 +1,6 @@
 <template>
   <virtual-list
-    class="log-list k-text-selectable"
+    :class="['log-list k-text-selectable', { 'nowrap-enabled': !wrap }]"
     :data="logs"
     :count="300"
     :max-height="maxHeight"
@@ -122,11 +122,20 @@ function renderLine(record: Logger.Record) {
     ::selection {
       background-color: var(--terminal-bg-selection);
     }
+  }
 
-    &.nowrap {
+  &.nowrap-enabled {
+    :deep(.el-scrollbar__wrap) {
+      overflow-x: auto;
+    }
+
+    :deep(.el-scrollbar__view) {
+      min-width: fit-content;
+    }
+
+    .line.nowrap {
       white-space: pre;
       word-break: normal;
-      overflow-x: auto;
     }
   }
 }
