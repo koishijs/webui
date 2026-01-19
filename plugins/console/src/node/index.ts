@@ -147,8 +147,7 @@ class NodeConsole extends Console {
         const [key] = name.slice(8).split('/', 1)
         if (this.entries[key]) {
           const files = makeArray(this.getFiles(this.entries[key].files))
-          let filename = files[0] + name.slice(8 + key.length)
-          filename = resolve(files[0], filename)
+          const filename = resolve(this.root, files[0] + name.slice(8 + key.length))
           if (!filename.startsWith(files[0]) && !filename.includes('node_modules')) {
             return ctx.status = 403
           }
