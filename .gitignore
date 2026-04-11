@@ -17,7 +17,9 @@ yarn.lock
 package-lock.json
 pnpm-lock.yaml
 
-todo.md
+TODO.md
+CLAUDE.md
+
 coverage/
 node_modules/
 npm-debug.log
@@ -28,6 +30,7 @@ tsconfig.temp.json
 tsconfig.tsbuildinfo
 report.*.json
 
+.claude
 .eslintcache
 .DS_Store
 .idea

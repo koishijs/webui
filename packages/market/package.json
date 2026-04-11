@@ -36,7 +36,7 @@
   },
   "dependencies": {
     "@koishijs/components": "^1.5.22",
-    "cosmokit": "^1.7.2",
+    "cosmokit": "^1.8.1",
     "spark-md5": "^3.0.2"
   }
 }
