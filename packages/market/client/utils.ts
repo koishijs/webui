@@ -148,7 +148,8 @@ export const kConfig = Symbol('market.config') as InjectionKey<MarketConfig>
 
 export function getSorted(market: SearchObject[], words: string[]) {
   return market?.slice().filter((data) => {
-    return !data.manifest?.hidden || words.includes('show:hidden')
+    return (!data.manifest?.hidden || words.includes('show:hidden'))
+      && (!data.deprecated || words.includes('show:deprecated'))
   }).sort((a, b) => {
     for (let word of words) {
       if (!word.startsWith('sort:')) continue

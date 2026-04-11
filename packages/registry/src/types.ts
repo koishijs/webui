@@ -119,7 +119,8 @@ export interface SearchObject {
   searchScore: number
   score: Score
   rating: number
-  verified: boolean
+  verified?: boolean
+  deprecated?: boolean
   workspace?: boolean
   category?: string
   portable?: boolean
