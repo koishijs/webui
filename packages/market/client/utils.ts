@@ -12,7 +12,7 @@ export const useMarketI18n = () => useI18n({
 
 export function getUsers(data: SearchObject) {
   const result: Record<string, User> = {}
-  for (const user of data.package.contributors) {
+  for (const user of data.package.contributors ?? []) {
     if (!user.email) continue
     result[user.email] ||= user
   }
@@ -183,7 +183,7 @@ export function hasFilter(words: string[]) {
 }
 
 export function resolveCategory(name?: string) {
-  if (categories.includes(name)) return name
+  if (categories.includes(name!)) return name
   return 'other'
 }
 
