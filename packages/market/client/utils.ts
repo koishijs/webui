@@ -75,24 +75,29 @@ interface Comparator {
 function getSimilarity(data: SearchObject, word: string) {
   word = word.replace('koishi-plugin-', '').replace('@koishijs/plugin-', '')
   const shortname = data.package.name.replace(/(koishi-|^@koishijs\/)plugin-/, '')
-  if (shortname === word) return 10
-  if (shortname.startsWith(word)) return 5
-  if (shortname.includes(word)) return 2
+  if (shortname === word) return 1
+  const tokens = shortname.split(/[-/_]/)
+  // if (tokens[0] === word) return 0.5
+  if (tokens.includes(word)) return 0.5
+  // if (tokens[0].startsWith(word)) return 0.3
+  if (tokens.some(t => t.startsWith(word))) return 0.3
+  if (tokens.some(t => t.includes(word))) return 0.2
   return [
     ...data.package.keywords,
     ...Object.values(data.manifest?.description ?? {}),
-  ].some(keyword => keyword.includes(word)) ? 1 : 0
+  ].some(keyword => keyword.includes(word)) ? 0.05 : 0
 }
 
 function getSimRating(data: SearchObject, words: string[]) {
   words = words.filter(w => w && !w.includes(':'))
-  let result = 0
+  if (!words.length) return data.rating
+  let weight = 0
   for (const word of words) {
     const similarity = getSimilarity(data, word)
     if (!similarity) return 0
-    result = Math.max(result, similarity)
+    weight += similarity
   }
-  return data.rating + result
+  return data.rating * weight
 }
 
 export const comparators: Dict<Comparator> = {
