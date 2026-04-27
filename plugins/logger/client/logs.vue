@@ -1,7 +1,14 @@
 <template>
-  <virtual-list class="log-list k-text-selectable" :data="logs" :count="300" :max-height="maxHeight">
+  <virtual-list
+    :class="['log-list k-text-selectable', { 'nowrap-enabled': !wrap }]"
+    :data="logs"
+    :count="300"
+    :max-height="maxHeight"
+    :pinned="pinned"
+    :follow="follow"
+  >
     <template #="record">
-      <div :class="{ line: true, start: isStart(record) }">
+      <div :class="{ line: true, start: isStart(record), nowrap: !wrap }">
         <code v-html="renderLine(record)"></code>
         <router-link
           class="log-link inline-flex items-center justify-center absolute w-20px h-20px bottom-0 right-0"
@@ -22,11 +29,19 @@ import {} from '@koishijs/plugin-config'
 import Logger from 'reggol'
 import ansi from 'ansi_up'
 
-const props = defineProps<{
+const props = withDefaults(defineProps<{
   logs: Logger.Record[],
   showLink?: boolean,
   maxHeight?: string,
-}>()
+  pinned?: boolean,
+  follow?: boolean,
+  wrap?: boolean,
+}>(), {
+  showLink: false,
+  pinned: false,
+  follow: true,
+  wrap: true,
+})
 
 // this package does not have consistent exports in different environments
 const converter = new (ansi['default'] || ansi)()
@@ -38,7 +53,9 @@ function renderColor(code: number, value: any, decoration = '') {
 const showTime = 'yyyy-MM-dd hh:mm:ss'
 
 function isStart(record: Logger.Record & { index: number }) {
-  return record.index && props.logs[record.index - 1].id > record.id && record.name === 'app'
+  if (!record?.index || !store.logs?.length) return false
+  const previous = store.logs[record.index - 1]
+  return !!previous && previous.id > record.id && record.name === 'app'
 }
 
 function renderLine(record: Logger.Record) {
@@ -104,6 +121,21 @@ function renderLine(record: Logger.Record) {
 
     ::selection {
       background-color: var(--terminal-bg-selection);
+    }
+  }
+
+  &.nowrap-enabled {
+    :deep(.el-scrollbar__wrap) {
+      overflow-x: auto;
+    }
+
+    :deep(.el-scrollbar__view) {
+      min-width: fit-content;
+    }
+
+    .line.nowrap {
+      white-space: pre;
+      word-break: normal;
     }
   }
 }
