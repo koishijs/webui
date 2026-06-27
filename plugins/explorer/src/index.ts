@@ -1,6 +1,6 @@
 import { Context, Dict, Schema } from 'koishi'
 import { DataService } from '@koishijs/console'
-import { join, relative, resolve } from 'path'
+import { relative, resolve, sep } from 'path'
 import { mkdir, readdir, readFile, readlink, rename, rm, writeFile } from 'fs/promises'
 import { FSWatcher } from 'chokidar'
 import { detect } from 'chardet'
@@ -67,7 +67,7 @@ class Explorer extends DataService<Entry[]> {
     this.root = resolve(ctx.baseDir, config.root)
 
     ctx.console.addListener('explorer/read', async (filename, binary) => {
-      filename = join(this.root, filename)
+      filename = this.resolvePath(filename)
       const buffer = await readFile(filename)
       const result = await FileType.fromBuffer(buffer)
       return {
@@ -78,7 +78,7 @@ class Explorer extends DataService<Entry[]> {
     }, { authority: 4 })
 
     ctx.console.addListener('explorer/write', async (filename, content, binary) => {
-      filename = join(this.root, filename)
+      filename = this.resolvePath(filename)
       if (binary) {
         const buffer = Buffer.from(content, 'base64')
         await writeFile(filename, buffer)
@@ -89,20 +89,20 @@ class Explorer extends DataService<Entry[]> {
     }, { authority: 4 })
 
     ctx.console.addListener('explorer/mkdir', async (filename) => {
-      filename = join(this.root, filename)
+      filename = this.resolvePath(filename)
       await mkdir(filename)
       this.refresh()
     }, { authority: 4 })
 
     ctx.console.addListener('explorer/remove', async (filename) => {
-      filename = join(this.root, filename)
+      filename = this.resolvePath(filename)
       await rm(filename, { recursive: true })
       this.refresh()
     }, { authority: 4 })
 
     ctx.console.addListener('explorer/rename', async (oldValue, newValue) => {
-      oldValue = join(this.root, oldValue)
-      newValue = join(this.root, newValue)
+      oldValue = this.resolvePath(oldValue)
+      newValue = this.resolvePath(newValue)
       await rename(oldValue, newValue)
       this.refresh()
     }, { authority: 4 })
@@ -118,10 +118,18 @@ class Explorer extends DataService<Entry[]> {
     }
   }
 
+  private resolvePath(filename: string) {
+    const resolved = resolve(this.root, filename)
+    if (resolved !== this.root && !resolved.startsWith(this.root + sep)) {
+      throw new Error('invalid path')
+    }
+    return resolved
+  }
+
   private async traverse(root: string): Promise<Entry[]> {
     const dirents = await readdir(root, { withFileTypes: true })
     return Promise.all(dirents.map<Promise<Entry>>(async (dirent) => {
-      const filename = join(root, dirent.name)
+      const filename = resolve(root, dirent.name)
       if (this.globFilter(relative(this.root, filename))) return
       if (dirent.isFile()) {
         return { type: 'file', name: dirent.name }
