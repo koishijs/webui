@@ -19,14 +19,15 @@ category:
   all: 利用可能なプラグイン
   other: カテゴリなし
   adapter: アダプター
-  storage: 静的ストレージ
+  general: 通用服务
   extension: 拡張機能
-  console: コンソール
+  webui: コンソール
   manage: 管理ツール
   preset: ボット行為
   image: イラスト検索
   media: 情報提供
   tool: ユーティリティツール
+  life: 生活指南
   ai: 人工知能
   meme: ミーム関連
   game: 独自遊戯
