@@ -7,4 +7,5 @@ search:
   $description: 搜索设置
   endpoint: 用于搜索插件市场的网址。默认跟随插件源设置。
   timeout: 搜索插件市场的超时时间。
+  delay: 延迟多久后再开始首次同步。
   proxyAgent: 用于搜索插件市场的代理。

@@ -6,4 +6,5 @@ search:
   $description: 搜尋設定
   endpoint: 用於搜尋外掛程式市場的網址。默認跟隨外掛程式源設置。
   timeout: 搜尋外掛程式市場的超時時間。
+  delay: 延遲多久後再開始首次同步。
   proxyAgent: 用於搜尋外掛程式市場的代理。
