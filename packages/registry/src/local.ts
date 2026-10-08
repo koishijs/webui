@@ -29,7 +29,8 @@ export class LocalScanner {
       root = parent
     }
     await Promise.all(tasks)
-    return Promise.all(Object.values(this.cache))
+    const objects = await Promise.all(Object.values(this.cache))
+    return objects.filter(Boolean)
   }
 
   async collect(forced = false) {
