@@ -1,5 +1,12 @@
 <template>
-  <el-tooltip placement="top" effect="light" popper-class="k-status-tooltip">
+  <!-- preventOverflow 默认 padding 为 0，弹层会被允许贴死视口右缘：
+       经典滚动条环境下亚像素取整溢出会触发 body 滚动条与悬停循环闪烁，故留出安全边距 -->
+  <el-tooltip
+    placement="top"
+    effect="light"
+    popper-class="k-status-tooltip"
+    :popper-options="{ modifiers: [{ name: 'preventOverflow', options: { padding: { top: 0, bottom: 0, left: 8, right: 8 } } }] }"
+  >
     <template #content>
       <el-scrollbar max-height="calc(100vh - 4rem)">
         <slot name="tooltip">
