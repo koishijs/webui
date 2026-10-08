@@ -45,7 +45,7 @@ defineOptions({
   padding: 0 0;
   border-radius: 8px;
 
-  .el-popper__empty + .el-popper__arrow {
+  &:has(.el-popper__empty) {
     display: none;
   }
 }
