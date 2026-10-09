@@ -265,7 +265,7 @@ const warning = computed(() => {
 
 const result = computed(() => {
   if (!version.value) return
-  const { result } = data.value[version.value]
+  const { result } = data.value[version.value] ?? {}
   if (result === 'danger' || danger.value) return 'danger'
   if (result === 'warning' || warning.value) return 'warning'
   return result
