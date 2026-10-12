@@ -35,6 +35,7 @@ const props = defineProps({
   activeKey: { default: '' },
   threshold: { default: 0 },
   maxHeight: String,
+  follow: { type: Boolean, default: true },
   activate: {
     type: String as PropType<'top' | 'bottom' | 'current'>,
     default: 'bottom',
@@ -47,7 +48,7 @@ const root = ref<typeof ElScrollbar>()
 
 watch(() => props.data.length, () => {
   const { scrollTop, clientHeight, scrollHeight } = root.value.wrapRef
-  if (!props.pinned || Math.abs(scrollTop + clientHeight - scrollHeight) < 1) {
+  if (props.follow && (!props.pinned || Math.abs(scrollTop + clientHeight - scrollHeight) < 1)) {
     nextTick(scrollToBottom)
   }
   virtual.updateUids(getUids())
@@ -91,6 +92,10 @@ onMounted(() => {
   } else {
     scrollToBottom()
   }
+})
+
+watch(() => props.follow, (value) => {
+  if (value) nextTick(scrollToBottom)
 })
 
 function scrollToOffset(offset: number, smooth = false) {
