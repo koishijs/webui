@@ -1,4 +1,4 @@
-import { Context, Dict, HTTP, Schema, Time } from 'koishi'
+import { Context, Dict, HTTP, Schema, Time, sleep } from 'koishi'
 import Scanner, { SearchObject, SearchResult } from '@koishijs/registry'
 import { MarketProvider as BaseMarketProvider } from '../shared'
 
@@ -29,6 +29,9 @@ class MarketProvider extends BaseMarketProvider {
     this.fullCache = {}
     this.tempCache = {}
     if (refresh) this.ctx.installer.refresh(true)
+    if (!refresh && this.config.delay) {
+      await sleep(this.config.delay)
+    }
     await this.prepare()
     super.start()
   }
@@ -101,11 +104,13 @@ namespace MarketProvider {
   export interface Config {
     endpoint?: string
     timeout?: number
+    delay?: number
   }
 
   export const Config: Schema<Config> = Schema.object({
     endpoint: Schema.string().role('link'),
     timeout: Schema.number().role('time').default(Time.second * 30),
+    delay: Schema.number().role('time').default(0).description('执行首次同步前的等待时间。'),
     proxyAgent: Schema.string().role('link'),
   })
 }
