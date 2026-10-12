@@ -29,6 +29,7 @@ const config = computed({
 })
 
 const entities = {
+  'isDirect': '是否私聊',
   'userId': '用户 ID',
   'guildId': '群组 ID',
   'channelId': '频道 ID',
