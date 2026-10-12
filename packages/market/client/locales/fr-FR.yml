@@ -19,14 +19,15 @@ category:
   all: Plugins disponibles
   other: Non catégorisé
   adapter: Adaptateurs
-  storage: Stockage
+  general: 通用服务
   extension: Extension
-  console: Console
+  webui: Console
   manage: Administration
   preset: Comportement
   image: Image
   media: Information
   tool: Outils
+  life: 生活指南
   ai: IA
   meme: Mème
   game: Divertissement
