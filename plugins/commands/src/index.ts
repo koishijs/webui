@@ -147,7 +147,9 @@ export class CommandManager {
     if (!this.config[command.name]) return
     this._tasks[command.name] ||= this.ctx.setTimeout(() => {
       delete this._tasks[command.name]
-      this.accept(command, this.config[command.name], true)
+      // the override may be removed before the task is executed
+      const override = this.config[command.name]
+      if (override) this.accept(command, override, true)
     }, 0)
   }
 

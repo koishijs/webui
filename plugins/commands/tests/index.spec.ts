@@ -63,6 +63,18 @@ describe('@koishijs/plugin-commands', () => {
       await client.shouldNotReply('baz')
     })
 
+    it('remove alias before the deferred update', async () => {
+      const fork = app.plugin(commands)
+
+      app.command('bar').action(() => 'test')
+      await client.shouldReply('command bar -a baz', '已更新指令配置。')
+      await client.shouldReply('command bar -A baz', '已更新指令配置。')
+
+      // the deferred `accept()` must not throw when the override is already gone
+      await app.sleep(0)
+      expect(fork.config).to.deep.equal({})
+    })
+
     it('edit command', async () => {
       const fork = app.plugin(commands)
 
